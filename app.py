@@ -1188,14 +1188,14 @@ THINKING_PHRASES_IMAGE = [
     "Melukis perlahan",
 ]
 
-# Durasi minimum proses berpikir (detik) — sesuai permintaan ±12 detik
-THINKING_MIN_SECONDS = 12.0
+# Durasi minimum proses berpikir (detik) — diperpendek agar jawaban terasa cepat
+THINKING_MIN_SECONDS = 6.0
 
 # Durasi minimum progress bar gambar (detik) — biar animasi % terasa
 IMAGE_MIN_SECONDS = 10.0
 
-# Delay antar kata saat jawaban diketik kata per kata (lebih cepat & responsif)
-WORD_STREAM_DELAY = 0.0002
+# Delay antar kata saat jawaban diketik kata per kata (cepat & tetap natural)
+WORD_STREAM_DELAY = 0.03
 
 
 @st.cache_data(show_spinner=False)
@@ -1529,7 +1529,7 @@ def handle_chat_request(answer_slot) -> None:
         AVAILABLE_MODELS[DEFAULT_MODEL_LABEL],
     )
 
-    # Thinking ala Claude — frasa berganti-ganti selama ±12 detik
+    # Thinking ala Claude — frasa berganti-ganti selama beberapa detik
     think_slot = st.empty()
     think_slot.markdown(thinking_html(THINKING_PHRASES_CHAT), unsafe_allow_html=True)
     t0 = time.time()
@@ -1544,7 +1544,7 @@ def handle_chat_request(answer_slot) -> None:
             )
         )
 
-        # Tahan sampai proses berpikir genap ±12 detik
+        # Tahan sampai proses berpikir genap minimal beberapa detik
         elapsed = time.time() - t0
         if elapsed < THINKING_MIN_SECONDS:
             time.sleep(THINKING_MIN_SECONDS - elapsed)
