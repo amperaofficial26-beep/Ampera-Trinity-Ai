@@ -64,11 +64,6 @@ APP_TAGLINE = "Multi AI · Generate Foto · Chat — by Ampera Official"
 
 # --- Multi AI (dari App 3: Ampera Multi AI) ---
 GROQ_BASE_URL = "https://api.groq.com/openai/v1"
-# Katalog model ala Claude: nama polos + deskripsi kecil (tanpa emoji)
-# Setiap entri punya "key" unik (dipakai internal & sebagai Streamlit key)
-# terpisah dari "name" (label tampilan) karena dua model boleh berbagi nama
-# tier yang sama (mis. dua model "Trinity Normal").
-# Diurutkan dari tingkat termudah → tertinggi; tier Hard & Extreme = premium.
 MODEL_CATALOG = [
     {"key": "gpt_oss_20b",   "name": "Trinity Easy",    "desc": "Cepat untuk chat & coding ringan",      "id": "openai/gpt-oss-20b", "premium": False},
     {"key": "compound_mini", "name": "Trinity Normal",  "desc": "Web search ringkas & cepat",            "id": "groq/compound-mini", "premium": False},
@@ -81,7 +76,6 @@ AVAILABLE_MODELS = {m["key"]: m["id"] for m in MODEL_CATALOG}
 MODEL_BY_KEY = {m["key"]: m for m in MODEL_CATALOG}
 DEFAULT_MODEL_KEY = "gpt_oss_20b"
 
-# Model vision (wajib dipakai saat pesan membawa gambar)
 VISION_MODEL_ID = "meta-llama/llama-4-scout-17b-16e-instruct"
 VISION_MODEL_LABEL = "Llama-4 Scout"
 VISION_MODEL_FALLBACKS = (
@@ -89,17 +83,14 @@ VISION_MODEL_FALLBACKS = (
     "meta-llama/llama-4-maverick-17b-128e-instruct",
 )
 
-# Fallback jika model terpilih sudah tidak tersedia di provider (dari App 1)
 GROQ_MODEL_FALLBACKS = (
     "openai/gpt-oss-120b",
     "openai/gpt-oss-20b",
     "qwen/qwen3.6-27b",
 )
 
-# Konteks panjang tapi tetap ramah free-tier (dari App 1)
 MAX_HISTORY_MESSAGES = 40
 
-# --- Persona Yuki (dari App 3) ---
 YUKI_SYSTEM_PROMPT = """
 Kamu adalah Yuki, asisten AI eksklusif dari Ampera AI (Ampera Trinity AI).
 Karaktermu: super jenius, kocak, sedikit usil, suka melempar lelucon receh, dan hobi menggoda User layaknya karakter anime komedi.
@@ -112,32 +103,23 @@ Gaya bicara: Selalu berikan jawaban dan solusi koding yang akurat dan bersih, te
 Kamu bisa membantu apa saja: ngobrol santai, coding, matematika, menganalisis gambar yang dikirim User, sampai ide kreatif.
 """
 
-# --- Generate Gambar / Cloudflare FLUX (dari App 1: AI Studio) ---
 CF_API_BASE = "https://api.cloudflare.com/client/v4/accounts"
 CF_IMAGE_MODEL = "@cf/black-forest-labs/flux-1-schnell"
 CF_DEFAULT_STEPS = 4
 
-# --- Suara & gambar (Groq — pakai GROQ_API_KEY yang sama) ---
-STT_MODEL = "whisper-large-v3-turbo"          # transkrip suara → teks
-TTS_MODEL = "canopylabs/orpheus-v1-english"   # teks → suara (Orpheus)
-TTS_VOICE = "tara"                            # suara Yuki (perempuan, hangat)
-TTS_MAX_CHARS = 1200                          # batas teks yang dibacakan
-MAX_IMAGES_PER_MESSAGE = 5                    # batas model vision (Llama-4)
+STT_MODEL = "whisper-large-v3-turbo"
+TTS_MODEL = "canopylabs/orpheus-v1-english"
+TTS_VOICE = "tara"
+TTS_MAX_CHARS = 1200
+MAX_IMAGES_PER_MESSAGE = 5
 IMAGE_INPUT_TYPES = ["png", "jpg", "jpeg", "webp", "gif"]
-VISION_RECENT_MESSAGES = 4  # pesan terakhir yang gambarnya ikut ke API
+VISION_RECENT_MESSAGES = 4
 
-# Fitur mic/lampiran hanya jalan di Streamlit yang mendukung (1.47+);
-# di versi lama otomatis nonaktif tanpa error.
 _CHAT_INPUT_PARAMS = inspect.signature(st.chat_input).parameters
 CHAT_INPUT_SUPPORTS_FILE = "accept_file" in _CHAT_INPUT_PARAMS
 CHAT_INPUT_SUPPORTS_AUDIO = "accept_audio" in _CHAT_INPUT_PARAMS
 
-
-# ============================================================================
-# KREDENSIAL (Secrets → Environment Variable)
-# ============================================================================
 def _get_secret(*keys: str) -> str:
-    """Ambil kredensial dari st.secrets lalu fallback ke env var."""
     for key in keys:
         try:
             val = st.secrets.get(key)
@@ -150,7 +132,6 @@ def _get_secret(*keys: str) -> str:
             return val.strip()
     return ""
 
-
 GROQ_API_KEY = _get_secret("GROQ_API_KEY", "GROQ_KEY")
 CF_ACCOUNT_ID = _get_secret("CF_ACCOUNT_ID", "CLOUDFLARE_ACCOUNT_ID")
 CF_API_TOKEN = _get_secret("CF_API_TOKEN", "CLOUDFLARE_API_TOKEN")
@@ -158,28 +139,12 @@ CF_API_TOKEN = _get_secret("CF_API_TOKEN", "CLOUDFLARE_API_TOKEN")
 CHAT_READY = bool(GROQ_API_KEY)
 IMAGE_READY = bool(CF_ACCOUNT_ID and CF_API_TOKEN)
 
-
-# ============================================================================
-# CSS — TEMA ALA CLAUDE.AI (buatan sendiri)
-#   Latar krem hangat, judul serif, aksen terracotta, UI kalem & bersih
-# ============================================================================
 def inject_css() -> None:
     st.markdown(
         """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
-/* ============ PALET WARNA CLAUDE ============
-   Latar utama : #F0EEE6 (krem hangat)
-   Permukaan   : #FAF9F5 (putih gading)
-   Bubble user : #E8E5D8 / #EDEAE0
-   Teks utama  : #3D3929 (cokelat gelap hangat)
-   Teks sekunder: #73726C
-   Aksen       : #DA7756 (terracotta) / hover #C15F3C
-   Border      : #E3E0D5
-============================================== */
-
-/* ---------- dasar ---------- */
 html, body, [data-testid="stAppViewContainer"], .stApp {
     background: #F0EEE6 !important;
     color: #3D3929;
@@ -189,7 +154,6 @@ html, body, [data-testid="stAppViewContainer"], .stApp {
 [data-testid="stHeader"] { background: transparent !important; }
 #MainMenu, footer, [data-testid="stToolbar"], [data-testid="stDecoration"] { visibility: hidden; }
 
-/* ---------- SIDEBAR ala Claude ---------- */
 section[data-testid="stSidebar"] {
     background: #F5F4EF !important;
     border-right: 1px solid #E3E0D5 !important;
@@ -200,13 +164,11 @@ section[data-testid="stSidebar"] {
 section[data-testid="stSidebar"] > div {
     padding: 0.4rem 0.7rem 0.5rem;
 }
-/* konten sidebar DIPENTOK KE ATAS: buang ruang kosong bawaan di atasnya */
 section[data-testid="stSidebar"] [data-testid="stSidebarHeader"] {
     padding: 0 !important;
     min-height: 0 !important;
     height: 0 !important;
 }
-/* tombol tutup sidebar « melayang di pojok, tidak memakan ruang */
 section[data-testid="stSidebar"] [data-testid="stSidebarHeader"] > * {
     position: absolute;
     top: 8px; right: 8px;
@@ -215,7 +177,6 @@ section[data-testid="stSidebar"] [data-testid="stSidebarHeader"] > * {
 section[data-testid="stSidebar"] [data-testid="stSidebarUserContent"] {
     padding-top: 6px !important;
 }
-/* tombol buka sidebar (saat tertutup) HARUS selalu terlihat */
 [data-testid="stSidebarCollapsedControl"],
 [data-testid="collapsedControl"] {
     display: flex !important;
@@ -232,7 +193,6 @@ section[data-testid="stSidebar"] [data-testid="stSidebarUserContent"] {
     border-radius: 10px !important;
 }
 [data-testid="stSidebarCollapseButton"] button { color: #73726C !important; }
-/* varian testid tombol expand sidebar di Streamlit versi baru */
 [data-testid="stExpandSidebarButton"],
 button[kind="headerNoPadding"] {
     display: inline-flex !important;
@@ -245,7 +205,6 @@ button[kind="headerNoPadding"] {
     pointer-events: auto !important;
 }
 
-/* judul brand serif ala "Claude" — rapat ke atas, besar */
 .sb-brand {
     font-family: 'Source Serif 4', Georgia, serif;
     font-size: 1.9rem; font-weight: 700; color: #1a1915;
@@ -255,7 +214,6 @@ button[kind="headerNoPadding"] {
     line-height: 1.1;
 }
 
-/* tombol menu sidebar: baris teks polos RATA KIRI, hover krem (ala Claude) */
 section[data-testid="stSidebar"] div.stButton > button {
     background: transparent !important;
     border: none !important;
@@ -278,7 +236,6 @@ section[data-testid="stSidebar"] div.stButton > button:hover {
     box-shadow: none !important;
     color: #3D3929 !important;
 }
-/* paksa SEMUA lapisan dalam tombol rata kiri (markdown container ikut) */
 section[data-testid="stSidebar"] div.stButton > button > div,
 section[data-testid="stSidebar"] div.stButton > button [data-testid="stMarkdownContainer"] {
     width: 100% !important;
@@ -291,7 +248,6 @@ section[data-testid="stSidebar"] div.stButton > button p {
     color: #3D3929 !important;
     margin: 0 !important;
 }
-/* tombol "+ Baru" menonjol sedikit (latar krem seperti Claude) */
 section[data-testid="stSidebar"] .st-key-sb_new button {
     background: #EAE8DE !important;
     font-weight: 600 !important;
@@ -300,12 +256,10 @@ section[data-testid="stSidebar"] .st-key-sb_new button:hover {
     background: #E3E0D5 !important;
 }
 
-/* label grup riwayat: "Hari ini" abu kecil */
 .sb-group {
     font-size: 0.85rem; font-weight: 500; color: #8B887D;
     padding: 16px 12px 6px; letter-spacing: 0.01em;
 }
-/* item riwayat: bulatan kecil ○ di depan + teks abu gelap, elipsis 1 baris */
 section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] button {
     font-weight: 400 !important;
     color: #57544A !important;
@@ -331,12 +285,10 @@ section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] button p {
     text-overflow: ellipsis !important;
     max-width: 210px;
 }
-/* item riwayat aktif */
 section[data-testid="stSidebar"] [class*="st-key-sb_hist_"].sb-active button {
     background: #EAE8DE !important;
 }
 
-/* tombol unduh di sidebar: sama polosnya dengan menu lain */
 section[data-testid="stSidebar"] div.stDownloadButton > button {
     background: transparent !important;
     border: none !important;
@@ -371,16 +323,14 @@ section[data-testid="stSidebar"] div.stDownloadButton > button p {
     margin: 0 !important;
 }
 
-/* garis pemisah tipis */
 .sb-divider {
     height: 1px; background: #E3E0D5; margin: 10px 4px;
 }
 
-/* baris akun ala Claude — DIPAKU di dasar layar, selebar sidebar */
 .sb-account {
     position: fixed;
     bottom: 0; left: 0;
-    width: 300px;              /* = lebar sidebar */
+    width: 300px;
     display: flex; align-items: center; gap: 10px;
     padding: 12px 16px 14px;
     border-top: 1px solid #E3E0D5;
@@ -388,7 +338,6 @@ section[data-testid="stSidebar"] div.stDownloadButton > button p {
     z-index: 999995;
     box-sizing: border-box;
 }
-/* beri ruang bawah agar konten sidebar tidak tertutup baris akun */
 section[data-testid="stSidebar"] > div:first-child {
     padding-bottom: 70px !important;
 }
@@ -408,7 +357,6 @@ section[data-testid="stSidebar"] > div:first-child {
     display: flex; align-items: center; gap: 12px;
     color: #73726C; font-size: 0.95rem;
 }
-/* rapatkan jarak antar elemen sidebar */
 section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] { gap: 2px !important; }
 section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 [data-testid="stMainBlockContainer"] {
@@ -417,7 +365,6 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     padding-bottom: 10rem !important;
 }
 
-/* scrollbar halus ala Claude */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #D5D1C3; border-radius: 99px; }
@@ -425,7 +372,6 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 
 ::selection { background: rgba(218,119,86,0.25); }
 
-/* ---------- header app (minimal, serif ala Claude) ---------- */
 .trinity-head {
     display: flex; align-items: center; justify-content: center;
     gap: 10px; padding: 4px 0 2px; margin-bottom: 6px;
@@ -450,7 +396,6 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     margin: 0 0 22px;
 }
 
-/* sapaan besar serif ala halaman awal Claude */
 .trinity-greeting {
     font-family: 'Source Serif 4', Georgia, serif;
     font-size: 3.4rem; font-weight: 500; color: #3D3929;
@@ -459,17 +404,10 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 }
 .trinity-greeting .star { color: #DA7756; }
 
-/* ---------- pesan: gaya percakapan Claude ---------- */
-/* User: bubble krem membulat di kanan */
 .bubble-row { display: flex; width: 100%; margin-bottom: 4px; }
 .bubble-row.user { justify-content: flex-end; margin: 12px 0; }
 .bubble-row.ai   { justify-content: flex-start; margin: 4px 0 22px; }
 
-/* ---------- jarak antar pesan: rapat & konsisten ala Claude ---------- */
-/* Streamlit menambah spasi sendiri antar elemen (gap 1rem antar container
-   + hack margin -1rem pada markdown) sehingga jarak antar bubble membengkak
-   dan tidak menentu. Dimatikan total di area chat — jarak sepenuhnya
-   dikendalikan margin .bubble-row di atas agar rapat seperti Claude. */
 [data-testid="stMainBlockContainer"] [data-testid="stVerticalBlock"] {
     gap: 0 !important;
 }
@@ -479,7 +417,6 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 [data-testid="stMarkdownContainer"] {
     margin: 0 !important;
 }
-/* elemen mode gambar tetap diberi jarak wajar */
 [data-testid="stMainBlockContainer"] div.stDownloadButton {
     margin: 6px 0 18px !important;
 }
@@ -500,7 +437,6 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     padding: 11px 16px;
     border: 1px solid rgba(61,57,41,0.05);
 }
-/* AI: teks polos di atas latar — persis gaya Claude */
 .bubble.ai {
     max-width: 100%;
     background: transparent;
@@ -517,7 +453,6 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 .bubble-row.user .bubble-wrap { align-items: flex-end; }
 .bubble-wrap .bubble { max-width: 100%; }
 
-/* lampiran gambar di bubble user (thumbnail rapi ala Claude) */
 .bubble-imgs {
     display: flex; flex-wrap: wrap; gap: 6px;
     justify-content: flex-end; margin-top: 8px;
@@ -528,20 +463,17 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     border: 1px solid rgba(61,57,41,0.08);
 }
 
-/* pemutar suara Yuki (TTS) — kompak di bawah jawaban */
 [data-testid="stAudio"] {
     max-width: 320px !important;
     margin: 2px 0 8px;
 }
 
-/* label "Yuki" dengan logo custom di atas jawaban AI */
 .ai-label {
     display: inline-flex; align-items: center; gap: 4px;
     font-size: 0.92rem; font-weight: 600; color: #3D3929;
     margin-bottom: 6px;
 }
 
-/* ===== ukuran logo custom di berbagai tempat (statis, tanpa animasi) ===== */
 .logo-label {
     width: 30px; height: 30px;
     display: inline-block; vertical-align: middle;
@@ -556,14 +488,10 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     display: inline-block; vertical-align: middle;
 }
 
-/* ---------- chat input: kartu putih membulat ala Claude ---------- */
 [data-testid="stBottom"], [data-testid="stBottomBlockContainer"],
 [data-testid="stBottom"] > div {
     background: #F0EEE6 !important; border: none !important; box-shadow: none !important;
 }
-/* KARTU GABUNGAN ala Claude: kotak teks + baris kontrol (+, toggle, model)
-   dibungkus jadi SATU kartu membulat, supaya tombol + terlihat menyatu
-   di dalam kotak chat input (bukan komponen terpisah di bawahnya). */
 [data-testid="stBottomBlockContainer"] {
     background: #FAF9F5 !important;
     border: 1px solid #E3E0D5 !important;
@@ -576,7 +504,6 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     border-color: #DA7756 !important;
     box-shadow: 0 4px 18px rgba(218,119,86,0.16) !important;
 }
-/* kotak input itu sendiri melebur transparan ke dalam kartu gabungan */
 [data-testid="stChatInput"] {
     background: transparent !important;
     border: none !important;
@@ -597,7 +524,6 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 [data-testid="stChatInput"] textarea::placeholder {
     color: #A8A69E !important;
 }
-/* tombol kirim: bulat terracotta khas Claude */
 [data-testid="stChatInput"] button {
     background: #DA7756 !important;
     border: none !important;
@@ -614,10 +540,6 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 }
 [data-testid="stChatInput"] button:disabled svg { fill: #A8A69E !important; color: #A8A69E !important; }
 
-/* ---------- baris kontrol DI DALAM kartu, tepat di bawah teks (ala Claude) ---------- */
-/* Berada di dok bawah Streamlit (satu wadah dengan st.chat_input)
-   → otomatis ikut bergeser saat sidebar dibuka/ditutup.
-   Layout: [+] [toggle Gambar] [toggle Suara] ......... [Nama Model] */
 .st-key-chat_controls {
     position: relative;
     margin-top: 0 !important;
@@ -629,7 +551,6 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     gap: 2px !important;
     flex-wrap: nowrap !important;
 }
-/* kolom kiri & kanan menyusut mengikuti isi, spacer tengah melar */
 .st-key-chat_controls [data-testid="stHorizontalBlock"]:last-of-type > [data-testid="stColumn"] {
     width: auto !important;
     flex: 0 0 auto !important;
@@ -638,7 +559,6 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 .st-key-chat_controls [data-testid="stHorizontalBlock"]:last-of-type > [data-testid="stColumn"]:nth-child(4) {
     flex: 1 1 auto !important;
 }
-/* disclaimer kecil di tengah (ala Claude) */
 .input-disclaimer {
     text-align: center;
     font-size: 0.76rem;
@@ -648,12 +568,10 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     text-overflow: ellipsis;
     padding: 4px 8px 0;
 }
-/* toggle Gambar: teks kecil abu senada */
 .st-key-chat_controls [data-testid="stCheckbox"] label p {
     font-size: 0.8rem !important;
     color: #73726C !important;
 }
-/* tombol model = TULISAN BIASA tanpa kotak (ala Claude) */
 .st-key-chat_controls [data-testid="stPopover"] button,
 .st-key-chat_controls [data-testid="stPopover"] > div > button,
 .st-key-chat_controls button[data-testid="stBaseButton-secondary"],
@@ -681,7 +599,6 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     border: none !important;
     box-shadow: none !important;
 }
-/* hilangkan kotak pembungkus milik popover itu sendiri */
 .st-key-chat_controls [data-testid="stPopover"] {
     background: transparent !important;
     border: none !important;
@@ -700,17 +617,12 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     color: #73726C !important;
     white-space: nowrap;
 }
-/* rapikan tinggi elemen di baris kontrol */
 .st-key-chat_controls [data-testid="stVerticalBlock"] { gap: 0 !important; }
 .st-key-chat_controls .element-container { margin: 0 !important; }
 
-/* ---------- MENU ➕ ALA CLAUDE (minimalist: upload saja) ---------- */
-/* sembunyikan tombol lampiran bawaan Streamlit (diganti menu ➕);
-   drag-drop & paste Ctrl+V tetap berfungsi (ditangani elemen lain) */
 [data-testid="stChatInput"] [data-testid="stChatInputFileUploadButton"] {
     display: none !important;
 }
-/* tombol mic / rekam: bulat putih senada (bukan terracotta) */
 [data-testid="stChatInput"] [data-testid="stChatInputMicButton"],
 [data-testid="stChatInput"] [data-testid="stChatInputCancelButton"],
 [data-testid="stChatInput"] [data-testid="stChatInputApproveButton"] {
@@ -728,7 +640,6 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 [data-testid="stChatInput"] [data-testid="stChatInputMicButton"]:hover {
     border-color: #DA7756 !important;
 }
-/* tombol ➕ di baris kontrol: transparan tanpa lingkaran putih */
 .st-key-chat_controls .st-key-plus_menu [data-testid="stPopover"] button {
     background: transparent !important;
     border: none !important;
@@ -749,19 +660,14 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     border: none !important;
     color: #C15F3C !important;
 }
-/* Streamlit menambahkan ikon panah kecil di ujung tombol popover secara
-   otomatis (indikator dropdown) — disembunyikan supaya tombol ➕ tetap
-   polos, hanya ikon plus saja tanpa panah di sebelahnya. */
 .st-key-chat_controls .st-key-plus_menu [data-testid="stPopover"] button svg:last-child,
 .st-key-chat_controls .st-key-plus_menu [data-testid="stPopover"] button [data-testid="stIconMaterial"]:last-child {
     display: none !important;
 }
-/* isi popover ➕ minimalist: cukup teks upload tanpa tombol */
 .plus-menu-hint {
     font-size: 0.72rem; color: #A8A69E;
     padding: 2px 4px 4px;
 }
-/* ---- Uploader di popover ➕ : hanya teks, tanpa tombol ---- */
 .st-key-plus_upload_file [data-testid="stFileUploaderDropzone"],
 .st-key-plus_upload_image [data-testid="stFileUploaderDropzone"] {
     background: transparent !important;
@@ -774,12 +680,10 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 .st-key-plus_upload_image [data-testid="stFileUploaderDropzoneInstructions"] {
     display: none !important;
 }
-/* Sembunyikan tombol "Browse files" / "Upload" bawaan */
 .st-key-plus_upload_file [data-testid="stBaseButton-secondary"],
 .st-key-plus_upload_image [data-testid="stBaseButton-secondary"] {
     display: none !important;
 }
-/* Tampilkan teks custom di dalam dropzone */
 .st-key-plus_upload_file [data-testid="stFileUploaderDropzone"]::before {
     content: "📎  Upload file";
     display: block;
@@ -804,7 +708,6 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     text-align: left;
     transition: background 0.18s ease;
 }
-/* Efek hover lembut */
 .st-key-plus_upload_file [data-testid="stFileUploaderDropzone"]:hover::before,
 .st-key-plus_upload_image [data-testid="stFileUploaderDropzone"]:hover::before {
     background: #F0EEE6 !important;
@@ -818,10 +721,10 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     margin: 0 !important;
 }
 
-/* ---------- PREVIEW LAMPIRAN DI ATAS INPUT ---------- */
+/* Preview strip di atas input */
 .st-key-pending_strip_above {
     position: fixed;
-    bottom: 90px;  /* sesuaikan dengan tinggi dok input + kontrol */
+    bottom: 100px;  /* sesuaikan jika perlu */
     left: 50%;
     transform: translateX(-50%);
     width: min(768px, 90vw);
@@ -847,7 +750,6 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     border-radius: 8px !important;
 }
 
-/* ---------- tombol & popover: pill lembut ala Claude ---------- */
 div.stButton > button, [data-testid="stPopover"] > button,
 div.stDownloadButton > button {
     background: #FAF9F5 !important;
@@ -867,7 +769,6 @@ div.stDownloadButton > button:hover {
     color: #C15F3C !important;
     box-shadow: 0 2px 8px rgba(218,119,86,0.14) !important;
 }
-/* ---------- pop-up model ala Claude: SATU panel, item = teks polos ---------- */
 [data-testid="stPopoverBody"] {
     background: #FFFFFF !important;
     border: 1px solid #E3E0D5 !important;
@@ -879,7 +780,6 @@ div.stDownloadButton > button:hover {
 [data-testid="stPopoverBody"] p, [data-testid="stPopoverBody"] div {
     color: #3D3929;
 }
-/* item model: TANPA kotak sendiri-sendiri — hanya teks, hover baru menyala */
 [data-testid="stPopoverBody"] div.stButton > button {
     background: transparent !important;
     border: none !important;
@@ -899,14 +799,12 @@ div.stDownloadButton > button:hover {
     box-shadow: none !important;
     color: inherit !important;
 }
-/* isi tombol (markdown) dipaksa RATA KIRI penuh */
 [data-testid="stPopoverBody"] div.stButton > button > div,
 [data-testid="stPopoverBody"] div.stButton > button [data-testid="stMarkdownContainer"] {
     width: 100% !important;
     text-align: left !important;
     justify-content: flex-start !important;
 }
-/* nama model (baris pertama) tebal gelap, deskripsi kecil abu */
 [data-testid="stPopoverBody"] div.stButton > button p {
     text-align: left !important;
     margin: 0 !important;
@@ -915,7 +813,6 @@ div.stDownloadButton > button:hover {
     color: #3D3929 !important;
     line-height: 1.45 !important;
 }
-/* label PREMIUM kecil di sebelah nama model (tier Hard & Extreme) */
 .model-premium-badge {
     display: inline-block;
     font-size: 0.62rem; font-weight: 700;
@@ -928,8 +825,6 @@ div.stDownloadButton > button:hover {
     letter-spacing: 0.03em;
     vertical-align: middle;
 }
-/* label PREMIUM: dipojokkan kecil di sudut kanan-atas tiap baris model
-   (bukan menempel di sebelah nama) — ukuran & huruf dibuat mini */
 [data-testid="stPopoverBody"] [class*="_premium"] {
     position: relative;
 }
@@ -947,23 +842,19 @@ div.stDownloadButton > button:hover {
     padding: 1px 6px;
     pointer-events: none;
 }
-/* rapatkan jarak antar item */
 [data-testid="stPopoverBody"] .element-container { margin: 0 !important; }
 [data-testid="stPopoverBody"] [data-testid="stVerticalBlock"] { gap: 2px !important; }
 
-/* ---------- toggle mode gambar ---------- */
 [data-testid="stCheckbox"] label p, .stToggle label p {
     color: #3D3929 !important;
     font-size: 0.85rem !important;
     font-weight: 500 !important;
 }
-/* warna track toggle saat aktif → terracotta */
 [data-testid="stCheckbox"] [data-checked="true"],
 .stToggle [aria-checked="true"] > div:first-child {
     background: #DA7756 !important;
 }
 
-/* ---------- badge status mode ---------- */
 .mode-badge {
     display: inline-flex; align-items: center; gap: 6px;
     padding: 4px 12px; border-radius: 999px;
@@ -975,13 +866,11 @@ div.stDownloadButton > button:hover {
     border: 1px solid rgba(218,119,86,0.35); color: #C15F3C;
 }
 
-/* ---------- spinner ala Claude ---------- */
 [data-testid="stSpinner"] > div {
     border-top-color: #DA7756 !important;
 }
 [data-testid="stSpinner"] p { color: #73726C !important; }
 
-/* ---------- thinking indicator ala Claude ---------- */
 .claude-think {
     display: flex; align-items: center; gap: 10px;
     padding: 2px 2px 6px;
@@ -991,7 +880,6 @@ div.stDownloadButton > button:hover {
     from { opacity: 0; transform: translateY(4px); }
     to   { opacity: 1; transform: none; }
 }
-/* bintang ✳ terracotta berdenyut & berputar pelan (fallback) */
 .claude-think .star {
     font-size: 1.05rem; color: #DA7756; line-height: 1;
     animation: starPulse 2.2s ease-in-out infinite;
@@ -1002,10 +890,6 @@ div.stDownloadButton > button:hover {
     50%      { transform: scale(1.25) rotate(90deg); opacity: 1; }
 }
 
-/* ===== LOGO THINKING: shimmer glow BERJALAN yang halus + denyut ===== */
-/* Pita cahaya lembut (gradasi transparan→putih→transparan + blur +
-   blend screen) menyapu melintasi logo dari kiri ke kanan terus-menerus.
-   Tepinya gradasi & di-blur → mulus tanpa garis patah. */
 .claude-think .logo-shimmer {
     position: relative;
     display: inline-block;
@@ -1019,7 +903,6 @@ div.stDownloadButton > button:hover {
     width: 100%; height: 100%;
     display: block;
 }
-/* pita cahaya berjalan */
 .claude-think .logo-shimmer::after {
     content: "";
     position: absolute;
@@ -1046,7 +929,6 @@ div.stDownloadButton > button:hover {
     0%, 100% { transform: scale(1); }
     50%      { transform: scale(1.14); }
 }
-/* teks dengan shimmer lembut menyapu perlahan (gaya Claude) */
 .claude-think .phrase {
     font-size: 0.92rem; font-weight: 500;
     background: linear-gradient(
@@ -1065,13 +947,10 @@ div.stDownloadButton > button:hover {
     0%   { background-position: 110% 0; }
     100% { background-position: -110% 0; }
 }
-/* teks muncul perlahan-lahan (fade masuk lambat) */
 @keyframes phraseIn {
     from { opacity: 0; filter: blur(3px); }
     to   { opacity: 1; filter: blur(0); }
 }
-/* frasa berganti-ganti pelan (rotasi via CSS, jalan terus di browser
-   walau server sedang sibuk memanggil API) */
 .claude-think .phrases { position: relative; height: 1.5em; min-width: 260px; }
 .claude-think .phrases .phrase {
     position: absolute; left: 0; top: 0; white-space: nowrap;
@@ -1091,7 +970,6 @@ div.stDownloadButton > button:hover {
     100%    { opacity: 0; }
 }
 
-/* caret berkedip saat jawaban diketik kata per kata */
 .type-caret {
     display: inline-block; width: 7px; height: 1.05em;
     margin-left: 3px; vertical-align: -2px;
@@ -1100,7 +978,6 @@ div.stDownloadButton > button:hover {
 }
 @keyframes caretBlink { 50% { opacity: 0; } }
 
-/* ---------- progress bar gambar: % + shimmer (ala Claude) ---------- */
 .img-progress {
     padding: 14px 16px 16px;
     background: #FAF9F5;
@@ -1117,7 +994,6 @@ div.stDownloadButton > button:hover {
 .img-progress-label {
     display: inline-flex; align-items: center; gap: 8px;
     font-size: 0.9rem; font-weight: 500;
-    /* teks shimmer sama seperti thinking */
     background: linear-gradient(
         90deg,
         #A8A69E 0%, #A8A69E 35%,
@@ -1152,7 +1028,6 @@ div.stDownloadButton > button:hover {
     transition: width 0.5s ease;
     position: relative;
 }
-/* kilau putih menyapu di atas bar */
 .img-progress-fill::after {
     content: ""; position: absolute; inset: 0;
     background: linear-gradient(90deg,
@@ -1162,7 +1037,6 @@ div.stDownloadButton > button:hover {
     border-radius: 99px;
 }
 
-/* ---------- alert / error ---------- */
 [data-testid="stAlert"] {
     background: #FAF9F5 !important;
     border: 1px solid #E3E0D5 !important;
@@ -1170,12 +1044,10 @@ div.stDownloadButton > button:hover {
     color: #3D3929 !important;
 }
 
-/* ---------- footer ---------- */
 .trinity-foot {
     text-align: center; color: #A8A69E; font-size: 0.6rem;
     margin-top: 34px; font-family: 'Inter', sans-serif;
 }
-/* versi saat chat berjalan: lebih kecil lagi dari versi halaman awal */
 .trinity-foot.in-chat {
     font-size: 0.5rem;
     color: #B8B6AC;
@@ -1187,11 +1059,7 @@ div.stDownloadButton > button:hover {
     )
 
 
-
-# ============================================================================
-# UTIL: ERROR PUBLIK (dari App 1 — pesan ramah untuk pengguna umum)
-# ============================================================================
-def public_error_image(status: int | None, body: str, exc: Exception | None = None) -> str:
+def public_error_image(status, body, exc=None):
     text = (body or str(exc or "")).lower()
     if status in (401, 403) or "authentication" in text or "forbidden" in text or "permission" in text:
         return "⚠️ Layanan gambar sedang tidak tersedia. Coba lagi nanti."
@@ -1201,8 +1069,7 @@ def public_error_image(status: int | None, body: str, exc: Exception | None = No
         return "⌛ Server terlalu lama merespons. Coba lagi."
     return "❌ Gagal membuat gambar. Coba prompt lain atau ulangi sebentar lagi."
 
-
-def public_error_chat(exc: Exception) -> str:
+def public_error_chat(exc):
     text = str(exc).lower()
     status = getattr(exc, "status_code", None)
     if status == 401 or "invalid_api_key" in text or "unauthorized" in text or "authentication" in text:
@@ -1215,8 +1082,7 @@ def public_error_chat(exc: Exception) -> str:
         return "⌛ Respons terlalu lama. Coba lagi."
     return "❌ Gagal membalas. Coba kirim ulang atau mulai obrolan baru."
 
-
-def _is_model_unavailable_error(exc: Exception) -> bool:
+def _is_model_unavailable_error(exc):
     text = str(exc).lower()
     status = getattr(exc, "status_code", None)
     return (
@@ -1227,29 +1093,21 @@ def _is_model_unavailable_error(exc: Exception) -> bool:
         or ("not_found" in text and "model" in text)
     )
 
-
-# ============================================================================
-# ENGINE 1: CHAT MULTI AI (Groq + persona Yuki + streaming + fallback)
-# ============================================================================
-def build_chat_client() -> OpenAI:
+def build_chat_client():
     return OpenAI(api_key=GROQ_API_KEY, base_url=GROQ_BASE_URL)
 
-
-def messages_for_api(history: list[dict]) -> list[dict]:
-    """System prompt Yuki + riwayat terakhir (ramah free-tier).
-    Pesan yang membawa gambar dikirim sebagai konten multimodal (vision),
-    tapi hanya untuk beberapa pesan terakhir agar token tetap hemat."""
+def messages_for_api(history):
     trimmed = [
         m for m in history
         if m.get("role") in ("user", "assistant") and m.get("type", "text") == "text"
     ][-MAX_HISTORY_MESSAGES:]
-    msgs: list[dict] = [{"role": "system", "content": YUKI_SYSTEM_PROMPT}]
+    msgs = [{"role": "system", "content": YUKI_SYSTEM_PROMPT}]
     n = len(trimmed)
     for i, m in enumerate(trimmed):
         imgs = m.get("images") or []
         if imgs and i >= n - VISION_RECENT_MESSAGES:
             text_part = (m.get("content") or "").strip() or "Tolong analisis gambar ini ya."
-            parts: list[dict] = [{"type": "text", "text": text_part}]
+            parts = [{"type": "text", "text": text_part}]
             for im in imgs:
                 b64 = base64.b64encode(im["data"]).decode("ascii")
                 parts.append({
@@ -1261,17 +1119,15 @@ def messages_for_api(history: list[dict]) -> list[dict]:
             msgs.append({"role": m["role"], "content": m.get("content") or ""})
     return msgs
 
-
-def resolve_model_chain(preferred: str, vision: bool = False) -> list[str]:
+def resolve_model_chain(preferred, vision=False):
     base = VISION_MODEL_FALLBACKS if vision else (preferred, *GROQ_MODEL_FALLBACKS)
-    chain: list[str] = []
+    chain = []
     for m in base:
         if m and m not in chain:
             chain.append(m)
     return chain
 
-
-def stream_chat_reply(client: OpenAI, model: str, history: list[dict]):
+def stream_chat_reply(client, model, history):
     stream = client.chat.completions.create(
         model=model,
         messages=messages_for_api(history),
@@ -1287,12 +1143,8 @@ def stream_chat_reply(client: OpenAI, model: str, history: list[dict]):
         except Exception:
             continue
 
-
-def stream_chat_with_fallback(client: OpenAI, preferred_model: str, history: list[dict],
-                              vision: bool = False):
-    """Coba model pilihan user; kalau sudah dihapus provider, pakai fallback.
-    vision=True → pakai rantai model vision (untuk pesan bergambar)."""
-    last_exc: Exception | None = None
+def stream_chat_with_fallback(client, preferred_model, history, vision=False):
+    last_exc = None
     for model in resolve_model_chain(preferred_model, vision=vision):
         try:
             stream_iter = stream_chat_reply(client, model, history)
@@ -1311,12 +1163,7 @@ def stream_chat_with_fallback(client: OpenAI, preferred_model: str, history: lis
         raise last_exc
     raise RuntimeError("no chat model available")
 
-
-# ============================================================================
-# ENGINE 3: SUARA & GAMBAR (Groq — Whisper STT, Orpheus TTS, Llama-4 vision)
-# ============================================================================
-def transcribe_audio(client: OpenAI, audio_bytes: bytes) -> str:
-    """Ubah rekaman suara (wav) menjadi teks dengan Groq Whisper."""
+def transcribe_audio(client, audio_bytes):
     resp = client.audio.transcriptions.create(
         model=STT_MODEL,
         file=("suara.wav", audio_bytes, "audio/wav"),
@@ -1324,9 +1171,7 @@ def transcribe_audio(client: OpenAI, audio_bytes: bytes) -> str:
     )
     return (getattr(resp, "text", "") or "").strip()
 
-
-def synthesize_speech(client: OpenAI, text: str) -> bytes | None:
-    """Bacakan teks dengan Groq Orpheus TTS → bytes wav (None bila gagal)."""
+def synthesize_speech(client, text):
     clean = " ".join((text or "").split())
     if not clean:
         return None
@@ -1349,9 +1194,7 @@ def synthesize_speech(client: OpenAI, text: str) -> bytes | None:
     except Exception:
         return None
 
-
-def normalize_image(data: bytes) -> tuple[bytes, str]:
-    """Resize/kompres gambar (maks 1024px) supaya payload ke model ringan."""
+def normalize_image(data):
     try:
         im = Image.open(io.BytesIO(data))
         im.load()
@@ -1368,10 +1211,8 @@ def normalize_image(data: bytes) -> tuple[bytes, str]:
     except Exception:
         return data, "image/jpeg"
 
-
-def collect_images(files) -> list[dict]:
-    """Ambil gambar dari lampiran chat input → [{mime, data, name}]."""
-    imgs: list[dict] = []
+def collect_images(files):
+    imgs = []
     for f in files or []:
         try:
             data = f.getvalue()
@@ -1386,16 +1227,11 @@ def collect_images(files) -> list[dict]:
             break
     return imgs
 
-
-# ============================================================================
-# ENGINE 2: GENERATE GAMBAR (Cloudflare FLUX — dari App 1)
-# ============================================================================
-def extract_image_bytes(payload: dict) -> bytes:
+def extract_image_bytes(payload):
     if not isinstance(payload, dict):
         raise RuntimeError("invalid response")
     if payload.get("success") is False:
         raise RuntimeError(str(payload.get("errors") or payload))
-
     result = payload.get("result", payload)
     if isinstance(result, str):
         b64 = result
@@ -1415,17 +1251,13 @@ def extract_image_bytes(payload: dict) -> bytes:
                 b64 = nested
     else:
         b64 = None
-
     if not b64 or not isinstance(b64, str):
         raise RuntimeError("no image")
-
     if "," in b64 and b64.strip().lower().startswith("data:"):
         b64 = b64.split(",", 1)[1]
-
     raw = base64.b64decode(b64, validate=False)
     if not raw:
         raise RuntimeError("empty image")
-
     try:
         im = Image.open(io.BytesIO(raw))
         if im.mode not in ("RGB", "RGBA"):
@@ -1436,22 +1268,19 @@ def extract_image_bytes(payload: dict) -> bytes:
     except Exception:
         return raw
 
-
-def generate_image(prompt: str) -> bytes:
+def generate_image(prompt):
     url = f"{CF_API_BASE}/{CF_ACCOUNT_ID}/ai/run/{CF_IMAGE_MODEL}"
     headers = {
         "Authorization": f"Bearer {CF_API_TOKEN}",
         "Content-Type": "application/json",
     }
     body = {"prompt": prompt, "steps": CF_DEFAULT_STEPS}
-
     try:
         resp = requests.post(url, headers=headers, json=body, timeout=180)
     except requests.Timeout as e:
         raise RuntimeError("timeout") from e
     except requests.RequestException as e:
         raise RuntimeError(str(e)) from e
-
     content_type = (resp.headers.get("Content-Type") or "").lower()
     if "image/" in content_type:
         if resp.status_code >= 400:
@@ -1464,33 +1293,23 @@ def generate_image(prompt: str) -> bytes:
             return buf.getvalue()
         except Exception:
             return raw
-
     try:
         payload = resp.json()
     except Exception:
         if resp.status_code >= 400:
             raise RuntimeError(public_error_image(resp.status_code, resp.text[:400]))
         raise RuntimeError("invalid response")
-
     if resp.status_code >= 400:
         err = payload.get("errors") if isinstance(payload, dict) else payload
         raise RuntimeError(public_error_image(resp.status_code, str(err)[:400]))
-
     return extract_image_bytes(payload)
 
-
-# ============================================================================
-# RENDER BUBBLE CHAT (style buatan sendiri)
-# ============================================================================
-def bubble_html(role: str, content: str, timestamp: str = "",
-                images_html: str = "", meta_note: str = "") -> str:
+def bubble_html(role, content, timestamp="", images_html="", meta_note=""):
     body = html.escape(content or "")
     css = "user" if role == "user" else "ai"
     if role == "user":
-        # User: bubble krem membulat di kanan (gaya Claude)
         meta = ""
     else:
-        # AI: teks polos + label kecil "Yuki" dengan titik terracotta (gaya Claude)
         meta = f'<div class="ai-label">{logo_img_html("logo-label")} Yuki</div>'
     note = f'<div class="bubble-meta">{html.escape(meta_note)}</div>' if meta_note else ""
     return (
@@ -1501,9 +1320,7 @@ def bubble_html(role: str, content: str, timestamp: str = "",
         f"</div></div>"
     )
 
-
-def images_bubble_html(images: list[dict]) -> str:
-    """Thumbnail lampiran gambar (base64) untuk ditampilkan di bubble user."""
+def images_bubble_html(images):
     if not images:
         return ""
     parts = []
@@ -1515,9 +1332,7 @@ def images_bubble_html(images: list[dict]) -> str:
         )
     return f'<div class="bubble-imgs">{"".join(parts)}</div>'
 
-
-def render_message(msg: dict) -> None:
-    """Render 1 pesan: teks (bubble, bisa + gambar lampiran/suara) atau gambar."""
+def render_message(msg):
     if msg.get("type") == "image" and msg.get("image_bytes"):
         st.markdown(
             bubble_html("assistant", f"🎨 Hasil gambar untuk: {msg.get('prompt', '')}", msg.get("time", "")),
@@ -1540,7 +1355,6 @@ def render_message(msg: dict) -> None:
                         msg.get("time", ""), imgs_html, note),
             unsafe_allow_html=True,
         )
-        # pemutar suara Yuki (hasil TTS) di bawah jawaban
         if msg.get("audio"):
             st.audio(msg["audio"], format="audio/wav")
         elif msg.get("audio_note"):
@@ -1549,14 +1363,6 @@ def render_message(msg: dict) -> None:
                 unsafe_allow_html=True,
             )
 
-
-# ============================================================================
-# THINKING INDICATOR ALA CLAUDE
-#   Bintang ✳ berdenyut + frasa dengan shimmer yang muncul perlahan
-#   dan berganti-ganti lambat (animasi murni CSS → tetap jalan
-#   walau server sedang menunggu respons API).
-# ============================================================================
-# Frasa ala Claude — berganti tiap ~4 detik selama proses berpikir (~12s+)
 THINKING_PHRASES_CHAT = [
     "Berpikir",
     "Mencerna pertanyaan",
@@ -1570,19 +1376,12 @@ THINKING_PHRASES_IMAGE = [
     "Melukis perlahan",
 ]
 
-# Durasi minimum proses berpikir (detik) — ±10 detik ala Claude
 THINKING_MIN_SECONDS = 10.0
-
-# Durasi minimum progress bar gambar (detik) — biar animasi % terasa
 IMAGE_MIN_SECONDS = 10.0
-
-# Delay antar kata saat jawaban diketik kata per kata (cepat & tetap natural)
 WORD_STREAM_DELAY = 0.03
 
-
 @st.cache_data(show_spinner=False)
-def _thinking_logo_b64() -> str:
-    """Logo custom (PNG transparan) sebagai base64 untuk inline HTML."""
+def _thinking_logo_b64():
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                         "assets", "logo_thinking_small.png")
     try:
@@ -1591,23 +1390,18 @@ def _thinking_logo_b64() -> str:
     except Exception:
         return ""
 
-
-def logo_img_html(css_class: str = "logo-inline") -> str:
-    """Tag <img> logo custom; fallback ke bintang ✳ bila file tidak ada."""
+def logo_img_html(css_class="logo-inline"):
     b64 = _thinking_logo_b64()
     if b64:
         return f'<img class="{css_class}" src="data:image/png;base64,{b64}" alt="✳"/>'
     return '<span class="star">✳</span>'
 
-
-def thinking_html(phrases: list[str]) -> str:
+def thinking_html(phrases):
     spans = "".join(
         f'<span class="phrase">{html.escape(p)}…</span>' for p in phrases
     )
     logo_b64 = _thinking_logo_b64()
     if logo_b64:
-        # Logo dengan glow halus bernapas (halo radial + drop-shadow
-        # bertingkat + denyut) — semua ease-in-out, mulus.
         src = f"data:image/png;base64,{logo_b64}"
         icon = (
             '<span class="logo-shimmer">'
@@ -1615,7 +1409,7 @@ def thinking_html(phrases: list[str]) -> str:
             "</span>"
         )
     else:
-        icon = '<span class="star">✳</span>'  # fallback bila file logo hilang
+        icon = '<span class="star">✳</span>'
     return (
         '<div class="claude-think">'
         f"{icon}"
@@ -1623,9 +1417,7 @@ def thinking_html(phrases: list[str]) -> str:
         "</div>"
     )
 
-
-def image_progress_html(pct: float, label: str) -> str:
-    """Kartu progress bar % + shimmer untuk proses pembuatan gambar."""
+def image_progress_html(pct, label):
     pct = max(0.0, min(100.0, float(pct)))
     return (
         '<div class="img-progress">'
@@ -1640,9 +1432,7 @@ def image_progress_html(pct: float, label: str) -> str:
         "</div></div>"
     )
 
-
-def stream_words(answer_slot, full_text: str) -> None:
-    """Tampilkan jawaban kata per kata dengan delay agak lambat + caret ✳."""
+def stream_words(answer_slot, full_text):
     words = full_text.split(" ")
     acc = ""
     for i, word in enumerate(words):
@@ -1651,17 +1441,12 @@ def stream_words(answer_slot, full_text: str) -> None:
         caret = "" if is_last else '<span class="type-caret"></span>'
         html_bubble = bubble_html("assistant", acc)
         if caret:
-            # sisipkan caret sebelum penutup bubble
             html_bubble = html_bubble.replace("</div></div></div>", f"{caret}</div></div></div>")
         answer_slot.markdown(html_bubble, unsafe_allow_html=True)
         if not is_last:
             time.sleep(WORD_STREAM_DELAY)
 
-
-# ============================================================================
-# EXPORT CHAT (.md — diadaptasi dari App 2)
-# ============================================================================
-def get_chat_export_text() -> str:
+def get_chat_export_text():
     lines = [
         "# Riwayat Obrolan — Ampera Trinity AI",
         f"# Tanggal Ekspor: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}",
@@ -1684,13 +1469,7 @@ def get_chat_export_text() -> str:
         lines.append("\n---\n")
     return "\n".join(lines)
 
-
-# ============================================================================
-# SESSION STATE
-# ============================================================================
-def init_state() -> None:
-    # Halaman awal bersih ala Claude: tanpa pesan sambutan,
-    # hanya sapaan besar + input di tengah.
+def init_state():
     if "messages" not in st.session_state:
         st.session_state.messages = []
     if "selected_model_key" not in st.session_state:
@@ -1699,45 +1478,39 @@ def init_state() -> None:
         st.session_state.image_mode = False
     if "voice_reply" not in st.session_state:
         st.session_state.voice_reply = False
-    # Lampiran yang di-stage lewat menu ➕ (menunggu dikirim bersama pesan)
     if "pending_images" not in st.session_state:
         st.session_state.pending_images = []
     if "plus_uploader_gen" not in st.session_state:
         st.session_state.plus_uploader_gen = 0
+    if "plus_popover_key" not in st.session_state:
+        st.session_state.plus_popover_key = 0
     if "msg_counter" not in st.session_state:
         st.session_state.msg_counter = 1
-    # Riwayat percakapan (untuk sidebar ala Claude)
     if "conversations" not in st.session_state:
-        st.session_state.conversations = []  # list[{id, title, messages}]
+        st.session_state.conversations = []
     if "conv_counter" not in st.session_state:
         st.session_state.conv_counter = 0
     if "active_conv_id" not in st.session_state:
         st.session_state.active_conv_id = None
 
-
-def next_msg_id() -> int:
+def next_msg_id():
     st.session_state.msg_counter += 1
     return st.session_state.msg_counter
 
-
-def _conversation_title(messages: list[dict]) -> str:
-    """Judul percakapan = potongan pesan user pertama (ala Claude)."""
+def _conversation_title(messages):
     for m in messages:
         if m.get("role") == "user" and m.get("content"):
             title = " ".join(str(m["content"]).split())
             return title[:48] + ("…" if len(title) > 48 else "")
     return "Percakapan baru"
 
-
-def _archive_current_conversation() -> None:
-    """Simpan obrolan aktif ke daftar riwayat (kalau ada isi dari user)."""
+def _archive_current_conversation():
     msgs = st.session_state.get("messages", [])
     has_user = any(m.get("role") == "user" for m in msgs)
     if not has_user:
         return
     conv_id = st.session_state.get("active_conv_id")
     if conv_id is not None:
-        # update entri yang sudah ada
         for c in st.session_state.conversations:
             if c["id"] == conv_id:
                 c["messages"] = msgs
@@ -1750,17 +1523,14 @@ def _archive_current_conversation() -> None:
         "messages": msgs,
     })
 
-
-def reset_conversation() -> None:
+def reset_conversation():
     _archive_current_conversation()
     st.session_state.active_conv_id = None
     for key in ("messages", "msg_counter"):
         st.session_state.pop(key, None)
     init_state()
 
-
-def open_conversation(conv_id: int) -> None:
-    """Buka kembali percakapan lama dari riwayat sidebar."""
+def open_conversation(conv_id):
     _archive_current_conversation()
     for c in st.session_state.conversations:
         if c["id"] == conv_id:
@@ -1771,23 +1541,13 @@ def open_conversation(conv_id: int) -> None:
             )
             return
 
-
-# ============================================================================
-# SIDEBAR ALA CLAUDE
-#   Brand serif · + Baru · menu · riwayat "Hari ini" · akun di bawah
-# ============================================================================
-def render_sidebar() -> None:
+def render_sidebar():
     with st.sidebar:
-        # Brand serif ala "Claude"
         st.markdown('<div class="sb-brand">Trinity</div>', unsafe_allow_html=True)
-
-        # + Baru (latar krem menonjol seperti Claude)
         with st.container(key="sb_new"):
             if st.button(":material/add: &nbsp;Baru", use_container_width=True):
                 reset_conversation()
                 st.rerun()
-
-        # Menu ala Claude (ikon garis tipis + teks rata kiri)
         with st.container(key="sb_menu_chat"):
             if st.button(":material/chat_bubble: &nbsp;Chat", use_container_width=True):
                 st.session_state.image_mode = False
@@ -1804,8 +1564,6 @@ def render_sidebar() -> None:
                 mime="text/markdown",
                 use_container_width=True,
             )
-
-        # Riwayat percakapan (grup "Hari ini" seperti Claude)
         convs = st.session_state.get("conversations", [])
         if convs:
             st.markdown('<div class="sb-group">Hari ini</div>', unsafe_allow_html=True)
@@ -1815,8 +1573,6 @@ def render_sidebar() -> None:
                     if st.button(c["title"], key=f"btn_{key}", use_container_width=True):
                         open_conversation(c["id"])
                         st.rerun()
-
-        # Baris akun di dasar sidebar ala Claude: (U) User · Free  ⌄ | ikon
         st.markdown(
             """
 <div class="sb-account">
@@ -1829,12 +1585,7 @@ def render_sidebar() -> None:
             unsafe_allow_html=True,
         )
 
-
-# ============================================================================
-# HANDLER PESAN
-# ============================================================================
-def handle_image_request(prompt: str) -> None:
-    """Mode gambar: prompt → Cloudflare FLUX → bubble gambar."""
+def handle_image_request(prompt):
     if not IMAGE_READY:
         st.session_state.messages.append({
             "id": next_msg_id(), "role": "assistant", "type": "text",
@@ -1842,23 +1593,15 @@ def handle_image_request(prompt: str) -> None:
             "time": datetime.now().strftime("%H:%M"),
         })
         return
-
-    # Progress bar % + shimmer (generate jalan di thread background,
-    # persentase naik perlahan mengikuti tahapan label)
     progress_slot = st.empty()
-
-    result: dict = {"data": None, "error": None}
-
-    def _worker() -> None:
+    result = {"data": None, "error": None}
+    def _worker():
         try:
             result["data"] = generate_image(prompt)
-        except Exception as exc:  # simpan untuk ditampilkan di thread utama
+        except Exception as exc:
             result["error"] = exc
-
     worker = threading.Thread(target=_worker, daemon=True)
     worker.start()
-
-    # Tahapan label + target % (label berganti seiring progress naik)
     stages = [
         (0, "Membayangkan gambarnya"),
         (30, "Menyiapkan kanvas"),
@@ -1868,7 +1611,6 @@ def handle_image_request(prompt: str) -> None:
     pct = 0.0
     t0 = time.time()
     while worker.is_alive() or (time.time() - t0) < IMAGE_MIN_SECONDS:
-        # naik perlahan, melambat mendekati 92% selama masih menunggu
         if pct < 60:
             pct += 2.4
         elif pct < 85:
@@ -1883,11 +1625,8 @@ def handle_image_request(prompt: str) -> None:
         time.sleep(0.35)
         if not worker.is_alive() and (time.time() - t0) >= IMAGE_MIN_SECONDS:
             break
-
     worker.join(timeout=200)
-
     if result["error"] is None and result["data"]:
-        # sentuhan akhir: lompat mulus ke 100%
         progress_slot.markdown(image_progress_html(100, "Selesai"), unsafe_allow_html=True)
         time.sleep(0.6)
         progress_slot.empty()
@@ -1907,9 +1646,7 @@ def handle_image_request(prompt: str) -> None:
             "content": msg, "time": datetime.now().strftime("%H:%M"),
         })
 
-
-def handle_chat_request(answer_slot) -> None:
-    """Mode chat: streaming jawaban Yuki dengan model terpilih + fallback."""
+def handle_chat_request(answer_slot):
     if not CHAT_READY:
         st.session_state.messages.append({
             "id": next_msg_id(), "role": "assistant", "type": "text",
@@ -1917,12 +1654,10 @@ def handle_chat_request(answer_slot) -> None:
             "time": datetime.now().strftime("%H:%M"),
         })
         return
-
     model_id = AVAILABLE_MODELS.get(
         st.session_state.selected_model_key,
         AVAILABLE_MODELS[DEFAULT_MODEL_KEY],
     )
-    # Pesan bergambar WAJIB lewat model vision (model teks tidak bisa lihat gambar)
     last_user = next(
         (m for m in reversed(st.session_state.messages) if m.get("role") == "user"),
         None,
@@ -1930,56 +1665,42 @@ def handle_chat_request(answer_slot) -> None:
     has_images = bool(last_user and last_user.get("images"))
     if has_images:
         model_id = VISION_MODEL_ID
-
-    # Thinking ala Claude — frasa berganti-ganti selama beberapa detik
     think_slot = st.empty()
     think_slot.markdown(thinking_html(THINKING_PHRASES_CHAT), unsafe_allow_html=True)
     t0 = time.time()
-
     try:
         client = build_chat_client()
-        # Kumpulkan seluruh jawaban SELAMA animasi berpikir masih berjalan
         full = "".join(
             piece or ""
             for piece in stream_chat_with_fallback(
                 client, model_id, st.session_state.messages, vision=has_images
             )
         )
-
-        # TTS jalan di background selama animasi berpikir + efek ketik,
-        # supaya suara tidak menambah waktu tunggu user
-        tts_box: dict = {}
-        tts_thread: threading.Thread | None = None
+        tts_box = {}
+        tts_thread = None
         if st.session_state.get("voice_reply") and full:
-            def _tts() -> None:
+            def _tts():
                 tts_box["data"] = synthesize_speech(client, full)
             tts_thread = threading.Thread(target=_tts, daemon=True)
             tts_thread.start()
-
-        # Tahan sampai proses berpikir genap minimal beberapa detik
         elapsed = time.time() - t0
         if elapsed < THINKING_MIN_SECONDS:
             time.sleep(THINKING_MIN_SECONDS - elapsed)
         think_slot.empty()
-
         if not full:
             full = "…"
-
-        # Jawaban muncul kata per kata dengan delay agak lambat
         stream_words(answer_slot, full)
-
         audio_wav = None
         if tts_thread is not None:
             tts_thread.join(timeout=90)
             audio_wav = tts_box.get("data")
-
         reply = {
             "id": next_msg_id(), "role": "assistant", "type": "text",
             "content": full, "time": datetime.now().strftime("%H:%M"),
         }
         if audio_wav:
             reply["audio"] = audio_wav
-            st.audio(audio_wav, format="audio/wav")  # langsung tampil sebelum rerun
+            st.audio(audio_wav, format="audio/wav")
         elif tts_thread is not None:
             reply["audio_note"] = "🔇 Suara gagal dibuat (limit TTS / teks tak didukung)"
         st.session_state.messages.append(reply)
@@ -1991,34 +1712,22 @@ def handle_chat_request(answer_slot) -> None:
             "content": err, "time": datetime.now().strftime("%H:%M"),
         })
 
-
-# ============================================================================
-# MAIN
-# ============================================================================
-def main() -> None:
+def main():
     init_state()
     inject_css()
     render_sidebar()
 
-    # is_fresh sekarang juga memperhitungkan adanya pending_images,
-    # agar ketika user menambahkan lampiran sebelum pesan pertama,
-    # input langsung turun ke bawah dan preview tampil di atasnya.
     is_fresh = len(st.session_state.messages) == 0 and not st.session_state.pending_images
 
     if is_fresh:
-        # ---------- HALAMAN AWAL ala Claude ----------
-        # Sapaan besar serif di tengah + input diangkat ke tengah layar (CSS)
         st.markdown(
             """
 <style>
-/* angkat dok input ke tengah layar saat belum ada percakapan
-   (turun sedikit agar tidak menutupi judul sapaan) */
 [data-testid="stBottom"] {
     transform: translateY(-26vh);
     background: transparent !important;
     transition: transform 0.35s ease;
 }
-/* SEMUA lapisan dok harus transparan agar tidak menutupi judul sapaan */
 [data-testid="stBottom"] > div,
 [data-testid="stBottom"] [data-testid="stBottomBlockContainer"],
 [data-testid="stBottom"] [data-testid="stVerticalBlock"],
@@ -2026,7 +1735,6 @@ def main() -> None:
     background: transparent !important;
     background-color: transparent !important;
 }
-/* HALAMAN AWAL TIDAK BISA DI-SCROLL (atas/bawah) */
 [data-testid="stAppViewContainer"],
 [data-testid="stMain"],
 section.main,
@@ -2044,15 +1752,11 @@ html, body {
             unsafe_allow_html=True,
         )
 
-    # ---------- Riwayat chat ----------
     for msg in st.session_state.messages:
         render_message(msg)
 
-    # ---------- PREVIEW LAMPIRAN DI ATAS INPUT ----------
     pending = st.session_state.get("pending_images", [])
     if pending:
-        # Container ini dirender sebelum st.chat_input sehingga berada
-        # di atas input; CSS menempatkannya fixed di atas dok input.
         with st.container(key="pending_strip_above"):
             cols = st.columns([0.8] * len(pending) + [2.0])
             for i, im in enumerate(pending):
@@ -2069,16 +1773,13 @@ html, body {
                     unsafe_allow_html=True,
                 )
 
-    # ---------- Chat input ----------
     if st.session_state.image_mode:
         placeholder_text = "Deskripsikan gambar yang ingin dibuat…"
     elif is_fresh:
         placeholder_text = "Apa yang bisa Yuki bantu hari ini?"
     else:
         placeholder_text = "Tulis pesan…"
-    # Mic 🎤 & lampiran 📎 native Streamlit (kirim gambar, paste, drag-drop);
-    # otomatis nonaktif bila versi Streamlit belum mendukung.
-    chat_kwargs: dict = {}
+    chat_kwargs = {}
     if CHAT_INPUT_SUPPORTS_FILE:
         chat_kwargs["accept_file"] = True
         chat_kwargs["file_type"] = IMAGE_INPUT_TYPES
@@ -2086,40 +1787,37 @@ html, body {
         chat_kwargs["accept_audio"] = True
     user_input = st.chat_input(placeholder_text, **chat_kwargs)
 
-    # ---------- Kontrol DI DALAM kotak chat input ----------
-    # Dirender ke dok bawah Streamlit (wadah yang sama dengan st.chat_input)
-    # → otomatis ikut bergeser saat sidebar dibuka/ditutup (seperti Claude).
-    # CSS menariknya naik (margin-top negatif) ke ruang padding kotak input.
-    # (st._bottom deprecated di Streamlit baru → pakai st.bottom bila tersedia)
     bottom_dock = getattr(st, "bottom", None) or st._bottom
     with bottom_dock:
         with st.container(key="chat_controls"):
-            # [➕ menu] [Gambar] [Suara] ....spacer.... [Nama Model]
             ctrl_plus, ctrl_mode, ctrl_voice, _sp, ctrl_model = st.columns(
                 [0.08, 0.2, 0.18, 1.04, 0.28]
             )
 
-            # ---- Menu ➕ ala Claude: MINIMALIST — hanya 2 baris ikon+teks
-            #      (📎 Upload file · 📸 Upload gambar atau foto). Mode chat/
-            #      gambar, pencarian web, suara, unduh & chat baru sudah ada
-            #      di luar popup ini, jadi tidak diduplikasi di sini. ----
             with ctrl_plus:
                 with st.container(key="plus_menu"):
-                    with st.popover(":material/add:", use_container_width=False,
-                                    help="Unggah file atau gambar"):
+                    popover_key = st.session_state.plus_popover_key
+                    with st.popover(":material/add:", key=f"plus_popover_{popover_key}",
+                                    use_container_width=False, help="Unggah file atau gambar"):
                         gen = st.session_state.get("plus_uploader_gen", 0)
 
-                        def _stage_uploaded(files) -> None:
+                        def _stage_uploaded(files):
                             if not files:
                                 return
                             staged = st.session_state.get("pending_images", [])
                             seen = {(im["name"], len(im["data"])) for im in staged}
+                            added = False
                             for im in collect_images(files):
                                 k = (im["name"], len(im["data"]))
                                 if k not in seen:
                                     staged.append(im)
                                     seen.add(k)
-                            st.session_state.pending_images = staged
+                                    added = True
+                            if added:
+                                st.session_state.pending_images = staged
+                                st.session_state.plus_popover_key += 1
+                                st.session_state.plus_uploader_gen += 1
+                                st.rerun()
 
                         with st.container(key="plus_upload_file"):
                             picked_file = st.file_uploader(
@@ -2168,9 +1866,6 @@ html, body {
                 current_key = st.session_state.selected_model_key
                 current_name = MODEL_BY_KEY.get(current_key, MODEL_BY_KEY[DEFAULT_MODEL_KEY])["name"]
                 with st.popover(current_name, use_container_width=False):
-                    # Daftar model ala Claude, sudah terurut dari tingkat
-                    # termudah → tertinggi. Tier Hard & Extreme diberi
-                    # label PREMIUM kecil di sebelah nama.
                     for m in MODEL_CATALOG:
                         is_active = m["key"] == st.session_state.selected_model_key
                         check = " :orange[✓]" if is_active else ""
@@ -2181,9 +1876,7 @@ html, body {
                                 st.session_state.selected_model_key = m["key"]
                                 st.rerun()
 
-    # ---------- Proses kiriman (teks / lampiran gambar / rekaman suara) ----------
     if user_input is not None:
-        # Bongkar nilai chat input: teks + lampiran + rekaman (bila didukung)
         if isinstance(user_input, str):
             raw_text, send_files, send_audio = user_input, [], None
         else:
@@ -2194,7 +1887,6 @@ html, body {
         text = (raw_text or "").strip()
         via_voice = False
 
-        # Kiriman suara tanpa teks → transkrip dulu dengan Groq Whisper
         if send_audio is not None and not text:
             if CHAT_READY:
                 try:
@@ -2213,7 +1905,6 @@ html, body {
                 st.rerun()
 
         images = collect_images(send_files)
-        # Gabungkan lampiran yang di-stage lewat menu ➕ (hindari duplikat)
         pending = st.session_state.get("pending_images", [])
         if pending:
             keys = {(im["name"], len(im["data"])) for im in images}
@@ -2230,9 +1921,6 @@ html, body {
 
         if text or images:
             now = datetime.now().strftime("%H:%M")
-
-            # Begitu KIRIM ditekan: kotak input langsung turun ke bawah
-            # dan scroll diaktifkan lagi (menimpa CSS halaman awal).
             if is_fresh:
                 st.markdown(
                     """
@@ -2247,7 +1935,6 @@ html, body { overflow: auto !important; }
                     unsafe_allow_html=True,
                 )
 
-            # simpan & tampilkan pesan user (+ thumbnail lampiran)
             user_msg = {
                 "id": next_msg_id(), "role": "user", "type": "text",
                 "content": text, "time": now,
@@ -2263,8 +1950,6 @@ html, body { overflow: auto !important; }
                 unsafe_allow_html=True,
             )
 
-            # Ada lampiran gambar → selalu chat vision (Yuki melihat gambarnya),
-            # walau toggle "Gambar" sedang aktif sekalipun.
             if st.session_state.image_mode and not images:
                 handle_image_request(text)
             else:
@@ -2273,14 +1958,11 @@ html, body { overflow: auto !important; }
 
             st.rerun()
 
-    # ---------- Footer ----------
-    # Halaman awal: ukuran normal. Saat chat berjalan: lebih kecil lagi.
     foot_class = "trinity-foot" if is_fresh else "trinity-foot in-chat"
     st.markdown(
         f'<p class="{foot_class}">🔱 Ampera Trinity AI · by Ampera Official · 2026</p>',
         unsafe_allow_html=True,
     )
-
 
 if __name__ == "__main__":
     main()
