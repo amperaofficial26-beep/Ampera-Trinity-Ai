@@ -390,7 +390,7 @@ div.stDownloadButton > button:hover {
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: shimmerSweep 2.6s linear infinite, phraseIn 1.6s ease both;
+    animation: shimmerSweep 4s linear infinite, phraseIn 3s ease both;
 }
 @keyframes shimmerSweep {
     0%   { background-position: 110% 0; }
@@ -407,17 +407,17 @@ div.stDownloadButton > button:hover {
 .claude-think .phrases .phrase {
     position: absolute; left: 0; top: 0; white-space: nowrap;
     opacity: 0;
-    animation: shimmerSweep 2.6s linear infinite,
-               phraseCycle 12s ease-in-out infinite;
+    animation: shimmerSweep 4s linear infinite,
+               phraseCycle 30s ease-in-out infinite;
 }
 .claude-think .phrases .phrase:nth-child(1) { animation-delay: 0s, 0s; }
-.claude-think .phrases .phrase:nth-child(2) { animation-delay: 0s, 4s; }
-.claude-think .phrases .phrase:nth-child(3) { animation-delay: 0s, 8s; }
+.claude-think .phrases .phrase:nth-child(2) { animation-delay: 0s, 10s; }
+.claude-think .phrases .phrase:nth-child(3) { animation-delay: 0s, 20s; }
 @keyframes phraseCycle {
-    0%      { opacity: 0; filter: blur(3px); }
-    6%      { opacity: 1; filter: blur(0); }
-    30%     { opacity: 1; filter: blur(0); }
-    36%     { opacity: 0; filter: blur(3px); }
+    0%      { opacity: 0; filter: blur(4px); }
+    10%     { opacity: 1; filter: blur(0); }
+    28%     { opacity: 1; filter: blur(0); }
+    33.3%   { opacity: 0; filter: blur(4px); }
     100%    { opacity: 0; }
 }
 
@@ -831,10 +831,10 @@ def handle_chat_request(answer_slot) -> None:
             client, model_id, st.session_state.messages
         )
         first = next(stream_iter, None)
-        # tahan sebentar agar animasi thinking terlihat perlahan (min ~1.6s)
+        # tahan agar animasi thinking terlihat perlahan (min ~4.5s)
         elapsed = time.time() - t0
-        if elapsed < 1.6:
-            time.sleep(1.6 - elapsed)
+        if elapsed < 4.5:
+            time.sleep(4.5 - elapsed)
         think_slot.empty()
 
         full = first or ""
