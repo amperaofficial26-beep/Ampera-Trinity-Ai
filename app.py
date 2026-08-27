@@ -1454,10 +1454,12 @@ def main() -> None:
         st.markdown(
             """
 <style>
-/* angkat dok input ke tengah layar saat belum ada percakapan */
+/* angkat dok input ke tengah layar saat belum ada percakapan
+   (turun sedikit agar tidak menutupi judul sapaan) */
 [data-testid="stBottom"] {
-    transform: translateY(-38vh);
+    transform: translateY(-26vh);
     background: transparent !important;
+    transition: transform 0.35s ease;
 }
 /* SEMUA lapisan dok harus transparan agar tidak menutupi judul sapaan */
 [data-testid="stBottom"] > div,
@@ -1467,12 +1469,19 @@ def main() -> None:
     background: transparent !important;
     background-color: transparent !important;
 }
+/* HALAMAN AWAL TIDAK BISA DI-SCROLL (atas/bawah) */
+[data-testid="stAppViewContainer"],
+[data-testid="stMain"],
+section.main,
+html, body {
+    overflow: hidden !important;
+}
 </style>
 """,
             unsafe_allow_html=True,
         )
         st.markdown(
-            '<div class="trinity-greeting" style="margin-top:20vh;">'
+            '<div class="trinity-greeting" style="margin-top:18vh;">'
             '<span class="star">✳</span> Semangat lagi, Ampera!'
             "</div>",
             unsafe_allow_html=True,
@@ -1533,6 +1542,22 @@ def main() -> None:
     if user_text and user_text.strip():
         text = user_text.strip()
         now = datetime.now().strftime("%H:%M")
+
+        # Begitu KIRIM ditekan: kotak input langsung turun ke bawah
+        # dan scroll diaktifkan lagi (menimpa CSS halaman awal).
+        if is_fresh:
+            st.markdown(
+                """
+<style>
+[data-testid="stBottom"] { transform: translateY(0) !important; }
+[data-testid="stAppViewContainer"],
+[data-testid="stMain"],
+section.main,
+html, body { overflow: auto !important; }
+</style>
+""",
+                unsafe_allow_html=True,
+            )
 
         # simpan & tampilkan pesan user
         st.session_state.messages.append({
