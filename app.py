@@ -458,14 +458,14 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 
 /* label "Yuki" dengan logo custom di atas jawaban AI */
 .ai-label {
-    display: inline-flex; align-items: center; gap: 8px;
-    font-size: 1.02rem; font-weight: 600; color: #3D3929;
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 0.92rem; font-weight: 600; color: #3D3929;
     margin-bottom: 6px;
 }
 
 /* ===== ukuran logo custom di berbagai tempat (statis, tanpa animasi) ===== */
 .logo-label {
-    width: 26px; height: 26px;
+    width: 30px; height: 30px;
     display: inline-block; vertical-align: middle;
 }
 .logo-greeting {
@@ -901,6 +901,12 @@ div.stDownloadButton > button:hover {
 .trinity-foot {
     text-align: center; color: #A8A69E; font-size: 0.6rem;
     margin-top: 34px; font-family: 'Inter', sans-serif;
+}
+/* versi saat chat berjalan: lebih kecil lagi dari versi halaman awal */
+.trinity-foot.in-chat {
+    font-size: 0.5rem;
+    color: #B8B6AC;
+    margin-top: 22px;
 }
 </style>
 """,
@@ -1683,8 +1689,10 @@ html, body { overflow: auto !important; }
         st.rerun()
 
     # ---------- Footer ----------
+    # Halaman awal: ukuran normal. Saat chat berjalan: lebih kecil lagi.
+    foot_class = "trinity-foot" if is_fresh else "trinity-foot in-chat"
     st.markdown(
-        '<p class="trinity-foot">🔱 Ampera Trinity AI · by Ampera Official · 2026</p>',
+        f'<p class="{foot_class}">🔱 Ampera Trinity AI · by Ampera Official · 2026</p>',
         unsafe_allow_html=True,
     )
 
