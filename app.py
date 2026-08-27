@@ -248,12 +248,13 @@ html, body, [data-testid="stAppViewContainer"], .stApp {
 [data-testid="stBottom"] > div {
     background: #F0EEE6 !important; border: none !important; box-shadow: none !important;
 }
+/* kotak input DIBUAT LEBIH TINGGI: ada ruang baris kontrol di dalamnya */
 [data-testid="stChatInput"] {
     background: #FAF9F5 !important;
     border: 1px solid #E3E0D5 !important;
-    border-radius: 18px !important;
+    border-radius: 22px !important;
     box-shadow: 0 4px 14px rgba(61,57,41,0.07) !important;
-    padding: 4px 8px !important;
+    padding: 6px 8px 52px 8px !important;
     transition: border-color .18s ease, box-shadow .18s ease !important;
 }
 [data-testid="stChatInput"]:hover {
@@ -293,6 +294,52 @@ html, body, [data-testid="stAppViewContainer"], .stApp {
     background: #E3E0D5 !important;
 }
 [data-testid="stChatInput"] button:disabled svg { fill: #A8A69E !important; color: #A8A69E !important; }
+
+/* ---------- baris kontrol DI DALAM kotak chat input ---------- */
+/* container dengan key "chat_controls" dipindah (fixed) ke area bawah
+   kotak input — menempati ruang padding-bottom 52px milik stChatInput */
+.st-key-chat_controls {
+    position: fixed;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(736px, calc(100vw - 3.2rem));
+    z-index: 99999;
+    background: transparent !important;
+}
+.st-key-chat_controls [data-testid="stHorizontalBlock"] {
+    align-items: center;
+    gap: 8px;
+}
+/* tombol model & toggle jadi chip kecil transparan di dalam kartu input */
+.st-key-chat_controls [data-testid="stPopover"] > button {
+    background: transparent !important;
+    border: 1px solid #E3E0D5 !important;
+    border-radius: 999px !important;
+    padding: 2px 12px !important;
+    min-height: 30px !important;
+    height: 30px !important;
+    font-size: 0.78rem !important;
+    color: #73726C !important;
+    box-shadow: none !important;
+    white-space: nowrap;
+}
+.st-key-chat_controls [data-testid="stPopover"] > button:hover {
+    border-color: #DA7756 !important;
+    color: #C15F3C !important;
+    background: rgba(218,119,86,0.06) !important;
+}
+.st-key-chat_controls [data-testid="stCheckbox"] {
+    margin: 0 !important;
+}
+.st-key-chat_controls [data-testid="stCheckbox"] label p {
+    font-size: 0.78rem !important;
+    color: #73726C !important;
+    white-space: nowrap;
+}
+/* rapikan tinggi elemen di baris kontrol */
+.st-key-chat_controls [data-testid="stVerticalBlock"] { gap: 0 !important; }
+.st-key-chat_controls .element-container { margin: 0 !important; }
 
 /* ---------- tombol & popover: pill lembut ala Claude ---------- */
 div.stButton > button, [data-testid="stPopover"] > button,
@@ -1063,36 +1110,31 @@ def main() -> None:
     for msg in st.session_state.messages:
         render_message(msg)
 
-    # ---------- Kontrol di area chat input ----------
-    # (Multi AI + Mode Gambar, keduanya di dekat kolom ketik sesuai permintaan)
-    ctrl_model, ctrl_mode = st.columns([1.4, 1])
+    # ---------- Kontrol DI DALAM kotak chat input ----------
+    # Container ber-key "chat_controls" dipindahkan oleh CSS (position:fixed)
+    # ke ruang bawah kotak st.chat_input → tampak menyatu seperti Claude.
+    with st.container(key="chat_controls"):
+        ctrl_model, ctrl_mode, _sp = st.columns([1.1, 1, 1.2])
 
-    with ctrl_model:
-        current = st.session_state.selected_model_label
-        short_name = current.split("—")[0].strip()
-        with st.popover(f"🤖 {short_name}", use_container_width=True):
-            st.markdown("**Pilih Model AI**")
-            for label in AVAILABLE_MODELS:
-                is_active = label == st.session_state.selected_model_label
-                btn_label = f"✅ {label}" if is_active else label
-                if st.button(btn_label, key=f"model_{label}", use_container_width=True):
-                    st.session_state.selected_model_label = label
-                    st.rerun()
+        with ctrl_model:
+            current = st.session_state.selected_model_label
+            short_name = current.split("—")[0].strip()
+            with st.popover(f"{short_name} ▾", use_container_width=True):
+                st.markdown("**Pilih Model AI**")
+                for label in AVAILABLE_MODELS:
+                    is_active = label == st.session_state.selected_model_label
+                    btn_label = f"✅ {label}" if is_active else label
+                    if st.button(btn_label, key=f"model_{label}", use_container_width=True):
+                        st.session_state.selected_model_label = label
+                        st.rerun()
 
-    with ctrl_mode:
-        st.session_state.image_mode = st.toggle(
-            "🎨 Mode Gambar",
-            value=st.session_state.image_mode,
-            help="Nyalakan untuk membuat gambar dari teks (Cloudflare FLUX). "
-                 "Matikan untuk chat biasa dengan Yuki.",
-        )
-
-    # Badge mode aktif
-    if st.session_state.image_mode:
-        st.markdown(
-            '<span class="mode-badge img">🎨 Mode Gambar aktif — tulis deskripsi gambarmu</span>',
-            unsafe_allow_html=True,
-        )
+        with ctrl_mode:
+            st.session_state.image_mode = st.toggle(
+                "🎨 Gambar",
+                value=st.session_state.image_mode,
+                help="Nyalakan untuk membuat gambar dari teks (Cloudflare FLUX). "
+                     "Matikan untuk chat biasa dengan Yuki.",
+            )
 
     # ---------- Chat input ----------
     placeholder_text = (
