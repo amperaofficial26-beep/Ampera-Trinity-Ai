@@ -757,8 +757,7 @@ div.stDownloadButton > button:hover {
         #C96A47 68%, #C96A47 100%
     );
     background-size: 240% 100%;
-    -webkit-mask-image: var(--logo-mask);
-    mask-image: var(--logo-mask);
+    /* mask-image diisi lewat blok <style> global (base64 logo) */
     -webkit-mask-repeat: no-repeat;
     mask-repeat: no-repeat;
     -webkit-mask-size: contain;
@@ -912,6 +911,22 @@ div.stDownloadButton > button:hover {
 """,
         unsafe_allow_html=True,
     )
+
+    # Mask logo untuk shimmer thinking — HARUS lewat blok <style> global
+    # (atribut style inline dengan url(data:...) disaring sanitizer Streamlit)
+    logo_b64 = _thinking_logo_b64()
+    if logo_b64:
+        st.markdown(
+            f"""
+<style>
+.claude-think .logo-shimmer {{
+    -webkit-mask-image: url("data:image/png;base64,{logo_b64}");
+    mask-image: url("data:image/png;base64,{logo_b64}");
+}}
+</style>
+""",
+            unsafe_allow_html=True,
+        )
 
 
 # ============================================================================
@@ -1209,12 +1224,9 @@ def thinking_html(phrases: list[str]) -> str:
     )
     logo_b64 = _thinking_logo_b64()
     if logo_b64:
-        # Logo sebagai mask → shimmer (gradasi terang) menyapu di dalam
-        # bentuk logo + denyut membesar-mengecil.
-        icon = (
-            '<span class="logo-shimmer" '
-            f'style="--logo-mask:url(data:image/png;base64,{logo_b64});"></span>'
-        )
+        # Logo sebagai mask (didefinisikan di CSS global oleh inject_css)
+        # → shimmer menyapu di dalam bentuk logo + denyut membesar-mengecil.
+        icon = '<span class="logo-shimmer"></span>'
     else:
         icon = '<span class="star">✳</span>'  # fallback bila file logo hilang
     return (
