@@ -14,6 +14,8 @@ Fitur suara & gambar (via Groq, satu API key yang sama):
                    (canopylabs/orpheus-v1-english — paling pas utk teks Inggris)
   - Gambar 📎    → kirim/paste/drag-drop gambar, dianalisis model vision
                    Llama-4 Scout (meta-llama/llama-4-scout-17b-16e-instruct)
+  - Menu ➕      → popup ala Claude: lampiran gambar, mode chat/gambar,
+                   pencarian web (Compound), suara Yuki, unduh chat, chat baru
 
 Catatan sesuai kesepakatan:
   - Style/CSS       : buatan sendiri (bukan bawaan app lama) — bebas diedit nanti
@@ -604,7 +606,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 /* ---------- baris kontrol DI BAWAH kotak chat input (ala Claude) ---------- */
 /* Berada di dok bawah Streamlit (satu wadah dengan st.chat_input)
    → otomatis ikut bergeser saat sidebar dibuka/ditutup.
-   Layout: [toggle Gambar] [toggle Suara] ... [Nama Model] */
+   Layout: [toggle Gambar] ......... [Nama Model]  (model di kanan spt Claude) */
 .st-key-chat_controls {
     position: relative;
     margin-top: 2px !important;
@@ -617,12 +619,12 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     flex-wrap: nowrap !important;
 }
 /* kolom kiri & kanan menyusut mengikuti isi, spacer tengah melar */
-.st-key-chat_controls [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {
+.st-key-chat_controls [data-testid="stHorizontalBlock"]:last-of-type > [data-testid="stColumn"] {
     width: auto !important;
     flex: 0 0 auto !important;
     min-width: 0 !important;
 }
-.st-key-chat_controls [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(3) {
+.st-key-chat_controls [data-testid="stHorizontalBlock"]:last-of-type > [data-testid="stColumn"]:nth-child(4) {
     flex: 1 1 auto !important;
 }
 /* disclaimer kecil di tengah (ala Claude) */
@@ -690,6 +692,76 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 /* rapikan tinggi elemen di baris kontrol */
 .st-key-chat_controls [data-testid="stVerticalBlock"] { gap: 0 !important; }
 .st-key-chat_controls .element-container { margin: 0 !important; }
+
+/* ---------- MENU ➕ ALA CLAUDE ---------- */
+/* sembunyikan tombol lampiran bawaan Streamlit (diganti menu ➕);
+   drag-drop & paste Ctrl+V tetap berfungsi (ditangani elemen lain) */
+[data-testid="stChatInput"] [data-testid="stChatInputFileUploadButton"] {
+    display: none !important;
+}
+/* tombol mic / rekam: bulat putih senada (bukan terracotta) */
+[data-testid="stChatInput"] [data-testid="stChatInputMicButton"],
+[data-testid="stChatInput"] [data-testid="stChatInputCancelButton"],
+[data-testid="stChatInput"] [data-testid="stChatInputApproveButton"] {
+    background: #FAF9F5 !important;
+    border: 1px solid #E3E0D5 !important;
+    border-radius: 10px !important;
+    color: #57544A !important;
+    box-shadow: none !important;
+}
+[data-testid="stChatInput"] [data-testid="stChatInputMicButton"] svg,
+[data-testid="stChatInput"] [data-testid="stChatInputCancelButton"] svg,
+[data-testid="stChatInput"] [data-testid="stChatInputApproveButton"] svg {
+    fill: #57544A !important; color: #57544A !important;
+}
+[data-testid="stChatInput"] [data-testid="stChatInputMicButton"]:hover {
+    border-color: #DA7756 !important;
+}
+/* tombol ➕ di baris kontrol: lingkaran putih bersih ala Claude */
+.st-key-chat_controls .st-key-plus_menu [data-testid="stPopover"] button {
+    background: #FAF9F5 !important;
+    border: 1px solid #E3E0D5 !important;
+    border-radius: 999px !important;
+    min-width: 34px !important;
+    width: 34px !important;
+    min-height: 34px !important;
+    height: 34px !important;
+    padding: 0 !important;
+    font-size: 1.05rem !important;
+    font-weight: 400 !important;
+    color: #3D3929 !important;
+    box-shadow: 0 1px 2px rgba(61,57,41,0.06) !important;
+    justify-content: center !important;
+}
+.st-key-chat_controls .st-key-plus_menu [data-testid="stPopover"] button:hover {
+    background: #FFFFFF !important;
+    border-color: #DA7756 !important;
+    color: #C15F3C !important;
+    box-shadow: 0 2px 8px rgba(218,119,86,0.18) !important;
+}
+/* label seksi + hint kecil di dalam menu ➕ (ala grup sidebar Claude) */
+.plus-menu-label {
+    font-size: 0.74rem; font-weight: 500; color: #8B887D;
+    padding: 8px 12px 2px; letter-spacing: 0.02em;
+}
+.plus-menu-hint {
+    font-size: 0.72rem; color: #A8A69E;
+    padding: 2px 12px 4px;
+}
+/* strip lampiran yang menunggu dikirim (hasil menu ➕) */
+.st-key-pending_strip { padding: 2px 2px 0; }
+.st-key-pending_strip [data-testid="stHorizontalBlock"] {
+    gap: 10px !important;
+    align-items: flex-start !important;
+}
+.st-key-pending_strip [data-testid="stImage"] { margin: 0 !important; }
+.st-key-pending_strip button {
+    min-height: 24px !important;
+    height: 24px !important;
+    font-size: 0.72rem !important;
+    padding: 0 10px !important;
+    border-radius: 8px !important;
+}
 
 /* ---------- tombol & popover: pill lembut ala Claude ---------- */
 div.stButton > button, [data-testid="stPopover"] > button,
@@ -1511,6 +1583,11 @@ def init_state() -> None:
         st.session_state.image_mode = False
     if "voice_reply" not in st.session_state:
         st.session_state.voice_reply = False
+    # Lampiran yang di-stage lewat menu ➕ (menunggu dikirim bersama pesan)
+    if "pending_images" not in st.session_state:
+        st.session_state.pending_images = []
+    if "plus_uploader_gen" not in st.session_state:
+        st.session_state.plus_uploader_gen = 0
     if "msg_counter" not in st.session_state:
         st.session_state.msg_counter = 1
     # Riwayat percakapan (untuk sidebar ala Claude)
@@ -1877,8 +1954,106 @@ html, body {
     bottom_dock = getattr(st, "bottom", None) or st._bottom
     with bottom_dock:
         with st.container(key="chat_controls"):
-            # [toggle Gambar] [toggle Suara] ....spacer.... [Nama Model]
-            ctrl_mode, ctrl_voice, _sp, ctrl_model = st.columns([0.24, 0.22, 1.18, 0.3])
+
+            # ---- Strip lampiran yang menunggu dikirim (dari menu ➕) ----
+            pending = st.session_state.get("pending_images", [])
+            if pending:
+                with st.container(key="pending_strip"):
+                    pcols = st.columns([0.1] * len(pending) + [1.0])
+                    for i, im in enumerate(pending):
+                        with pcols[i]:
+                            st.image(im["data"], width=54)
+                            if st.button("✕", key=f"pending_rm_{i}",
+                                         use_container_width=True):
+                                st.session_state.pending_images.pop(i)
+                                st.rerun()
+                    with pcols[-1]:
+                        st.markdown(
+                            '<div class="plus-menu-hint">📎 Siap dikirim bersama '
+                            'pesan berikutnya…</div>',
+                            unsafe_allow_html=True,
+                        )
+
+            # [➕ menu] [Gambar] [Suara] ....spacer.... [Nama Model]
+            ctrl_plus, ctrl_mode, ctrl_voice, _sp, ctrl_model = st.columns(
+                [0.08, 0.2, 0.18, 1.04, 0.28]
+            )
+
+            # ---- Menu ➕ ala Claude: semua aksi dalam satu popup ----
+            with ctrl_plus:
+                with st.container(key="plus_menu"):
+                    with st.popover(":material/add:", use_container_width=False,
+                                    help="Tambahkan lampiran & aksi lainnya"):
+                        st.markdown('<div class="plus-menu-label">LAMPIRAN</div>',
+                                    unsafe_allow_html=True)
+                        gen = st.session_state.get("plus_uploader_gen", 0)
+                        picked = st.file_uploader(
+                            "Tambahkan gambar",
+                            type=IMAGE_INPUT_TYPES,
+                            accept_multiple_files=True,
+                            label_visibility="collapsed",
+                            key=f"plus_uploader_{gen}",
+                        )
+                        if picked:
+                            staged = st.session_state.get("pending_images", [])
+                            seen = {(im["name"], len(im["data"])) for im in staged}
+                            for im in collect_images(picked):
+                                k = (im["name"], len(im["data"]))
+                                if k not in seen:
+                                    staged.append(im)
+                                    seen.add(k)
+                            st.session_state.pending_images = staged
+                        st.markdown(
+                            '<div class="plus-menu-hint">Pilih gambar — atau tempel '
+                            '(Ctrl+V) langsung di kotak chat.</div>',
+                            unsafe_allow_html=True,
+                        )
+
+                        st.markdown('<div class="plus-menu-label">MODE</div>',
+                                    unsafe_allow_html=True)
+                        chk = "" if st.session_state.image_mode else " :orange[✓]"
+                        if st.button(f"💬 &nbsp;Chat dengan Yuki{chk}", key="pm_chat",
+                                     use_container_width=True):
+                            st.session_state.image_mode = False
+                            st.rerun()
+                        chk = " :orange[✓]" if st.session_state.image_mode else ""
+                        if st.button(f"🎨 &nbsp;Buat gambar (FLUX){chk}", key="pm_img",
+                                     use_container_width=True):
+                            st.session_state.image_mode = True
+                            st.rerun()
+
+                        st.markdown('<div class="plus-menu-label">PENCARIAN</div>',
+                                    unsafe_allow_html=True)
+                        web_on = st.session_state.selected_model_label == "Compound"
+                        chk = " :orange[✓]" if web_on else ""
+                        if st.button(f"🌐 &nbsp;Pencarian web (Compound){chk}",
+                                     key="pm_web", use_container_width=True):
+                            st.session_state.selected_model_label = "Compound"
+                            st.rerun()
+
+                        st.markdown('<div class="plus-menu-label">LAINNYA</div>',
+                                    unsafe_allow_html=True)
+                        chk = " :orange[✓]" if st.session_state.get("voice_reply") else ""
+                        if st.button(f"🔊 &nbsp;Suara Yuki{chk}", key="pm_voice",
+                                     use_container_width=True):
+                            st.session_state.voice_reply = not st.session_state.get("voice_reply", False)
+                            st.rerun()
+                        st.download_button(
+                            label="⬇️ &nbsp;Unduh chat (.md)",
+                            data=get_chat_export_text(),
+                            file_name=f"trinity-chat-{datetime.now().strftime('%Y%m%d-%H%M')}.md",
+                            mime="text/markdown",
+                            use_container_width=True,
+                            key="pm_download",
+                        )
+                        if st.button("🕘 &nbsp;Chat baru", key="pm_new",
+                                     use_container_width=True):
+                            st.session_state.pending_images = []
+                            st.session_state.plus_uploader_gen = (
+                                st.session_state.get("plus_uploader_gen", 0) + 1
+                            )
+                            reset_conversation()
+                            st.rerun()
 
             with ctrl_mode:
                 st.session_state.image_mode = st.toggle(
@@ -1951,6 +2126,20 @@ html, body {
                 st.rerun()
 
         images = collect_images(send_files)
+        # Gabungkan lampiran yang di-stage lewat menu ➕ (hindari duplikat)
+        pending = st.session_state.get("pending_images", [])
+        if pending:
+            keys = {(im["name"], len(im["data"])) for im in images}
+            for im in pending:
+                k = (im["name"], len(im["data"]))
+                if k not in keys:
+                    images.append(im)
+                    keys.add(k)
+            st.session_state.pending_images = []
+            st.session_state.plus_uploader_gen = (
+                st.session_state.get("plus_uploader_gen", 0) + 1
+            )
+        images = images[:MAX_IMAGES_PER_MESSAGE]
 
         if text or images:
             now = datetime.now().strftime("%H:%M")
