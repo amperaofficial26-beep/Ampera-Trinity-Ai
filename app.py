@@ -65,16 +65,21 @@ APP_TAGLINE = "Multi AI · Generate Foto · Chat — by Ampera Official"
 # --- Multi AI (dari App 3: Ampera Multi AI) ---
 GROQ_BASE_URL = "https://api.groq.com/openai/v1"
 # Katalog model ala Claude: nama polos + deskripsi kecil (tanpa emoji)
+# Setiap entri punya "key" unik (dipakai internal & sebagai Streamlit key)
+# terpisah dari "name" (label tampilan) karena dua model boleh berbagi nama
+# tier yang sama (mis. dua model "Trinity Normal").
+# Diurutkan dari tingkat termudah → tertinggi; tier Hard & Extreme = premium.
 MODEL_CATALOG = [
-    {"name": "GPT-OSS 20B",   "desc": "Cepat untuk chat & coding ringan",      "id": "openai/gpt-oss-20b"},
-    {"name": "GPT-OSS 120B",  "desc": "Reasoning mendalam untuk tugas berat",  "id": "openai/gpt-oss-120b"},
-    {"name": "Compound",      "desc": "Browsing web & eksekusi kode",          "id": "groq/compound"},
-    {"name": "Compound Mini", "desc": "Web search ringkas & cepat",            "id": "groq/compound-mini"},
-    {"name": "Llama-4 Scout", "desc": "Bisa melihat & menganalisis gambar",    "id": "meta-llama/llama-4-scout-17b-16e-instruct"},
-    {"name": "Qwen3.6 27B",   "desc": "Reasoning & matematika",                "id": "qwen/qwen3.6-27b"},
+    {"key": "gpt_oss_20b",   "name": "Trinity Easy",    "desc": "Cepat untuk chat & coding ringan",      "id": "openai/gpt-oss-20b", "premium": False},
+    {"key": "compound_mini", "name": "Trinity Normal",  "desc": "Web search ringkas & cepat",            "id": "groq/compound-mini", "premium": False},
+    {"key": "llama4_scout",  "name": "Trinity Normal",  "desc": "Bisa melihat & menganalisis gambar",    "id": "meta-llama/llama-4-scout-17b-16e-instruct", "premium": False},
+    {"key": "compound",      "name": "Trinity Hard",    "desc": "Browsing web & eksekusi kode",          "id": "groq/compound", "premium": True},
+    {"key": "qwen3_6_27b",   "name": "Trinity Hard",    "desc": "Reasoning & matematika",                "id": "qwen/qwen3.6-27b", "premium": True},
+    {"key": "gpt_oss_120b",  "name": "Trinity Extreme", "desc": "Reasoning mendalam untuk tugas berat",  "id": "openai/gpt-oss-120b", "premium": True},
 ]
-AVAILABLE_MODELS = {m["name"]: m["id"] for m in MODEL_CATALOG}
-DEFAULT_MODEL_LABEL = "GPT-OSS 20B"
+AVAILABLE_MODELS = {m["key"]: m["id"] for m in MODEL_CATALOG}
+MODEL_BY_KEY = {m["key"]: m for m in MODEL_CATALOG}
+DEFAULT_MODEL_KEY = "gpt_oss_20b"
 
 # Model vision (wajib dipakai saat pesan membawa gambar)
 VISION_MODEL_ID = "meta-llama/llama-4-scout-17b-16e-instruct"
@@ -556,21 +561,27 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 [data-testid="stBottom"] > div {
     background: #F0EEE6 !important; border: none !important; box-shadow: none !important;
 }
-/* kotak input 1 BARIS ala Claude (kontrol ada DI BAWAH kotak, bukan di dalam) */
-[data-testid="stChatInput"] {
+/* KARTU GABUNGAN ala Claude: kotak teks + baris kontrol (+, toggle, model)
+   dibungkus jadi SATU kartu membulat, supaya tombol + terlihat menyatu
+   di dalam kotak chat input (bukan komponen terpisah di bawahnya). */
+[data-testid="stBottomBlockContainer"] {
     background: #FAF9F5 !important;
     border: 1px solid #E3E0D5 !important;
-    border-radius: 16px !important;
+    border-radius: 22px !important;
     box-shadow: 0 4px 14px rgba(61,57,41,0.07) !important;
-    padding: 4px 8px !important;
+    padding: 6px 6px 4px !important;
     transition: border-color .18s ease, box-shadow .18s ease !important;
 }
-[data-testid="stChatInput"]:hover {
-    border-color: #D5D1C3 !important;
-}
-[data-testid="stChatInput"]:focus-within {
+[data-testid="stBottomBlockContainer"]:focus-within {
     border-color: #DA7756 !important;
     box-shadow: 0 4px 18px rgba(218,119,86,0.16) !important;
+}
+/* kotak input itu sendiri melebur transparan ke dalam kartu gabungan */
+[data-testid="stChatInput"] {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 2px 6px !important;
 }
 [data-testid="stChatInput"] div,
 [data-testid="stChatInput"] [data-baseweb="base-input"],
@@ -603,14 +614,14 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 }
 [data-testid="stChatInput"] button:disabled svg { fill: #A8A69E !important; color: #A8A69E !important; }
 
-/* ---------- baris kontrol DI BAWAH kotak chat input (ala Claude) ---------- */
+/* ---------- baris kontrol DI DALAM kartu, tepat di bawah teks (ala Claude) ---------- */
 /* Berada di dok bawah Streamlit (satu wadah dengan st.chat_input)
    → otomatis ikut bergeser saat sidebar dibuka/ditutup.
-   Layout: [toggle Gambar] ......... [Nama Model]  (model di kanan spt Claude) */
+   Layout: [+] [toggle Gambar] [toggle Suara] ......... [Nama Model] */
 .st-key-chat_controls {
     position: relative;
-    margin-top: 2px !important;
-    padding: 0 6px 6px;
+    margin-top: 0 !important;
+    padding: 2px 4px 2px;
     background: transparent !important;
 }
 .st-key-chat_controls [data-testid="stHorizontalBlock"] {
@@ -693,7 +704,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 .st-key-chat_controls [data-testid="stVerticalBlock"] { gap: 0 !important; }
 .st-key-chat_controls .element-container { margin: 0 !important; }
 
-/* ---------- MENU ➕ ALA CLAUDE ---------- */
+/* ---------- MENU ➕ ALA CLAUDE (minimalist: upload saja) ---------- */
 /* sembunyikan tombol lampiran bawaan Streamlit (diganti menu ➕);
    drag-drop & paste Ctrl+V tetap berfungsi (ditangani elemen lain) */
 [data-testid="stChatInput"] [data-testid="stChatInputFileUploadButton"] {
@@ -717,36 +728,32 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 [data-testid="stChatInput"] [data-testid="stChatInputMicButton"]:hover {
     border-color: #DA7756 !important;
 }
-/* tombol ➕ di baris kontrol: lingkaran putih bersih ala Claude */
+/* tombol ➕ di baris kontrol: lingkaran putih bersih ala Claude, menyatu
+   di dalam kartu (tanpa bayangan berlebih karena kartu sudah punya shadow) */
 .st-key-chat_controls .st-key-plus_menu [data-testid="stPopover"] button {
-    background: #FAF9F5 !important;
+    background: #FFFFFF !important;
     border: 1px solid #E3E0D5 !important;
     border-radius: 999px !important;
-    min-width: 34px !important;
-    width: 34px !important;
-    min-height: 34px !important;
-    height: 34px !important;
+    min-width: 32px !important;
+    width: 32px !important;
+    min-height: 32px !important;
+    height: 32px !important;
     padding: 0 !important;
     font-size: 1.05rem !important;
     font-weight: 400 !important;
     color: #3D3929 !important;
-    box-shadow: 0 1px 2px rgba(61,57,41,0.06) !important;
+    box-shadow: none !important;
     justify-content: center !important;
 }
 .st-key-chat_controls .st-key-plus_menu [data-testid="stPopover"] button:hover {
-    background: #FFFFFF !important;
+    background: #F5F4EF !important;
     border-color: #DA7756 !important;
     color: #C15F3C !important;
-    box-shadow: 0 2px 8px rgba(218,119,86,0.18) !important;
 }
-/* label seksi + hint kecil di dalam menu ➕ (ala grup sidebar Claude) */
-.plus-menu-label {
-    font-size: 0.74rem; font-weight: 500; color: #8B887D;
-    padding: 8px 12px 2px; letter-spacing: 0.02em;
-}
+/* isi popover ➕ minimalist: cukup tombol unggah, tanpa label/hint besar */
 .plus-menu-hint {
     font-size: 0.72rem; color: #A8A69E;
-    padding: 2px 12px 4px;
+    padding: 2px 4px 4px;
 }
 /* strip lampiran yang menunggu dikirim (hasil menu ➕) */
 .st-key-pending_strip { padding: 2px 2px 0; }
@@ -830,6 +837,19 @@ div.stDownloadButton > button:hover {
     font-weight: 500 !important;
     color: #3D3929 !important;
     line-height: 1.45 !important;
+}
+/* label PREMIUM kecil di sebelah nama model (tier Hard & Extreme) */
+.model-premium-badge {
+    display: inline-block;
+    font-size: 0.62rem; font-weight: 700;
+    color: #C15F3C;
+    background: rgba(218,119,86,0.12);
+    border: 1px solid rgba(218,119,86,0.35);
+    border-radius: 999px;
+    padding: 1px 7px;
+    margin-left: 6px;
+    letter-spacing: 0.03em;
+    vertical-align: middle;
 }
 /* rapatkan jarak antar item */
 [data-testid="stPopoverBody"] .element-container { margin: 0 !important; }
@@ -1577,8 +1597,8 @@ def init_state() -> None:
     # hanya sapaan besar + input di tengah.
     if "messages" not in st.session_state:
         st.session_state.messages = []
-    if "selected_model_label" not in st.session_state:
-        st.session_state.selected_model_label = DEFAULT_MODEL_LABEL
+    if "selected_model_key" not in st.session_state:
+        st.session_state.selected_model_key = DEFAULT_MODEL_KEY
     if "image_mode" not in st.session_state:
         st.session_state.image_mode = False
     if "voice_reply" not in st.session_state:
@@ -1803,8 +1823,8 @@ def handle_chat_request(answer_slot) -> None:
         return
 
     model_id = AVAILABLE_MODELS.get(
-        st.session_state.selected_model_label,
-        AVAILABLE_MODELS[DEFAULT_MODEL_LABEL],
+        st.session_state.selected_model_key,
+        AVAILABLE_MODELS[DEFAULT_MODEL_KEY],
     )
     # Pesan bergambar WAJIB lewat model vision (model teks tidak bisa lihat gambar)
     last_user = next(
@@ -1979,16 +1999,17 @@ html, body {
                 [0.08, 0.2, 0.18, 1.04, 0.28]
             )
 
-            # ---- Menu ➕ ala Claude: semua aksi dalam satu popup ----
+            # ---- Menu ➕ ala Claude: MINIMALIST, hanya unggah file/gambar ----
+            # (mode chat/gambar, pencarian web, suara, unduh & chat baru
+            # sudah tersedia di luar popup ini: toggle di baris kontrol
+            # dan menu sidebar — jadi tidak diduplikasi di sini)
             with ctrl_plus:
                 with st.container(key="plus_menu"):
                     with st.popover(":material/add:", use_container_width=False,
-                                    help="Tambahkan lampiran & aksi lainnya"):
-                        st.markdown('<div class="plus-menu-label">LAMPIRAN</div>',
-                                    unsafe_allow_html=True)
+                                    help="Unggah file atau gambar"):
                         gen = st.session_state.get("plus_uploader_gen", 0)
                         picked = st.file_uploader(
-                            "Tambahkan gambar",
+                            "Unggah file / gambar",
                             type=IMAGE_INPUT_TYPES,
                             accept_multiple_files=True,
                             label_visibility="collapsed",
@@ -2004,56 +2025,10 @@ html, body {
                                     seen.add(k)
                             st.session_state.pending_images = staged
                         st.markdown(
-                            '<div class="plus-menu-hint">Pilih gambar — atau tempel '
-                            '(Ctrl+V) langsung di kotak chat.</div>',
+                            '<div class="plus-menu-hint">Atau tempel (Ctrl+V) / '
+                            'drag-drop langsung di kotak chat.</div>',
                             unsafe_allow_html=True,
                         )
-
-                        st.markdown('<div class="plus-menu-label">MODE</div>',
-                                    unsafe_allow_html=True)
-                        chk = "" if st.session_state.image_mode else " :orange[✓]"
-                        if st.button(f"💬 &nbsp;Chat dengan Yuki{chk}", key="pm_chat",
-                                     use_container_width=True):
-                            st.session_state.image_mode = False
-                            st.rerun()
-                        chk = " :orange[✓]" if st.session_state.image_mode else ""
-                        if st.button(f"🎨 &nbsp;Buat gambar (FLUX){chk}", key="pm_img",
-                                     use_container_width=True):
-                            st.session_state.image_mode = True
-                            st.rerun()
-
-                        st.markdown('<div class="plus-menu-label">PENCARIAN</div>',
-                                    unsafe_allow_html=True)
-                        web_on = st.session_state.selected_model_label == "Compound"
-                        chk = " :orange[✓]" if web_on else ""
-                        if st.button(f"🌐 &nbsp;Pencarian web (Compound){chk}",
-                                     key="pm_web", use_container_width=True):
-                            st.session_state.selected_model_label = "Compound"
-                            st.rerun()
-
-                        st.markdown('<div class="plus-menu-label">LAINNYA</div>',
-                                    unsafe_allow_html=True)
-                        chk = " :orange[✓]" if st.session_state.get("voice_reply") else ""
-                        if st.button(f"🔊 &nbsp;Suara Yuki{chk}", key="pm_voice",
-                                     use_container_width=True):
-                            st.session_state.voice_reply = not st.session_state.get("voice_reply", False)
-                            st.rerun()
-                        st.download_button(
-                            label="⬇️ &nbsp;Unduh chat (.md)",
-                            data=get_chat_export_text(),
-                            file_name=f"trinity-chat-{datetime.now().strftime('%Y%m%d-%H%M')}.md",
-                            mime="text/markdown",
-                            use_container_width=True,
-                            key="pm_download",
-                        )
-                        if st.button("🕘 &nbsp;Chat baru", key="pm_new",
-                                     use_container_width=True):
-                            st.session_state.pending_images = []
-                            st.session_state.plus_uploader_gen = (
-                                st.session_state.get("plus_uploader_gen", 0) + 1
-                            )
-                            reset_conversation()
-                            st.rerun()
 
             with ctrl_mode:
                 st.session_state.image_mode = st.toggle(
@@ -2082,16 +2057,19 @@ html, body {
                     )
 
             with ctrl_model:
-                current = st.session_state.selected_model_label
-                with st.popover(current, use_container_width=False):
-                    # Daftar model ala Claude: baris teks polos (nama + deskripsi),
-                    # tanpa kotak per item — model aktif ditandai ✓
+                current_key = st.session_state.selected_model_key
+                current_name = MODEL_BY_KEY.get(current_key, MODEL_BY_KEY[DEFAULT_MODEL_KEY])["name"]
+                with st.popover(current_name, use_container_width=False):
+                    # Daftar model ala Claude, sudah terurut dari tingkat
+                    # termudah → tertinggi. Tier Hard & Extreme diberi
+                    # label PREMIUM kecil di sebelah nama.
                     for m in MODEL_CATALOG:
-                        is_active = m["name"] == st.session_state.selected_model_label
+                        is_active = m["key"] == st.session_state.selected_model_key
                         check = " :orange[✓]" if is_active else ""
-                        label = f"{m['name']}{check}  \n:small[:gray[{m['desc']}]]"
-                        if st.button(label, key=f"model_{m['name']}", use_container_width=True):
-                            st.session_state.selected_model_label = m["name"]
+                        premium_tag = "  :orange-background[PREMIUM]" if m.get("premium") else ""
+                        label = f"{m['name']}{premium_tag}{check}  \n:small[:gray[{m['desc']}]]"
+                        if st.button(label, key=f"model_{m['key']}", use_container_width=True):
+                            st.session_state.selected_model_key = m["key"]
                             st.rerun()
 
     # ---------- Proses kiriman (teks / lampiran gambar / rekaman suara) ----------
