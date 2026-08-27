@@ -42,7 +42,7 @@ st.set_page_config(
     page_title="Ampera Trinity AI",
     page_icon="🔱",
     layout="centered",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed",
 )
 
 # ============================================================================
@@ -118,129 +118,226 @@ IMAGE_READY = bool(CF_ACCOUNT_ID and CF_API_TOKEN)
 
 
 # ============================================================================
-# CSS BUATAN SENDIRI (sederhana & bersih — bebas kita edit nanti)
+# CSS — TEMA ALA CLAUDE.AI (buatan sendiri)
+#   Latar krem hangat, judul serif, aksen terracotta, UI kalem & bersih
 # ============================================================================
 def inject_css() -> None:
     st.markdown(
         """
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ============ PALET WARNA CLAUDE ============
+   Latar utama : #F0EEE6 (krem hangat)
+   Permukaan   : #FAF9F5 (putih gading)
+   Bubble user : #E8E5D8 / #EDEAE0
+   Teks utama  : #3D3929 (cokelat gelap hangat)
+   Teks sekunder: #73726C
+   Aksen       : #DA7756 (terracotta) / hover #C15F3C
+   Border      : #E3E0D5
+============================================== */
 
 /* ---------- dasar ---------- */
 html, body, [data-testid="stAppViewContainer"], .stApp {
-    background: linear-gradient(160deg, #0b0f1a 0%, #131a2e 55%, #0b0f1a 100%) !important;
-    color: #eef2ff;
-    font-family: 'Inter', sans-serif;
+    background: #F0EEE6 !important;
+    color: #3D3929;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
 }
 [data-testid="stHeader"] { background: transparent !important; }
-#MainMenu, footer { visibility: hidden; }
+#MainMenu, footer, [data-testid="stToolbar"], [data-testid="stDecoration"] { visibility: hidden; }
+[data-testid="stSidebar"], [data-testid="stSidebarCollapsedControl"] { display: none !important; }
 [data-testid="stMainBlockContainer"] {
-    max-width: 860px;
-    padding-bottom: 9rem !important;
+    max-width: 768px;
+    padding-top: 1.2rem !important;
+    padding-bottom: 10rem !important;
 }
 
-/* ---------- header app ---------- */
+/* scrollbar halus ala Claude */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #D5D1C3; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #BFBAA8; }
+
+::selection { background: rgba(218,119,86,0.25); }
+
+/* ---------- header app (minimal, serif ala Claude) ---------- */
 .trinity-head {
-    display: flex; align-items: center; gap: 14px;
-    padding: 14px 18px; margin-bottom: 18px;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.10);
-    border-radius: 18px;
-    backdrop-filter: blur(14px);
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px; padding: 4px 0 2px; margin-bottom: 6px;
 }
 .trinity-logo {
-    width: 48px; height: 48px; border-radius: 14px;
-    display: grid; place-items: center; font-size: 24px;
-    background: linear-gradient(135deg, #6366f1, #ec4899);
-    box-shadow: 0 0 22px rgba(99,102,241,0.45);
+    width: 34px; height: 34px; border-radius: 10px;
+    display: grid; place-items: center; font-size: 17px;
+    background: #DA7756; color: #FFFFFF;
     flex-shrink: 0;
 }
 .trinity-head h1 {
-    margin: 0; font-family: 'Poppins', sans-serif;
-    font-size: 1.3rem; font-weight: 700;
-    background: linear-gradient(135deg, #ffffff, #a5b4fc);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin: 0;
+    font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+    font-size: 1.45rem; font-weight: 600;
+    color: #3D3929; letter-spacing: -0.01em;
 }
-.trinity-head p { margin: 2px 0 0; color: #94a3b8; font-size: 0.82rem; }
+.trinity-head p {
+    margin: 0; color: #73726C; font-size: 0.78rem; font-weight: 400;
+}
+.trinity-sub {
+    text-align: center; color: #73726C; font-size: 0.8rem;
+    margin: 0 0 22px;
+}
 
-/* ---------- bubble chat ---------- */
-.bubble-row { display: flex; width: 100%; margin-bottom: 14px; }
-.bubble-row.user { justify-content: flex-end; }
-.bubble-row.ai   { justify-content: flex-start; }
+/* sapaan besar serif ala halaman awal Claude */
+.trinity-greeting {
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 1.9rem; font-weight: 500; color: #3D3929;
+    text-align: center; margin: 26px 0 4px;
+    letter-spacing: -0.02em;
+}
+.trinity-greeting .star { color: #DA7756; }
+
+/* ---------- pesan: gaya percakapan Claude ---------- */
+/* User: bubble krem membulat di kanan */
+.bubble-row { display: flex; width: 100%; margin-bottom: 4px; }
+.bubble-row.user { justify-content: flex-end; margin: 14px 0; }
+.bubble-row.ai   { justify-content: flex-start; margin: 6px 0 18px; }
 
 .bubble {
-    max-width: 78%;
-    padding: 11px 15px;
-    font-size: 0.95rem; line-height: 1.55;
+    font-size: 0.965rem; line-height: 1.65;
     word-break: break-word; overflow-wrap: anywhere;
     white-space: pre-wrap;
 }
 .bubble.user {
-    background: linear-gradient(135deg, #4f46e5, #3b82f6);
-    color: #ffffff;
-    border-radius: 16px 16px 4px 16px;
-    box-shadow: 0 6px 18px rgba(59,130,246,0.28);
+    max-width: 78%;
+    background: #E8E5D8;
+    color: #3D3929;
+    border-radius: 18px;
+    padding: 11px 16px;
+    border: 1px solid rgba(61,57,41,0.05);
 }
+/* AI: teks polos di atas latar — persis gaya Claude */
 .bubble.ai {
-    background: rgba(255,255,255,0.055);
-    border: 1px solid rgba(255,255,255,0.11);
-    color: #eef2ff;
-    border-radius: 16px 16px 16px 4px;
-    backdrop-filter: blur(10px);
+    max-width: 100%;
+    background: transparent;
+    color: #3D3929;
+    padding: 0 2px;
+    border: none;
 }
 .bubble-meta {
-    font-size: 0.68rem; color: #64748b;
-    margin: 0 4px 3px; font-weight: 600;
+    font-size: 0.7rem; color: #A8A69E;
+    margin: 0 4px 4px; font-weight: 500;
 }
 .bubble-wrap { display: flex; flex-direction: column; max-width: 78%; }
+.bubble-row.ai .bubble-wrap { max-width: 100%; }
 .bubble-row.user .bubble-wrap { align-items: flex-end; }
 .bubble-wrap .bubble { max-width: 100%; }
 
-/* ---------- chat input ---------- */
-[data-testid="stBottom"], [data-testid="stBottomBlockContainer"] {
-    background: transparent !important; border: none !important;
+/* label kecil "Yuki" dengan titik aksen di atas jawaban AI */
+.ai-label {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 0.78rem; font-weight: 600; color: #3D3929;
+    margin-bottom: 4px;
+}
+.ai-label::before {
+    content: ""; width: 8px; height: 8px; border-radius: 50%;
+    background: #DA7756; display: inline-block;
+}
+
+/* ---------- chat input: kartu putih membulat ala Claude ---------- */
+[data-testid="stBottom"], [data-testid="stBottomBlockContainer"],
+[data-testid="stBottom"] > div {
+    background: #F0EEE6 !important; border: none !important; box-shadow: none !important;
 }
 [data-testid="stChatInput"] {
-    background: rgba(255,255,255,0.05) !important;
-    border: 1px solid rgba(255,255,255,0.14) !important;
-    border-radius: 999px !important;
-    backdrop-filter: blur(18px) !important;
+    background: #FAF9F5 !important;
+    border: 1px solid #E3E0D5 !important;
+    border-radius: 18px !important;
+    box-shadow: 0 4px 14px rgba(61,57,41,0.07) !important;
+    padding: 4px 8px !important;
+    transition: border-color .18s ease, box-shadow .18s ease !important;
+}
+[data-testid="stChatInput"]:hover {
+    border-color: #D5D1C3 !important;
 }
 [data-testid="stChatInput"]:focus-within {
-    border-color: rgba(129,140,248,0.55) !important;
-    box-shadow: 0 0 18px rgba(129,140,248,0.25) !important;
+    border-color: #DA7756 !important;
+    box-shadow: 0 4px 18px rgba(218,119,86,0.16) !important;
+}
+[data-testid="stChatInput"] div,
+[data-testid="stChatInput"] [data-baseweb="base-input"],
+[data-testid="stChatInput"] [data-baseweb="textarea"] {
+    background: transparent !important; border: none !important; box-shadow: none !important;
 }
 [data-testid="stChatInput"] textarea {
-    background: transparent !important; color: #f8fafc !important;
+    background: transparent !important;
+    color: #3D3929 !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 0.95rem !important;
 }
+[data-testid="stChatInput"] textarea::placeholder {
+    color: #A8A69E !important;
+}
+/* tombol kirim: bulat terracotta khas Claude */
+[data-testid="stChatInput"] button {
+    background: #DA7756 !important;
+    border: none !important;
+    border-radius: 10px !important;
+    color: #FFFFFF !important;
+    transition: background .18s ease !important;
+}
+[data-testid="stChatInput"] button:hover {
+    background: #C15F3C !important;
+}
+[data-testid="stChatInput"] button svg { fill: #FFFFFF !important; color: #FFFFFF !important; }
+[data-testid="stChatInput"] button:disabled {
+    background: #E3E0D5 !important;
+}
+[data-testid="stChatInput"] button:disabled svg { fill: #A8A69E !important; color: #A8A69E !important; }
 
-/* ---------- tombol & popover ---------- */
-div.stButton > button, [data-testid="stPopover"] > button {
-    background: rgba(255,255,255,0.05) !important;
-    border: 1px solid rgba(255,255,255,0.13) !important;
-    color: #e2e8f0 !important;
+/* ---------- tombol & popover: pill lembut ala Claude ---------- */
+div.stButton > button, [data-testid="stPopover"] > button,
+div.stDownloadButton > button {
+    background: #FAF9F5 !important;
+    border: 1px solid #E3E0D5 !important;
+    color: #3D3929 !important;
     border-radius: 12px !important;
-    transition: all .2s ease !important;
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 500 !important;
+    font-size: 0.85rem !important;
+    box-shadow: 0 1px 3px rgba(61,57,41,0.05) !important;
+    transition: all .18s ease !important;
 }
-div.stButton > button:hover, [data-testid="stPopover"] > button:hover {
-    border-color: #818cf8 !important;
-    box-shadow: 0 0 14px rgba(129,140,248,0.35) !important;
-    transform: translateY(-1px);
+div.stButton > button:hover, [data-testid="stPopover"] > button:hover,
+div.stDownloadButton > button:hover {
+    background: #F5F4EF !important;
+    border-color: #DA7756 !important;
+    color: #C15F3C !important;
+    box-shadow: 0 2px 8px rgba(218,119,86,0.14) !important;
 }
 [data-testid="stPopoverBody"] {
-    background: rgba(15,23,42,0.97) !important;
-    border: 1px solid rgba(129,140,248,0.3) !important;
+    background: #FAF9F5 !important;
+    border: 1px solid #E3E0D5 !important;
     border-radius: 16px !important;
+    box-shadow: 0 12px 36px rgba(61,57,41,0.14) !important;
 }
-
-/* ---------- sidebar ---------- */
-section[data-testid="stSidebar"] {
-    background: rgba(10,14,25,0.92) !important;
-    border-right: 1px solid rgba(255,255,255,0.07) !important;
+[data-testid="stPopoverBody"] p, [data-testid="stPopoverBody"] div {
+    color: #3D3929;
+}
+[data-testid="stPopoverBody"] div.stButton > button {
+    text-align: left !important;
+    box-shadow: none !important;
 }
 
 /* ---------- toggle mode gambar ---------- */
-[data-testid="stCheckbox"] label p, .stToggle label p { color: #e2e8f0 !important; }
+[data-testid="stCheckbox"] label p, .stToggle label p {
+    color: #3D3929 !important;
+    font-size: 0.85rem !important;
+    font-weight: 500 !important;
+}
+/* warna track toggle saat aktif → terracotta */
+[data-testid="stCheckbox"] [data-checked="true"],
+.stToggle [aria-checked="true"] > div:first-child {
+    background: #DA7756 !important;
+}
 
 /* ---------- badge status mode ---------- */
 .mode-badge {
@@ -249,13 +346,29 @@ section[data-testid="stSidebar"] {
     font-size: 0.74rem; font-weight: 600;
     margin-bottom: 6px;
 }
-.mode-badge.chat {
-    background: rgba(99,102,241,0.14);
-    border: 1px solid rgba(129,140,248,0.35); color: #a5b4fc;
-}
 .mode-badge.img {
-    background: rgba(236,72,153,0.14);
-    border: 1px solid rgba(244,114,182,0.4); color: #f9a8d4;
+    background: rgba(218,119,86,0.10);
+    border: 1px solid rgba(218,119,86,0.35); color: #C15F3C;
+}
+
+/* ---------- spinner ala Claude ---------- */
+[data-testid="stSpinner"] > div {
+    border-top-color: #DA7756 !important;
+}
+[data-testid="stSpinner"] p { color: #73726C !important; }
+
+/* ---------- alert / error ---------- */
+[data-testid="stAlert"] {
+    background: #FAF9F5 !important;
+    border: 1px solid #E3E0D5 !important;
+    border-radius: 12px !important;
+    color: #3D3929 !important;
+}
+
+/* ---------- footer ---------- */
+.trinity-foot {
+    text-align: center; color: #A8A69E; font-size: 0.74rem;
+    margin-top: 34px; font-family: 'Inter', sans-serif;
 }
 </style>
 """,
@@ -464,9 +577,13 @@ def generate_image(prompt: str) -> bytes:
 # ============================================================================
 def bubble_html(role: str, content: str, timestamp: str = "") -> str:
     body = html.escape(content or "")
-    who = "Kamu" if role == "user" else "Yuki"
     css = "user" if role == "user" else "ai"
-    meta = f'<div class="bubble-meta">{who} · {html.escape(timestamp)}</div>' if timestamp else ""
+    if role == "user":
+        # User: bubble krem membulat di kanan (gaya Claude)
+        meta = ""
+    else:
+        # AI: teks polos + label kecil "Yuki" dengan titik terracotta (gaya Claude)
+        meta = '<div class="ai-label">Yuki</div>'
     return (
         f'<div class="bubble-row {css}">'
         f'<div class="bubble-wrap">{meta}'
@@ -560,36 +677,11 @@ def reset_conversation() -> None:
 
 
 # ============================================================================
-# SIDEBAR (minimal dulu — nanti dibuat ulang + search percakapan)
+# SIDEBAR — NONAKTIF DULU (nanti dibuat ulang + search percakapan)
+# CSS juga menyembunyikan sidebar sepenuhnya.
 # ============================================================================
 def render_sidebar() -> None:
-    with st.sidebar:
-        st.markdown("### 🔱 Ampera Trinity AI")
-        st.caption("by Ampera Official")
-        st.divider()
-
-        st.markdown(f"**Model aktif:**")
-        st.caption(st.session_state.selected_model_label)
-        st.markdown(f"**Mode:** {'🎨 Gambar' if st.session_state.image_mode else '💬 Chat'}")
-        st.divider()
-
-        if st.button("✦ Obrolan Baru", use_container_width=True):
-            reset_conversation()
-            st.rerun()
-
-        st.download_button(
-            label="📥 Unduh Riwayat Chat",
-            data=get_chat_export_text(),
-            file_name=f"trinity-chat-{datetime.now().strftime('%Y%m%d-%H%M')}.md",
-            mime="text/markdown",
-            use_container_width=True,
-        )
-
-        st.divider()
-        chat_status = "🟢 Aktif" if CHAT_READY else "🔴 Belum dikonfigurasi"
-        img_status = "🟢 Aktif" if IMAGE_READY else "🔴 Belum dikonfigurasi"
-        st.caption(f"Chat AI: {chat_status}")
-        st.caption(f"Generate Gambar: {img_status}")
+    return  # sengaja kosong — sidebar akan dibuat ulang nanti
 
 
 # ============================================================================
@@ -679,19 +771,26 @@ def main() -> None:
     inject_css()
     render_sidebar()
 
-    # ---------- Header ----------
+    # ---------- Header (gaya Claude: minimal, serif) ----------
     st.markdown(
         f"""
 <div class="trinity-head">
   <div class="trinity-logo">🔱</div>
-  <div>
-    <h1>{APP_NAME}</h1>
-    <p>{APP_TAGLINE}</p>
-  </div>
+  <h1>{APP_NAME}</h1>
 </div>
+<p class="trinity-sub">{APP_TAGLINE}</p>
 """,
         unsafe_allow_html=True,
     )
+
+    # Sapaan besar serif ala halaman awal Claude (hanya saat chat masih baru)
+    if len(st.session_state.messages) <= 1:
+        st.markdown(
+            '<div class="trinity-greeting">'
+            '<span class="star">✳</span> Ada yang bisa Yuki bantu hari ini?'
+            "</div>",
+            unsafe_allow_html=True,
+        )
 
     # ---------- Riwayat chat ----------
     for msg in st.session_state.messages:
@@ -757,8 +856,7 @@ def main() -> None:
 
     # ---------- Footer ----------
     st.markdown(
-        '<p style="text-align:center;color:#475569;font-size:0.75rem;margin-top:30px;">'
-        "🔱 Ampera Trinity AI · by Ampera Official · 2026</p>",
+        '<p class="trinity-foot">🔱 Ampera Trinity AI · by Ampera Official · 2026</p>',
         unsafe_allow_html=True,
     )
 
