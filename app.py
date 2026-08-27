@@ -733,8 +733,8 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 /* ========== THUMBNAIL PREVIEW KECIL ========== */
 /* Untuk thumbnail yang muncul di dalam baris kontrol */
 .st-key-chat_controls [data-testid="stImage"] img {
-    width: 24px !important;
-    height: 24px !important;
+    width: 30px !important;
+    height: 30px !important;
     object-fit: cover;
     border-radius: 2px;
     border: none !important;
