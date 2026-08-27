@@ -1459,15 +1459,20 @@ def main() -> None:
     transform: translateY(-38vh);
     background: transparent !important;
 }
-[data-testid="stBottom"] [data-testid="stBottomBlockContainer"] {
+/* SEMUA lapisan dok harus transparan agar tidak menutupi judul sapaan */
+[data-testid="stBottom"] > div,
+[data-testid="stBottom"] [data-testid="stBottomBlockContainer"],
+[data-testid="stBottom"] [data-testid="stVerticalBlock"],
+[data-testid="stBottom"] .element-container {
     background: transparent !important;
+    background-color: transparent !important;
 }
 </style>
 """,
             unsafe_allow_html=True,
         )
         st.markdown(
-            '<div class="trinity-greeting" style="margin-top:26vh;">'
+            '<div class="trinity-greeting" style="margin-top:20vh;">'
             '<span class="star">✳</span> Semangat lagi, Ampera!'
             "</div>",
             unsafe_allow_html=True,
