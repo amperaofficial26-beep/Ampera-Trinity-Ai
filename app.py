@@ -743,37 +743,53 @@ div.stDownloadButton > button:hover {
     50%      { transform: scale(1.25) rotate(90deg); opacity: 1; }
 }
 
-/* ===== LOGO THINKING: shimmer berjalan + denyut (teknik 2 lapis img) ===== */
-/* Lapisan dasar = logo normal; lapisan atas = logo diterangkan yang
-   hanya terlihat lewat pita diagonal berjalan (clip-path) →
-   kilau shimmer mengikuti bentuk logo, tanpa CSS mask. */
+/* ===== LOGO THINKING: glow halus bernapas + denyut ===== */
+/* Cahaya radial terracotta lembut di belakang logo yang menguat-melemah
+   secara mulus + logo berdenyut & glow drop-shadow bertingkat.
+   Semua transisi ease-in-out → benar-benar halus. */
 .claude-think .logo-shimmer {
     position: relative;
     display: inline-block;
     width: 34px; height: 34px;
     flex-shrink: 0;
-    animation: logoPulse 2.6s ease-in-out infinite;
+    animation: logoPulse 3s ease-in-out infinite;
+}
+/* cahaya radial lembut di belakang logo */
+.claude-think .logo-shimmer::before {
+    content: "";
+    position: absolute; inset: -10px;
+    border-radius: 50%;
+    background: radial-gradient(circle,
+        rgba(218,119,86,0.45) 0%,
+        rgba(218,119,86,0.18) 45%,
+        transparent 70%);
+    animation: haloBreathe 3s ease-in-out infinite;
+    z-index: 0;
 }
 .claude-think .logo-shimmer img {
-    position: absolute; inset: 0;
+    position: relative; z-index: 1;
     width: 100%; height: 100%;
     display: block;
-}
-.claude-think .logo-shimmer img.shine {
-    filter: brightness(2.1) saturate(0.45);
-    animation: shineMove 2.4s linear infinite;
-}
-@keyframes shineMove {
-    0% {
-        clip-path: polygon(-45% 0, -20% 0, -35% 100%, -60% 100%);
-    }
-    100% {
-        clip-path: polygon(135% 0, 160% 0, 145% 100%, 120% 100%);
-    }
+    animation: glowBreathe 3s ease-in-out infinite;
 }
 @keyframes logoPulse {
     0%, 100% { transform: scale(1); }
-    50%      { transform: scale(1.18); }
+    50%      { transform: scale(1.14); }
+}
+@keyframes haloBreathe {
+    0%, 100% { opacity: 0.25; transform: scale(0.85); }
+    50%      { opacity: 1;    transform: scale(1.15); }
+}
+@keyframes glowBreathe {
+    0%, 100% {
+        filter: drop-shadow(0 0 1px rgba(218,119,86,0.2))
+                brightness(1);
+    }
+    50% {
+        filter: drop-shadow(0 0 6px rgba(218,119,86,0.85))
+                drop-shadow(0 0 14px rgba(218,119,86,0.4))
+                brightness(1.22);
+    }
 }
 /* teks dengan shimmer lembut menyapu perlahan (gaya Claude) */
 .claude-think .phrase {
@@ -1212,14 +1228,12 @@ def thinking_html(phrases: list[str]) -> str:
     )
     logo_b64 = _thinking_logo_b64()
     if logo_b64:
-        # 2 lapis <img>: dasar = logo normal; atas = logo diterangkan yang
-        # dipotong pita diagonal berjalan (clip-path) → efek kilau menyapu
-        # mengikuti bentuk logo. Tanpa CSS mask (aman dari sanitizer).
+        # Logo dengan glow halus bernapas (halo radial + drop-shadow
+        # bertingkat + denyut) — semua ease-in-out, mulus.
         src = f"data:image/png;base64,{logo_b64}"
         icon = (
             '<span class="logo-shimmer">'
             f'<img src="{src}" alt=""/>'
-            f'<img class="shine" src="{src}" alt=""/>'
             "</span>"
         )
     else:
