@@ -730,115 +730,44 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     margin: 0 !important;
 }
 
-/* ========== THUMBNAIL PREVIEW KECIL ========== */
-/* Untuk thumbnail yang muncul di dalam baris kontrol */
-.st-key-chat_controls [data-testid="stImage"] img {
-    width: 30px !important;
-    height: 30px !important;
-    object-fit: cover;
-    border-radius: 2px;
-    border: none !important;
-    box-shadow: none !important;
+/* ========== THUMBNAIL PREVIEW KECIL (untuk preview di atas input) ========== */
+.st-key-preview_container [data-testid="stImage"] img {
+    width: 80px !important;
+    height: 80px !important;
+    object-fit: cover !important;
+    border-radius: 8px;
+    border: 1px solid #E3E0D5;
 }
-/* Tombol hapus thumbnail sangat kecil */
-.st-key-chat_controls [class*="st-key-pending_rm_ctl_"] button {
-    min-height: 18px !important;
-    height: 18px !important;
-    padding: 0 2px !important;
-    font-size: 0.55rem !important;
-    line-height: 1 !important;
-    border-radius: 4px !important;
-    background: transparent !important;
-    border: none !important;
-    color: #73726C !important;
-    box-shadow: none !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    justify-content: center !important;
-}
-.st-key-chat_controls [class*="st-key-pending_rm_ctl_"] button:hover {
-    color: #C15F3C !important;
+.st-key-preview_container .stButton button {
+    min-height: 24px !important;
+    height: 24px !important;
+    padding: 0 6px !important;
+    font-size: 0.7rem !important;
+    border-radius: 6px !important;
     background: rgba(61,57,41,0.06) !important;
-}
-
-/* ========== POPOVER MODEL ========== */
-[data-testid="stPopoverBody"] {
-    background: #FFFFFF !important;
     border: 1px solid #E3E0D5 !important;
-    border-radius: 16px !important;
-    box-shadow: 0 16px 48px rgba(61,57,41,0.18) !important;
-    min-width: 300px !important;
-    padding: 8px 6px !important;
-}
-[data-testid="stPopoverBody"] p, [data-testid="stPopoverBody"] div {
-    color: #3D3929;
-}
-[data-testid="stPopoverBody"] div.stButton > button {
-    background: transparent !important;
-    border: none !important;
-    border-radius: 10px !important;
-    box-shadow: none !important;
-    text-align: left !important;
-    justify-content: flex-start !important;
-    align-items: flex-start !important;
-    padding: 8px 12px !important;
-    margin: 0 !important;
-    width: 100% !important;
-    display: flex !important;
-}
-[data-testid="stPopoverBody"] div.stButton > button:hover {
-    background: #F0EEE6 !important;
-    border: none !important;
-    box-shadow: none !important;
-    color: inherit !important;
-}
-[data-testid="stPopoverBody"] div.stButton > button > div,
-[data-testid="stPopoverBody"] div.stButton > button [data-testid="stMarkdownContainer"] {
-    width: 100% !important;
-    text-align: left !important;
-    justify-content: flex-start !important;
-}
-[data-testid="stPopoverBody"] div.stButton > button p {
-    text-align: left !important;
-    margin: 0 !important;
-    font-size: 0.92rem !important;
-    font-weight: 500 !important;
     color: #3D3929 !important;
-    line-height: 1.45 !important;
+    box-shadow: none !important;
+    width: 100% !important;
 }
-.model-premium-badge {
-    display: inline-block;
-    font-size: 0.62rem; font-weight: 700;
-    color: #C15F3C;
-    background: rgba(218,119,86,0.12);
-    border: 1px solid rgba(218,119,86,0.35);
-    border-radius: 999px;
-    padding: 1px 7px;
-    margin-left: 6px;
-    letter-spacing: 0.03em;
-    vertical-align: middle;
+.st-key-preview_container .stButton button:hover {
+    background: rgba(218,119,86,0.15) !important;
+    border-color: #DA7756 !important;
+    color: #C15F3C !important;
 }
-[data-testid="stPopoverBody"] [class*="_premium"] {
-    position: relative;
+.st-key-preview_container .stColumn {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 2px !important;
+    min-width: 90px !important;
 }
-[data-testid="stPopoverBody"] [class*="_premium"]::after {
-    content: "Premium";
-    position: absolute;
-    top: 4px; right: 6px;
-    font-size: 0.55rem;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    color: #B0774F;
-    background: rgba(218,119,86,0.10);
-    border: 1px solid rgba(218,119,86,0.25);
-    border-radius: 999px;
-    padding: 1px 6px;
-    pointer-events: none;
+.st-key-preview_container [data-testid="stVerticalBlock"] {
+    gap: 0 !important;
+    padding: 4px 0 2px !important;
 }
-[data-testid="stPopoverBody"] .element-container { margin: 0 !important; }
-[data-testid="stPopoverBody"] [data-testid="stVerticalBlock"] { gap: 2px !important; }
 
-/* ========== TOGGLE ========== */
+/* ========== Toggle ========== */
 [data-testid="stCheckbox"] label p, .stToggle label p {
     color: #3D3929 !important;
     font-size: 0.85rem !important;
@@ -1754,11 +1683,28 @@ html, body {
         chat_kwargs["file_type"] = IMAGE_INPUT_TYPES
     if CHAT_INPUT_SUPPORTS_AUDIO:
         chat_kwargs["accept_audio"] = True
-    user_input = st.chat_input(placeholder_text, **chat_kwargs)
 
-    # ========== CONTROLS ==========
     bottom_dock = getattr(st, "bottom", None) or st._bottom
     with bottom_dock:
+        # --- PREVIEW (di atas chat input) ---
+        with st.container(key="preview_container"):
+            pending = st.session_state.get("pending_images", [])
+            if pending:
+                cols = st.columns(len(pending) + 1)  # +1 untuk spacer opsional
+                for i, im in enumerate(pending):
+                    with cols[i]:
+                        st.image(im["data"], width=80)
+                        if st.button("✕", key=f"pending_rm_preview_{i}", help="Hapus"):
+                            st.session_state.pending_images.pop(i)
+                            st.rerun()
+                # Kolom terakhir kosong (spacer)
+                with cols[-1]:
+                    pass
+
+        # --- CHAT INPUT ---
+        user_input = st.chat_input(placeholder_text, **chat_kwargs)
+
+        # --- CONTROLS (tombol +, toggle, model) ---
         with st.container(key="chat_controls"):
             ctrl_plus, ctrl_mode, ctrl_voice, _sp, ctrl_model = st.columns(
                 [0.08, 0.2, 0.18, 1.04, 0.28]
@@ -1825,24 +1771,13 @@ html, body {
 
             with _sp:
                 pending = st.session_state.get("pending_images", [])
-                if pending:
-                    # Tampilkan thumbnail kecil 24x24 dan tombol hapus super kecil
-                    cols = st.columns([0.08] * len(pending) + [1])
-                    for i, im in enumerate(pending):
-                        with cols[i]:
-                            st.image(im["data"], width=24)
-                            if st.button("✕", key=f"pending_rm_ctl_{i}",
-                                         use_container_width=True, help="Hapus"):
-                                st.session_state.pending_images.pop(i)
-                                st.rerun()
-                else:
-                    if not is_fresh:
-                        st.markdown(
-                            '<div class="input-disclaimer">'
-                            "Yuki adalah AI dan bisa membuat kesalahan. Harap periksa kembali respons."
-                            "</div>",
-                            unsafe_allow_html=True,
-                        )
+                if not pending and not is_fresh:
+                    st.markdown(
+                        '<div class="input-disclaimer">'
+                        "Yuki adalah AI dan bisa membuat kesalahan. Harap periksa kembali respons."
+                        "</div>",
+                        unsafe_allow_html=True,
+                    )
 
             with ctrl_model:
                 current_key = st.session_state.selected_model_key
