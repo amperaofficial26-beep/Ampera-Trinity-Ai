@@ -730,20 +730,24 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     margin: 0 !important;
 }
 
-/* ========== THUMBNAIL PREVIEW KECIL (untuk preview di atas input) ========== */
+/* ========== THUMBNAIL PREVIEW (lebih kecil & rapat ke input) ========== */
+.st-key-preview_container {
+    padding: 0 4px 2px !important;  /* jarak ke bawah dikurangi */
+    margin-bottom: 0 !important;
+}
 .st-key-preview_container [data-testid="stImage"] img {
-    width: 80px !important;
-    height: 80px !important;
+    width: 56px !important;
+    height: 56px !important;
     object-fit: cover !important;
-    border-radius: 8px;
+    border-radius: 6px;
     border: 1px solid #E3E0D5;
 }
 .st-key-preview_container .stButton button {
-    min-height: 24px !important;
-    height: 24px !important;
-    padding: 0 6px !important;
-    font-size: 0.7rem !important;
-    border-radius: 6px !important;
+    min-height: 20px !important;
+    height: 20px !important;
+    padding: 0 4px !important;
+    font-size: 0.6rem !important;
+    border-radius: 4px !important;
     background: rgba(61,57,41,0.06) !important;
     border: 1px solid #E3E0D5 !important;
     color: #3D3929 !important;
@@ -759,12 +763,13 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    gap: 2px !important;
-    min-width: 90px !important;
+    gap: 0 !important;
+    min-width: 64px !important;
+    padding: 0 2px !important;
 }
 .st-key-preview_container [data-testid="stVerticalBlock"] {
     gap: 0 !important;
-    padding: 4px 0 2px !important;
+    padding: 0 !important;
 }
 
 /* ========== Toggle ========== */
@@ -1686,18 +1691,17 @@ html, body {
 
     bottom_dock = getattr(st, "bottom", None) or st._bottom
     with bottom_dock:
-        # --- PREVIEW (di atas chat input) ---
+        # --- PREVIEW (di atas chat input, ukuran kecil & rapat) ---
         with st.container(key="preview_container"):
             pending = st.session_state.get("pending_images", [])
             if pending:
-                cols = st.columns(len(pending) + 1)  # +1 untuk spacer opsional
+                cols = st.columns(len(pending) + 1)
                 for i, im in enumerate(pending):
                     with cols[i]:
-                        st.image(im["data"], width=80)
+                        st.image(im["data"], width=56)
                         if st.button("✕", key=f"pending_rm_preview_{i}", help="Hapus"):
                             st.session_state.pending_images.pop(i)
                             st.rerun()
-                # Kolom terakhir kosong (spacer)
                 with cols[-1]:
                     pass
 
