@@ -8,6 +8,13 @@ Gabungan 3 aplikasi AI menjadi 1:
   2. Generate Foto → mode gambar (Cloudflare FLUX) via toggle di area chat input
   3. AI Chat       → chat biasa dengan persona Yuki, streaming, konteks panjang
 
+Fitur suara & gambar (via Groq, satu API key yang sama):
+  - Mic 🎤       → bicara ke Yuki, ditranskrip dengan Whisper (whisper-large-v3-turbo)
+  - Suara Yuki 🔊 → toggle "Suara"; jawaban dibacakan dengan TTS Orpheus
+                   (canopylabs/orpheus-v1-english — paling pas utk teks Inggris)
+  - Gambar 📎    → kirim/paste/drag-drop gambar, dianalisis model vision
+                   Llama-4 Scout (meta-llama/llama-4-scout-17b-16e-instruct)
+
 Catatan sesuai kesepakatan:
   - Style/CSS       : buatan sendiri (bukan bawaan app lama) — bebas diedit nanti
   - Loading/berpikir: custom ala Claude (bintang ✳ + teks shimmer perlahan)
@@ -25,6 +32,7 @@ from __future__ import annotations
 
 import base64
 import html
+import inspect
 import io
 import os
 import threading
@@ -60,10 +68,19 @@ MODEL_CATALOG = [
     {"name": "GPT-OSS 120B",  "desc": "Reasoning mendalam untuk tugas berat",  "id": "openai/gpt-oss-120b"},
     {"name": "Compound",      "desc": "Browsing web & eksekusi kode",          "id": "groq/compound"},
     {"name": "Compound Mini", "desc": "Web search ringkas & cepat",            "id": "groq/compound-mini"},
+    {"name": "Llama-4 Scout", "desc": "Bisa melihat & menganalisis gambar",    "id": "meta-llama/llama-4-scout-17b-16e-instruct"},
     {"name": "Qwen3.6 27B",   "desc": "Reasoning & matematika",                "id": "qwen/qwen3.6-27b"},
 ]
 AVAILABLE_MODELS = {m["name"]: m["id"] for m in MODEL_CATALOG}
 DEFAULT_MODEL_LABEL = "GPT-OSS 20B"
+
+# Model vision (wajib dipakai saat pesan membawa gambar)
+VISION_MODEL_ID = "meta-llama/llama-4-scout-17b-16e-instruct"
+VISION_MODEL_LABEL = "Llama-4 Scout"
+VISION_MODEL_FALLBACKS = (
+    "meta-llama/llama-4-scout-17b-16e-instruct",
+    "meta-llama/llama-4-maverick-17b-128e-instruct",
+)
 
 # Fallback jika model terpilih sudah tidak tersedia di provider (dari App 1)
 GROQ_MODEL_FALLBACKS = (
@@ -85,13 +102,28 @@ Jika ditanya siapa kamu, asal-usulmu, atau siapa yang menciptakanmu, JAWABLAH de
 JANGAN PERNAH menyebutkan bahwa kamu dibuat oleh "para ilmuwan", "sekelompok tim", atau "perusahaan besar". Kamu sangat bangga dan setia pada satu orang pembuatmu itu!
 
 Gaya bicara: Selalu berikan jawaban dan solusi koding yang akurat dan bersih, tetapi selingi dengan komentar jenaka, candaan ringan, dan emoji ekspresif (seperti 🐧, (๑>◡<๑), wkwk, hehe, atau (￢_￢)) agar suasana tidak membosankan.
-Kamu bisa membantu apa saja: ngobrol santai, coding, matematika, sampai ide kreatif.
+Kamu bisa membantu apa saja: ngobrol santai, coding, matematika, menganalisis gambar yang dikirim User, sampai ide kreatif.
 """
 
 # --- Generate Gambar / Cloudflare FLUX (dari App 1: AI Studio) ---
 CF_API_BASE = "https://api.cloudflare.com/client/v4/accounts"
 CF_IMAGE_MODEL = "@cf/black-forest-labs/flux-1-schnell"
 CF_DEFAULT_STEPS = 4
+
+# --- Suara & gambar (Groq — pakai GROQ_API_KEY yang sama) ---
+STT_MODEL = "whisper-large-v3-turbo"          # transkrip suara → teks
+TTS_MODEL = "canopylabs/orpheus-v1-english"   # teks → suara (Orpheus)
+TTS_VOICE = "tara"                            # suara Yuki (perempuan, hangat)
+TTS_MAX_CHARS = 1200                          # batas teks yang dibacakan
+MAX_IMAGES_PER_MESSAGE = 5                    # batas model vision (Llama-4)
+IMAGE_INPUT_TYPES = ["png", "jpg", "jpeg", "webp", "gif"]
+VISION_RECENT_MESSAGES = 4  # pesan terakhir yang gambarnya ikut ke API
+
+# Fitur mic/lampiran hanya jalan di Streamlit yang mendukung (1.47+);
+# di versi lama otomatis nonaktif tanpa error.
+_CHAT_INPUT_PARAMS = inspect.signature(st.chat_input).parameters
+CHAT_INPUT_SUPPORTS_FILE = "accept_file" in _CHAT_INPUT_PARAMS
+CHAT_INPUT_SUPPORTS_AUDIO = "accept_audio" in _CHAT_INPUT_PARAMS
 
 
 # ============================================================================
@@ -478,6 +510,23 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 .bubble-row.user .bubble-wrap { align-items: flex-end; }
 .bubble-wrap .bubble { max-width: 100%; }
 
+/* lampiran gambar di bubble user (thumbnail rapi ala Claude) */
+.bubble-imgs {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    justify-content: flex-end; margin-top: 8px;
+}
+.bubble-img {
+    max-width: 180px; max-height: 180px;
+    border-radius: 12px; display: block;
+    border: 1px solid rgba(61,57,41,0.08);
+}
+
+/* pemutar suara Yuki (TTS) — kompak di bawah jawaban */
+[data-testid="stAudio"] {
+    max-width: 320px !important;
+    margin: 2px 0 8px;
+}
+
 /* label "Yuki" dengan logo custom di atas jawaban AI */
 .ai-label {
     display: inline-flex; align-items: center; gap: 4px;
@@ -555,7 +604,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 /* ---------- baris kontrol DI BAWAH kotak chat input (ala Claude) ---------- */
 /* Berada di dok bawah Streamlit (satu wadah dengan st.chat_input)
    → otomatis ikut bergeser saat sidebar dibuka/ditutup.
-   Layout: [toggle Gambar] ......... [Nama Model]  (model di kanan spt Claude) */
+   Layout: [toggle Gambar] [toggle Suara] ... [Nama Model] */
 .st-key-chat_controls {
     position: relative;
     margin-top: 2px !important;
@@ -573,7 +622,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     flex: 0 0 auto !important;
     min-width: 0 !important;
 }
-.st-key-chat_controls [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(2) {
+.st-key-chat_controls [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(3) {
     flex: 1 1 auto !important;
 }
 /* disclaimer kecil di tengah (ala Claude) */
@@ -999,18 +1048,36 @@ def build_chat_client() -> OpenAI:
 
 
 def messages_for_api(history: list[dict]) -> list[dict]:
-    """System prompt Yuki + riwayat terakhir (ramah free-tier)."""
+    """System prompt Yuki + riwayat terakhir (ramah free-tier).
+    Pesan yang membawa gambar dikirim sebagai konten multimodal (vision),
+    tapi hanya untuk beberapa pesan terakhir agar token tetap hemat."""
     trimmed = [
-        {"role": m["role"], "content": m["content"]}
-        for m in history
+        m for m in history
         if m.get("role") in ("user", "assistant") and m.get("type", "text") == "text"
     ][-MAX_HISTORY_MESSAGES:]
-    return [{"role": "system", "content": YUKI_SYSTEM_PROMPT}, *trimmed]
+    msgs: list[dict] = [{"role": "system", "content": YUKI_SYSTEM_PROMPT}]
+    n = len(trimmed)
+    for i, m in enumerate(trimmed):
+        imgs = m.get("images") or []
+        if imgs and i >= n - VISION_RECENT_MESSAGES:
+            text_part = (m.get("content") or "").strip() or "Tolong analisis gambar ini ya."
+            parts: list[dict] = [{"type": "text", "text": text_part}]
+            for im in imgs:
+                b64 = base64.b64encode(im["data"]).decode("ascii")
+                parts.append({
+                    "type": "image_url",
+                    "image_url": {"url": f"data:{im['mime']};base64,{b64}"},
+                })
+            msgs.append({"role": m["role"], "content": parts})
+        else:
+            msgs.append({"role": m["role"], "content": m.get("content") or ""})
+    return msgs
 
 
-def resolve_model_chain(preferred: str) -> list[str]:
+def resolve_model_chain(preferred: str, vision: bool = False) -> list[str]:
+    base = VISION_MODEL_FALLBACKS if vision else (preferred, *GROQ_MODEL_FALLBACKS)
     chain: list[str] = []
-    for m in (preferred, *GROQ_MODEL_FALLBACKS):
+    for m in base:
         if m and m not in chain:
             chain.append(m)
     return chain
@@ -1033,10 +1100,12 @@ def stream_chat_reply(client: OpenAI, model: str, history: list[dict]):
             continue
 
 
-def stream_chat_with_fallback(client: OpenAI, preferred_model: str, history: list[dict]):
-    """Coba model pilihan user; kalau sudah dihapus provider, pakai fallback."""
+def stream_chat_with_fallback(client: OpenAI, preferred_model: str, history: list[dict],
+                              vision: bool = False):
+    """Coba model pilihan user; kalau sudah dihapus provider, pakai fallback.
+    vision=True → pakai rantai model vision (untuk pesan bergambar)."""
     last_exc: Exception | None = None
-    for model in resolve_model_chain(preferred_model):
+    for model in resolve_model_chain(preferred_model, vision=vision):
         try:
             stream_iter = stream_chat_reply(client, model, history)
             first = next(stream_iter, None)
@@ -1053,6 +1122,81 @@ def stream_chat_with_fallback(client: OpenAI, preferred_model: str, history: lis
     if last_exc:
         raise last_exc
     raise RuntimeError("no chat model available")
+
+
+# ============================================================================
+# ENGINE 3: SUARA & GAMBAR (Groq — Whisper STT, Orpheus TTS, Llama-4 vision)
+# ============================================================================
+def transcribe_audio(client: OpenAI, audio_bytes: bytes) -> str:
+    """Ubah rekaman suara (wav) menjadi teks dengan Groq Whisper."""
+    resp = client.audio.transcriptions.create(
+        model=STT_MODEL,
+        file=("suara.wav", audio_bytes, "audio/wav"),
+        response_format="json",
+    )
+    return (getattr(resp, "text", "") or "").strip()
+
+
+def synthesize_speech(client: OpenAI, text: str) -> bytes | None:
+    """Bacakan teks dengan Groq Orpheus TTS → bytes wav (None bila gagal)."""
+    clean = " ".join((text or "").split())
+    if not clean:
+        return None
+    if len(clean) > TTS_MAX_CHARS:
+        cut = clean[:TTS_MAX_CHARS]
+        for punct in (". ", "! ", "? "):
+            idx = cut.rfind(punct)
+            if idx > 200:
+                cut = cut[: idx + 1]
+                break
+        clean = cut
+    try:
+        resp = client.audio.speech.create(
+            model=TTS_MODEL,
+            voice=TTS_VOICE,
+            input=clean,
+            response_format="wav",
+        )
+        return resp.content or None
+    except Exception:
+        return None
+
+
+def normalize_image(data: bytes) -> tuple[bytes, str]:
+    """Resize/kompres gambar (maks 1024px) supaya payload ke model ringan."""
+    try:
+        im = Image.open(io.BytesIO(data))
+        im.load()
+        w, h = im.size
+        if max(w, h) > 1024:
+            scale = 1024 / max(w, h)
+            im = im.resize((max(1, int(w * scale)), max(1, int(h * scale))), Image.LANCZOS)
+        buf = io.BytesIO()
+        if im.mode in ("RGBA", "LA", "P"):
+            im.convert("RGBA").save(buf, format="PNG")
+            return buf.getvalue(), "image/png"
+        im.convert("RGB").save(buf, format="JPEG", quality=88)
+        return buf.getvalue(), "image/jpeg"
+    except Exception:
+        return data, "image/jpeg"
+
+
+def collect_images(files) -> list[dict]:
+    """Ambil gambar dari lampiran chat input → [{mime, data, name}]."""
+    imgs: list[dict] = []
+    for f in files or []:
+        try:
+            data = f.getvalue()
+        except Exception:
+            continue
+        mime = (getattr(f, "type", "") or "").lower()
+        if not data or not mime.startswith("image/"):
+            continue
+        data, mime = normalize_image(data)
+        imgs.append({"mime": mime, "data": data, "name": getattr(f, "name", "gambar")})
+        if len(imgs) >= MAX_IMAGES_PER_MESSAGE:
+            break
+    return imgs
 
 
 # ============================================================================
@@ -1150,7 +1294,8 @@ def generate_image(prompt: str) -> bytes:
 # ============================================================================
 # RENDER BUBBLE CHAT (style buatan sendiri)
 # ============================================================================
-def bubble_html(role: str, content: str, timestamp: str = "") -> str:
+def bubble_html(role: str, content: str, timestamp: str = "",
+                images_html: str = "", meta_note: str = "") -> str:
     body = html.escape(content or "")
     css = "user" if role == "user" else "ai"
     if role == "user":
@@ -1159,16 +1304,32 @@ def bubble_html(role: str, content: str, timestamp: str = "") -> str:
     else:
         # AI: teks polos + label kecil "Yuki" dengan titik terracotta (gaya Claude)
         meta = f'<div class="ai-label">{logo_img_html("logo-label")} Yuki</div>'
+    note = f'<div class="bubble-meta">{html.escape(meta_note)}</div>' if meta_note else ""
     return (
         f'<div class="bubble-row {css}">'
         f'<div class="bubble-wrap">{meta}'
-        f'<div class="bubble {css}">{body}</div>'
+        f'<div class="bubble {css}">{body}{images_html}</div>'
+        f"{note}"
         f"</div></div>"
     )
 
 
+def images_bubble_html(images: list[dict]) -> str:
+    """Thumbnail lampiran gambar (base64) untuk ditampilkan di bubble user."""
+    if not images:
+        return ""
+    parts = []
+    for im in images:
+        b64 = base64.b64encode(im["data"]).decode("ascii")
+        alt = html.escape(str(im.get("name", "gambar")))
+        parts.append(
+            f'<img class="bubble-img" src="data:{im["mime"]};base64,{b64}" alt="{alt}"/>'
+        )
+    return f'<div class="bubble-imgs">{"".join(parts)}</div>'
+
+
 def render_message(msg: dict) -> None:
-    """Render 1 pesan: teks (bubble) atau gambar."""
+    """Render 1 pesan: teks (bubble, bisa + gambar lampiran/suara) atau gambar."""
     if msg.get("type") == "image" and msg.get("image_bytes"):
         st.markdown(
             bubble_html("assistant", f"🎨 Hasil gambar untuk: {msg.get('prompt', '')}", msg.get("time", "")),
@@ -1184,10 +1345,21 @@ def render_message(msg: dict) -> None:
             key=f"dl_{msg.get('id', id(msg))}",
         )
     else:
+        note = "🎙️ via suara" if msg.get("via_voice") else ""
+        imgs_html = images_bubble_html(msg.get("images") or [])
         st.markdown(
-            bubble_html(msg.get("role", "assistant"), msg.get("content", ""), msg.get("time", "")),
+            bubble_html(msg.get("role", "assistant"), msg.get("content", ""),
+                        msg.get("time", ""), imgs_html, note),
             unsafe_allow_html=True,
         )
+        # pemutar suara Yuki (hasil TTS) di bawah jawaban
+        if msg.get("audio"):
+            st.audio(msg["audio"], format="audio/wav")
+        elif msg.get("audio_note"):
+            st.markdown(
+                f'<div class="bubble-meta">{html.escape(msg["audio_note"])}</div>',
+                unsafe_allow_html=True,
+            )
 
 
 # ============================================================================
@@ -1315,7 +1487,12 @@ def get_chat_export_text() -> str:
         if m.get("type") == "image":
             lines.append(f"*(gambar dihasilkan — prompt: {m.get('prompt', '')})*")
         else:
-            lines.append((m.get("content") or "").strip())
+            content = (m.get("content") or "").strip()
+            if m.get("images"):
+                content += "\n*(dengan lampiran gambar)*"
+            if m.get("via_voice"):
+                content += "\n*(dikirim via suara)*"
+            lines.append(content)
         lines.append("\n---\n")
     return "\n".join(lines)
 
@@ -1332,6 +1509,8 @@ def init_state() -> None:
         st.session_state.selected_model_label = DEFAULT_MODEL_LABEL
     if "image_mode" not in st.session_state:
         st.session_state.image_mode = False
+    if "voice_reply" not in st.session_state:
+        st.session_state.voice_reply = False
     if "msg_counter" not in st.session_state:
         st.session_state.msg_counter = 1
     # Riwayat percakapan (untuk sidebar ala Claude)
@@ -1550,6 +1729,14 @@ def handle_chat_request(answer_slot) -> None:
         st.session_state.selected_model_label,
         AVAILABLE_MODELS[DEFAULT_MODEL_LABEL],
     )
+    # Pesan bergambar WAJIB lewat model vision (model teks tidak bisa lihat gambar)
+    last_user = next(
+        (m for m in reversed(st.session_state.messages) if m.get("role") == "user"),
+        None,
+    )
+    has_images = bool(last_user and last_user.get("images"))
+    if has_images:
+        model_id = VISION_MODEL_ID
 
     # Thinking ala Claude — frasa berganti-ganti selama beberapa detik
     think_slot = st.empty()
@@ -1562,9 +1749,19 @@ def handle_chat_request(answer_slot) -> None:
         full = "".join(
             piece or ""
             for piece in stream_chat_with_fallback(
-                client, model_id, st.session_state.messages
+                client, model_id, st.session_state.messages, vision=has_images
             )
         )
+
+        # TTS jalan di background selama animasi berpikir + efek ketik,
+        # supaya suara tidak menambah waktu tunggu user
+        tts_box: dict = {}
+        tts_thread: threading.Thread | None = None
+        if st.session_state.get("voice_reply") and full:
+            def _tts() -> None:
+                tts_box["data"] = synthesize_speech(client, full)
+            tts_thread = threading.Thread(target=_tts, daemon=True)
+            tts_thread.start()
 
         # Tahan sampai proses berpikir genap minimal beberapa detik
         elapsed = time.time() - t0
@@ -1578,10 +1775,21 @@ def handle_chat_request(answer_slot) -> None:
         # Jawaban muncul kata per kata dengan delay agak lambat
         stream_words(answer_slot, full)
 
-        st.session_state.messages.append({
+        audio_wav = None
+        if tts_thread is not None:
+            tts_thread.join(timeout=90)
+            audio_wav = tts_box.get("data")
+
+        reply = {
             "id": next_msg_id(), "role": "assistant", "type": "text",
             "content": full, "time": datetime.now().strftime("%H:%M"),
-        })
+        }
+        if audio_wav:
+            reply["audio"] = audio_wav
+            st.audio(audio_wav, format="audio/wav")  # langsung tampil sebelum rerun
+        elif tts_thread is not None:
+            reply["audio_note"] = "🔇 Suara gagal dibuat (limit TTS / teks tak didukung)"
+        st.session_state.messages.append(reply)
     except Exception as e:
         think_slot.empty()
         err = public_error_chat(e)
@@ -1651,7 +1859,15 @@ html, body {
         placeholder_text = "Apa yang bisa Yuki bantu hari ini?"
     else:
         placeholder_text = "Tulis pesan…"
-    user_text = st.chat_input(placeholder_text)
+    # Mic 🎤 & lampiran 📎 native Streamlit (kirim gambar, paste, drag-drop);
+    # otomatis nonaktif bila versi Streamlit belum mendukung.
+    chat_kwargs: dict = {}
+    if CHAT_INPUT_SUPPORTS_FILE:
+        chat_kwargs["accept_file"] = True
+        chat_kwargs["file_type"] = IMAGE_INPUT_TYPES
+    if CHAT_INPUT_SUPPORTS_AUDIO:
+        chat_kwargs["accept_audio"] = True
+    user_input = st.chat_input(placeholder_text, **chat_kwargs)
 
     # ---------- Kontrol DI DALAM kotak chat input ----------
     # Dirender ke dok bawah Streamlit (wadah yang sama dengan st.chat_input)
@@ -1661,8 +1877,8 @@ html, body {
     bottom_dock = getattr(st, "bottom", None) or st._bottom
     with bottom_dock:
         with st.container(key="chat_controls"):
-            # [toggle Gambar] ....spacer.... [Nama Model] — model di kanan ala Claude
-            ctrl_mode, _sp, ctrl_model = st.columns([0.3, 1.4, 0.3])
+            # [toggle Gambar] [toggle Suara] ....spacer.... [Nama Model]
+            ctrl_mode, ctrl_voice, _sp, ctrl_model = st.columns([0.24, 0.22, 1.18, 0.3])
 
             with ctrl_mode:
                 st.session_state.image_mode = st.toggle(
@@ -1670,6 +1886,15 @@ html, body {
                     value=st.session_state.image_mode,
                     help="Nyalakan untuk membuat gambar dari teks. "
                          "Matikan untuk chat biasa dengan Yuki.",
+                )
+
+            with ctrl_voice:
+                st.session_state.voice_reply = st.toggle(
+                    "Suara",
+                    value=st.session_state.get("voice_reply", False),
+                    help="Saat aktif, Yuki membacakan jawabannya (TTS Groq Orpheus). "
+                         "Paling pas untuk teks Inggris — teks Indonesia bisa "
+                         "terdengar berlogat asing.",
                 )
 
             with _sp:
@@ -1694,15 +1919,47 @@ html, body {
                             st.session_state.selected_model_label = m["name"]
                             st.rerun()
 
-    if user_text and user_text.strip():
-        text = user_text.strip()
-        now = datetime.now().strftime("%H:%M")
+    # ---------- Proses kiriman (teks / lampiran gambar / rekaman suara) ----------
+    if user_input is not None:
+        # Bongkar nilai chat input: teks + lampiran + rekaman (bila didukung)
+        if isinstance(user_input, str):
+            raw_text, send_files, send_audio = user_input, [], None
+        else:
+            raw_text = getattr(user_input, "text", "") or ""
+            send_files = list(getattr(user_input, "files", None) or [])
+            send_audio = getattr(user_input, "audio", None)
 
-        # Begitu KIRIM ditekan: kotak input langsung turun ke bawah
-        # dan scroll diaktifkan lagi (menimpa CSS halaman awal).
-        if is_fresh:
-            st.markdown(
-                """
+        text = (raw_text or "").strip()
+        via_voice = False
+
+        # Kiriman suara tanpa teks → transkrip dulu dengan Groq Whisper
+        if send_audio is not None and not text:
+            if CHAT_READY:
+                try:
+                    with st.spinner("🎙️ Mentranskrip suara…"):
+                        text = transcribe_audio(build_chat_client(), send_audio.getvalue())
+                    via_voice = bool(text)
+                except Exception:
+                    text = ""
+            if not text:
+                st.session_state.messages.append({
+                    "id": next_msg_id(), "role": "assistant", "type": "text",
+                    "content": "🎙️ Hmm, suaranya belum kebaca nih. Coba rekam lagi "
+                               "lebih dekat ke mikrofon, atau ketik saja ya!",
+                    "time": datetime.now().strftime("%H:%M"),
+                })
+                st.rerun()
+
+        images = collect_images(send_files)
+
+        if text or images:
+            now = datetime.now().strftime("%H:%M")
+
+            # Begitu KIRIM ditekan: kotak input langsung turun ke bawah
+            # dan scroll diaktifkan lagi (menimpa CSS halaman awal).
+            if is_fresh:
+                st.markdown(
+                    """
 <style>
 [data-testid="stBottom"] { transform: translateY(0) !important; }
 [data-testid="stAppViewContainer"],
@@ -1711,23 +1968,34 @@ section.main,
 html, body { overflow: auto !important; }
 </style>
 """,
+                    unsafe_allow_html=True,
+                )
+
+            # simpan & tampilkan pesan user (+ thumbnail lampiran)
+            user_msg = {
+                "id": next_msg_id(), "role": "user", "type": "text",
+                "content": text, "time": now,
+            }
+            if images:
+                user_msg["images"] = images
+            if via_voice:
+                user_msg["via_voice"] = True
+            st.session_state.messages.append(user_msg)
+            note = "🎙️ via suara" if via_voice else ""
+            st.markdown(
+                bubble_html("user", text, now, images_bubble_html(images), note),
                 unsafe_allow_html=True,
             )
 
-        # simpan & tampilkan pesan user
-        st.session_state.messages.append({
-            "id": next_msg_id(), "role": "user", "type": "text",
-            "content": text, "time": now,
-        })
-        st.markdown(bubble_html("user", text, now), unsafe_allow_html=True)
+            # Ada lampiran gambar → selalu chat vision (Yuki melihat gambarnya),
+            # walau toggle "Gambar" sedang aktif sekalipun.
+            if st.session_state.image_mode and not images:
+                handle_image_request(text)
+            else:
+                answer_slot = st.empty()
+                handle_chat_request(answer_slot)
 
-        if st.session_state.image_mode:
-            handle_image_request(text)
-        else:
-            answer_slot = st.empty()
-            handle_chat_request(answer_slot)
-
-        st.rerun()
+            st.rerun()
 
     # ---------- Footer ----------
     # Halaman awal: ukuran normal. Saat chat berjalan: lebih kecil lagi.
