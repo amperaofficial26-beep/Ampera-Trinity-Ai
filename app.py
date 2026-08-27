@@ -765,33 +765,58 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 /* ---- reskin st.file_uploader jadi baris menu polos: ikon + teks saja ----
    (label uploader disembunyikan; teks kustom disisipkan lewat ::before
    pada tombol "Browse files" bawaan, dropzone/caption bawaan disembunyikan) */
+/* ---------- Uploader di popover ➕ : hanya teks, tanpa tombol ---------- */
 .st-key-plus_upload_file [data-testid="stFileUploaderDropzone"],
 .st-key-plus_upload_image [data-testid="stFileUploaderDropzone"] {
     background: transparent !important;
     border: none !important;
     padding: 0 !important;
     min-height: 0 !important;
+    cursor: pointer !important;
 }
+
 .st-key-plus_upload_file [data-testid="stFileUploaderDropzoneInstructions"],
 .st-key-plus_upload_image [data-testid="stFileUploaderDropzoneInstructions"] {
     display: none !important;
 }
+
+/* Sembunyikan tombol "Browse files" / "Upload" bawaan */
 .st-key-plus_upload_file [data-testid="stBaseButton-secondary"],
 .st-key-plus_upload_image [data-testid="stBaseButton-secondary"] {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    border-radius: 0 !important;          /* hilangkan sudut membulat */
-    width: 100% !important;
-    display: flex !important;
-    justify-content: flex-start !important;
-    padding: 4px 0 !important;            /* padding minimal, hanya untuk area klik */
-    min-height: 0 !important;             /* hilangkan tinggi minimal */
-    font-size: 0 !important;              /* tetap sembunyikan teks bawaan */
+    display: none !important;
 }
-.st-key-plus_upload_file [data-testid="stBaseButton-secondary"]:hover,
-.st-key-plus_upload_image [data-testid="stBaseButton-secondary"]:hover {
-    background: transparent !important;   /* tidak ada perubahan latar saat hover */
+
+/* Tampilkan teks custom di dalam dropzone */
+.st-key-plus_upload_file [data-testid="stFileUploaderDropzone"]::before {
+    content: "📎  Upload file";
+    display: block;
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: #3D3929;
+    padding: 8px 12px;
+    border-radius: 10px;
+    width: 100%;
+    text-align: left;
+    transition: background 0.18s ease;
+}
+
+.st-key-plus_upload_image [data-testid="stFileUploaderDropzone"]::before {
+    content: "📸  Upload gambar atau foto";
+    display: block;
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: #3D3929;
+    padding: 8px 12px;
+    border-radius: 10px;
+    width: 100%;
+    text-align: left;
+    transition: background 0.18s ease;
+}
+
+/* Efek hover lembut */
+.st-key-plus_upload_file [data-testid="stFileUploaderDropzone"]:hover::before,
+.st-key-plus_upload_image [data-testid="stFileUploaderDropzone"]:hover::before {
+    background: #F0EEE6 !important;
 }
 .st-key-plus_upload_file [data-testid="stBaseButton-secondary"]::before {
     content: "📎  Upload file";
