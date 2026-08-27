@@ -743,53 +743,49 @@ div.stDownloadButton > button:hover {
     50%      { transform: scale(1.25) rotate(90deg); opacity: 1; }
 }
 
-/* ===== LOGO THINKING: glow halus bernapas + denyut ===== */
-/* Cahaya radial terracotta lembut di belakang logo yang menguat-melemah
-   secara mulus + logo berdenyut & glow drop-shadow bertingkat.
-   Semua transisi ease-in-out → benar-benar halus. */
+/* ===== LOGO THINKING: shimmer glow BERJALAN yang halus + denyut ===== */
+/* Pita cahaya lembut (gradasi transparan→putih→transparan + blur +
+   blend screen) menyapu melintasi logo dari kiri ke kanan terus-menerus.
+   Tepinya gradasi & di-blur → mulus tanpa garis patah. */
 .claude-think .logo-shimmer {
     position: relative;
     display: inline-block;
     width: 34px; height: 34px;
     flex-shrink: 0;
+    overflow: hidden;
+    border-radius: 6px;
     animation: logoPulse 3s ease-in-out infinite;
 }
-/* cahaya radial lembut di belakang logo */
-.claude-think .logo-shimmer::before {
-    content: "";
-    position: absolute; inset: -10px;
-    border-radius: 50%;
-    background: radial-gradient(circle,
-        rgba(218,119,86,0.45) 0%,
-        rgba(218,119,86,0.18) 45%,
-        transparent 70%);
-    animation: haloBreathe 3s ease-in-out infinite;
-    z-index: 0;
-}
 .claude-think .logo-shimmer img {
-    position: relative; z-index: 1;
     width: 100%; height: 100%;
     display: block;
-    animation: glowBreathe 3s ease-in-out infinite;
+}
+/* pita cahaya berjalan */
+.claude-think .logo-shimmer::after {
+    content: "";
+    position: absolute;
+    top: -30%; bottom: -30%;
+    left: 0; width: 60%;
+    background: linear-gradient(
+        100deg,
+        rgba(255,255,255,0) 0%,
+        rgba(255,240,225,0.85) 50%,
+        rgba(255,255,255,0) 100%
+    );
+    filter: blur(3px);
+    mix-blend-mode: screen;
+    transform: translateX(-130%) skewX(-16deg);
+    animation: shineSweep 2.6s ease-in-out infinite;
+    pointer-events: none;
+}
+@keyframes shineSweep {
+    0%   { transform: translateX(-130%) skewX(-16deg); }
+    60%  { transform: translateX(260%) skewX(-16deg); }
+    100% { transform: translateX(260%) skewX(-16deg); }
 }
 @keyframes logoPulse {
     0%, 100% { transform: scale(1); }
     50%      { transform: scale(1.14); }
-}
-@keyframes haloBreathe {
-    0%, 100% { opacity: 0.25; transform: scale(0.85); }
-    50%      { opacity: 1;    transform: scale(1.15); }
-}
-@keyframes glowBreathe {
-    0%, 100% {
-        filter: drop-shadow(0 0 1px rgba(218,119,86,0.2))
-                brightness(1);
-    }
-    50% {
-        filter: drop-shadow(0 0 6px rgba(218,119,86,0.85))
-                drop-shadow(0 0 14px rgba(218,119,86,0.4))
-                brightness(1.22);
-    }
 }
 /* teks dengan shimmer lembut menyapu perlahan (gaya Claude) */
 .claude-think .phrase {
