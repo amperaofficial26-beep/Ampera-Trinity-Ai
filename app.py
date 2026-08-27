@@ -424,13 +424,13 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 [data-testid="stBottom"] > div {
     background: #F0EEE6 !important; border: none !important; box-shadow: none !important;
 }
-/* kotak input DIBUAT LEBIH TINGGI: ada ruang baris kontrol di dalamnya */
+/* kotak input 1 BARIS ala Claude (kontrol ada DI BAWAH kotak, bukan di dalam) */
 [data-testid="stChatInput"] {
     background: #FAF9F5 !important;
     border: 1px solid #E3E0D5 !important;
-    border-radius: 22px !important;
+    border-radius: 16px !important;
     box-shadow: 0 4px 14px rgba(61,57,41,0.07) !important;
-    padding: 6px 8px 52px 8px !important;
+    padding: 4px 8px !important;
     transition: border-color .18s ease, box-shadow .18s ease !important;
 }
 [data-testid="stChatInput"]:hover {
@@ -471,15 +471,14 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 }
 [data-testid="stChatInput"] button:disabled svg { fill: #A8A69E !important; color: #A8A69E !important; }
 
-/* ---------- baris kontrol DI DALAM kotak chat input ---------- */
-/* container "chat_controls" berada DI DALAM area bawah Streamlit
-   (satu wadah dengan st.chat_input) → otomatis ikut bergeser saat
-   sidebar dibuka/ditutup. Ditarik naik ke ruang padding bawah kotak input. */
+/* ---------- baris kontrol DI BAWAH kotak chat input (ala Claude) ---------- */
+/* Berada di dok bawah Streamlit (satu wadah dengan st.chat_input)
+   → otomatis ikut bergeser saat sidebar dibuka/ditutup.
+   Layout: [toggle Gambar] ......... [Nama Model]  (model di kanan spt Claude) */
 .st-key-chat_controls {
     position: relative;
-    margin-top: -54px !important;
-    padding: 0 18px 10px;
-    z-index: 999;
+    margin-top: 2px !important;
+    padding: 0 6px 6px;
     background: transparent !important;
 }
 .st-key-chat_controls [data-testid="stHorizontalBlock"] {
@@ -487,15 +486,29 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     gap: 2px !important;
     flex-wrap: nowrap !important;
 }
-/* kolom menyusut mengikuti isinya — model & toggle jadi berdampingan rapat */
+/* kolom kiri & kanan menyusut mengikuti isi, spacer tengah melar */
 .st-key-chat_controls [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {
     width: auto !important;
     flex: 0 0 auto !important;
     min-width: 0 !important;
 }
-/* kolom spacer terakhir tetap melar mengisi sisa ruang */
-.st-key-chat_controls [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:last-child {
+.st-key-chat_controls [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(2) {
     flex: 1 1 auto !important;
+}
+/* disclaimer kecil di tengah (ala Claude) */
+.input-disclaimer {
+    text-align: center;
+    font-size: 0.76rem;
+    color: #A8A69E;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 4px 8px 0;
+}
+/* toggle Gambar: teks kecil abu senada */
+.st-key-chat_controls [data-testid="stCheckbox"] label p {
+    font-size: 0.8rem !important;
+    color: #73726C !important;
 }
 /* tombol model = TULISAN BIASA tanpa kotak (ala Claude) */
 .st-key-chat_controls [data-testid="stPopover"] button,
@@ -1146,22 +1159,10 @@ def get_chat_export_text() -> str:
 # SESSION STATE
 # ============================================================================
 def init_state() -> None:
+    # Halaman awal bersih ala Claude: tanpa pesan sambutan,
+    # hanya sapaan besar + input di tengah.
     if "messages" not in st.session_state:
-        st.session_state.messages = [
-            {
-                "id": 0,
-                "role": "assistant",
-                "type": "text",
-                "content": (
-                    "Halo! Aku Yuki dari Ampera Trinity AI (๑>◡<๑)\n\n"
-                    "Aku bisa 3 hal sekaligus:\n"
-                    "🤖 Ganti-ganti model AI — klik tombol model di bawah\n"
-                    "🎨 Bikin gambar — nyalakan Mode Gambar lalu tulis deskripsinya\n"
-                    "💬 Ngobrol & coding — tulis aja langsung, aku ladenin wkwk 🐧"
-                ),
-                "time": datetime.now().strftime("%H:%M"),
-            }
-        ]
+        st.session_state.messages = []
     if "selected_model_label" not in st.session_state:
         st.session_state.selected_model_label = DEFAULT_MODEL_LABEL
     if "image_mode" not in st.session_state:
@@ -1445,23 +1446,29 @@ def main() -> None:
     inject_css()
     render_sidebar()
 
-    # ---------- Header (gaya Claude: minimal, serif) ----------
-    st.markdown(
-        f"""
-<div class="trinity-head">
-  <div class="trinity-logo">🔱</div>
-  <h1>{APP_NAME}</h1>
-</div>
-<p class="trinity-sub">{APP_TAGLINE}</p>
-""",
-        unsafe_allow_html=True,
-    )
+    is_fresh = len(st.session_state.messages) == 0
 
-    # Sapaan besar serif ala halaman awal Claude (hanya saat chat masih baru)
-    if len(st.session_state.messages) <= 1:
+    if is_fresh:
+        # ---------- HALAMAN AWAL ala Claude ----------
+        # Sapaan besar serif di tengah + input diangkat ke tengah layar (CSS)
         st.markdown(
-            '<div class="trinity-greeting">'
-            '<span class="star">✳</span> Ada yang bisa Yuki bantu hari ini?'
+            """
+<style>
+/* angkat dok input ke tengah layar saat belum ada percakapan */
+[data-testid="stBottom"] {
+    transform: translateY(-38vh);
+    background: transparent !important;
+}
+[data-testid="stBottom"] [data-testid="stBottomBlockContainer"] {
+    background: transparent !important;
+}
+</style>
+""",
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            '<div class="trinity-greeting" style="margin-top:26vh;">'
+            '<span class="star">✳</span> Semangat lagi, Ampera!'
             "</div>",
             unsafe_allow_html=True,
         )
@@ -1471,11 +1478,12 @@ def main() -> None:
         render_message(msg)
 
     # ---------- Chat input ----------
-    placeholder_text = (
-        "Deskripsikan gambar yang ingin dibuat..."
-        if st.session_state.image_mode
-        else "Tanya apa saja ke Yuki..."
-    )
+    if st.session_state.image_mode:
+        placeholder_text = "Deskripsikan gambar yang ingin dibuat…"
+    elif is_fresh:
+        placeholder_text = "Apa yang bisa Yuki bantu hari ini?"
+    else:
+        placeholder_text = "Tulis pesan…"
     user_text = st.chat_input(placeholder_text)
 
     # ---------- Kontrol DI DALAM kotak chat input ----------
@@ -1484,7 +1492,25 @@ def main() -> None:
     # CSS menariknya naik (margin-top negatif) ke ruang padding kotak input.
     with st._bottom:
         with st.container(key="chat_controls"):
-            ctrl_model, ctrl_mode, _sp = st.columns([0.34, 0.26, 1.4])
+            # [toggle Gambar] ....spacer.... [Nama Model] — model di kanan ala Claude
+            ctrl_mode, _sp, ctrl_model = st.columns([0.3, 1.4, 0.3])
+
+            with ctrl_mode:
+                st.session_state.image_mode = st.toggle(
+                    "Gambar",
+                    value=st.session_state.image_mode,
+                    help="Nyalakan untuk membuat gambar dari teks. "
+                         "Matikan untuk chat biasa dengan Yuki.",
+                )
+
+            with _sp:
+                if not is_fresh:
+                    st.markdown(
+                        '<div class="input-disclaimer">'
+                        "Yuki adalah AI dan bisa membuat kesalahan. Harap periksa kembali respons."
+                        "</div>",
+                        unsafe_allow_html=True,
+                    )
 
             with ctrl_model:
                 current = st.session_state.selected_model_label
@@ -1498,14 +1524,6 @@ def main() -> None:
                         if st.button(label, key=f"model_{m['name']}", use_container_width=True):
                             st.session_state.selected_model_label = m["name"]
                             st.rerun()
-
-            with ctrl_mode:
-                st.session_state.image_mode = st.toggle(
-                    "🎨 Gambar",
-                    value=st.session_state.image_mode,
-                    help="Nyalakan untuk membuat gambar dari teks (Cloudflare FLUX). "
-                         "Matikan untuk chat biasa dengan Yuki.",
-                )
 
     if user_text and user_text.strip():
         text = user_text.strip()
