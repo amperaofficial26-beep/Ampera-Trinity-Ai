@@ -731,23 +731,23 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 /* tombol ➕ di baris kontrol: lingkaran putih bersih ala Claude, menyatu
    di dalam kartu (tanpa bayangan berlebih karena kartu sudah punya shadow) */
 .st-key-chat_controls .st-key-plus_menu [data-testid="stPopover"] button {
-    background: #FFFFFF !important;
-    border: 1px solid #E3E0D5 !important;
-    border-radius: 999px !important;
+    background: transparent !important;      /* hilangkan lingkaran putih */
+    border: none !important;                 /* hilangkan border */
+    border-radius: 8px !important;           /* opsional: tetap rounded kecil */
     min-width: 32px !important;
     width: 32px !important;
     min-height: 32px !important;
     height: 32px !important;
     padding: 0 !important;
-    font-size: 1.05rem !important;
+    font-size: 1.2rem !important;           /* sedikit lebih besar agar jelas */
     font-weight: 400 !important;
     color: #3D3929 !important;
     box-shadow: none !important;
     justify-content: center !important;
 }
 .st-key-chat_controls .st-key-plus_menu [data-testid="stPopover"] button:hover {
-    background: #F5F4EF !important;
-    border-color: #DA7756 !important;
+    background: rgba(61, 57, 41, 0.06) !important;  /* hover lembut abu transparan */
+    border: none !important;
     color: #C15F3C !important;
 }
 /* Streamlit menambahkan ikon panah kecil di ujung tombol popover secara
@@ -781,17 +781,17 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
-    border-radius: 10px !important;
+    border-radius: 0 !important;          /* hilangkan sudut membulat */
     width: 100% !important;
     display: flex !important;
     justify-content: flex-start !important;
-    padding: 8px 12px !important;
-    min-height: 40px !important;
-    font-size: 0 !important;   /* sembunyikan teks bawaan "Browse files" */
+    padding: 4px 0 !important;            /* padding minimal, hanya untuk area klik */
+    min-height: 0 !important;             /* hilangkan tinggi minimal */
+    font-size: 0 !important;              /* tetap sembunyikan teks bawaan */
 }
 .st-key-plus_upload_file [data-testid="stBaseButton-secondary"]:hover,
 .st-key-plus_upload_image [data-testid="stBaseButton-secondary"]:hover {
-    background: #F0EEE6 !important;
+    background: transparent !important;   /* tidak ada perubahan latar saat hover */
 }
 .st-key-plus_upload_file [data-testid="stBaseButton-secondary"]::before {
     content: "📎  Upload file";
