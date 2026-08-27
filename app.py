@@ -54,14 +54,16 @@ APP_TAGLINE = "Multi AI · Generate Foto · Chat — by Ampera Official"
 
 # --- Multi AI (dari App 3: Ampera Multi AI) ---
 GROQ_BASE_URL = "https://api.groq.com/openai/v1"
-AVAILABLE_MODELS = {
-    "⚡ GPT-OSS 20B — Chat & Coding Ringan": "openai/gpt-oss-20b",
-    "💎 GPT-OSS 120B — Reasoning Mendalam": "openai/gpt-oss-120b",
-    "💎 Compound — Browsing Web & Eksekusi Kode": "groq/compound",
-    "⚡ Compound Mini — Web Search Ringkas": "groq/compound-mini",
-    "💎 Qwen3.6 27B — Reasoning & Matematika": "qwen/qwen3.6-27b",
-}
-DEFAULT_MODEL_LABEL = "⚡ GPT-OSS 20B — Chat & Coding Ringan"
+# Katalog model ala Claude: nama polos + deskripsi kecil (tanpa emoji)
+MODEL_CATALOG = [
+    {"name": "GPT-OSS 20B",   "desc": "Cepat untuk chat & coding ringan",      "id": "openai/gpt-oss-20b"},
+    {"name": "GPT-OSS 120B",  "desc": "Reasoning mendalam untuk tugas berat",  "id": "openai/gpt-oss-120b"},
+    {"name": "Compound",      "desc": "Browsing web & eksekusi kode",          "id": "groq/compound"},
+    {"name": "Compound Mini", "desc": "Web search ringkas & cepat",            "id": "groq/compound-mini"},
+    {"name": "Qwen3.6 27B",   "desc": "Reasoning & matematika",                "id": "qwen/qwen3.6-27b"},
+]
+AVAILABLE_MODELS = {m["name"]: m["id"] for m in MODEL_CATALOG}
+DEFAULT_MODEL_LABEL = "GPT-OSS 20B"
 
 # Fallback jika model terpilih sudah tidak tersedia di provider (dari App 1)
 GROQ_MODEL_FALLBACKS = (
@@ -311,23 +313,24 @@ html, body, [data-testid="stAppViewContainer"], .stApp {
     align-items: center;
     gap: 8px;
 }
-/* tombol model & toggle jadi chip kecil transparan di dalam kartu input */
+/* tombol model = TULISAN BIASA tanpa kotak (ala Claude) */
 .st-key-chat_controls [data-testid="stPopover"] > button {
     background: transparent !important;
-    border: 1px solid #E3E0D5 !important;
-    border-radius: 999px !important;
-    padding: 2px 12px !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 2px 8px !important;
     min-height: 30px !important;
     height: 30px !important;
-    font-size: 0.78rem !important;
+    font-size: 0.8rem !important;
+    font-weight: 500 !important;
     color: #73726C !important;
     box-shadow: none !important;
     white-space: nowrap;
 }
 .st-key-chat_controls [data-testid="stPopover"] > button:hover {
-    border-color: #DA7756 !important;
-    color: #C15F3C !important;
-    background: rgba(218,119,86,0.06) !important;
+    background: rgba(61,57,41,0.06) !important;
+    color: #3D3929 !important;
+    border: none !important;
 }
 .st-key-chat_controls [data-testid="stCheckbox"] {
     margin: 0 !important;
@@ -361,19 +364,48 @@ div.stDownloadButton > button:hover {
     color: #C15F3C !important;
     box-shadow: 0 2px 8px rgba(218,119,86,0.14) !important;
 }
+/* ---------- pop-up model ala Claude: SATU panel, item = teks polos ---------- */
 [data-testid="stPopoverBody"] {
-    background: #FAF9F5 !important;
+    background: #FFFFFF !important;
     border: 1px solid #E3E0D5 !important;
     border-radius: 16px !important;
-    box-shadow: 0 12px 36px rgba(61,57,41,0.14) !important;
+    box-shadow: 0 16px 48px rgba(61,57,41,0.18) !important;
+    min-width: 300px !important;
+    padding: 8px 6px !important;
 }
 [data-testid="stPopoverBody"] p, [data-testid="stPopoverBody"] div {
     color: #3D3929;
 }
+/* item model: TANPA kotak sendiri-sendiri — hanya teks, hover baru menyala */
 [data-testid="stPopoverBody"] div.stButton > button {
-    text-align: left !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 10px !important;
     box-shadow: none !important;
+    text-align: left !important;
+    justify-content: flex-start !important;
+    padding: 8px 12px !important;
+    margin: 0 !important;
+    width: 100% !important;
 }
+[data-testid="stPopoverBody"] div.stButton > button:hover {
+    background: #F0EEE6 !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: inherit !important;
+}
+/* nama model (baris pertama) tebal gelap, deskripsi kecil abu */
+[data-testid="stPopoverBody"] div.stButton > button p {
+    text-align: left !important;
+    margin: 0 !important;
+    font-size: 0.92rem !important;
+    font-weight: 500 !important;
+    color: #3D3929 !important;
+    line-height: 1.45 !important;
+}
+/* rapatkan jarak antar item */
+[data-testid="stPopoverBody"] .element-container { margin: 0 !important; }
+[data-testid="stPopoverBody"] [data-testid="stVerticalBlock"] { gap: 2px !important; }
 
 /* ---------- toggle mode gambar ---------- */
 [data-testid="stCheckbox"] label p, .stToggle label p {
@@ -1118,14 +1150,15 @@ def main() -> None:
 
         with ctrl_model:
             current = st.session_state.selected_model_label
-            short_name = current.split("—")[0].strip()
-            with st.popover(f"{short_name} ▾", use_container_width=True):
-                st.markdown("**Pilih Model AI**")
-                for label in AVAILABLE_MODELS:
-                    is_active = label == st.session_state.selected_model_label
-                    btn_label = f"✅ {label}" if is_active else label
-                    if st.button(btn_label, key=f"model_{label}", use_container_width=True):
-                        st.session_state.selected_model_label = label
+            with st.popover(f"{current} ▾", use_container_width=True):
+                # Daftar model ala Claude: baris teks polos (nama + deskripsi),
+                # tanpa kotak per item — model aktif ditandai ✓
+                for m in MODEL_CATALOG:
+                    is_active = m["name"] == st.session_state.selected_model_label
+                    check = " :orange[✓]" if is_active else ""
+                    label = f"{m['name']}{check}  \n:small[:gray[{m['desc']}]]"
+                    if st.button(label, key=f"model_{m['name']}", use_container_width=True):
+                        st.session_state.selected_model_label = m["name"]
                         st.rerun()
 
         with ctrl_mode:
