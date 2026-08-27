@@ -456,15 +456,29 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 .bubble-row.user .bubble-wrap { align-items: flex-end; }
 .bubble-wrap .bubble { max-width: 100%; }
 
-/* label kecil "Yuki" dengan titik aksen di atas jawaban AI */
+/* label kecil "Yuki" dengan logo custom di atas jawaban AI */
 .ai-label {
     display: inline-flex; align-items: center; gap: 6px;
     font-size: 0.78rem; font-weight: 600; color: #3D3929;
     margin-bottom: 4px;
 }
-.ai-label::before {
-    content: ""; width: 8px; height: 8px; border-radius: 50%;
-    background: #DA7756; display: inline-block;
+
+/* ===== ukuran logo custom di berbagai tempat ===== */
+.logo-label {
+    width: 16px; height: 16px;
+    display: inline-block; vertical-align: middle;
+}
+.logo-greeting {
+    width: 44px; height: 44px;
+    display: inline-block; vertical-align: -8px;
+    margin-right: 4px;
+    animation: slowSpin 8s linear infinite;
+}
+.logo-progress {
+    width: 22px; height: 22px;
+    display: inline-block; vertical-align: middle;
+    animation: slowSpin 8s linear infinite,
+               breatheGlow 3.2s ease-in-out infinite;
 }
 
 /* ---------- chat input: kartu putih membulat ala Claude ---------- */
@@ -732,28 +746,25 @@ div.stDownloadButton > button:hover {
     50%      { transform: scale(1.25) rotate(90deg); opacity: 1; }
 }
 
-/* ===== LOGO THINKING CUSTOM: koreografi 4 animasi ===== */
-/* Lapisan LUAR — opsi 4 lalu opsi 2:
-   spin cepat 1 putaran saat muncul (0.8s), lalu ayunan pendulum
-   kompas ±30° bolak-balik selamanya */
+/* ===== LOGO THINKING CUSTOM: koreografi animasi ===== */
+/* Lapisan LUAR — opsi 4 lalu opsi 1:
+   spin cepat 1 putaran saat muncul (0.8s), lalu PUTARAN PELAN
+   kontinu (1 putaran ~8 detik) selamanya */
 .claude-think .logo-spin {
     display: inline-block;
-    width: 24px; height: 24px;
+    width: 34px; height: 34px;
     flex-shrink: 0;
     animation:
         introSpin 0.8s cubic-bezier(0.22, 1, 0.36, 1) 1,
-        pendulum 5s ease-in-out 0.8s infinite;
+        slowSpin 8s linear 0.8s infinite;
 }
 @keyframes introSpin {
     from { transform: rotate(0deg) scale(0.4); }
     to   { transform: rotate(360deg) scale(1); }
 }
-@keyframes pendulum {
-    0%   { transform: rotate(0deg); }
-    25%  { transform: rotate(30deg); }
-    50%  { transform: rotate(0deg); }
-    75%  { transform: rotate(-30deg); }
-    100% { transform: rotate(0deg); }
+@keyframes slowSpin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
 }
 /* Lapisan DALAM — opsi 3 + opsi 5:
    napas (scale) + glow terracotta yang menguat-melemah
@@ -1123,7 +1134,7 @@ def bubble_html(role: str, content: str, timestamp: str = "") -> str:
         meta = ""
     else:
         # AI: teks polos + label kecil "Yuki" dengan titik terracotta (gaya Claude)
-        meta = '<div class="ai-label">Yuki</div>'
+        meta = f'<div class="ai-label">{logo_img_html("logo-label")} Yuki</div>'
     return (
         f'<div class="bubble-row {css}">'
         f'<div class="bubble-wrap">{meta}'
@@ -1187,7 +1198,7 @@ WORD_STREAM_DELAY = 0.14
 
 @st.cache_data(show_spinner=False)
 def _thinking_logo_b64() -> str:
-    """Logo thinking custom (PNG transparan) sebagai base64 untuk inline HTML."""
+    """Logo custom (PNG transparan) sebagai base64 untuk inline HTML."""
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                         "assets", "logo_thinking_small.png")
     try:
@@ -1195,6 +1206,14 @@ def _thinking_logo_b64() -> str:
             return base64.b64encode(fh.read()).decode("ascii")
     except Exception:
         return ""
+
+
+def logo_img_html(css_class: str = "logo-inline") -> str:
+    """Tag <img> logo custom; fallback ke bintang ✳ bila file tidak ada."""
+    b64 = _thinking_logo_b64()
+    if b64:
+        return f'<img class="{css_class}" src="data:image/png;base64,{b64}" alt="✳"/>'
+    return '<span class="star">✳</span>'
 
 
 def thinking_html(phrases: list[str]) -> str:
@@ -1227,7 +1246,7 @@ def image_progress_html(pct: float, label: str) -> str:
         '<div class="img-progress">'
         '<div class="img-progress-top">'
         '<span class="img-progress-label">'
-        '<span class="star">✳</span>'
+        f'{logo_img_html("logo-progress")}'
         f'{html.escape(label)}…</span>'
         f'<span class="img-progress-pct">{pct:.0f}%</span>'
         "</div>"
@@ -1591,7 +1610,7 @@ html, body {
         )
         st.markdown(
             '<div class="trinity-greeting" style="margin-top:18vh;">'
-            '<span class="star">✳</span> Semangat lagi!'
+            f'{logo_img_html("logo-greeting")} Semangat lagi!'
             "</div>",
             unsafe_allow_html=True,
         )
