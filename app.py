@@ -469,9 +469,9 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     display: inline-block; vertical-align: middle;
 }
 .logo-greeting {
-    width: 64px; height: 64px;
-    display: inline-block; vertical-align: -12px;
-    margin-right: 8px;
+    width: 76px; height: 76px;
+    display: inline-block; vertical-align: -16px;
+    margin-right: 2px;
 }
 .logo-progress {
     width: 22px; height: 22px;
@@ -915,7 +915,7 @@ div.stDownloadButton > button:hover {
 
 /* ---------- footer ---------- */
 .trinity-foot {
-    text-align: center; color: #A8A69E; font-size: 0.68rem;
+    text-align: center; color: #A8A69E; font-size: 0.6rem;
     margin-top: 34px; font-family: 'Inter', sans-serif;
 }
 </style>
