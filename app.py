@@ -154,6 +154,7 @@ html, body, [data-testid="stAppViewContainer"], .stApp {
 [data-testid="stHeader"] { background: transparent !important; }
 #MainMenu, footer, [data-testid="stToolbar"], [data-testid="stDecoration"] { visibility: hidden; }
 
+/* ========== SIDEBAR ========== */
 section[data-testid="stSidebar"] {
     background: #F5F4EF !important;
     border-right: 1px solid #E3E0D5 !important;
@@ -372,6 +373,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 
 ::selection { background: rgba(218,119,86,0.25); }
 
+/* ========== HEADER & GREETING ========== */
 .trinity-head {
     display: flex; align-items: center; justify-content: center;
     gap: 10px; padding: 4px 0 2px; margin-bottom: 6px;
@@ -404,6 +406,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 }
 .trinity-greeting .star { color: #DA7756; }
 
+/* ========== CHAT MESSAGES ========== */
 .bubble-row { display: flex; width: 100%; margin-bottom: 4px; }
 .bubble-row.user { justify-content: flex-end; margin: 12px 0; }
 .bubble-row.ai   { justify-content: flex-start; margin: 4px 0 22px; }
@@ -488,6 +491,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     display: inline-block; vertical-align: middle;
 }
 
+/* ========== CHAT INPUT ========== */
 [data-testid="stBottom"], [data-testid="stBottomBlockContainer"],
 [data-testid="stBottom"] > div {
     background: #F0EEE6 !important; border: none !important; box-shadow: none !important;
@@ -540,6 +544,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 }
 [data-testid="stChatInput"] button:disabled svg { fill: #A8A69E !important; color: #A8A69E !important; }
 
+/* ========== CONTROLS INSIDE INPUT ========== */
 .st-key-chat_controls {
     position: relative;
     margin-top: 0 !important;
@@ -640,6 +645,8 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 [data-testid="stChatInput"] [data-testid="stChatInputMicButton"]:hover {
     border-color: #DA7756 !important;
 }
+
+/* Tombol + transparan */
 .st-key-chat_controls .st-key-plus_menu [data-testid="stPopover"] button {
     background: transparent !important;
     border: none !important;
@@ -668,6 +675,8 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     font-size: 0.72rem; color: #A8A69E;
     padding: 2px 4px 4px;
 }
+
+/* Uploader di popover: hanya teks */
 .st-key-plus_upload_file [data-testid="stFileUploaderDropzone"],
 .st-key-plus_upload_image [data-testid="stFileUploaderDropzone"] {
     background: transparent !important;
@@ -721,344 +730,46 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     margin: 0 !important;
 }
 
-/* Preview strip di atas input */
-.st-key-pending_strip_above {
-    position: fixed;
-    bottom: 100px;  /* sesuaikan jika perlu */
-    left: 50%;
-    transform: translateX(-50%);
-    width: min(768px, 90vw);
-    background: #FAF9F5;
-    border: 1px solid #E3E0D5;
-    border-radius: 16px;
-    box-shadow: 0 4px 14px rgba(61,57,41,0.07);
-    padding: 8px 12px;
-    z-index: 999990;
+/* Thumbnail pending di dalam baris kontrol */
+.pending-thumbs {
     display: flex;
     align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
+    gap: 4px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    max-width: 300px;
+    padding: 0;
+    margin: 0;
 }
-.st-key-pending_strip_above [data-testid="stImage"] {
-    margin: 0 !important;
+.pending-thumbs img {
+    width: 50px !important;
+    height: 50px !important;
+    object-fit: cover;
+    border-radius: 4px;
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
 }
-.st-key-pending_strip_above button {
-    min-height: 24px !important;
-    height: 24px !important;
-    font-size: 0.72rem !important;
-    padding: 0 10px !important;
-    border-radius: 8px !important;
-}
-
-div.stButton > button, [data-testid="stPopover"] > button,
-div.stDownloadButton > button {
-    background: #FAF9F5 !important;
-    border: 1px solid #E3E0D5 !important;
-    color: #3D3929 !important;
-    border-radius: 12px !important;
-    font-family: 'Inter', sans-serif !important;
-    font-weight: 500 !important;
-    font-size: 0.85rem !important;
-    box-shadow: 0 1px 3px rgba(61,57,41,0.05) !important;
-    transition: all .18s ease !important;
-}
-div.stButton > button:hover, [data-testid="stPopover"] > button:hover,
-div.stDownloadButton > button:hover {
-    background: #F5F4EF !important;
-    border-color: #DA7756 !important;
-    color: #C15F3C !important;
-    box-shadow: 0 2px 8px rgba(218,119,86,0.14) !important;
-}
-[data-testid="stPopoverBody"] {
-    background: #FFFFFF !important;
-    border: 1px solid #E3E0D5 !important;
-    border-radius: 16px !important;
-    box-shadow: 0 16px 48px rgba(61,57,41,0.18) !important;
-    min-width: 300px !important;
-    padding: 8px 6px !important;
-}
-[data-testid="stPopoverBody"] p, [data-testid="stPopoverBody"] div {
-    color: #3D3929;
-}
-[data-testid="stPopoverBody"] div.stButton > button {
+.pending-thumbs button {
     background: transparent !important;
     border: none !important;
-    border-radius: 10px !important;
-    box-shadow: none !important;
-    text-align: left !important;
-    justify-content: flex-start !important;
-    align-items: flex-start !important;
-    padding: 8px 12px !important;
-    margin: 0 !important;
-    width: 100% !important;
-    display: flex !important;
+    color: #73726C;
+    font-size: 0.7rem;
+    cursor: pointer;
+    padding: 0 2px;
+    margin: 0;
 }
-[data-testid="stPopoverBody"] div.stButton > button:hover {
-    background: #F0EEE6 !important;
-    border: none !important;
-    box-shadow: none !important;
-    color: inherit !important;
-}
-[data-testid="stPopoverBody"] div.stButton > button > div,
-[data-testid="stPopoverBody"] div.stButton > button [data-testid="stMarkdownContainer"] {
-    width: 100% !important;
-    text-align: left !important;
-    justify-content: flex-start !important;
-}
-[data-testid="stPopoverBody"] div.stButton > button p {
-    text-align: left !important;
-    margin: 0 !important;
-    font-size: 0.92rem !important;
-    font-weight: 500 !important;
-    color: #3D3929 !important;
-    line-height: 1.45 !important;
-}
-.model-premium-badge {
-    display: inline-block;
-    font-size: 0.62rem; font-weight: 700;
+.pending-thumbs button:hover {
     color: #C15F3C;
-    background: rgba(218,119,86,0.12);
-    border: 1px solid rgba(218,119,86,0.35);
-    border-radius: 999px;
-    padding: 1px 7px;
-    margin-left: 6px;
-    letter-spacing: 0.03em;
-    vertical-align: middle;
-}
-[data-testid="stPopoverBody"] [class*="_premium"] {
-    position: relative;
-}
-[data-testid="stPopoverBody"] [class*="_premium"]::after {
-    content: "Premium";
-    position: absolute;
-    top: 4px; right: 6px;
-    font-size: 0.55rem;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    color: #B0774F;
-    background: rgba(218,119,86,0.10);
-    border: 1px solid rgba(218,119,86,0.25);
-    border-radius: 999px;
-    padding: 1px 6px;
-    pointer-events: none;
-}
-[data-testid="stPopoverBody"] .element-container { margin: 0 !important; }
-[data-testid="stPopoverBody"] [data-testid="stVerticalBlock"] { gap: 2px !important; }
-
-[data-testid="stCheckbox"] label p, .stToggle label p {
-    color: #3D3929 !important;
-    font-size: 0.85rem !important;
-    font-weight: 500 !important;
-}
-[data-testid="stCheckbox"] [data-checked="true"],
-.stToggle [aria-checked="true"] > div:first-child {
-    background: #DA7756 !important;
-}
-
-.mode-badge {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 4px 12px; border-radius: 999px;
-    font-size: 0.74rem; font-weight: 600;
-    margin-bottom: 6px;
-}
-.mode-badge.img {
-    background: rgba(218,119,86,0.10);
-    border: 1px solid rgba(218,119,86,0.35); color: #C15F3C;
-}
-
-[data-testid="stSpinner"] > div {
-    border-top-color: #DA7756 !important;
-}
-[data-testid="stSpinner"] p { color: #73726C !important; }
-
-.claude-think {
-    display: flex; align-items: center; gap: 10px;
-    padding: 2px 2px 6px;
-    animation: thinkFadeIn 1.4s ease both;
-}
-@keyframes thinkFadeIn {
-    from { opacity: 0; transform: translateY(4px); }
-    to   { opacity: 1; transform: none; }
-}
-.claude-think .star {
-    font-size: 1.05rem; color: #DA7756; line-height: 1;
-    animation: starPulse 2.2s ease-in-out infinite;
-    display: inline-block;
-}
-@keyframes starPulse {
-    0%, 100% { transform: scale(1) rotate(0deg);   opacity: 0.85; }
-    50%      { transform: scale(1.25) rotate(90deg); opacity: 1; }
-}
-
-.claude-think .logo-shimmer {
-    position: relative;
-    display: inline-block;
-    width: 34px; height: 34px;
-    flex-shrink: 0;
-    overflow: hidden;
-    border-radius: 6px;
-    animation: logoPulse 3s ease-in-out infinite;
-}
-.claude-think .logo-shimmer img {
-    width: 100%; height: 100%;
-    display: block;
-}
-.claude-think .logo-shimmer::after {
-    content: "";
-    position: absolute;
-    top: -30%; bottom: -30%;
-    left: 0; width: 60%;
-    background: linear-gradient(
-        100deg,
-        rgba(255,255,255,0) 0%,
-        rgba(255,240,225,0.85) 50%,
-        rgba(255,255,255,0) 100%
-    );
-    filter: blur(3px);
-    mix-blend-mode: screen;
-    transform: translateX(-130%) skewX(-16deg);
-    animation: shineSweep 2.6s ease-in-out infinite;
-    pointer-events: none;
-}
-@keyframes shineSweep {
-    0%   { transform: translateX(-130%) skewX(-16deg); }
-    60%  { transform: translateX(260%) skewX(-16deg); }
-    100% { transform: translateX(260%) skewX(-16deg); }
-}
-@keyframes logoPulse {
-    0%, 100% { transform: scale(1); }
-    50%      { transform: scale(1.14); }
-}
-.claude-think .phrase {
-    font-size: 0.92rem; font-weight: 500;
-    background: linear-gradient(
-        90deg,
-        #A8A69E 0%, #A8A69E 35%,
-        #3D3929 50%,
-        #A8A69E 65%, #A8A69E 100%
-    );
-    background-size: 220% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: shimmerSweep 4s linear infinite, phraseIn 3s ease both;
-}
-@keyframes shimmerSweep {
-    0%   { background-position: 110% 0; }
-    100% { background-position: -110% 0; }
-}
-@keyframes phraseIn {
-    from { opacity: 0; filter: blur(3px); }
-    to   { opacity: 1; filter: blur(0); }
-}
-.claude-think .phrases { position: relative; height: 1.5em; min-width: 260px; }
-.claude-think .phrases .phrase {
-    position: absolute; left: 0; top: 0; white-space: nowrap;
-    opacity: 0;
-    animation: shimmerSweep 4s linear infinite,
-               phraseCycle 16s ease-in-out infinite;
-}
-.claude-think .phrases .phrase:nth-child(1) { animation-delay: 0s, 0s; }
-.claude-think .phrases .phrase:nth-child(2) { animation-delay: 0s, 4s; }
-.claude-think .phrases .phrase:nth-child(3) { animation-delay: 0s, 8s; }
-.claude-think .phrases .phrase:nth-child(4) { animation-delay: 0s, 12s; }
-@keyframes phraseCycle {
-    0%      { opacity: 0; filter: blur(4px); }
-    3%      { opacity: 1; filter: blur(0); }
-    21%     { opacity: 1; filter: blur(0); }
-    25%     { opacity: 0; filter: blur(4px); }
-    100%    { opacity: 0; }
-}
-
-.type-caret {
-    display: inline-block; width: 7px; height: 1.05em;
-    margin-left: 3px; vertical-align: -2px;
-    background: #DA7756; border-radius: 2px;
-    animation: caretBlink 0.8s step-end infinite;
-}
-@keyframes caretBlink { 50% { opacity: 0; } }
-
-.img-progress {
-    padding: 14px 16px 16px;
-    background: #FAF9F5;
-    border: 1px solid #E3E0D5;
-    border-radius: 16px;
-    box-shadow: 0 2px 10px rgba(61,57,41,0.06);
-    animation: thinkFadeIn 1s ease both;
-    margin: 6px 0 14px;
-}
-.img-progress-top {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 10px;
-}
-.img-progress-label {
-    display: inline-flex; align-items: center; gap: 8px;
-    font-size: 0.9rem; font-weight: 500;
-    background: linear-gradient(
-        90deg,
-        #A8A69E 0%, #A8A69E 35%,
-        #3D3929 50%,
-        #A8A69E 65%, #A8A69E 100%
-    );
-    background-size: 220% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: shimmerSweep 4s linear infinite;
-}
-.img-progress-label .star {
-    -webkit-text-fill-color: #DA7756;
-    animation: starPulse 2.2s ease-in-out infinite;
-    display: inline-block; font-size: 1rem;
-}
-.img-progress-pct {
-    font-size: 0.92rem; font-weight: 600; color: #C15F3C;
-    font-variant-numeric: tabular-nums;
-}
-.img-progress-track {
-    height: 8px; border-radius: 99px;
-    background: #E8E5D8; overflow: hidden;
-    position: relative;
-}
-.img-progress-fill {
-    height: 100%; border-radius: 99px;
-    background: linear-gradient(90deg, #DA7756, #E89B7F, #DA7756);
-    background-size: 200% 100%;
-    animation: shimmerSweep 2.2s linear infinite;
-    transition: width 0.5s ease;
-    position: relative;
-}
-.img-progress-fill::after {
-    content: ""; position: absolute; inset: 0;
-    background: linear-gradient(90deg,
-        transparent 0%, rgba(255,255,255,0.55) 50%, transparent 100%);
-    background-size: 180% 100%;
-    animation: shimmerSweep 1.8s linear infinite;
-    border-radius: 99px;
-}
-
-[data-testid="stAlert"] {
-    background: #FAF9F5 !important;
-    border: 1px solid #E3E0D5 !important;
-    border-radius: 12px !important;
-    color: #3D3929 !important;
-}
-
-.trinity-foot {
-    text-align: center; color: #A8A69E; font-size: 0.6rem;
-    margin-top: 34px; font-family: 'Inter', sans-serif;
-}
-.trinity-foot.in-chat {
-    font-size: 0.5rem;
-    color: #B8B6AC;
-    margin-top: 22px;
 }
 </style>
 """,
         unsafe_allow_html=True,
     )
 
-
+# ============================================================================
+# UTIL
+# ============================================================================
 def public_error_image(status, body, exc=None):
     text = (body or str(exc or "")).lower()
     if status in (401, 403) or "authentication" in text or "forbidden" in text or "permission" in text:
@@ -1755,24 +1466,7 @@ html, body {
     for msg in st.session_state.messages:
         render_message(msg)
 
-    pending = st.session_state.get("pending_images", [])
-    if pending:
-        with st.container(key="pending_strip_above"):
-            cols = st.columns([0.8] * len(pending) + [2.0])
-            for i, im in enumerate(pending):
-                with cols[i]:
-                    st.image(im["data"], width=50)
-                    if st.button("✕", key=f"pending_rm_above_{i}",
-                                 use_container_width=True):
-                        st.session_state.pending_images.pop(i)
-                        st.rerun()
-            with cols[-1]:
-                st.markdown(
-                    '<div class="plus-menu-hint">📎 Siap dikirim bersama '
-                    'pesan berikutnya…</div>',
-                    unsafe_allow_html=True,
-                )
-
+    # ========== CHAT INPUT ==========
     if st.session_state.image_mode:
         placeholder_text = "Deskripsikan gambar yang ingin dibuat…"
     elif is_fresh:
@@ -1787,6 +1481,7 @@ html, body {
         chat_kwargs["accept_audio"] = True
     user_input = st.chat_input(placeholder_text, **chat_kwargs)
 
+    # ========== CONTROLS ==========
     bottom_dock = getattr(st, "bottom", None) or st._bottom
     with bottom_dock:
         with st.container(key="chat_controls"):
@@ -1854,13 +1549,30 @@ html, body {
                 )
 
             with _sp:
-                if not is_fresh:
-                    st.markdown(
-                        '<div class="input-disclaimer">'
-                        "Yuki adalah AI dan bisa membuat kesalahan. Harap periksa kembali respons."
-                        "</div>",
-                        unsafe_allow_html=True,
-                    )
+                pending = st.session_state.get("pending_images", [])
+                if pending:
+                    # Tampilkan thumbnail persegi tanpa background
+                    st.markdown('<div class="pending-thumbs">', unsafe_allow_html=True)
+                    for i, im in enumerate(pending):
+                        b64 = base64.b64encode(im["data"]).decode("ascii")
+                        st.markdown(
+                            f'<img src="data:{im["mime"]};base64,{b64}" '
+                            f'alt="{html.escape(im.get("name", "gambar"))}">',
+                            unsafe_allow_html=True,
+                        )
+                        # Tombol hapus kecil
+                        if st.button("✕", key=f"pending_rm_ctl_{i}"):
+                            st.session_state.pending_images.pop(i)
+                            st.rerun()
+                    st.markdown('</div>', unsafe_allow_html=True)
+                else:
+                    if not is_fresh:
+                        st.markdown(
+                            '<div class="input-disclaimer">'
+                            "Yuki adalah AI dan bisa membuat kesalahan. Harap periksa kembali respons."
+                            "</div>",
+                            unsafe_allow_html=True,
+                        )
 
             with ctrl_model:
                 current_key = st.session_state.selected_model_key
@@ -1876,6 +1588,7 @@ html, body {
                                 st.session_state.selected_model_key = m["key"]
                                 st.rerun()
 
+    # ========== PROCESS INPUT ==========
     if user_input is not None:
         if isinstance(user_input, str):
             raw_text, send_files, send_audio = user_input, [], None
