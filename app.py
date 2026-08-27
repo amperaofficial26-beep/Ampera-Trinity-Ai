@@ -27,6 +27,7 @@ import base64
 import html
 import io
 import os
+import threading
 import time
 from datetime import datetime
 
@@ -431,6 +432,68 @@ div.stDownloadButton > button:hover {
 }
 @keyframes caretBlink { 50% { opacity: 0; } }
 
+/* ---------- progress bar gambar: % + shimmer (ala Claude) ---------- */
+.img-progress {
+    padding: 14px 16px 16px;
+    background: #FAF9F5;
+    border: 1px solid #E3E0D5;
+    border-radius: 16px;
+    box-shadow: 0 2px 10px rgba(61,57,41,0.06);
+    animation: thinkFadeIn 1s ease both;
+    margin: 6px 0 14px;
+}
+.img-progress-top {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+}
+.img-progress-label {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 0.9rem; font-weight: 500;
+    /* teks shimmer sama seperti thinking */
+    background: linear-gradient(
+        90deg,
+        #A8A69E 0%, #A8A69E 35%,
+        #3D3929 50%,
+        #A8A69E 65%, #A8A69E 100%
+    );
+    background-size: 220% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmerSweep 4s linear infinite;
+}
+.img-progress-label .star {
+    -webkit-text-fill-color: #DA7756;
+    animation: starPulse 2.2s ease-in-out infinite;
+    display: inline-block; font-size: 1rem;
+}
+.img-progress-pct {
+    font-size: 0.92rem; font-weight: 600; color: #C15F3C;
+    font-variant-numeric: tabular-nums;
+}
+.img-progress-track {
+    height: 8px; border-radius: 99px;
+    background: #E8E5D8; overflow: hidden;
+    position: relative;
+}
+.img-progress-fill {
+    height: 100%; border-radius: 99px;
+    background: linear-gradient(90deg, #DA7756, #E89B7F, #DA7756);
+    background-size: 200% 100%;
+    animation: shimmerSweep 2.2s linear infinite;
+    transition: width 0.5s ease;
+    position: relative;
+}
+/* kilau putih menyapu di atas bar */
+.img-progress-fill::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(90deg,
+        transparent 0%, rgba(255,255,255,0.55) 50%, transparent 100%);
+    background-size: 180% 100%;
+    animation: shimmerSweep 1.8s linear infinite;
+    border-radius: 99px;
+}
+
 /* ---------- alert / error ---------- */
 [data-testid="stAlert"] {
     background: #FAF9F5 !important;
@@ -712,6 +775,9 @@ THINKING_PHRASES_IMAGE = [
 # Durasi minimum proses berpikir (detik) — sesuai permintaan ±12 detik
 THINKING_MIN_SECONDS = 12.0
 
+# Durasi minimum progress bar gambar (detik) — biar animasi % terasa
+IMAGE_MIN_SECONDS = 10.0
+
 # Delay antar kata saat jawaban diketik kata per kata (agak lambat)
 WORD_STREAM_DELAY = 0.14
 
@@ -725,6 +791,23 @@ def thinking_html(phrases: list[str]) -> str:
         '<span class="star">✳</span>'
         f'<span class="phrases">{spans}</span>'
         "</div>"
+    )
+
+
+def image_progress_html(pct: float, label: str) -> str:
+    """Kartu progress bar % + shimmer untuk proses pembuatan gambar."""
+    pct = max(0.0, min(100.0, float(pct)))
+    return (
+        '<div class="img-progress">'
+        '<div class="img-progress-top">'
+        '<span class="img-progress-label">'
+        '<span class="star">✳</span>'
+        f'{html.escape(label)}…</span>'
+        f'<span class="img-progress-pct">{pct:.0f}%</span>'
+        "</div>"
+        '<div class="img-progress-track">'
+        f'<div class="img-progress-fill" style="width:{pct:.1f}%;"></div>'
+        "</div></div>"
     )
 
 
@@ -827,19 +910,62 @@ def handle_image_request(prompt: str) -> None:
         })
         return
 
-    # Thinking ala Claude (teks shimmer muncul perlahan)
-    think_slot = st.empty()
-    think_slot.markdown(thinking_html(THINKING_PHRASES_IMAGE), unsafe_allow_html=True)
-    try:
-        data = generate_image(prompt)
-        think_slot.empty()
+    # Progress bar % + shimmer (generate jalan di thread background,
+    # persentase naik perlahan mengikuti tahapan label)
+    progress_slot = st.empty()
+
+    result: dict = {"data": None, "error": None}
+
+    def _worker() -> None:
+        try:
+            result["data"] = generate_image(prompt)
+        except Exception as exc:  # simpan untuk ditampilkan di thread utama
+            result["error"] = exc
+
+    worker = threading.Thread(target=_worker, daemon=True)
+    worker.start()
+
+    # Tahapan label + target % (label berganti seiring progress naik)
+    stages = [
+        (0, "Membayangkan gambarnya"),
+        (30, "Menyiapkan kanvas"),
+        (55, "Melukis perlahan"),
+        (80, "Menajamkan detail"),
+    ]
+    pct = 0.0
+    t0 = time.time()
+    while worker.is_alive() or (time.time() - t0) < IMAGE_MIN_SECONDS:
+        # naik perlahan, melambat mendekati 92% selama masih menunggu
+        if pct < 60:
+            pct += 2.4
+        elif pct < 85:
+            pct += 1.1
+        elif pct < 92:
+            pct += 0.35
+        label = stages[0][1]
+        for threshold, name in stages:
+            if pct >= threshold:
+                label = name
+        progress_slot.markdown(image_progress_html(pct, label), unsafe_allow_html=True)
+        time.sleep(0.35)
+        if not worker.is_alive() and (time.time() - t0) >= IMAGE_MIN_SECONDS:
+            break
+
+    worker.join(timeout=200)
+
+    if result["error"] is None and result["data"]:
+        # sentuhan akhir: lompat mulus ke 100%
+        progress_slot.markdown(image_progress_html(100, "Selesai"), unsafe_allow_html=True)
+        time.sleep(0.6)
+        progress_slot.empty()
         st.session_state.messages.append({
             "id": next_msg_id(), "role": "assistant", "type": "image",
-            "image_bytes": data, "prompt": prompt,
+            "image_bytes": result["data"], "prompt": prompt,
             "time": datetime.now().strftime("%H:%M"),
         })
-    except Exception as e:
-        think_slot.empty()
+    else:
+        progress_slot.empty()
+        e = result["error"] or RuntimeError("no image")
         msg = str(e)
         if not msg.startswith(("⚠️", "⏳", "⌛", "❌")):
             msg = public_error_image(None, msg, e)
