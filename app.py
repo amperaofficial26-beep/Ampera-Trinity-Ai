@@ -159,7 +159,15 @@ section[data-testid="stSidebar"] {
     visibility: visible !important;
 }
 section[data-testid="stSidebar"] > div {
-    padding: 0.7rem 0.7rem 0.5rem;
+    padding: 0.4rem 0.7rem 0.5rem;
+}
+/* konten sidebar DIPENTOK KE ATAS: buang ruang kosong bawaan di atasnya */
+section[data-testid="stSidebar"] [data-testid="stSidebarHeader"] {
+    padding-bottom: 0 !important;
+    min-height: 34px !important;
+}
+section[data-testid="stSidebar"] [data-testid="stSidebarUserContent"] {
+    padding-top: 0 !important;
 }
 /* tombol buka sidebar (saat tertutup) HARUS selalu terlihat */
 [data-testid="stSidebarCollapsedControl"],
@@ -191,12 +199,13 @@ button[kind="headerNoPadding"] {
     pointer-events: auto !important;
 }
 
-/* judul brand serif ala "Claude" */
+/* judul brand serif ala "Claude" — rapat ke atas */
 .sb-brand {
     font-family: 'Source Serif 4', Georgia, serif;
     font-size: 1.55rem; font-weight: 700; color: #1a1915;
     letter-spacing: -0.02em;
-    padding: 6px 8px 16px;
+    padding: 0 8px 14px;
+    margin-top: -6px;
 }
 
 /* tombol menu sidebar: baris teks polos RATA KIRI, hover krem (ala Claude) */
@@ -320,20 +329,21 @@ section[data-testid="stSidebar"] div.stDownloadButton > button p {
     height: 1px; background: #E3E0D5; margin: 10px 4px;
 }
 
-/* baris akun bawah ala Claude — DITEMPEL di dasar sidebar */
+/* baris akun ala Claude — DIPAKU di dasar layar, selebar sidebar */
 .sb-account {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
+    position: fixed;
+    bottom: 0; left: 0;
+    width: 300px;              /* = lebar sidebar */
     display: flex; align-items: center; gap: 10px;
     padding: 12px 16px 14px;
     border-top: 1px solid #E3E0D5;
     background: #F5F4EF;
-    z-index: 5;
+    z-index: 999995;
+    box-sizing: border-box;
 }
 /* beri ruang bawah agar konten sidebar tidak tertutup baris akun */
 section[data-testid="stSidebar"] > div:first-child {
-    padding-bottom: 64px !important;
-    position: relative;
+    padding-bottom: 70px !important;
 }
 .sb-account .ava {
     width: 28px; height: 28px; border-radius: 50%;
