@@ -155,12 +155,39 @@ section[data-testid="stSidebar"] {
     background: #F5F4EF !important;
     border-right: 1px solid #E3E0D5 !important;
     width: 300px !important;
+    display: flex !important;
+    visibility: visible !important;
 }
 section[data-testid="stSidebar"] > div { padding-top: 0.6rem; }
-[data-testid="stSidebarCollapsedControl"] {
-    color: #73726C !important;
+/* tombol buka sidebar (saat tertutup) HARUS selalu terlihat */
+[data-testid="stSidebarCollapsedControl"],
+[data-testid="collapsedControl"] {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    color: #3D3929 !important;
+    z-index: 999990 !important;
+}
+[data-testid="stSidebarCollapsedControl"] button,
+[data-testid="collapsedControl"] button {
+    color: #3D3929 !important;
+    background: #FAF9F5 !important;
+    border: 1px solid #E3E0D5 !important;
+    border-radius: 10px !important;
 }
 [data-testid="stSidebarCollapseButton"] button { color: #73726C !important; }
+/* varian testid tombol expand sidebar di Streamlit versi baru */
+[data-testid="stExpandSidebarButton"],
+button[kind="headerNoPadding"] {
+    display: inline-flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    color: #3D3929 !important;
+}
+[data-testid="stHeader"] {
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
 
 /* judul brand serif ala "Claude" */
 .sb-brand {
