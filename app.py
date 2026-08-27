@@ -65,12 +65,12 @@ APP_TAGLINE = "Multi AI · Generate Foto · Chat — by Ampera Official"
 # --- Multi AI (dari App 3: Ampera Multi AI) ---
 GROQ_BASE_URL = "https://api.groq.com/openai/v1"
 MODEL_CATALOG = [
-    {"key": "gpt_oss_20b",   "name": "Trinity Easy",    "desc": "Cepat untuk chat & coding ringan",      "id": "openai/gpt-oss-20b", "premium": False},
-    {"key": "compound_mini", "name": "Trinity Normal",  "desc": "Web search ringkas & cepat",            "id": "groq/compound-mini", "premium": False},
-    {"key": "llama4_scout",  "name": "Trinity Normal",  "desc": "Bisa melihat & menganalisis gambar",    "id": "meta-llama/llama-4-scout-17b-16e-instruct", "premium": False},
-    {"key": "compound",      "name": "Trinity Hard",    "desc": "Browsing web & eksekusi kode",          "id": "groq/compound", "premium": True},
-    {"key": "qwen3_6_27b",   "name": "Trinity Hard",    "desc": "Reasoning & matematika",                "id": "qwen/qwen3.6-27b", "premium": True},
-    {"key": "gpt_oss_120b",  "name": "Trinity Extreme", "desc": "Reasoning mendalam untuk tugas berat",  "id": "openai/gpt-oss-120b", "premium": True},
+    {"key": "gpt_oss_20b",   "name": "Trinity Easy",    "desc": "Cepat untuk chat & coding ringan",      "id": "openai/gpt-oss-20b", "premium": False, "level": "Easy"},
+    {"key": "compound_mini", "name": "Trinity Normal",  "desc": "Web search ringkas & cepat",            "id": "groq/compound-mini", "premium": False, "level": "Normal"},
+    {"key": "llama4_scout",  "name": "Trinity Normal",  "desc": "Bisa melihat & menganalisis gambar",    "id": "meta-llama/llama-4-scout-17b-16e-instruct", "premium": False, "level": "Normal"},
+    {"key": "compound",      "name": "Trinity Hard",    "desc": "Browsing web & eksekusi kode",          "id": "groq/compound", "premium": True, "level": "Hard"},
+    {"key": "qwen3_6_27b",   "name": "Trinity Hard",    "desc": "Reasoning & matematika",                "id": "qwen/qwen3.6-27b", "premium": True, "level": "Hard"},
+    {"key": "gpt_oss_120b",  "name": "Trinity Extreme", "desc": "Reasoning mendalam untuk tugas berat",  "id": "openai/gpt-oss-120b", "premium": True, "level": "Extreme"},
 ]
 AVAILABLE_MODELS = {m["key"]: m["id"] for m in MODEL_CATALOG}
 MODEL_BY_KEY = {m["key"]: m for m in MODEL_CATALOG}
@@ -732,7 +732,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 
 /* ========== THUMBNAIL PREVIEW (lebih kecil & rapat ke input) ========== */
 .st-key-preview_container {
-    padding: 0 4px 2px !important;  /* jarak ke bawah dikurangi */
+    padding: 0 4px 2px !important;
     margin-bottom: 0 !important;
 }
 .st-key-preview_container [data-testid="stImage"] img {
@@ -772,6 +772,78 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     padding: 0 !important;
 }
 
+/* ========== POPOVER MODEL (gaya baru) ========== */
+/* Menghilangkan tombol dengan background dan border, tampilkan sebagai daftar teks */
+.st-key-model_popover_content [data-testid="stVerticalBlock"] {
+    gap: 2px !important;
+}
+.st-key-model_popover_content .stButton button {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 6px !important;
+    padding: 6px 12px !important;
+    margin: 0 !important;
+    width: 100% !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
+    font-weight: 400 !important;
+    color: #3D3929 !important;
+    box-shadow: none !important;
+    display: flex !important;
+    align-items: center !important;
+    min-height: 32px !important;
+    height: auto !important;
+}
+.st-key-model_popover_content .stButton button:hover {
+    background: #F0EEE6 !important;
+}
+.st-key-model_popover_content .stButton button p {
+    margin: 0 !important;
+    font-size: 0.9rem !important;
+    font-weight: 400 !important;
+    color: #3D3929 !important;
+    text-align: left !important;
+    width: 100% !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+/* Label premium kecil di kanan */
+.model-level-label {
+    font-size: 0.6rem !important;
+    font-weight: 600 !important;
+    color: #C15F3C !important;
+    background: rgba(218,119,86,0.10) !important;
+    border: 1px solid rgba(218,119,86,0.25) !important;
+    border-radius: 999px !important;
+    padding: 1px 8px !important;
+    margin-left: 8px !important;
+    white-space: nowrap !important;
+}
+.model-level-label.easy {
+    color: #8B887D !important;
+    background: transparent !important;
+    border: 1px solid #D5D1C3 !important;
+}
+.model-level-label.normal {
+    color: #8B887D !important;
+    background: transparent !important;
+    border: 1px solid #D5D1C3 !important;
+}
+.model-level-label.hard {
+    color: #C15F3C !important;
+    border-color: rgba(218,119,86,0.35) !important;
+}
+.model-level-label.extreme {
+    color: #C15F3C !important;
+    border-color: rgba(218,119,86,0.35) !important;
+}
+/* Tanda centang untuk model aktif */
+.model-check {
+    color: #DA7756 !important;
+    font-size: 0.8rem !important;
+    margin-left: 4px !important;
+}
 /* ========== Toggle ========== */
 [data-testid="stCheckbox"] label p, .stToggle label p {
     color: #3D3929 !important;
@@ -1787,13 +1859,27 @@ html, body {
                 current_key = st.session_state.selected_model_key
                 current_name = MODEL_BY_KEY.get(current_key, MODEL_BY_KEY[DEFAULT_MODEL_KEY])["name"]
                 with st.popover(current_name, use_container_width=False):
-                    for m in MODEL_CATALOG:
-                        is_active = m["key"] == st.session_state.selected_model_key
-                        check = " :orange[✓]" if is_active else ""
-                        label = f"{m['name']}{check}  \n:small[:gray[{m['desc']}]]"
-                        row_key = f"model_row_{m['key']}" + ("_premium" if m.get("premium") else "")
-                        with st.container(key=row_key):
-                            if st.button(label, key=f"model_{m['key']}", use_container_width=True):
+                    # Container dengan class khusus agar gaya CSS diterapkan
+                    with st.container(key="model_popover_content"):
+                        for m in MODEL_CATALOG:
+                            is_active = (m["key"] == st.session_state.selected_model_key)
+                            # Tentukan label level
+                            level = m.get("level", "")
+                            if level == "Easy":
+                                level_label = '<span class="model-level-label easy">Easy</span>'
+                            elif level == "Normal":
+                                level_label = '<span class="model-level-label normal">Normal</span>'
+                            elif level == "Hard":
+                                level_label = '<span class="model-level-label hard">Hard</span>'
+                            elif level == "Extreme":
+                                level_label = '<span class="model-level-label extreme">Extreme</span>'
+                            else:
+                                level_label = ""
+                            # Tanda centang jika aktif
+                            check = '<span class="model-check"> ✓</span>' if is_active else ""
+                            # Buat tombol dengan teks rata kiri dan label di kanan
+                            label_html = f"{m['name']}{check} {level_label}"
+                            if st.button(label_html, key=f"model_{m['key']}", use_container_width=True):
                                 st.session_state.selected_model_key = m["key"]
                                 st.rerun()
 
