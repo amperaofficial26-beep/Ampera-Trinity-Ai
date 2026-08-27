@@ -408,18 +408,28 @@ div.stDownloadButton > button:hover {
     position: absolute; left: 0; top: 0; white-space: nowrap;
     opacity: 0;
     animation: shimmerSweep 4s linear infinite,
-               phraseCycle 30s ease-in-out infinite;
+               phraseCycle 16s ease-in-out infinite;
 }
 .claude-think .phrases .phrase:nth-child(1) { animation-delay: 0s, 0s; }
-.claude-think .phrases .phrase:nth-child(2) { animation-delay: 0s, 10s; }
-.claude-think .phrases .phrase:nth-child(3) { animation-delay: 0s, 20s; }
+.claude-think .phrases .phrase:nth-child(2) { animation-delay: 0s, 4s; }
+.claude-think .phrases .phrase:nth-child(3) { animation-delay: 0s, 8s; }
+.claude-think .phrases .phrase:nth-child(4) { animation-delay: 0s, 12s; }
 @keyframes phraseCycle {
     0%      { opacity: 0; filter: blur(4px); }
-    10%     { opacity: 1; filter: blur(0); }
-    28%     { opacity: 1; filter: blur(0); }
-    33.3%   { opacity: 0; filter: blur(4px); }
+    3%      { opacity: 1; filter: blur(0); }
+    21%     { opacity: 1; filter: blur(0); }
+    25%     { opacity: 0; filter: blur(4px); }
     100%    { opacity: 0; }
 }
+
+/* caret berkedip saat jawaban diketik kata per kata */
+.type-caret {
+    display: inline-block; width: 7px; height: 1.05em;
+    margin-left: 3px; vertical-align: -2px;
+    background: #DA7756; border-radius: 2px;
+    animation: caretBlink 0.8s step-end infinite;
+}
+@keyframes caretBlink { 50% { opacity: 0; } }
 
 /* ---------- alert / error ---------- */
 [data-testid="stAlert"] {
@@ -685,8 +695,25 @@ def render_message(msg: dict) -> None:
 #   dan berganti-ganti lambat (animasi murni CSS → tetap jalan
 #   walau server sedang menunggu respons API).
 # ============================================================================
-THINKING_PHRASES_CHAT = ["Berpikir", "Merangkai jawaban", "Menimbang kata"]
-THINKING_PHRASES_IMAGE = ["Membayangkan gambarnya", "Menyiapkan kanvas", "Melukis perlahan"]
+# Frasa ala Claude — berganti tiap ~4 detik selama proses berpikir (~12s+)
+THINKING_PHRASES_CHAT = [
+    "Berpikir",
+    "Mencerna pertanyaan",
+    "Menelusuri kemungkinan",
+    "Merangkai jawaban",
+]
+THINKING_PHRASES_IMAGE = [
+    "Berpikir",
+    "Membayangkan gambarnya",
+    "Menyiapkan kanvas",
+    "Melukis perlahan",
+]
+
+# Durasi minimum proses berpikir (detik) — sesuai permintaan ±12 detik
+THINKING_MIN_SECONDS = 12.0
+
+# Delay antar kata saat jawaban diketik kata per kata (agak lambat)
+WORD_STREAM_DELAY = 0.14
 
 
 def thinking_html(phrases: list[str]) -> str:
@@ -699,6 +726,23 @@ def thinking_html(phrases: list[str]) -> str:
         f'<span class="phrases">{spans}</span>'
         "</div>"
     )
+
+
+def stream_words(answer_slot, full_text: str) -> None:
+    """Tampilkan jawaban kata per kata dengan delay agak lambat + caret ✳."""
+    words = full_text.split(" ")
+    acc = ""
+    for i, word in enumerate(words):
+        acc = word if not acc else f"{acc} {word}"
+        is_last = i == len(words) - 1
+        caret = "" if is_last else '<span class="type-caret"></span>'
+        html_bubble = bubble_html("assistant", acc)
+        if caret:
+            # sisipkan caret sebelum penutup bubble
+            html_bubble = html_bubble.replace("</div></div></div>", f"{caret}</div></div></div>")
+        answer_slot.markdown(html_bubble, unsafe_allow_html=True)
+        if not is_last:
+            time.sleep(WORD_STREAM_DELAY)
 
 
 # ============================================================================
@@ -820,33 +864,32 @@ def handle_chat_request(answer_slot) -> None:
         AVAILABLE_MODELS[DEFAULT_MODEL_LABEL],
     )
 
-    # Thinking ala Claude (teks shimmer muncul perlahan)
+    # Thinking ala Claude — frasa berganti-ganti selama ±12 detik
     think_slot = st.empty()
     think_slot.markdown(thinking_html(THINKING_PHRASES_CHAT), unsafe_allow_html=True)
     t0 = time.time()
 
     try:
         client = build_chat_client()
-        stream_iter = stream_chat_with_fallback(
-            client, model_id, st.session_state.messages
+        # Kumpulkan seluruh jawaban SELAMA animasi berpikir masih berjalan
+        full = "".join(
+            piece or ""
+            for piece in stream_chat_with_fallback(
+                client, model_id, st.session_state.messages
+            )
         )
-        first = next(stream_iter, None)
-        # tahan agar animasi thinking terlihat perlahan (min ~4.5s)
-        elapsed = time.time() - t0
-        if elapsed < 4.5:
-            time.sleep(4.5 - elapsed)
-        think_slot.empty()
 
-        full = first or ""
-        if full:
-            answer_slot.markdown(bubble_html("assistant", full), unsafe_allow_html=True)
-        for piece in stream_iter:
-            full += piece or ""
-            answer_slot.markdown(bubble_html("assistant", full), unsafe_allow_html=True)
+        # Tahan sampai proses berpikir genap ±12 detik
+        elapsed = time.time() - t0
+        if elapsed < THINKING_MIN_SECONDS:
+            time.sleep(THINKING_MIN_SECONDS - elapsed)
+        think_slot.empty()
 
         if not full:
             full = "…"
-            answer_slot.markdown(bubble_html("assistant", full), unsafe_allow_html=True)
+
+        # Jawaban muncul kata per kata dengan delay agak lambat
+        stream_words(answer_slot, full)
 
         st.session_state.messages.append({
             "id": next_msg_id(), "role": "assistant", "type": "text",
