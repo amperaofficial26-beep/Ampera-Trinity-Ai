@@ -1194,8 +1194,8 @@ THINKING_MIN_SECONDS = 12.0
 # Durasi minimum progress bar gambar (detik) — biar animasi % terasa
 IMAGE_MIN_SECONDS = 10.0
 
-# Delay antar kata saat jawaban diketik kata per kata (agak lambat)
-WORD_STREAM_DELAY = 0.14
+# Delay antar kata saat jawaban diketik kata per kata (lebih cepat & responsif)
+WORD_STREAM_DELAY = 0.05
 
 
 @st.cache_data(show_spinner=False)
