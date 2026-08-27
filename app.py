@@ -721,7 +721,7 @@ div.stDownloadButton > button:hover {
     from { opacity: 0; transform: translateY(4px); }
     to   { opacity: 1; transform: none; }
 }
-/* bintang ✳ terracotta berdenyut & berputar pelan */
+/* bintang ✳ terracotta berdenyut & berputar pelan (fallback) */
 .claude-think .star {
     font-size: 1.05rem; color: #DA7756; line-height: 1;
     animation: starPulse 2.2s ease-in-out infinite;
@@ -730,6 +730,56 @@ div.stDownloadButton > button:hover {
 @keyframes starPulse {
     0%, 100% { transform: scale(1) rotate(0deg);   opacity: 0.85; }
     50%      { transform: scale(1.25) rotate(90deg); opacity: 1; }
+}
+
+/* ===== LOGO THINKING CUSTOM: koreografi 4 animasi ===== */
+/* Lapisan LUAR — opsi 4 lalu opsi 2:
+   spin cepat 1 putaran saat muncul (0.8s), lalu ayunan pendulum
+   kompas ±30° bolak-balik selamanya */
+.claude-think .logo-spin {
+    display: inline-block;
+    width: 24px; height: 24px;
+    flex-shrink: 0;
+    animation:
+        introSpin 0.8s cubic-bezier(0.22, 1, 0.36, 1) 1,
+        pendulum 5s ease-in-out 0.8s infinite;
+}
+@keyframes introSpin {
+    from { transform: rotate(0deg) scale(0.4); }
+    to   { transform: rotate(360deg) scale(1); }
+}
+@keyframes pendulum {
+    0%   { transform: rotate(0deg); }
+    25%  { transform: rotate(30deg); }
+    50%  { transform: rotate(0deg); }
+    75%  { transform: rotate(-30deg); }
+    100% { transform: rotate(0deg); }
+}
+/* Lapisan DALAM — opsi 3 + opsi 5:
+   napas (scale) + glow terracotta yang menguat-melemah
+   + gelombang opasitas kelap-kelip dengan ritme berbeda */
+.claude-think .logo-core {
+    width: 100%; height: 100%;
+    display: block;
+    animation:
+        breatheGlow 3.2s ease-in-out infinite,
+        opacityWave 4.6s ease-in-out infinite;
+}
+@keyframes breatheGlow {
+    0%, 100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 2px rgba(218,119,86,0.25));
+    }
+    50% {
+        transform: scale(1.14);
+        filter: drop-shadow(0 0 9px rgba(218,119,86,0.65));
+    }
+}
+@keyframes opacityWave {
+    0%, 100% { opacity: 1; }
+    30%      { opacity: 0.55; }
+    60%      { opacity: 0.9; }
+    80%      { opacity: 0.65; }
 }
 /* teks dengan shimmer lembut menyapu perlahan (gaya Claude) */
 .claude-think .phrase {
@@ -1135,13 +1185,36 @@ IMAGE_MIN_SECONDS = 10.0
 WORD_STREAM_DELAY = 0.14
 
 
+@st.cache_data(show_spinner=False)
+def _thinking_logo_b64() -> str:
+    """Logo thinking custom (PNG transparan) sebagai base64 untuk inline HTML."""
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                        "assets", "logo_thinking_small.png")
+    try:
+        with open(path, "rb") as fh:
+            return base64.b64encode(fh.read()).decode("ascii")
+    except Exception:
+        return ""
+
+
 def thinking_html(phrases: list[str]) -> str:
     spans = "".join(
         f'<span class="phrase">{html.escape(p)}…</span>' for p in phrases
     )
+    logo_b64 = _thinking_logo_b64()
+    if logo_b64:
+        # Koreografi: lapisan luar = spin cepat 1x → pendulum kompas;
+        # lapisan dalam = napas + glow + gelombang opasitas.
+        icon = (
+            '<span class="logo-spin">'
+            f'<img class="logo-core" src="data:image/png;base64,{logo_b64}" alt=""/>'
+            "</span>"
+        )
+    else:
+        icon = '<span class="star">✳</span>'  # fallback bila file logo hilang
     return (
         '<div class="claude-think">'
-        '<span class="star">✳</span>'
+        f"{icon}"
         f'<span class="phrases">{spans}</span>'
         "</div>"
     )
