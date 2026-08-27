@@ -728,25 +728,24 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 [data-testid="stChatInput"] [data-testid="stChatInputMicButton"]:hover {
     border-color: #DA7756 !important;
 }
-/* tombol ➕ di baris kontrol: lingkaran putih bersih ala Claude, menyatu
-   di dalam kartu (tanpa bayangan berlebih karena kartu sudah punya shadow) */
+/* tombol ➕ di baris kontrol: transparan tanpa lingkaran putih */
 .st-key-chat_controls .st-key-plus_menu [data-testid="stPopover"] button {
-    background: transparent !important;      /* hilangkan lingkaran putih */
-    border: none !important;                 /* hilangkan border */
-    border-radius: 8px !important;           /* opsional: tetap rounded kecil */
+    background: transparent !important;
+    border: none !important;
+    border-radius: 8px !important;
     min-width: 32px !important;
     width: 32px !important;
     min-height: 32px !important;
     height: 32px !important;
     padding: 0 !important;
-    font-size: 1.2rem !important;           /* sedikit lebih besar agar jelas */
+    font-size: 1.2rem !important;
     font-weight: 400 !important;
     color: #3D3929 !important;
     box-shadow: none !important;
     justify-content: center !important;
 }
 .st-key-chat_controls .st-key-plus_menu [data-testid="stPopover"] button:hover {
-    background: rgba(61, 57, 41, 0.06) !important;  /* hover lembut abu transparan */
+    background: rgba(61,57,41,0.06) !important;
     border: none !important;
     color: #C15F3C !important;
 }
@@ -757,15 +756,12 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 .st-key-chat_controls .st-key-plus_menu [data-testid="stPopover"] button [data-testid="stIconMaterial"]:last-child {
     display: none !important;
 }
-/* isi popover ➕ minimalist: cukup tombol unggah, tanpa label/hint besar */
+/* isi popover ➕ minimalist: cukup teks upload tanpa tombol */
 .plus-menu-hint {
     font-size: 0.72rem; color: #A8A69E;
     padding: 2px 4px 4px;
 }
-/* ---- reskin st.file_uploader jadi baris menu polos: ikon + teks saja ----
-   (label uploader disembunyikan; teks kustom disisipkan lewat ::before
-   pada tombol "Browse files" bawaan, dropzone/caption bawaan disembunyikan) */
-/* ---------- Uploader di popover ➕ : hanya teks, tanpa tombol ---------- */
+/* ---- Uploader di popover ➕ : hanya teks, tanpa tombol ---- */
 .st-key-plus_upload_file [data-testid="stFileUploaderDropzone"],
 .st-key-plus_upload_image [data-testid="stFileUploaderDropzone"] {
     background: transparent !important;
@@ -774,18 +770,15 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     min-height: 0 !important;
     cursor: pointer !important;
 }
-
 .st-key-plus_upload_file [data-testid="stFileUploaderDropzoneInstructions"],
 .st-key-plus_upload_image [data-testid="stFileUploaderDropzoneInstructions"] {
     display: none !important;
 }
-
 /* Sembunyikan tombol "Browse files" / "Upload" bawaan */
 .st-key-plus_upload_file [data-testid="stBaseButton-secondary"],
 .st-key-plus_upload_image [data-testid="stBaseButton-secondary"] {
     display: none !important;
 }
-
 /* Tampilkan teks custom di dalam dropzone */
 .st-key-plus_upload_file [data-testid="stFileUploaderDropzone"]::before {
     content: "📎  Upload file";
@@ -799,7 +792,6 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     text-align: left;
     transition: background 0.18s ease;
 }
-
 .st-key-plus_upload_image [data-testid="stFileUploaderDropzone"]::before {
     content: "📸  Upload gambar atau foto";
     display: block;
@@ -812,19 +804,10 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     text-align: left;
     transition: background 0.18s ease;
 }
-
 /* Efek hover lembut */
 .st-key-plus_upload_file [data-testid="stFileUploaderDropzone"]:hover::before,
 .st-key-plus_upload_image [data-testid="stFileUploaderDropzone"]:hover::before {
     background: #F0EEE6 !important;
-}
-.st-key-plus_upload_file [data-testid="stBaseButton-secondary"]::before {
-    content: "📎  Upload file";
-    font-size: 0.92rem; font-weight: 500; color: #3D3929;
-}
-.st-key-plus_upload_image [data-testid="stBaseButton-secondary"]::before {
-    content: "📸  Upload gambar atau foto";
-    font-size: 0.92rem; font-weight: 500; color: #3D3929;
 }
 .st-key-plus_upload_file [data-testid="stFileUploader"] label,
 .st-key-plus_upload_image [data-testid="stFileUploader"] label {
@@ -834,14 +817,29 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 .st-key-plus_upload_image [data-testid="stFileUploader"] {
     margin: 0 !important;
 }
-/* strip lampiran yang menunggu dikirim (hasil menu ➕) */
-.st-key-pending_strip { padding: 2px 2px 0; }
-.st-key-pending_strip [data-testid="stHorizontalBlock"] {
-    gap: 10px !important;
-    align-items: flex-start !important;
+
+/* ---------- PREVIEW LAMPIRAN DI ATAS INPUT ---------- */
+.st-key-pending_strip_above {
+    position: fixed;
+    bottom: 90px;  /* sesuaikan dengan tinggi dok input + kontrol */
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(768px, 90vw);
+    background: #FAF9F5;
+    border: 1px solid #E3E0D5;
+    border-radius: 16px;
+    box-shadow: 0 4px 14px rgba(61,57,41,0.07);
+    padding: 8px 12px;
+    z-index: 999990;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
 }
-.st-key-pending_strip [data-testid="stImage"] { margin: 0 !important; }
-.st-key-pending_strip button {
+.st-key-pending_strip_above [data-testid="stImage"] {
+    margin: 0 !important;
+}
+.st-key-pending_strip_above button {
     min-height: 24px !important;
     height: 24px !important;
     font-size: 0.72rem !important;
@@ -2002,7 +2000,10 @@ def main() -> None:
     inject_css()
     render_sidebar()
 
-    is_fresh = len(st.session_state.messages) == 0
+    # is_fresh sekarang juga memperhitungkan adanya pending_images,
+    # agar ketika user menambahkan lampiran sebelum pesan pertama,
+    # input langsung turun ke bawah dan preview tampil di atasnya.
+    is_fresh = len(st.session_state.messages) == 0 and not st.session_state.pending_images
 
     if is_fresh:
         # ---------- HALAMAN AWAL ala Claude ----------
@@ -2047,6 +2048,27 @@ html, body {
     for msg in st.session_state.messages:
         render_message(msg)
 
+    # ---------- PREVIEW LAMPIRAN DI ATAS INPUT ----------
+    pending = st.session_state.get("pending_images", [])
+    if pending:
+        # Container ini dirender sebelum st.chat_input sehingga berada
+        # di atas input; CSS menempatkannya fixed di atas dok input.
+        with st.container(key="pending_strip_above"):
+            cols = st.columns([0.8] * len(pending) + [2.0])
+            for i, im in enumerate(pending):
+                with cols[i]:
+                    st.image(im["data"], width=50)
+                    if st.button("✕", key=f"pending_rm_above_{i}",
+                                 use_container_width=True):
+                        st.session_state.pending_images.pop(i)
+                        st.rerun()
+            with cols[-1]:
+                st.markdown(
+                    '<div class="plus-menu-hint">📎 Siap dikirim bersama '
+                    'pesan berikutnya…</div>',
+                    unsafe_allow_html=True,
+                )
+
     # ---------- Chat input ----------
     if st.session_state.image_mode:
         placeholder_text = "Deskripsikan gambar yang ingin dibuat…"
@@ -2072,26 +2094,6 @@ html, body {
     bottom_dock = getattr(st, "bottom", None) or st._bottom
     with bottom_dock:
         with st.container(key="chat_controls"):
-
-            # ---- Strip lampiran yang menunggu dikirim (dari menu ➕) ----
-            pending = st.session_state.get("pending_images", [])
-            if pending:
-                with st.container(key="pending_strip"):
-                    pcols = st.columns([0.1] * len(pending) + [1.0])
-                    for i, im in enumerate(pending):
-                        with pcols[i]:
-                            st.image(im["data"], width=54)
-                            if st.button("✕", key=f"pending_rm_{i}",
-                                         use_container_width=True):
-                                st.session_state.pending_images.pop(i)
-                                st.rerun()
-                    with pcols[-1]:
-                        st.markdown(
-                            '<div class="plus-menu-hint">📎 Siap dikirim bersama '
-                            'pesan berikutnya…</div>',
-                            unsafe_allow_html=True,
-                        )
-
             # [➕ menu] [Gambar] [Suara] ....spacer.... [Nama Model]
             ctrl_plus, ctrl_mode, ctrl_voice, _sp, ctrl_model = st.columns(
                 [0.08, 0.2, 0.18, 1.04, 0.28]
