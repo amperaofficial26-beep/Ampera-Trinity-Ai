@@ -456,16 +456,16 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 .bubble-row.user .bubble-wrap { align-items: flex-end; }
 .bubble-wrap .bubble { max-width: 100%; }
 
-/* label kecil "Yuki" dengan logo custom di atas jawaban AI */
+/* label "Yuki" dengan logo custom di atas jawaban AI */
 .ai-label {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-size: 0.78rem; font-weight: 600; color: #3D3929;
-    margin-bottom: 4px;
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 1.02rem; font-weight: 600; color: #3D3929;
+    margin-bottom: 6px;
 }
 
 /* ===== ukuran logo custom di berbagai tempat (statis, tanpa animasi) ===== */
 .logo-label {
-    width: 16px; height: 16px;
+    width: 26px; height: 26px;
     display: inline-block; vertical-align: middle;
 }
 .logo-greeting {
@@ -743,51 +743,35 @@ div.stDownloadButton > button:hover {
     50%      { transform: scale(1.25) rotate(90deg); opacity: 1; }
 }
 
-/* ===== LOGO THINKING CUSTOM: koreografi animasi ===== */
-/* Lapisan LUAR — opsi 4 lalu opsi 1:
-   spin cepat 1 putaran saat muncul (0.8s), lalu PUTARAN PELAN
-   kontinu (1 putaran ~8 detik) selamanya */
-.claude-think .logo-spin {
+/* ===== LOGO THINKING: shimmer berjalan + denyut ===== */
+/* Logo dipakai sebagai MASK, latarnya gradasi terang yang menyapu
+   → kilau shimmer benar-benar berjalan mengikuti bentuk logo */
+.claude-think .logo-shimmer {
     display: inline-block;
     width: 34px; height: 34px;
     flex-shrink: 0;
+    background: linear-gradient(
+        100deg,
+        #C96A47 0%, #C96A47 32%,
+        #F3C9A8 46%, #FFE9D6 50%, #F3C9A8 54%,
+        #C96A47 68%, #C96A47 100%
+    );
+    background-size: 240% 100%;
+    -webkit-mask-image: var(--logo-mask);
+    mask-image: var(--logo-mask);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-position: center;
+    mask-position: center;
     animation:
-        introSpin 0.8s cubic-bezier(0.22, 1, 0.36, 1) 1,
-        slowSpin 8s linear 0.8s infinite;
+        shimmerSweep 2.4s linear infinite,
+        logoPulse 2.6s ease-in-out infinite;
 }
-@keyframes introSpin {
-    from { transform: rotate(0deg) scale(0.4); }
-    to   { transform: rotate(360deg) scale(1); }
-}
-@keyframes slowSpin {
-    from { transform: rotate(0deg); }
-    to   { transform: rotate(360deg); }
-}
-/* Lapisan DALAM — opsi 3 + opsi 5:
-   napas (scale) + glow terracotta yang menguat-melemah
-   + gelombang opasitas kelap-kelip dengan ritme berbeda */
-.claude-think .logo-core {
-    width: 100%; height: 100%;
-    display: block;
-    animation:
-        breatheGlow 3.2s ease-in-out infinite,
-        opacityWave 4.6s ease-in-out infinite;
-}
-@keyframes breatheGlow {
-    0%, 100% {
-        transform: scale(1);
-        filter: drop-shadow(0 0 2px rgba(218,119,86,0.25));
-    }
-    50% {
-        transform: scale(1.14);
-        filter: drop-shadow(0 0 9px rgba(218,119,86,0.65));
-    }
-}
-@keyframes opacityWave {
-    0%, 100% { opacity: 1; }
-    30%      { opacity: 0.55; }
-    60%      { opacity: 0.9; }
-    80%      { opacity: 0.65; }
+@keyframes logoPulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.18); }
 }
 /* teks dengan shimmer lembut menyapu perlahan (gaya Claude) */
 .claude-think .phrase {
@@ -1219,12 +1203,11 @@ def thinking_html(phrases: list[str]) -> str:
     )
     logo_b64 = _thinking_logo_b64()
     if logo_b64:
-        # Koreografi: lapisan luar = spin cepat 1x → pendulum kompas;
-        # lapisan dalam = napas + glow + gelombang opasitas.
+        # Logo sebagai mask → shimmer (gradasi terang) menyapu di dalam
+        # bentuk logo + denyut membesar-mengecil.
         icon = (
-            '<span class="logo-spin">'
-            f'<img class="logo-core" src="data:image/png;base64,{logo_b64}" alt=""/>'
-            "</span>"
+            '<span class="logo-shimmer" '
+            f'style="--logo-mask:url(data:image/png;base64,{logo_b64});"></span>'
         )
     else:
         icon = '<span class="star">✳</span>'  # fallback bila file logo hilang
