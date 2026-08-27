@@ -423,8 +423,30 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 /* ---------- pesan: gaya percakapan Claude ---------- */
 /* User: bubble krem membulat di kanan */
 .bubble-row { display: flex; width: 100%; margin-bottom: 4px; }
-.bubble-row.user { justify-content: flex-end; margin: 14px 0; }
-.bubble-row.ai   { justify-content: flex-start; margin: 6px 0 18px; }
+.bubble-row.user { justify-content: flex-end; margin: 12px 0; }
+.bubble-row.ai   { justify-content: flex-start; margin: 4px 0 22px; }
+
+/* ---------- jarak antar pesan: rapat & konsisten ala Claude ---------- */
+/* Streamlit menambah spasi sendiri antar elemen (gap 1rem antar container
+   + hack margin -1rem pada markdown) sehingga jarak antar bubble membengkak
+   dan tidak menentu. Dimatikan total di area chat — jarak sepenuhnya
+   dikendalikan margin .bubble-row di atas agar rapat seperti Claude. */
+[data-testid="stMainBlockContainer"] [data-testid="stVerticalBlock"] {
+    gap: 0 !important;
+}
+[data-testid="stMainBlockContainer"] .element-container {
+    margin: 0 !important;
+}
+[data-testid="stMarkdownContainer"] {
+    margin: 0 !important;
+}
+/* elemen mode gambar tetap diberi jarak wajar */
+[data-testid="stMainBlockContainer"] div.stDownloadButton {
+    margin: 6px 0 18px !important;
+}
+[data-testid="stMainBlockContainer"] [data-testid="stImage"] {
+    margin: 0 !important;
+}
 
 .bubble {
     font-size: 0.965rem; line-height: 1.65;
@@ -1635,7 +1657,9 @@ html, body {
     # Dirender ke dok bawah Streamlit (wadah yang sama dengan st.chat_input)
     # → otomatis ikut bergeser saat sidebar dibuka/ditutup (seperti Claude).
     # CSS menariknya naik (margin-top negatif) ke ruang padding kotak input.
-    with st._bottom:
+    # (st._bottom deprecated di Streamlit baru → pakai st.bottom bila tersedia)
+    bottom_dock = getattr(st, "bottom", None) or st._bottom
+    with bottom_dock:
         with st.container(key="chat_controls"):
             # [toggle Gambar] ....spacer.... [Nama Model] — model di kanan ala Claude
             ctrl_mode, _sp, ctrl_model = st.columns([0.3, 1.4, 0.3])
