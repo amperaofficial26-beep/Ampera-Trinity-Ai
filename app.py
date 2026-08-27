@@ -197,15 +197,17 @@ button[kind="headerNoPadding"] {
     padding: 4px 8px 12px;
 }
 
-/* tombol menu sidebar: baris teks polos, hover krem (ala Claude) */
+/* tombol menu sidebar: baris teks polos RATA KIRI, hover krem (ala Claude) */
 section[data-testid="stSidebar"] div.stButton > button {
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
     border-radius: 10px !important;
     width: 100% !important;
+    display: flex !important;
     text-align: left !important;
     justify-content: flex-start !important;
+    align-items: center !important;
     padding: 7px 10px !important;
     min-height: 36px !important;
     color: #3D3929 !important;
@@ -217,6 +219,13 @@ section[data-testid="stSidebar"] div.stButton > button:hover {
     border: none !important;
     box-shadow: none !important;
     color: #3D3929 !important;
+}
+/* paksa SEMUA lapisan dalam tombol rata kiri (markdown container ikut) */
+section[data-testid="stSidebar"] div.stButton > button > div,
+section[data-testid="stSidebar"] div.stButton > button [data-testid="stMarkdownContainer"] {
+    width: 100% !important;
+    text-align: left !important;
+    justify-content: flex-start !important;
 }
 section[data-testid="stSidebar"] div.stButton > button p {
     text-align: left !important;
@@ -265,13 +274,21 @@ section[data-testid="stSidebar"] div.stDownloadButton > button {
     box-shadow: none !important;
     border-radius: 10px !important;
     width: 100% !important;
+    display: flex !important;
     text-align: left !important;
     justify-content: flex-start !important;
+    align-items: center !important;
     padding: 7px 10px !important;
     min-height: 36px !important;
     color: #3D3929 !important;
     font-size: 0.92rem !important;
     font-weight: 500 !important;
+}
+section[data-testid="stSidebar"] div.stDownloadButton > button > div,
+section[data-testid="stSidebar"] div.stDownloadButton > button [data-testid="stMarkdownContainer"] {
+    width: 100% !important;
+    text-align: left !important;
+    justify-content: flex-start !important;
 }
 section[data-testid="stSidebar"] div.stDownloadButton > button:hover {
     background: #EAE8DE !important;
@@ -455,15 +472,14 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 [data-testid="stChatInput"] button:disabled svg { fill: #A8A69E !important; color: #A8A69E !important; }
 
 /* ---------- baris kontrol DI DALAM kotak chat input ---------- */
-/* container dengan key "chat_controls" dipindah (fixed) ke area bawah
-   kotak input — menempati ruang padding-bottom 52px milik stChatInput */
+/* container "chat_controls" berada DI DALAM area bawah Streamlit
+   (satu wadah dengan st.chat_input) → otomatis ikut bergeser saat
+   sidebar dibuka/ditutup. Ditarik naik ke ruang padding bawah kotak input. */
 .st-key-chat_controls {
-    position: fixed;
-    bottom: 14px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: min(736px, calc(100vw - 3.2rem));
-    z-index: 99999;
+    position: relative;
+    margin-top: -54px !important;
+    padding: 0 18px 10px;
+    z-index: 999;
     background: transparent !important;
 }
 .st-key-chat_controls [data-testid="stHorizontalBlock"] {
@@ -1229,17 +1245,17 @@ def render_sidebar() -> None:
 
         # + Baru
         with st.container(key="sb_new"):
-            if st.button("＋　Baru", use_container_width=True):
+            if st.button(":material/add: Baru", use_container_width=True):
                 reset_conversation()
                 st.rerun()
 
-        # Menu ala Claude (Proyek/Artefak/Kode → versi Trinity)
+        # Menu ala Claude (ikon kecil + teks rata kiri)
         with st.container(key="sb_menu_chat"):
-            if st.button("💬　Chat", use_container_width=True):
+            if st.button(":material/chat_bubble: Chat", use_container_width=True):
                 st.session_state.image_mode = False
                 st.rerun()
         with st.container(key="sb_menu_img"):
-            if st.button("🎨　Gambar", use_container_width=True):
+            if st.button(":material/palette: Gambar", use_container_width=True):
                 st.session_state.image_mode = True
                 st.rerun()
 
@@ -1267,7 +1283,7 @@ def render_sidebar() -> None:
         # Unduh riwayat chat aktif (fitur dari App 2)
         with st.container(key="sb_download"):
             st.download_button(
-                label="📥　Unduh Chat",
+                label=":material/download: Unduh Chat",
                 data=get_chat_export_text(),
                 file_name=f"trinity-chat-{datetime.now().strftime('%Y%m%d-%H%M')}.md",
                 mime="text/markdown",
@@ -1454,33 +1470,6 @@ def main() -> None:
     for msg in st.session_state.messages:
         render_message(msg)
 
-    # ---------- Kontrol DI DALAM kotak chat input ----------
-    # Container ber-key "chat_controls" dipindahkan oleh CSS (position:fixed)
-    # ke ruang bawah kotak st.chat_input → tampak menyatu seperti Claude.
-    with st.container(key="chat_controls"):
-        ctrl_model, ctrl_mode, _sp = st.columns([0.34, 0.26, 1.4])
-
-        with ctrl_model:
-            current = st.session_state.selected_model_label
-            with st.popover(current, use_container_width=False):
-                # Daftar model ala Claude: baris teks polos (nama + deskripsi),
-                # tanpa kotak per item — model aktif ditandai ✓
-                for m in MODEL_CATALOG:
-                    is_active = m["name"] == st.session_state.selected_model_label
-                    check = " :orange[✓]" if is_active else ""
-                    label = f"{m['name']}{check}  \n:small[:gray[{m['desc']}]]"
-                    if st.button(label, key=f"model_{m['name']}", use_container_width=True):
-                        st.session_state.selected_model_label = m["name"]
-                        st.rerun()
-
-        with ctrl_mode:
-            st.session_state.image_mode = st.toggle(
-                "🎨 Gambar",
-                value=st.session_state.image_mode,
-                help="Nyalakan untuk membuat gambar dari teks (Cloudflare FLUX). "
-                     "Matikan untuk chat biasa dengan Yuki.",
-            )
-
     # ---------- Chat input ----------
     placeholder_text = (
         "Deskripsikan gambar yang ingin dibuat..."
@@ -1488,6 +1477,35 @@ def main() -> None:
         else "Tanya apa saja ke Yuki..."
     )
     user_text = st.chat_input(placeholder_text)
+
+    # ---------- Kontrol DI DALAM kotak chat input ----------
+    # Dirender ke dok bawah Streamlit (wadah yang sama dengan st.chat_input)
+    # → otomatis ikut bergeser saat sidebar dibuka/ditutup (seperti Claude).
+    # CSS menariknya naik (margin-top negatif) ke ruang padding kotak input.
+    with st._bottom:
+        with st.container(key="chat_controls"):
+            ctrl_model, ctrl_mode, _sp = st.columns([0.34, 0.26, 1.4])
+
+            with ctrl_model:
+                current = st.session_state.selected_model_label
+                with st.popover(current, use_container_width=False):
+                    # Daftar model ala Claude: baris teks polos (nama + deskripsi),
+                    # tanpa kotak per item — model aktif ditandai ✓
+                    for m in MODEL_CATALOG:
+                        is_active = m["name"] == st.session_state.selected_model_label
+                        check = " :orange[✓]" if is_active else ""
+                        label = f"{m['name']}{check}  \n:small[:gray[{m['desc']}]]"
+                        if st.button(label, key=f"model_{m['name']}", use_container_width=True):
+                            st.session_state.selected_model_label = m["name"]
+                            st.rerun()
+
+            with ctrl_mode:
+                st.session_state.image_mode = st.toggle(
+                    "🎨 Gambar",
+                    value=st.session_state.image_mode,
+                    help="Nyalakan untuk membuat gambar dari teks (Cloudflare FLUX). "
+                         "Matikan untuk chat biasa dengan Yuki.",
+                )
 
     if user_text and user_text.strip():
         text = user_text.strip()
