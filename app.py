@@ -311,7 +311,18 @@ html, body, [data-testid="stAppViewContainer"], .stApp {
 }
 .st-key-chat_controls [data-testid="stHorizontalBlock"] {
     align-items: center;
-    gap: 8px;
+    gap: 2px !important;
+    flex-wrap: nowrap !important;
+}
+/* kolom menyusut mengikuti isinya — model & toggle jadi berdampingan rapat */
+.st-key-chat_controls [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {
+    width: auto !important;
+    flex: 0 0 auto !important;
+    min-width: 0 !important;
+}
+/* kolom spacer terakhir tetap melar mengisi sisa ruang */
+.st-key-chat_controls [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:last-child {
+    flex: 1 1 auto !important;
 }
 /* tombol model = TULISAN BIASA tanpa kotak (ala Claude) */
 .st-key-chat_controls [data-testid="stPopover"] button,
@@ -1175,7 +1186,7 @@ def main() -> None:
     # Container ber-key "chat_controls" dipindahkan oleh CSS (position:fixed)
     # ke ruang bawah kotak st.chat_input → tampak menyatu seperti Claude.
     with st.container(key="chat_controls"):
-        ctrl_model, ctrl_mode, _sp = st.columns([1.1, 1, 1.2])
+        ctrl_model, ctrl_mode, _sp = st.columns([0.34, 0.26, 1.4])
 
         with ctrl_model:
             current = st.session_state.selected_model_label
