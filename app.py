@@ -730,37 +730,312 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     margin: 0 !important;
 }
 
-/* Thumbnail pending di dalam baris kontrol */
-.pending-thumbs {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    max-width: 300px;
-    padding: 0;
-    margin: 0;
-}
-.pending-thumbs img {
-    width: 50px !important;
-    height: 50px !important;
+/* ========== THUMBNAIL PREVIEW KECIL ========== */
+/* Untuk thumbnail yang muncul di dalam baris kontrol */
+.st-key-chat_controls [data-testid="stImage"] img {
+    width: 24px !important;
+    height: 24px !important;
     object-fit: cover;
-    border-radius: 4px;
+    border-radius: 2px;
     border: none !important;
     box-shadow: none !important;
-    background: transparent !important;
 }
-.pending-thumbs button {
+/* Tombol hapus thumbnail sangat kecil */
+.st-key-chat_controls [class*="st-key-pending_rm_ctl_"] button {
+    min-height: 18px !important;
+    height: 18px !important;
+    padding: 0 2px !important;
+    font-size: 0.55rem !important;
+    line-height: 1 !important;
+    border-radius: 4px !important;
     background: transparent !important;
     border: none !important;
-    color: #73726C;
-    font-size: 0.7rem;
-    cursor: pointer;
-    padding: 0 2px;
-    margin: 0;
+    color: #73726C !important;
+    box-shadow: none !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    justify-content: center !important;
 }
-.pending-thumbs button:hover {
+.st-key-chat_controls [class*="st-key-pending_rm_ctl_"] button:hover {
+    color: #C15F3C !important;
+    background: rgba(61,57,41,0.06) !important;
+}
+
+/* ========== POPOVER MODEL ========== */
+[data-testid="stPopoverBody"] {
+    background: #FFFFFF !important;
+    border: 1px solid #E3E0D5 !important;
+    border-radius: 16px !important;
+    box-shadow: 0 16px 48px rgba(61,57,41,0.18) !important;
+    min-width: 300px !important;
+    padding: 8px 6px !important;
+}
+[data-testid="stPopoverBody"] p, [data-testid="stPopoverBody"] div {
+    color: #3D3929;
+}
+[data-testid="stPopoverBody"] div.stButton > button {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 10px !important;
+    box-shadow: none !important;
+    text-align: left !important;
+    justify-content: flex-start !important;
+    align-items: flex-start !important;
+    padding: 8px 12px !important;
+    margin: 0 !important;
+    width: 100% !important;
+    display: flex !important;
+}
+[data-testid="stPopoverBody"] div.stButton > button:hover {
+    background: #F0EEE6 !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: inherit !important;
+}
+[data-testid="stPopoverBody"] div.stButton > button > div,
+[data-testid="stPopoverBody"] div.stButton > button [data-testid="stMarkdownContainer"] {
+    width: 100% !important;
+    text-align: left !important;
+    justify-content: flex-start !important;
+}
+[data-testid="stPopoverBody"] div.stButton > button p {
+    text-align: left !important;
+    margin: 0 !important;
+    font-size: 0.92rem !important;
+    font-weight: 500 !important;
+    color: #3D3929 !important;
+    line-height: 1.45 !important;
+}
+.model-premium-badge {
+    display: inline-block;
+    font-size: 0.62rem; font-weight: 700;
     color: #C15F3C;
+    background: rgba(218,119,86,0.12);
+    border: 1px solid rgba(218,119,86,0.35);
+    border-radius: 999px;
+    padding: 1px 7px;
+    margin-left: 6px;
+    letter-spacing: 0.03em;
+    vertical-align: middle;
+}
+[data-testid="stPopoverBody"] [class*="_premium"] {
+    position: relative;
+}
+[data-testid="stPopoverBody"] [class*="_premium"]::after {
+    content: "Premium";
+    position: absolute;
+    top: 4px; right: 6px;
+    font-size: 0.55rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: #B0774F;
+    background: rgba(218,119,86,0.10);
+    border: 1px solid rgba(218,119,86,0.25);
+    border-radius: 999px;
+    padding: 1px 6px;
+    pointer-events: none;
+}
+[data-testid="stPopoverBody"] .element-container { margin: 0 !important; }
+[data-testid="stPopoverBody"] [data-testid="stVerticalBlock"] { gap: 2px !important; }
+
+/* ========== TOGGLE ========== */
+[data-testid="stCheckbox"] label p, .stToggle label p {
+    color: #3D3929 !important;
+    font-size: 0.85rem !important;
+    font-weight: 500 !important;
+}
+[data-testid="stCheckbox"] [data-checked="true"],
+.stToggle [aria-checked="true"] > div:first-child {
+    background: #DA7756 !important;
+}
+
+/* ========== SPINNER & THINKING ========== */
+[data-testid="stSpinner"] > div {
+    border-top-color: #DA7756 !important;
+}
+[data-testid="stSpinner"] p { color: #73726C !important; }
+
+.claude-think {
+    display: flex; align-items: center; gap: 10px;
+    padding: 2px 2px 6px;
+    animation: thinkFadeIn 1.4s ease both;
+}
+@keyframes thinkFadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: none; }
+}
+.claude-think .star {
+    font-size: 1.05rem; color: #DA7756; line-height: 1;
+    animation: starPulse 2.2s ease-in-out infinite;
+    display: inline-block;
+}
+@keyframes starPulse {
+    0%, 100% { transform: scale(1) rotate(0deg);   opacity: 0.85; }
+    50%      { transform: scale(1.25) rotate(90deg); opacity: 1; }
+}
+.claude-think .logo-shimmer {
+    position: relative;
+    display: inline-block;
+    width: 34px; height: 34px;
+    flex-shrink: 0;
+    overflow: hidden;
+    border-radius: 6px;
+    animation: logoPulse 3s ease-in-out infinite;
+}
+.claude-think .logo-shimmer img {
+    width: 100%; height: 100%;
+    display: block;
+}
+.claude-think .logo-shimmer::after {
+    content: "";
+    position: absolute;
+    top: -30%; bottom: -30%;
+    left: 0; width: 60%;
+    background: linear-gradient(
+        100deg,
+        rgba(255,255,255,0) 0%,
+        rgba(255,240,225,0.85) 50%,
+        rgba(255,255,255,0) 100%
+    );
+    filter: blur(3px);
+    mix-blend-mode: screen;
+    transform: translateX(-130%) skewX(-16deg);
+    animation: shineSweep 2.6s ease-in-out infinite;
+    pointer-events: none;
+}
+@keyframes shineSweep {
+    0%   { transform: translateX(-130%) skewX(-16deg); }
+    60%  { transform: translateX(260%) skewX(-16deg); }
+    100% { transform: translateX(260%) skewX(-16deg); }
+}
+@keyframes logoPulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.14); }
+}
+.claude-think .phrase {
+    font-size: 0.92rem; font-weight: 500;
+    background: linear-gradient(
+        90deg,
+        #A8A69E 0%, #A8A69E 35%,
+        #3D3929 50%,
+        #A8A69E 65%, #A8A69E 100%
+    );
+    background-size: 220% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmerSweep 4s linear infinite, phraseIn 3s ease both;
+}
+@keyframes shimmerSweep {
+    0%   { background-position: 110% 0; }
+    100% { background-position: -110% 0; }
+}
+@keyframes phraseIn {
+    from { opacity: 0; filter: blur(3px); }
+    to   { opacity: 1; filter: blur(0); }
+}
+.claude-think .phrases { position: relative; height: 1.5em; min-width: 260px; }
+.claude-think .phrases .phrase {
+    position: absolute; left: 0; top: 0; white-space: nowrap;
+    opacity: 0;
+    animation: shimmerSweep 4s linear infinite,
+               phraseCycle 16s ease-in-out infinite;
+}
+.claude-think .phrases .phrase:nth-child(1) { animation-delay: 0s, 0s; }
+.claude-think .phrases .phrase:nth-child(2) { animation-delay: 0s, 4s; }
+.claude-think .phrases .phrase:nth-child(3) { animation-delay: 0s, 8s; }
+.claude-think .phrases .phrase:nth-child(4) { animation-delay: 0s, 12s; }
+@keyframes phraseCycle {
+    0%      { opacity: 0; filter: blur(4px); }
+    3%      { opacity: 1; filter: blur(0); }
+    21%     { opacity: 1; filter: blur(0); }
+    25%     { opacity: 0; filter: blur(4px); }
+    100%    { opacity: 0; }
+}
+
+.type-caret {
+    display: inline-block; width: 7px; height: 1.05em;
+    margin-left: 3px; vertical-align: -2px;
+    background: #DA7756; border-radius: 2px;
+    animation: caretBlink 0.8s step-end infinite;
+}
+@keyframes caretBlink { 50% { opacity: 0; } }
+
+/* Progress bar gambar */
+.img-progress {
+    padding: 14px 16px 16px;
+    background: #FAF9F5;
+    border: 1px solid #E3E0D5;
+    border-radius: 16px;
+    box-shadow: 0 2px 10px rgba(61,57,41,0.06);
+    animation: thinkFadeIn 1s ease both;
+    margin: 6px 0 14px;
+}
+.img-progress-top {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+}
+.img-progress-label {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 0.9rem; font-weight: 500;
+    background: linear-gradient(
+        90deg,
+        #A8A69E 0%, #A8A69E 35%,
+        #3D3929 50%,
+        #A8A69E 65%, #A8A69E 100%
+    );
+    background-size: 220% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmerSweep 4s linear infinite;
+}
+.img-progress-label .star {
+    -webkit-text-fill-color: #DA7756;
+    animation: starPulse 2.2s ease-in-out infinite;
+    display: inline-block; font-size: 1rem;
+}
+.img-progress-pct {
+    font-size: 0.92rem; font-weight: 600; color: #C15F3C;
+    font-variant-numeric: tabular-nums;
+}
+.img-progress-track {
+    height: 8px; border-radius: 99px;
+    background: #E8E5D8; overflow: hidden;
+    position: relative;
+}
+.img-progress-fill {
+    height: 100%; border-radius: 99px;
+    background: linear-gradient(90deg, #DA7756, #E89B7F, #DA7756);
+    background-size: 200% 100%;
+    animation: shimmerSweep 2.2s linear infinite;
+    transition: width 0.5s ease;
+    position: relative;
+}
+.img-progress-fill::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(90deg,
+        transparent 0%, rgba(255,255,255,0.55) 50%, transparent 100%);
+    background-size: 180% 100%;
+    animation: shimmerSweep 1.8s linear infinite;
+    border-radius: 99px;
+}
+
+[data-testid="stAlert"] {
+    background: #FAF9F5 !important;
+    border: 1px solid #E3E0D5 !important;
+    border-radius: 12px !important;
+    color: #3D3929 !important;
+}
+
+.trinity-foot {
+    text-align: center; color: #A8A69E; font-size: 0.6rem;
+    margin-top: 34px; font-family: 'Inter', sans-serif;
+}
+.trinity-foot.in-chat {
+    font-size: 0.5rem;
+    color: #B8B6AC;
+    margin-top: 22px;
 }
 </style>
 """,
@@ -1551,20 +1826,15 @@ html, body {
             with _sp:
                 pending = st.session_state.get("pending_images", [])
                 if pending:
-                    # Tampilkan thumbnail persegi tanpa background
-                    st.markdown('<div class="pending-thumbs">', unsafe_allow_html=True)
+                    # Tampilkan thumbnail kecil 24x24 dan tombol hapus super kecil
+                    cols = st.columns([0.08] * len(pending) + [1])
                     for i, im in enumerate(pending):
-                        b64 = base64.b64encode(im["data"]).decode("ascii")
-                        st.markdown(
-                            f'<img src="data:{im["mime"]};base64,{b64}" '
-                            f'alt="{html.escape(im.get("name", "gambar"))}">',
-                            unsafe_allow_html=True,
-                        )
-                        # Tombol hapus kecil
-                        if st.button("✕", key=f"pending_rm_ctl_{i}"):
-                            st.session_state.pending_images.pop(i)
-                            st.rerun()
-                    st.markdown('</div>', unsafe_allow_html=True)
+                        with cols[i]:
+                            st.image(im["data"], width=24)
+                            if st.button("✕", key=f"pending_rm_ctl_{i}",
+                                         use_container_width=True, help="Hapus"):
+                                st.session_state.pending_images.pop(i)
+                                st.rerun()
                 else:
                     if not is_fresh:
                         st.markdown(
