@@ -414,7 +414,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 /* sapaan besar serif ala halaman awal Claude */
 .trinity-greeting {
     font-family: 'Source Serif 4', Georgia, serif;
-    font-size: 2.7rem; font-weight: 500; color: #3D3929;
+    font-size: 3.4rem; font-weight: 500; color: #3D3929;
     text-align: center; margin: 26px 0 4px;
     letter-spacing: -0.02em;
 }
@@ -463,22 +463,19 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     margin-bottom: 4px;
 }
 
-/* ===== ukuran logo custom di berbagai tempat ===== */
+/* ===== ukuran logo custom di berbagai tempat (statis, tanpa animasi) ===== */
 .logo-label {
     width: 16px; height: 16px;
     display: inline-block; vertical-align: middle;
 }
 .logo-greeting {
-    width: 44px; height: 44px;
-    display: inline-block; vertical-align: -8px;
-    margin-right: 4px;
-    animation: slowSpin 8s linear infinite;
+    width: 64px; height: 64px;
+    display: inline-block; vertical-align: -12px;
+    margin-right: 8px;
 }
 .logo-progress {
     width: 22px; height: 22px;
     display: inline-block; vertical-align: middle;
-    animation: slowSpin 8s linear infinite,
-               breatheGlow 3.2s ease-in-out infinite;
 }
 
 /* ---------- chat input: kartu putih membulat ala Claude ---------- */
