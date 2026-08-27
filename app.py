@@ -43,7 +43,7 @@ st.set_page_config(
     page_title="Ampera Trinity AI",
     page_icon="🔱",
     layout="centered",
-    initial_sidebar_state="collapsed",
+    initial_sidebar_state="expanded",
 )
 
 # ============================================================================
@@ -149,7 +149,137 @@ html, body, [data-testid="stAppViewContainer"], .stApp {
 }
 [data-testid="stHeader"] { background: transparent !important; }
 #MainMenu, footer, [data-testid="stToolbar"], [data-testid="stDecoration"] { visibility: hidden; }
-[data-testid="stSidebar"], [data-testid="stSidebarCollapsedControl"] { display: none !important; }
+
+/* ---------- SIDEBAR ala Claude ---------- */
+section[data-testid="stSidebar"] {
+    background: #F5F4EF !important;
+    border-right: 1px solid #E3E0D5 !important;
+    width: 300px !important;
+}
+section[data-testid="stSidebar"] > div { padding-top: 0.6rem; }
+[data-testid="stSidebarCollapsedControl"] {
+    color: #73726C !important;
+}
+[data-testid="stSidebarCollapseButton"] button { color: #73726C !important; }
+
+/* judul brand serif ala "Claude" */
+.sb-brand {
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 1.5rem; font-weight: 700; color: #3D3929;
+    letter-spacing: -0.02em;
+    padding: 4px 8px 12px;
+}
+
+/* tombol menu sidebar: baris teks polos, hover krem (ala Claude) */
+section[data-testid="stSidebar"] div.stButton > button {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 10px !important;
+    width: 100% !important;
+    text-align: left !important;
+    justify-content: flex-start !important;
+    padding: 7px 10px !important;
+    min-height: 36px !important;
+    color: #3D3929 !important;
+    font-size: 0.92rem !important;
+    font-weight: 500 !important;
+}
+section[data-testid="stSidebar"] div.stButton > button:hover {
+    background: #EAE8DE !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: #3D3929 !important;
+}
+section[data-testid="stSidebar"] div.stButton > button p {
+    text-align: left !important;
+    font-size: 0.92rem !important;
+    color: #3D3929 !important;
+    margin: 0 !important;
+}
+/* tombol "+ Baru" menonjol sedikit (latar krem seperti Claude) */
+section[data-testid="stSidebar"] .st-key-sb_new button {
+    background: #EAE8DE !important;
+    font-weight: 600 !important;
+}
+section[data-testid="stSidebar"] .st-key-sb_new button:hover {
+    background: #E3E0D5 !important;
+}
+
+/* label grup riwayat: "Hari ini" abu kecil */
+.sb-group {
+    font-size: 0.78rem; font-weight: 500; color: #A8A69E;
+    padding: 12px 10px 2px; letter-spacing: 0.01em;
+}
+/* item riwayat: teks lebih kecil & abu gelap, 1 baris dipotong elipsis */
+section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] button {
+    font-weight: 400 !important;
+    color: #57544A !important;
+    min-height: 32px !important;
+    padding: 5px 10px !important;
+}
+section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] button p {
+    font-size: 0.86rem !important;
+    color: #57544A !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 230px;
+}
+/* item riwayat aktif */
+section[data-testid="stSidebar"] [class*="st-key-sb_hist_"].sb-active button {
+    background: #EAE8DE !important;
+}
+
+/* tombol unduh di sidebar: sama polosnya dengan menu lain */
+section[data-testid="stSidebar"] div.stDownloadButton > button {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 10px !important;
+    width: 100% !important;
+    text-align: left !important;
+    justify-content: flex-start !important;
+    padding: 7px 10px !important;
+    min-height: 36px !important;
+    color: #3D3929 !important;
+    font-size: 0.92rem !important;
+    font-weight: 500 !important;
+}
+section[data-testid="stSidebar"] div.stDownloadButton > button:hover {
+    background: #EAE8DE !important;
+    border: none !important;
+    color: #3D3929 !important;
+}
+section[data-testid="stSidebar"] div.stDownloadButton > button p {
+    text-align: left !important;
+    font-size: 0.92rem !important;
+    color: #3D3929 !important;
+    margin: 0 !important;
+}
+
+/* garis pemisah tipis */
+.sb-divider {
+    height: 1px; background: #E3E0D5; margin: 10px 4px;
+}
+
+/* baris akun bawah ala Claude */
+.sb-account {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 8px 6px;
+}
+.sb-account .ava {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: #3D3929; color: #FAF9F5;
+    display: grid; place-items: center;
+    font-size: 0.8rem; font-weight: 600;
+    flex-shrink: 0;
+}
+.sb-account .name { font-size: 0.9rem; font-weight: 600; color: #3D3929; }
+.sb-account .plan { font-size: 0.78rem; color: #A8A69E; }
+/* rapatkan jarak antar elemen sidebar */
+section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] { gap: 2px !important; }
+section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 [data-testid="stMainBlockContainer"] {
     max-width: 768px;
     padding-top: 1.2rem !important;
@@ -995,6 +1125,13 @@ def init_state() -> None:
         st.session_state.image_mode = False
     if "msg_counter" not in st.session_state:
         st.session_state.msg_counter = 1
+    # Riwayat percakapan (untuk sidebar ala Claude)
+    if "conversations" not in st.session_state:
+        st.session_state.conversations = []  # list[{id, title, messages}]
+    if "conv_counter" not in st.session_state:
+        st.session_state.conv_counter = 0
+    if "active_conv_id" not in st.session_state:
+        st.session_state.active_conv_id = None
 
 
 def next_msg_id() -> int:
@@ -1002,18 +1139,126 @@ def next_msg_id() -> int:
     return st.session_state.msg_counter
 
 
+def _conversation_title(messages: list[dict]) -> str:
+    """Judul percakapan = potongan pesan user pertama (ala Claude)."""
+    for m in messages:
+        if m.get("role") == "user" and m.get("content"):
+            title = " ".join(str(m["content"]).split())
+            return title[:48] + ("…" if len(title) > 48 else "")
+    return "Percakapan baru"
+
+
+def _archive_current_conversation() -> None:
+    """Simpan obrolan aktif ke daftar riwayat (kalau ada isi dari user)."""
+    msgs = st.session_state.get("messages", [])
+    has_user = any(m.get("role") == "user" for m in msgs)
+    if not has_user:
+        return
+    conv_id = st.session_state.get("active_conv_id")
+    if conv_id is not None:
+        # update entri yang sudah ada
+        for c in st.session_state.conversations:
+            if c["id"] == conv_id:
+                c["messages"] = msgs
+                c["title"] = _conversation_title(msgs)
+                return
+    st.session_state.conv_counter += 1
+    st.session_state.conversations.insert(0, {
+        "id": st.session_state.conv_counter,
+        "title": _conversation_title(msgs),
+        "messages": msgs,
+    })
+
+
 def reset_conversation() -> None:
+    _archive_current_conversation()
+    st.session_state.active_conv_id = None
     for key in ("messages", "msg_counter"):
         st.session_state.pop(key, None)
     init_state()
 
 
+def open_conversation(conv_id: int) -> None:
+    """Buka kembali percakapan lama dari riwayat sidebar."""
+    _archive_current_conversation()
+    for c in st.session_state.conversations:
+        if c["id"] == conv_id:
+            st.session_state.messages = c["messages"]
+            st.session_state.active_conv_id = conv_id
+            st.session_state.msg_counter = max(
+                (m.get("id", 0) for m in c["messages"]), default=1
+            )
+            return
+
+
 # ============================================================================
-# SIDEBAR — NONAKTIF DULU (nanti dibuat ulang + search percakapan)
-# CSS juga menyembunyikan sidebar sepenuhnya.
+# SIDEBAR ALA CLAUDE
+#   Brand serif · + Baru · menu · riwayat "Hari ini" · akun di bawah
 # ============================================================================
 def render_sidebar() -> None:
-    return  # sengaja kosong — sidebar akan dibuat ulang nanti
+    with st.sidebar:
+        # Brand serif ala "Claude"
+        st.markdown('<div class="sb-brand">Trinity</div>', unsafe_allow_html=True)
+
+        # + Baru
+        with st.container(key="sb_new"):
+            if st.button("＋　Baru", use_container_width=True):
+                reset_conversation()
+                st.rerun()
+
+        # Menu ala Claude (Proyek/Artefak/Kode → versi Trinity)
+        with st.container(key="sb_menu_chat"):
+            if st.button("💬　Chat", use_container_width=True):
+                st.session_state.image_mode = False
+                st.rerun()
+        with st.container(key="sb_menu_img"):
+            if st.button("🎨　Gambar", use_container_width=True):
+                st.session_state.image_mode = True
+                st.rerun()
+
+        st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
+
+        # Riwayat percakapan (grup "Hari ini" seperti Claude)
+        convs = st.session_state.get("conversations", [])
+        if convs:
+            st.markdown('<div class="sb-group">Hari ini</div>', unsafe_allow_html=True)
+            for c in convs[:15]:
+                is_active = c["id"] == st.session_state.get("active_conv_id")
+                key = f"sb_hist_{c['id']}"
+                with st.container(key=key):
+                    if st.button(c["title"], key=f"btn_{key}", use_container_width=True):
+                        open_conversation(c["id"])
+                        st.rerun()
+        else:
+            st.markdown(
+                '<div class="sb-group">Belum ada riwayat</div>',
+                unsafe_allow_html=True,
+            )
+
+        st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
+
+        # Unduh riwayat chat aktif (fitur dari App 2)
+        with st.container(key="sb_download"):
+            st.download_button(
+                label="📥　Unduh Chat",
+                data=get_chat_export_text(),
+                file_name=f"trinity-chat-{datetime.now().strftime('%Y%m%d-%H%M')}.md",
+                mime="text/markdown",
+                use_container_width=True,
+            )
+
+        # Baris akun bawah ala Claude
+        st.markdown(
+            """
+<div class="sb-account">
+  <div class="ava">A</div>
+  <div>
+    <div class="name">Ampera <span class="plan">· Free</span></div>
+  </div>
+</div>
+""",
+            unsafe_allow_html=True,
+        )
 
 
 # ============================================================================
