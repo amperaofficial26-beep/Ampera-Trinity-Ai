@@ -163,11 +163,18 @@ section[data-testid="stSidebar"] > div {
 }
 /* konten sidebar DIPENTOK KE ATAS: buang ruang kosong bawaan di atasnya */
 section[data-testid="stSidebar"] [data-testid="stSidebarHeader"] {
-    padding-bottom: 0 !important;
-    min-height: 34px !important;
+    padding: 0 !important;
+    min-height: 0 !important;
+    height: 0 !important;
+}
+/* tombol tutup sidebar « melayang di pojok, tidak memakan ruang */
+section[data-testid="stSidebar"] [data-testid="stSidebarHeader"] > * {
+    position: absolute;
+    top: 8px; right: 8px;
+    z-index: 10;
 }
 section[data-testid="stSidebar"] [data-testid="stSidebarUserContent"] {
-    padding-top: 0 !important;
+    padding-top: 6px !important;
 }
 /* tombol buka sidebar (saat tertutup) HARUS selalu terlihat */
 [data-testid="stSidebarCollapsedControl"],
@@ -199,13 +206,14 @@ button[kind="headerNoPadding"] {
     pointer-events: auto !important;
 }
 
-/* judul brand serif ala "Claude" — rapat ke atas */
+/* judul brand serif ala "Claude" — rapat ke atas, besar */
 .sb-brand {
     font-family: 'Source Serif 4', Georgia, serif;
-    font-size: 1.55rem; font-weight: 700; color: #1a1915;
+    font-size: 1.9rem; font-weight: 700; color: #1a1915;
     letter-spacing: -0.02em;
-    padding: 0 8px 14px;
-    margin-top: -6px;
+    padding: 0 8px 16px;
+    margin-top: 0;
+    line-height: 1.1;
 }
 
 /* tombol menu sidebar: baris teks polos RATA KIRI, hover krem (ala Claude) */
@@ -219,10 +227,10 @@ section[data-testid="stSidebar"] div.stButton > button {
     text-align: left !important;
     justify-content: flex-start !important;
     align-items: center !important;
-    padding: 8px 12px !important;
-    min-height: 40px !important;
+    padding: 9px 12px !important;
+    min-height: 44px !important;
     color: #3D3929 !important;
-    font-size: 0.95rem !important;
+    font-size: 1.05rem !important;
     font-weight: 500 !important;
 }
 section[data-testid="stSidebar"] div.stButton > button:hover {
@@ -240,7 +248,7 @@ section[data-testid="stSidebar"] div.stButton > button [data-testid="stMarkdownC
 }
 section[data-testid="stSidebar"] div.stButton > button p {
     text-align: left !important;
-    font-size: 0.92rem !important;
+    font-size: 1.05rem !important;
     color: #3D3929 !important;
     margin: 0 !important;
 }
@@ -255,7 +263,7 @@ section[data-testid="stSidebar"] .st-key-sb_new button:hover {
 
 /* label grup riwayat: "Hari ini" abu kecil */
 .sb-group {
-    font-size: 0.8rem; font-weight: 500; color: #8B887D;
+    font-size: 0.85rem; font-weight: 500; color: #8B887D;
     padding: 16px 12px 6px; letter-spacing: 0.01em;
 }
 /* item riwayat: bulatan kecil ○ di depan + teks abu gelap, elipsis 1 baris */
@@ -276,7 +284,7 @@ section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] button::before {
     display: inline-block;
 }
 section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] button p {
-    font-size: 0.92rem !important;
+    font-size: 0.98rem !important;
     font-weight: 400 !important;
     color: #57544A !important;
     white-space: nowrap !important;
@@ -300,10 +308,10 @@ section[data-testid="stSidebar"] div.stDownloadButton > button {
     text-align: left !important;
     justify-content: flex-start !important;
     align-items: center !important;
-    padding: 7px 10px !important;
-    min-height: 36px !important;
+    padding: 9px 12px !important;
+    min-height: 44px !important;
     color: #3D3929 !important;
-    font-size: 0.92rem !important;
+    font-size: 1.05rem !important;
     font-weight: 500 !important;
 }
 section[data-testid="stSidebar"] div.stDownloadButton > button > div,
@@ -319,7 +327,7 @@ section[data-testid="stSidebar"] div.stDownloadButton > button:hover {
 }
 section[data-testid="stSidebar"] div.stDownloadButton > button p {
     text-align: left !important;
-    font-size: 0.92rem !important;
+    font-size: 1.05rem !important;
     color: #3D3929 !important;
     margin: 0 !important;
 }
@@ -353,8 +361,8 @@ section[data-testid="stSidebar"] > div:first-child {
     flex-shrink: 0;
     border: 1px solid #D5D1C3;
 }
-.sb-account .name { font-size: 0.92rem; font-weight: 600; color: #3D3929; }
-.sb-account .plan { font-size: 0.82rem; color: #A8A69E; font-weight: 400; }
+.sb-account .name { font-size: 1rem; font-weight: 600; color: #3D3929; }
+.sb-account .plan { font-size: 0.88rem; color: #A8A69E; font-weight: 400; }
 .sb-account .caret { color: #A8A69E; font-size: 0.7rem; margin-left: 2px; }
 .sb-account .right-icons {
     margin-left: auto;
