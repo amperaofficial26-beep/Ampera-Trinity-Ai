@@ -314,9 +314,14 @@ html, body, [data-testid="stAppViewContainer"], .stApp {
     gap: 8px;
 }
 /* tombol model = TULISAN BIASA tanpa kotak (ala Claude) */
-.st-key-chat_controls [data-testid="stPopover"] > button {
+.st-key-chat_controls [data-testid="stPopover"] button,
+.st-key-chat_controls [data-testid="stPopover"] > div > button,
+.st-key-chat_controls button[data-testid="stBaseButton-secondary"],
+.st-key-chat_controls button[data-testid="stPopoverButton"] {
     background: transparent !important;
+    background-color: transparent !important;
     border: none !important;
+    outline: none !important;
     border-radius: 8px !important;
     padding: 2px 8px !important;
     min-height: 30px !important;
@@ -326,11 +331,26 @@ html, body, [data-testid="stAppViewContainer"], .stApp {
     color: #73726C !important;
     box-shadow: none !important;
     white-space: nowrap;
+    justify-content: flex-start !important;
+    width: auto !important;
 }
-.st-key-chat_controls [data-testid="stPopover"] > button:hover {
+.st-key-chat_controls [data-testid="stPopover"] button:hover,
+.st-key-chat_controls button[data-testid="stPopoverButton"]:hover {
     background: rgba(61,57,41,0.06) !important;
     color: #3D3929 !important;
     border: none !important;
+    box-shadow: none !important;
+}
+/* hilangkan kotak pembungkus milik popover itu sendiri */
+.st-key-chat_controls [data-testid="stPopover"] {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+.st-key-chat_controls [data-testid="stPopover"] > div {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
 }
 .st-key-chat_controls [data-testid="stCheckbox"] {
     margin: 0 !important;
@@ -384,15 +404,24 @@ div.stDownloadButton > button:hover {
     box-shadow: none !important;
     text-align: left !important;
     justify-content: flex-start !important;
+    align-items: flex-start !important;
     padding: 8px 12px !important;
     margin: 0 !important;
     width: 100% !important;
+    display: flex !important;
 }
 [data-testid="stPopoverBody"] div.stButton > button:hover {
     background: #F0EEE6 !important;
     border: none !important;
     box-shadow: none !important;
     color: inherit !important;
+}
+/* isi tombol (markdown) dipaksa RATA KIRI penuh */
+[data-testid="stPopoverBody"] div.stButton > button > div,
+[data-testid="stPopoverBody"] div.stButton > button [data-testid="stMarkdownContainer"] {
+    width: 100% !important;
+    text-align: left !important;
+    justify-content: flex-start !important;
 }
 /* nama model (baris pertama) tebal gelap, deskripsi kecil abu */
 [data-testid="stPopoverBody"] div.stButton > button p {
@@ -1150,7 +1179,7 @@ def main() -> None:
 
         with ctrl_model:
             current = st.session_state.selected_model_label
-            with st.popover(f"{current} ▾", use_container_width=True):
+            with st.popover(current, use_container_width=False):
                 # Daftar model ala Claude: baris teks polos (nama + deskripsi),
                 # tanpa kotak per item — model aktif ditandai ✓
                 for m in MODEL_CATALOG:
