@@ -750,10 +750,64 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     border-color: #DA7756 !important;
     color: #C15F3C !important;
 }
+/* Streamlit menambahkan ikon panah kecil di ujung tombol popover secara
+   otomatis (indikator dropdown) — disembunyikan supaya tombol ➕ tetap
+   polos, hanya ikon plus saja tanpa panah di sebelahnya. */
+.st-key-chat_controls .st-key-plus_menu [data-testid="stPopover"] button svg:last-child,
+.st-key-chat_controls .st-key-plus_menu [data-testid="stPopover"] button [data-testid="stIconMaterial"]:last-child {
+    display: none !important;
+}
 /* isi popover ➕ minimalist: cukup tombol unggah, tanpa label/hint besar */
 .plus-menu-hint {
     font-size: 0.72rem; color: #A8A69E;
     padding: 2px 4px 4px;
+}
+/* ---- reskin st.file_uploader jadi baris menu polos: ikon + teks saja ----
+   (label uploader disembunyikan; teks kustom disisipkan lewat ::before
+   pada tombol "Browse files" bawaan, dropzone/caption bawaan disembunyikan) */
+.st-key-plus_upload_file [data-testid="stFileUploaderDropzone"],
+.st-key-plus_upload_image [data-testid="stFileUploaderDropzone"] {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    min-height: 0 !important;
+}
+.st-key-plus_upload_file [data-testid="stFileUploaderDropzoneInstructions"],
+.st-key-plus_upload_image [data-testid="stFileUploaderDropzoneInstructions"] {
+    display: none !important;
+}
+.st-key-plus_upload_file [data-testid="stBaseButton-secondary"],
+.st-key-plus_upload_image [data-testid="stBaseButton-secondary"] {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 10px !important;
+    width: 100% !important;
+    display: flex !important;
+    justify-content: flex-start !important;
+    padding: 8px 12px !important;
+    min-height: 40px !important;
+    font-size: 0 !important;   /* sembunyikan teks bawaan "Browse files" */
+}
+.st-key-plus_upload_file [data-testid="stBaseButton-secondary"]:hover,
+.st-key-plus_upload_image [data-testid="stBaseButton-secondary"]:hover {
+    background: #F0EEE6 !important;
+}
+.st-key-plus_upload_file [data-testid="stBaseButton-secondary"]::before {
+    content: "📎  Upload file";
+    font-size: 0.92rem; font-weight: 500; color: #3D3929;
+}
+.st-key-plus_upload_image [data-testid="stBaseButton-secondary"]::before {
+    content: "📸  Upload gambar atau foto";
+    font-size: 0.92rem; font-weight: 500; color: #3D3929;
+}
+.st-key-plus_upload_file [data-testid="stFileUploader"] label,
+.st-key-plus_upload_image [data-testid="stFileUploader"] label {
+    display: none !important;
+}
+.st-key-plus_upload_file [data-testid="stFileUploader"],
+.st-key-plus_upload_image [data-testid="stFileUploader"] {
+    margin: 0 !important;
 }
 /* strip lampiran yang menunggu dikirim (hasil menu ➕) */
 .st-key-pending_strip { padding: 2px 2px 0; }
@@ -850,6 +904,25 @@ div.stDownloadButton > button:hover {
     margin-left: 6px;
     letter-spacing: 0.03em;
     vertical-align: middle;
+}
+/* label PREMIUM: dipojokkan kecil di sudut kanan-atas tiap baris model
+   (bukan menempel di sebelah nama) — ukuran & huruf dibuat mini */
+[data-testid="stPopoverBody"] [class*="_premium"] {
+    position: relative;
+}
+[data-testid="stPopoverBody"] [class*="_premium"]::after {
+    content: "Premium";
+    position: absolute;
+    top: 4px; right: 6px;
+    font-size: 0.55rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: #B0774F;
+    background: rgba(218,119,86,0.10);
+    border: 1px solid rgba(218,119,86,0.25);
+    border-radius: 999px;
+    padding: 1px 6px;
+    pointer-events: none;
 }
 /* rapatkan jarak antar item */
 [data-testid="stPopoverBody"] .element-container { margin: 0 !important; }
@@ -1999,36 +2072,44 @@ html, body {
                 [0.08, 0.2, 0.18, 1.04, 0.28]
             )
 
-            # ---- Menu ➕ ala Claude: MINIMALIST, hanya unggah file/gambar ----
-            # (mode chat/gambar, pencarian web, suara, unduh & chat baru
-            # sudah tersedia di luar popup ini: toggle di baris kontrol
-            # dan menu sidebar — jadi tidak diduplikasi di sini)
+            # ---- Menu ➕ ala Claude: MINIMALIST — hanya 2 baris ikon+teks
+            #      (📎 Upload file · 📸 Upload gambar atau foto). Mode chat/
+            #      gambar, pencarian web, suara, unduh & chat baru sudah ada
+            #      di luar popup ini, jadi tidak diduplikasi di sini. ----
             with ctrl_plus:
                 with st.container(key="plus_menu"):
                     with st.popover(":material/add:", use_container_width=False,
                                     help="Unggah file atau gambar"):
                         gen = st.session_state.get("plus_uploader_gen", 0)
-                        picked = st.file_uploader(
-                            "Unggah file / gambar",
-                            type=IMAGE_INPUT_TYPES,
-                            accept_multiple_files=True,
-                            label_visibility="collapsed",
-                            key=f"plus_uploader_{gen}",
-                        )
-                        if picked:
+
+                        def _stage_uploaded(files) -> None:
+                            if not files:
+                                return
                             staged = st.session_state.get("pending_images", [])
                             seen = {(im["name"], len(im["data"])) for im in staged}
-                            for im in collect_images(picked):
+                            for im in collect_images(files):
                                 k = (im["name"], len(im["data"]))
                                 if k not in seen:
                                     staged.append(im)
                                     seen.add(k)
                             st.session_state.pending_images = staged
-                        st.markdown(
-                            '<div class="plus-menu-hint">Atau tempel (Ctrl+V) / '
-                            'drag-drop langsung di kotak chat.</div>',
-                            unsafe_allow_html=True,
-                        )
+
+                        with st.container(key="plus_upload_file"):
+                            picked_file = st.file_uploader(
+                                "Upload file", type=IMAGE_INPUT_TYPES,
+                                accept_multiple_files=True,
+                                label_visibility="collapsed",
+                                key=f"plus_uploader_file_{gen}",
+                            )
+                        with st.container(key="plus_upload_image"):
+                            picked_image = st.file_uploader(
+                                "Upload gambar atau foto", type=IMAGE_INPUT_TYPES,
+                                accept_multiple_files=True,
+                                label_visibility="collapsed",
+                                key=f"plus_uploader_image_{gen}",
+                            )
+                        _stage_uploaded(picked_file)
+                        _stage_uploaded(picked_image)
 
             with ctrl_mode:
                 st.session_state.image_mode = st.toggle(
@@ -2066,11 +2147,12 @@ html, body {
                     for m in MODEL_CATALOG:
                         is_active = m["key"] == st.session_state.selected_model_key
                         check = " :orange[✓]" if is_active else ""
-                        premium_tag = "  :orange-background[PREMIUM]" if m.get("premium") else ""
-                        label = f"{m['name']}{premium_tag}{check}  \n:small[:gray[{m['desc']}]]"
-                        if st.button(label, key=f"model_{m['key']}", use_container_width=True):
-                            st.session_state.selected_model_key = m["key"]
-                            st.rerun()
+                        label = f"{m['name']}{check}  \n:small[:gray[{m['desc']}]]"
+                        row_key = f"model_row_{m['key']}" + ("_premium" if m.get("premium") else "")
+                        with st.container(key=row_key):
+                            if st.button(label, key=f"model_{m['key']}", use_container_width=True):
+                                st.session_state.selected_model_key = m["key"]
+                                st.rerun()
 
     # ---------- Proses kiriman (teks / lampiran gambar / rekaman suara) ----------
     if user_input is not None:
