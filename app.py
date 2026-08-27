@@ -1195,7 +1195,7 @@ THINKING_MIN_SECONDS = 12.0
 IMAGE_MIN_SECONDS = 10.0
 
 # Delay antar kata saat jawaban diketik kata per kata (lebih cepat & responsif)
-WORD_STREAM_DELAY = 0.002
+WORD_STREAM_DELAY = 0.0002
 
 
 @st.cache_data(show_spinner=False)
