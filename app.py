@@ -743,30 +743,33 @@ div.stDownloadButton > button:hover {
     50%      { transform: scale(1.25) rotate(90deg); opacity: 1; }
 }
 
-/* ===== LOGO THINKING: shimmer berjalan + denyut ===== */
-/* Logo dipakai sebagai MASK, latarnya gradasi terang yang menyapu
-   → kilau shimmer benar-benar berjalan mengikuti bentuk logo */
+/* ===== LOGO THINKING: shimmer berjalan + denyut (teknik 2 lapis img) ===== */
+/* Lapisan dasar = logo normal; lapisan atas = logo diterangkan yang
+   hanya terlihat lewat pita diagonal berjalan (clip-path) →
+   kilau shimmer mengikuti bentuk logo, tanpa CSS mask. */
 .claude-think .logo-shimmer {
+    position: relative;
     display: inline-block;
     width: 34px; height: 34px;
     flex-shrink: 0;
-    background: linear-gradient(
-        100deg,
-        #C96A47 0%, #C96A47 32%,
-        #F3C9A8 46%, #FFE9D6 50%, #F3C9A8 54%,
-        #C96A47 68%, #C96A47 100%
-    );
-    background-size: 240% 100%;
-    /* mask-image diisi lewat blok <style> global (base64 logo) */
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-    -webkit-mask-size: contain;
-    mask-size: contain;
-    -webkit-mask-position: center;
-    mask-position: center;
-    animation:
-        shimmerSweep 2.4s linear infinite,
-        logoPulse 2.6s ease-in-out infinite;
+    animation: logoPulse 2.6s ease-in-out infinite;
+}
+.claude-think .logo-shimmer img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    display: block;
+}
+.claude-think .logo-shimmer img.shine {
+    filter: brightness(2.1) saturate(0.45);
+    animation: shineMove 2.4s linear infinite;
+}
+@keyframes shineMove {
+    0% {
+        clip-path: polygon(-45% 0, -20% 0, -35% 100%, -60% 100%);
+    }
+    100% {
+        clip-path: polygon(135% 0, 160% 0, 145% 100%, 120% 100%);
+    }
 }
 @keyframes logoPulse {
     0%, 100% { transform: scale(1); }
@@ -912,21 +915,6 @@ div.stDownloadButton > button:hover {
         unsafe_allow_html=True,
     )
 
-    # Mask logo untuk shimmer thinking — HARUS lewat blok <style> global
-    # (atribut style inline dengan url(data:...) disaring sanitizer Streamlit)
-    logo_b64 = _thinking_logo_b64()
-    if logo_b64:
-        st.markdown(
-            f"""
-<style>
-.claude-think .logo-shimmer {{
-    -webkit-mask-image: url("data:image/png;base64,{logo_b64}");
-    mask-image: url("data:image/png;base64,{logo_b64}");
-}}
-</style>
-""",
-            unsafe_allow_html=True,
-        )
 
 
 # ============================================================================
@@ -1224,9 +1212,16 @@ def thinking_html(phrases: list[str]) -> str:
     )
     logo_b64 = _thinking_logo_b64()
     if logo_b64:
-        # Logo sebagai mask (didefinisikan di CSS global oleh inject_css)
-        # → shimmer menyapu di dalam bentuk logo + denyut membesar-mengecil.
-        icon = '<span class="logo-shimmer"></span>'
+        # 2 lapis <img>: dasar = logo normal; atas = logo diterangkan yang
+        # dipotong pita diagonal berjalan (clip-path) → efek kilau menyapu
+        # mengikuti bentuk logo. Tanpa CSS mask (aman dari sanitizer).
+        src = f"data:image/png;base64,{logo_b64}"
+        icon = (
+            '<span class="logo-shimmer">'
+            f'<img src="{src}" alt=""/>'
+            f'<img class="shine" src="{src}" alt=""/>'
+            "</span>"
+        )
     else:
         icon = '<span class="star">✳</span>'  # fallback bila file logo hilang
     return (
