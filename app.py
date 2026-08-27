@@ -10,7 +10,7 @@ Gabungan 3 aplikasi AI menjadi 1:
 
 Catatan sesuai kesepakatan:
   - Style/CSS       : buatan sendiri (bukan bawaan app lama) — bebas diedit nanti
-  - Loading/berpikir: sementara pakai bawaan Streamlit (st.spinner)
+  - Loading/berpikir: custom ala Claude (bintang ✳ + teks shimmer perlahan)
   - Splash screen   : belum dibuat (nanti dibuat ulang)
   - Sidebar         : minimal dulu (nanti dibuat ulang + search percakapan)
   - Input foto      : tidak ada (tidak ada di ketiga app asal)
@@ -357,6 +357,70 @@ div.stDownloadButton > button:hover {
 }
 [data-testid="stSpinner"] p { color: #73726C !important; }
 
+/* ---------- thinking indicator ala Claude ---------- */
+.claude-think {
+    display: flex; align-items: center; gap: 10px;
+    padding: 2px 2px 6px;
+    animation: thinkFadeIn 1.4s ease both;
+}
+@keyframes thinkFadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: none; }
+}
+/* bintang ✳ terracotta berdenyut & berputar pelan */
+.claude-think .star {
+    font-size: 1.05rem; color: #DA7756; line-height: 1;
+    animation: starPulse 2.2s ease-in-out infinite;
+    display: inline-block;
+}
+@keyframes starPulse {
+    0%, 100% { transform: scale(1) rotate(0deg);   opacity: 0.85; }
+    50%      { transform: scale(1.25) rotate(90deg); opacity: 1; }
+}
+/* teks dengan shimmer lembut menyapu perlahan (gaya Claude) */
+.claude-think .phrase {
+    font-size: 0.92rem; font-weight: 500;
+    background: linear-gradient(
+        90deg,
+        #A8A69E 0%, #A8A69E 35%,
+        #3D3929 50%,
+        #A8A69E 65%, #A8A69E 100%
+    );
+    background-size: 220% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmerSweep 2.6s linear infinite, phraseIn 1.6s ease both;
+}
+@keyframes shimmerSweep {
+    0%   { background-position: 110% 0; }
+    100% { background-position: -110% 0; }
+}
+/* teks muncul perlahan-lahan (fade masuk lambat) */
+@keyframes phraseIn {
+    from { opacity: 0; filter: blur(3px); }
+    to   { opacity: 1; filter: blur(0); }
+}
+/* frasa berganti-ganti pelan (rotasi via CSS, jalan terus di browser
+   walau server sedang sibuk memanggil API) */
+.claude-think .phrases { position: relative; height: 1.5em; min-width: 260px; }
+.claude-think .phrases .phrase {
+    position: absolute; left: 0; top: 0; white-space: nowrap;
+    opacity: 0;
+    animation: shimmerSweep 2.6s linear infinite,
+               phraseCycle 12s ease-in-out infinite;
+}
+.claude-think .phrases .phrase:nth-child(1) { animation-delay: 0s, 0s; }
+.claude-think .phrases .phrase:nth-child(2) { animation-delay: 0s, 4s; }
+.claude-think .phrases .phrase:nth-child(3) { animation-delay: 0s, 8s; }
+@keyframes phraseCycle {
+    0%      { opacity: 0; filter: blur(3px); }
+    6%      { opacity: 1; filter: blur(0); }
+    30%     { opacity: 1; filter: blur(0); }
+    36%     { opacity: 0; filter: blur(3px); }
+    100%    { opacity: 0; }
+}
+
 /* ---------- alert / error ---------- */
 [data-testid="stAlert"] {
     background: #FAF9F5 !important;
@@ -616,6 +680,28 @@ def render_message(msg: dict) -> None:
 
 
 # ============================================================================
+# THINKING INDICATOR ALA CLAUDE
+#   Bintang ✳ berdenyut + frasa dengan shimmer yang muncul perlahan
+#   dan berganti-ganti lambat (animasi murni CSS → tetap jalan
+#   walau server sedang menunggu respons API).
+# ============================================================================
+THINKING_PHRASES_CHAT = ["Berpikir", "Merangkai jawaban", "Menimbang kata"]
+THINKING_PHRASES_IMAGE = ["Membayangkan gambarnya", "Menyiapkan kanvas", "Melukis perlahan"]
+
+
+def thinking_html(phrases: list[str]) -> str:
+    spans = "".join(
+        f'<span class="phrase">{html.escape(p)}…</span>' for p in phrases
+    )
+    return (
+        '<div class="claude-think">'
+        '<span class="star">✳</span>'
+        f'<span class="phrases">{spans}</span>'
+        "</div>"
+    )
+
+
+# ============================================================================
 # EXPORT CHAT (.md — diadaptasi dari App 2)
 # ============================================================================
 def get_chat_export_text() -> str:
@@ -697,23 +783,26 @@ def handle_image_request(prompt: str) -> None:
         })
         return
 
-    # Loading sementara pakai bawaan Streamlit (nanti dibuat custom)
-    with st.spinner("🎨 Yuki sedang menggambar... tunggu sebentar ya~"):
-        try:
-            data = generate_image(prompt)
-            st.session_state.messages.append({
-                "id": next_msg_id(), "role": "assistant", "type": "image",
-                "image_bytes": data, "prompt": prompt,
-                "time": datetime.now().strftime("%H:%M"),
-            })
-        except Exception as e:
-            msg = str(e)
-            if not msg.startswith(("⚠️", "⏳", "⌛", "❌")):
-                msg = public_error_image(None, msg, e)
-            st.session_state.messages.append({
-                "id": next_msg_id(), "role": "assistant", "type": "text",
-                "content": msg, "time": datetime.now().strftime("%H:%M"),
-            })
+    # Thinking ala Claude (teks shimmer muncul perlahan)
+    think_slot = st.empty()
+    think_slot.markdown(thinking_html(THINKING_PHRASES_IMAGE), unsafe_allow_html=True)
+    try:
+        data = generate_image(prompt)
+        think_slot.empty()
+        st.session_state.messages.append({
+            "id": next_msg_id(), "role": "assistant", "type": "image",
+            "image_bytes": data, "prompt": prompt,
+            "time": datetime.now().strftime("%H:%M"),
+        })
+    except Exception as e:
+        think_slot.empty()
+        msg = str(e)
+        if not msg.startswith(("⚠️", "⏳", "⌛", "❌")):
+            msg = public_error_image(None, msg, e)
+        st.session_state.messages.append({
+            "id": next_msg_id(), "role": "assistant", "type": "text",
+            "content": msg, "time": datetime.now().strftime("%H:%M"),
+        })
 
 
 def handle_chat_request(answer_slot) -> None:
@@ -731,14 +820,22 @@ def handle_chat_request(answer_slot) -> None:
         AVAILABLE_MODELS[DEFAULT_MODEL_LABEL],
     )
 
+    # Thinking ala Claude (teks shimmer muncul perlahan)
+    think_slot = st.empty()
+    think_slot.markdown(thinking_html(THINKING_PHRASES_CHAT), unsafe_allow_html=True)
+    t0 = time.time()
+
     try:
-        # Loading sementara pakai bawaan Streamlit (nanti dibuat custom)
-        with st.spinner("🐧 Yuki sedang berpikir..."):
-            client = build_chat_client()
-            stream_iter = stream_chat_with_fallback(
-                client, model_id, st.session_state.messages
-            )
-            first = next(stream_iter, None)
+        client = build_chat_client()
+        stream_iter = stream_chat_with_fallback(
+            client, model_id, st.session_state.messages
+        )
+        first = next(stream_iter, None)
+        # tahan sebentar agar animasi thinking terlihat perlahan (min ~1.6s)
+        elapsed = time.time() - t0
+        if elapsed < 1.6:
+            time.sleep(1.6 - elapsed)
+        think_slot.empty()
 
         full = first or ""
         if full:
@@ -756,6 +853,7 @@ def handle_chat_request(answer_slot) -> None:
             "content": full, "time": datetime.now().strftime("%H:%M"),
         })
     except Exception as e:
+        think_slot.empty()
         err = public_error_chat(e)
         st.session_state.messages.append({
             "id": next_msg_id(), "role": "assistant", "type": "text",
