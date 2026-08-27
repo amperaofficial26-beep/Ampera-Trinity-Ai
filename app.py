@@ -1188,8 +1188,8 @@ THINKING_PHRASES_IMAGE = [
     "Melukis perlahan",
 ]
 
-# Durasi minimum proses berpikir (detik) — diperpendek agar jawaban terasa cepat
-THINKING_MIN_SECONDS = 6.0
+# Durasi minimum proses berpikir (detik) — ±10 detik ala Claude
+THINKING_MIN_SECONDS = 10.0
 
 # Durasi minimum progress bar gambar (detik) — biar animasi % terasa
 IMAGE_MIN_SECONDS = 10.0
