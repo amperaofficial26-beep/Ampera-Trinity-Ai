@@ -197,7 +197,7 @@ html, body, [data-testid="stAppViewContainer"], .stApp {
 section[data-testid="stSidebar"] {
     background: #F5F4EF !important;
     border-right: 1px solid #E3E0D5 !important;
-    width: 300px !important;
+    width: 260px !important;
     display: flex !important;
     visibility: visible !important;
 }
@@ -252,9 +252,9 @@ button[kind="headerNoPadding"] {
 /* judul brand serif ala "Claude" — rapat ke atas, besar */
 .sb-brand {
     font-family: 'Source Serif 4', Georgia, serif;
-    font-size: 1.9rem; font-weight: 700; color: #1a1915;
+    font-size: 1.5rem; font-weight: 700; color: #1a1915;
     letter-spacing: -0.02em;
-    padding: 0 8px 16px;
+    padding: 0 6px 8px;
     margin-top: 0;
     line-height: 1.1;
 }
@@ -264,16 +264,16 @@ section[data-testid="stSidebar"] div.stButton > button {
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
-    border-radius: 10px !important;
+    border-radius: 8px !important;
     width: 100% !important;
     display: flex !important;
     text-align: left !important;
     justify-content: flex-start !important;
     align-items: center !important;
-    padding: 9px 12px !important;
-    min-height: 44px !important;
+    padding: 6px 10px !important;
+    min-height: 34px !important;
     color: #3D3929 !important;
-    font-size: 1.05rem !important;
+    font-size: 0.9rem !important;
     font-weight: 500 !important;
 }
 section[data-testid="stSidebar"] div.stButton > button:hover {
@@ -291,7 +291,7 @@ section[data-testid="stSidebar"] div.stButton > button [data-testid="stMarkdownC
 }
 section[data-testid="stSidebar"] div.stButton > button p {
     text-align: left !important;
-    font-size: 1.05rem !important;
+    font-size: 0.9rem !important;
     color: #3D3929 !important;
     margin: 0 !important;
 }
@@ -345,16 +345,16 @@ section[data-testid="stSidebar"] div.stDownloadButton > button {
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
-    border-radius: 10px !important;
+    border-radius: 8px !important;
     width: 100% !important;
     display: flex !important;
     text-align: left !important;
     justify-content: flex-start !important;
     align-items: center !important;
-    padding: 9px 12px !important;
-    min-height: 44px !important;
+    padding: 6px 10px !important;
+    min-height: 34px !important;
     color: #3D3929 !important;
-    font-size: 1.05rem !important;
+    font-size: 0.9rem !important;
     font-weight: 500 !important;
 }
 section[data-testid="stSidebar"] div.stDownloadButton > button > div,
@@ -370,21 +370,21 @@ section[data-testid="stSidebar"] div.stDownloadButton > button:hover {
 }
 section[data-testid="stSidebar"] div.stDownloadButton > button p {
     text-align: left !important;
-    font-size: 1.05rem !important;
+    font-size: 0.9rem !important;
     color: #3D3929 !important;
     margin: 0 !important;
 }
 
 /* garis pemisah tipis */
 .sb-divider {
-    height: 1px; background: #E3E0D5; margin: 10px 4px;
+    height: 1px; background: #E3E0D5; margin: 6px 2px;
 }
 
 /* baris akun ala Claude — DIPAKU di dasar layar, selebar sidebar */
 .sb-account {
     position: fixed;
     bottom: 0; left: 0;
-    width: 300px;              /* = lebar sidebar */
+    width: 260px;              /* = lebar sidebar */
     display: flex; align-items: center; gap: 10px;
     padding: 12px 16px 14px;
     border-top: 1px solid #E3E0D5;
@@ -2256,8 +2256,7 @@ html, body {
                                 st.rerun()
                     with pcols[-1]:
                         st.markdown(
-                            '<div class="plus-menu-hint">📎 Siap dikirim bersama '
-                            'pesan berikutnya…</div>',
+                            '<div class="plus-menu-hint">Siap dikirim…</div>',
                             unsafe_allow_html=True,
                         )
 
@@ -2276,17 +2275,20 @@ html, body {
                                     help="Unggah file atau gambar"):
                         gen = st.session_state.get("plus_uploader_gen", 0)
 
-                        def _stage_uploaded(files) -> None:
+                        def _stage_uploaded(files) -> bool:
                             if not files:
-                                return
+                                return False
                             staged = st.session_state.get("pending_images", [])
                             seen = {(im["name"], len(im["data"])) for im in staged}
+                            added = False
                             for im in collect_images(files):
                                 k = (im["name"], len(im["data"]))
                                 if k not in seen:
                                     staged.append(im)
                                     seen.add(k)
+                                    added = True
                             st.session_state.pending_images = staged
+                            return added
 
                         with st.container(key="plus_upload_file"):
                             picked_file = st.file_uploader(
@@ -2302,8 +2304,12 @@ html, body {
                                 label_visibility="visible",
                                 key=f"plus_uploader_image_{gen}",
                             )
-                        _stage_uploaded(picked_file)
-                        _stage_uploaded(picked_image)
+                        added_file = _stage_uploaded(picked_file)
+                        added_image = _stage_uploaded(picked_image)
+                        if added_file or added_image:
+                            # tutup popover & langsung tampilkan thumbnail
+                            # lampiran di dalam kotak chat input (ala Claude)
+                            st.rerun()
 
                         st.markdown('<div class="plus-menu-divider"></div>',
                                     unsafe_allow_html=True)
