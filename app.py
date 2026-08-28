@@ -1840,8 +1840,7 @@ html, body {
                         "</div>",
                         unsafe_allow_html=True,
                     )
-
-             with ctrl_model:
+            with ctrl_model:
               current_key = st.session_state.selected_model_key
               current_model = MODEL_BY_KEY.get(current_key, MODEL_BY_KEY[DEFAULT_MODEL_KEY])
               current_name = current_model["name"]
