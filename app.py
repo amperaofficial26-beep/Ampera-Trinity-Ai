@@ -1842,26 +1842,26 @@ html, body {
                     )
 
              with ctrl_model:
-                current_key = st.session_state.selected_model_key
-                current_model = MODEL_BY_KEY.get(current_key, MODEL_BY_KEY[DEFAULT_MODEL_KEY])
-                current_name = current_model["name"]
-                with st.popover(current_name, use_container_width=False):
-                    for m in MODEL_CATALOG:
-                        is_active = m["key"] == st.session_state.selected_model_key
-                        # Buat label dengan struktur: nama di kiri, badge premium di kanan
-                        # Kita gunakan markdown atau HTML di dalam button
-                        # Karena st.button menerima string yang bisa berisi HTML, kita buat label dengan elemen span
-                        name_span = f'<span class="model-name">• {m["name"]}</span>'
-                        badge = f' <span class="model-badge-premium">Premium</span>' if m.get("premium") else ''
-                        check = f' <span class="model-check">✓</span>' if is_active else ''
-                        label_html = name_span + badge + check
-                        if st.button(
-                            label_html,
-                            key=f"model_{m['key']}",
-                            use_container_width=True,
-                        ):
-                            st.session_state.selected_model_key = m["key"]
-                            st.rerun()
+              current_key = st.session_state.selected_model_key
+              current_model = MODEL_BY_KEY.get(current_key, MODEL_BY_KEY[DEFAULT_MODEL_KEY])
+              current_name = current_model["name"]
+              with st.popover(current_name, use_container_width=False):
+                  for m in MODEL_CATALOG:
+                      is_active = m["key"] == st.session_state.selected_model_key
+                      # Buat label dengan struktur: nama di kiri, badge premium di kanan
+                      # Kita gunakan markdown atau HTML di dalam button
+                      # Karena st.button menerima string yang bisa berisi HTML, kita buat label dengan elemen span
+                      name_span = f'<span class="model-name">• {m["name"]}</span>'
+                      badge = f' <span class="model-badge-premium">Premium</span>' if m.get("premium") else ''
+                      check = f' <span class="model-check">✓</span>' if is_active else ''
+                      label_html = name_span + badge + check
+                      if st.button(
+                          label_html,
+                          key=f"model_{m['key']}",
+                          use_container_width=True,
+                      ):
+                          st.session_state.selected_model_key = m["key"]
+                          st.rerun()
     # ========== PROCESS INPUT ==========
     if user_input is not None:
         if isinstance(user_input, str):
