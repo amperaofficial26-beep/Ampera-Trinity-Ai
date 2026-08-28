@@ -577,50 +577,46 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     font-size: 0.8rem !important;
     color: #73726C !important;
 }
-.st-key-chat_controls [data-testid="stPopover"] button,
-.st-key-chat_controls [data-testid="stPopover"] > div > button,
-.st-key-chat_controls button[data-testid="stBaseButton-secondary"],
-.st-key-chat_controls button[data-testid="stPopoverButton"] {
+/* ========== POPOVER MODEL (sederhana dengan bullet) ========== */
+[data-testid="stPopoverBody"] div.stButton > button {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 6px 14px !important;
     background: transparent !important;
-    background-color: transparent !important;
     border: none !important;
-    outline: none !important;
-    border-radius: 8px !important;
-    padding: 2px 8px !important;
-    min-height: 30px !important;
-    height: 30px !important;
-    font-size: 0.8rem !important;
-    font-weight: 500 !important;
-    color: #73726C !important;
-    box-shadow: none !important;
-    white-space: nowrap;
-    justify-content: flex-start !important;
-    width: auto !important;
-}
-.st-key-chat_controls [data-testid="stPopover"] button:hover,
-.st-key-chat_controls button[data-testid="stPopoverButton"]:hover {
-    background: rgba(61,57,41,0.06) !important;
+    border-radius: 0 !important;
+    width: 100% !important;
+    min-height: 32px !important;
+    font-size: 0.9rem !important;
+    font-weight: 400 !important;
     color: #3D3929 !important;
-    border: none !important;
-    box-shadow: none !important;
 }
-.st-key-chat_controls [data-testid="stPopover"] {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
+[data-testid="stPopoverBody"] div.stButton > button:hover {
+    background: #F5F4EF !important;
 }
-.st-key-chat_controls [data-testid="stPopover"] > div {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
+[data-testid="stPopoverBody"] .model-badge-premium {
+    font-size: 0.6rem !important;
+    font-weight: 600 !important;
+    color: #C15F3C !important;
+    background: rgba(218,119,86,0.12) !important;
+    border: 1px solid rgba(218,119,86,0.2) !important;
+    padding: 1px 8px !important;
+    border-radius: 99px !important;
+    margin-left: auto !important;
+    flex-shrink: 0 !important;
 }
-.st-key-chat_controls [data-testid="stCheckbox"] {
-    margin: 0 !important;
+[data-testid="stPopoverBody"] .model-check {
+    color: #DA7756 !important;
+    margin-left: 6px !important;
 }
-.st-key-chat_controls [data-testid="stCheckbox"] label p {
-    font-size: 0.78rem !important;
-    color: #73726C !important;
-    white-space: nowrap;
+[data-testid="stPopoverBody"] .stButton + .stButton {
+    border-top: 1px solid #F0EEE6 !important;
+}
+[data-testid="stPopoverBody"] {
+    padding: 4px 0 !important;
+    min-width: 200px !important;
+    max-width: 260px !important;
 }
 .st-key-chat_controls [data-testid="stVerticalBlock"] { gap: 0 !important; }
 .st-key-chat_controls .element-container { margin: 0 !important; }
@@ -1865,28 +1861,20 @@ html, body {
                         unsafe_allow_html=True,
                     )
 
-            with ctrl_model:
+                       with ctrl_model:
                 current_key = st.session_state.selected_model_key
                 current_model = MODEL_BY_KEY.get(current_key, MODEL_BY_KEY[DEFAULT_MODEL_KEY])
                 current_name = current_model["name"]
-                # Tombol pembuka popover model (tampil sebagai nama model saat ini)
                 with st.popover(current_name, use_container_width=False):
-                    # Daftar model sederhana tanpa kolom/container berlebihan
                     for m in MODEL_CATALOG:
                         is_active = m["key"] == st.session_state.selected_model_key
-                        # Tentukan level label
-                        level = "Easy" if "Easy" in m["name"] else "Normal" if "Normal" in m["name"] else "Hard" if "Hard" in m["name"] else "Extreme"
-                        level_class = "hard" if level in ("Hard", "Extreme") else ""
-                        # Tambahkan badge Premium jika premium
-                        premium_badge = ' <span class="model-level premium">Premium</span>' if m.get("premium") else ""
-                        checkmark = ' <span class="model-check">✓</span>' if is_active else ""
-                        label_html = (
-                            f'<span>{m["name"]}</span>'
-                            f'<span class="model-level {level_class}">{level}{premium_badge}</span>'
-                        )
-                        # Gunakan st.button dengan HTML yang sudah disusun
-                        # Kita masukkan ke dalam markdown p agar bisa menampung HTML
-                        button_label = f"{m['name']}  \n:small[:gray[{m['desc']}]]"
+                        # Buat label dengan bullet, nama, dan badge Premium jika perlu
+                        label_html = f'<span>• {m["name"]}</span>'
+                        if m.get("premium"):
+                            label_html += ' <span class="model-badge-premium">Premium</span>'
+                        if is_active:
+                            label_html += ' <span class="model-check">✓</span>'
+                        # Gunakan st.button dengan HTML
                         if st.button(
                             label_html,
                             key=f"model_{m['key']}",
