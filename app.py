@@ -65,12 +65,12 @@ APP_TAGLINE = "Multi AI · Generate Foto · Chat — by Ampera Official"
 # --- Multi AI (dari App 3: Ampera Multi AI) ---
 GROQ_BASE_URL = "https://api.groq.com/openai/v1"
 MODEL_CATALOG = [
-    {"key": "gpt_oss_20b",   "name": "Trinity Easy",    "desc": "Cepat untuk chat & coding ringan",      "id": "openai/gpt-oss-20b", "premium": False, "level": "Easy"},
-    {"key": "compound_mini", "name": "Trinity Normal",  "desc": "Web search ringkas & cepat",            "id": "groq/compound-mini", "premium": False, "level": "Normal"},
-    {"key": "llama4_scout",  "name": "Trinity Normal",  "desc": "Bisa melihat & menganalisis gambar",    "id": "meta-llama/llama-4-scout-17b-16e-instruct", "premium": False, "level": "Normal"},
-    {"key": "compound",      "name": "Trinity Hard",    "desc": "Browsing web & eksekusi kode",          "id": "groq/compound", "premium": True, "level": "Hard"},
-    {"key": "qwen3_6_27b",   "name": "Trinity Hard",    "desc": "Reasoning & matematika",                "id": "qwen/qwen3.6-27b", "premium": True, "level": "Hard"},
-    {"key": "gpt_oss_120b",  "name": "Trinity Extreme", "desc": "Reasoning mendalam untuk tugas berat",  "id": "openai/gpt-oss-120b", "premium": True, "level": "Extreme"},
+    {"key": "gpt_oss_20b",   "name": "Trinity Easy",    "desc": "Cepat untuk chat & coding ringan",      "id": "openai/gpt-oss-20b", "premium": False},
+    {"key": "compound_mini", "name": "Trinity Normal",  "desc": "Web search ringkas & cepat",            "id": "groq/compound-mini", "premium": False},
+    {"key": "llama4_scout",  "name": "Trinity Normal",  "desc": "Bisa melihat & menganalisis gambar",    "id": "meta-llama/llama-4-scout-17b-16e-instruct", "premium": False},
+    {"key": "compound",      "name": "Trinity Hard",    "desc": "Browsing web & eksekusi kode",          "id": "groq/compound", "premium": True},
+    {"key": "qwen3_6_27b",   "name": "Trinity Hard",    "desc": "Reasoning & matematika",                "id": "qwen/qwen3.6-27b", "premium": True},
+    {"key": "gpt_oss_120b",  "name": "Trinity Extreme", "desc": "Reasoning mendalam untuk tugas berat",  "id": "openai/gpt-oss-120b", "premium": True},
 ]
 AVAILABLE_MODELS = {m["key"]: m["id"] for m in MODEL_CATALOG}
 MODEL_BY_KEY = {m["key"]: m for m in MODEL_CATALOG}
@@ -772,32 +772,39 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     padding: 0 !important;
 }
 
-/* ========== POPOVER MODEL (gaya baru) ========== */
-/* Menghilangkan tombol dengan background dan border, tampilkan sebagai daftar teks */
-.st-key-model_popover_content [data-testid="stVerticalBlock"] {
-    gap: 2px !important;
+/* ========== POPOVER MODEL (kecil, rapi, ala Claude) ========== */
+/* Popover body menjadi lebih kecil dan tanpa padding berlebihan */
+[data-testid="stPopoverBody"] {
+    background: #FFFFFF !important;
+    border: 1px solid #E3E0D5 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 30px rgba(61,57,41,0.12) !important;
+    padding: 4px 0 !important;
+    min-width: 200px !important;
+    max-width: 260px !important;
 }
-.st-key-model_popover_content .stButton button {
+[data-testid="stPopoverBody"] .stButton {
+    margin: 0 !important;
+}
+[data-testid="stPopoverBody"] div.stButton > button {
     background: transparent !important;
     border: none !important;
-    border-radius: 6px !important;
-    padding: 6px 12px !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 6px 14px !important;
     margin: 0 !important;
     width: 100% !important;
     justify-content: flex-start !important;
-    text-align: left !important;
-    font-weight: 400 !important;
-    color: #3D3929 !important;
-    box-shadow: none !important;
-    display: flex !important;
     align-items: center !important;
     min-height: 32px !important;
     height: auto !important;
+    display: flex !important;
+    gap: 0 !important;
 }
-.st-key-model_popover_content .stButton button:hover {
-    background: #F0EEE6 !important;
+[data-testid="stPopoverBody"] div.stButton > button:hover {
+    background: #F5F4EF !important;
 }
-.st-key-model_popover_content .stButton button p {
+[data-testid="stPopoverBody"] div.stButton > button p {
     margin: 0 !important;
     font-size: 0.9rem !important;
     font-weight: 400 !important;
@@ -808,43 +815,46 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     justify-content: space-between !important;
     align-items: center !important;
 }
-/* Label premium kecil di kanan */
-.model-level-label {
-    font-size: 0.6rem !important;
-    font-weight: 600 !important;
-    color: #C15F3C !important;
-    background: rgba(218,119,86,0.10) !important;
-    border: 1px solid rgba(218,119,86,0.25) !important;
-    border-radius: 999px !important;
+[data-testid="stPopoverBody"] .model-level {
+    font-size: 0.65rem !important;
+    font-weight: 500 !important;
+    color: #A8A69E !important;
+    background: #F0EEE6 !important;
     padding: 1px 8px !important;
-    margin-left: 8px !important;
-    white-space: nowrap !important;
+    border-radius: 99px !important;
+    letter-spacing: 0.02em !important;
+    flex-shrink: 0 !important;
+    margin-left: 12px !important;
 }
-.model-level-label.easy {
-    color: #8B887D !important;
-    background: transparent !important;
-    border: 1px solid #D5D1C3 !important;
-}
-.model-level-label.normal {
-    color: #8B887D !important;
-    background: transparent !important;
-    border: 1px solid #D5D1C3 !important;
-}
-.model-level-label.hard {
+[data-testid="stPopoverBody"] .model-level.hard,
+[data-testid="stPopoverBody"] .model-level.extreme {
+    background: rgba(218,119,86,0.12) !important;
     color: #C15F3C !important;
-    border-color: rgba(218,119,86,0.35) !important;
+    border: 1px solid rgba(218,119,86,0.2) !important;
 }
-.model-level-label.extreme {
-    color: #C15F3C !important;
-    border-color: rgba(218,119,86,0.35) !important;
+[data-testid="stPopoverBody"] .model-level.premium {
+    background: #DA7756 !important;
+    color: #FFFFFF !important;
+    border: none !important;
+    font-size: 0.6rem !important;
+    padding: 1px 8px !important;
 }
-/* Tanda centang untuk model aktif */
-.model-check {
+[data-testid="stPopoverBody"] .model-check {
     color: #DA7756 !important;
-    font-size: 0.8rem !important;
-    margin-left: 4px !important;
+    margin-right: 6px !important;
 }
-/* ========== Toggle ========== */
+[data-testid="stPopoverBody"] .element-container {
+    margin: 0 !important;
+}
+[data-testid="stPopoverBody"] [data-testid="stVerticalBlock"] {
+    gap: 0 !important;
+}
+/* Hilangkan separator antara tombol */
+[data-testid="stPopoverBody"] .stButton + .stButton {
+    border-top: 1px solid #F0EEE6 !important;
+}
+
+/* ========== TOGGLE ========== */
 [data-testid="stCheckbox"] label p, .stToggle label p {
     color: #3D3929 !important;
     font-size: 0.85rem !important;
@@ -1857,31 +1867,33 @@ html, body {
 
             with ctrl_model:
                 current_key = st.session_state.selected_model_key
-                current_name = MODEL_BY_KEY.get(current_key, MODEL_BY_KEY[DEFAULT_MODEL_KEY])["name"]
+                current_model = MODEL_BY_KEY.get(current_key, MODEL_BY_KEY[DEFAULT_MODEL_KEY])
+                current_name = current_model["name"]
+                # Tombol pembuka popover model (tampil sebagai nama model saat ini)
                 with st.popover(current_name, use_container_width=False):
-                    # Container dengan class khusus agar gaya CSS diterapkan
-                    with st.container(key="model_popover_content"):
-                        for m in MODEL_CATALOG:
-                            is_active = (m["key"] == st.session_state.selected_model_key)
-                            # Tentukan label level
-                            level = m.get("level", "")
-                            if level == "Easy":
-                                level_label = '<span class="model-level-label easy">Easy</span>'
-                            elif level == "Normal":
-                                level_label = '<span class="model-level-label normal">Normal</span>'
-                            elif level == "Hard":
-                                level_label = '<span class="model-level-label hard">Hard</span>'
-                            elif level == "Extreme":
-                                level_label = '<span class="model-level-label extreme">Extreme</span>'
-                            else:
-                                level_label = ""
-                            # Tanda centang jika aktif
-                            check = '<span class="model-check"> ✓</span>' if is_active else ""
-                            # Buat tombol dengan teks rata kiri dan label di kanan
-                            label_html = f"{m['name']}{check} {level_label}"
-                            if st.button(label_html, key=f"model_{m['key']}", use_container_width=True):
-                                st.session_state.selected_model_key = m["key"]
-                                st.rerun()
+                    # Daftar model sederhana tanpa kolom/container berlebihan
+                    for m in MODEL_CATALOG:
+                        is_active = m["key"] == st.session_state.selected_model_key
+                        # Tentukan level label
+                        level = "Easy" if "Easy" in m["name"] else "Normal" if "Normal" in m["name"] else "Hard" if "Hard" in m["name"] else "Extreme"
+                        level_class = "hard" if level in ("Hard", "Extreme") else ""
+                        # Tambahkan badge Premium jika premium
+                        premium_badge = ' <span class="model-level premium">Premium</span>' if m.get("premium") else ""
+                        checkmark = ' <span class="model-check">✓</span>' if is_active else ""
+                        label_html = (
+                            f'<span>{m["name"]}</span>'
+                            f'<span class="model-level {level_class}">{level}{premium_badge}</span>'
+                        )
+                        # Gunakan st.button dengan HTML yang sudah disusun
+                        # Kita masukkan ke dalam markdown p agar bisa menampung HTML
+                        button_label = f"{m['name']}  \n:small[:gray[{m['desc']}]]"
+                        if st.button(
+                            label_html,
+                            key=f"model_{m['key']}",
+                            use_container_width=True,
+                        ):
+                            st.session_state.selected_model_key = m["key"]
+                            st.rerun()
 
     # ========== PROCESS INPUT ==========
     if user_input is not None:
