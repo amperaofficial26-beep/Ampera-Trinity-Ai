@@ -1228,6 +1228,34 @@ div.stDownloadButton > button:hover {
     color: #B8B6AC;
     margin-top: 22px;
 }
+/* baris feedback (👍/ & salin): paksa polos tanpa latar putih */
+[class*="st-key-msg_actions_"] div.stButton > button,
+[class*="st-key-fb_up_"] button, [class*="st-key-fb_down_"] button,
+[class*="st-key-msg_actions_"] [data-testid^="stBaseButton"] {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 4px 6px !important;
+    min-height: 26px !important;
+    height: 26px !important;
+    color: #A8A69E !important;
+}
+/* lapisan DALAM tombol (style emotion Streamlit) ikut ditransparankan */
+[class*="st-key-msg_actions_"] div.stButton > button > div,
+[class*="st-key-fb_up_"] button > div, [class*="st-key-fb_down_"] button > div,
+[class*="st-key-msg_actions_"] div.stButton > button p,
+[class*="st-key-msg_actions_"] [data-testid="stMarkdownContainer"] {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+/* hover tetap krem halus, bukan putih */
+[class*="st-key-msg_actions_"] div.stButton > button:hover,
+[class*="st-key-fb_up_"] button:hover, [class*="st-key-fb_down_"] button:hover {
+    background: #EAE8DE !important;
+}
 </style>
 """,
         unsafe_allow_html=True,
