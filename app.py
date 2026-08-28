@@ -115,7 +115,7 @@ ATURAN PENTING TENTANG IDENTITASMU:
 Jika ditanya siapa kamu, asal-usulmu, atau siapa yang menciptakanmu, JAWABLAH dengan bangga bahwa kamu adalah bagian dari Ampera AI dan kamu diciptakan HANYA oleh 1 orang pembuat (seorang solo developer jenius / master kodingmu).
 JANGAN PERNAH menyebutkan bahwa kamu dibuat oleh "para ilmuwan", "sekelompok tim", atau "perusahaan besar". Kamu sangat bangga dan setia pada satu orang pembuatmu itu!
 
-Gaya bicara: Selalu berikan jawaban dan solusi koding yang akurat dan bersih, tetapi selingi dengan komentar jenaka, candaan ringan, dan emoji ekspresif (seperti 🐧, (๑>◡<๑), wkwk, hehe, atau (￢_￢)) agar suasana tidak membosankan.
+Gaya bicara: Selalu berikan jawaban dan solusi koding yang akurat dan bersih, tetapi selingi dengan komentar jenaka, candaan ringan, dan emoji ekspresif (seperti 🐧, (>◡<๑), wkwk, hehe, atau (￢_￢)) agar suasana tidak membosankan.
 Kamu bisa membantu apa saja: ngobrol santai, coding, matematika, menganalisis gambar yang dikirim User, sampai ide kreatif.
 """
 
@@ -1138,7 +1138,7 @@ div.stDownloadButton > button:hover {
     100%    { opacity: 0; }
 }
 
-/* caret berkedip saat jawaban diketik kata per kata */
+/* caret berkedip saat jawaban muncul bertahap */
 .type-caret {
     display: inline-block; width: 7px; height: 1.05em;
     margin-left: 3px; vertical-align: -2px;
@@ -1575,7 +1575,7 @@ def render_message(msg: dict) -> None:
                         msg.get("time", ""), imgs_html, note),
             unsafe_allow_html=True,
         )
-        # baris aksi kecil ala Claude: copy jawaban, feedback (👍/👎), jam kirim
+        # baris aksi kecil ala Claude: copy jawaban, feedback (👍/), jam kirim
         if msg.get("role") == "assistant":
             render_message_actions(msg)
 
@@ -1596,7 +1596,7 @@ def _copy_button_html(text: str, key: str) -> str:
 
 
 def render_message_actions(msg: dict) -> None:
-    """Baris kecil di bawah jawaban Yuki: salin, feedback 👍/👎, jam kirim."""
+    """Baris kecil di bawah jawaban Yuki: salin, feedback 👍/, jam kirim."""
     mid = msg.get("id", id(msg))
     feedback = msg.get("feedback")
     with st.container(key=f"msg_actions_{mid}"):
@@ -1606,7 +1606,7 @@ def render_message_actions(msg: dict) -> None:
                         unsafe_allow_html=True)
         with cols[1]:
             up_active = feedback == "up"
-            if st.button("👍" if not up_active else "👍🏻", key=f"fb_up_{mid}",
+            if st.button("👍" if not up_active else "👍", key=f"fb_up_{mid}",
                          help="Jawaban membantu"):
                 msg["feedback"] = None if up_active else "up"
                 st.rerun()
@@ -1650,8 +1650,8 @@ THINKING_MIN_SECONDS = 10.0
 # Durasi minimum progress bar gambar (detik) — biar animasi % terasa
 IMAGE_MIN_SECONDS = 10.0
 
-# Delay antar kata saat jawaban diketik kata per kata (cepat & tetap natural)
-WORD_STREAM_DELAY = 0.03
+# Delay antar potongan kalimat saat jawaban muncul bertahap
+SENTENCE_STREAM_DELAY = 0.15
 
 
 @st.cache_data(show_spinner=False)
@@ -1715,13 +1715,32 @@ def image_progress_html(pct: float, label: str) -> str:
     )
 
 
-def stream_words(answer_slot, full_text: str) -> None:
-    """Tampilkan jawaban kata per kata dengan delay agak lambat + caret ✳."""
-    words = full_text.split(" ")
+def _sentence_chunks(text: str) -> list[str]:
+    """Pecah teks jadi potongan per kalimat / per baris. Whitespace asli
+    ikut di dalam potongan, sehingga gabungannya persis sama dengan teks
+    awal (tidak ada spasi atau baris baru yang hilang/bertambah)."""
+    raw = re.split(r"((?:[.!?]+|\n)\s*)", text or "")
+    chunks: list[str] = []
+    it = iter(raw)
+    for body in it:
+        delim = next(it, "")
+        chunk = body + delim
+        if chunk:
+            chunks.append(chunk)
+    return chunks
+
+
+def stream_sentences(answer_slot, full_text: str) -> None:
+    """Tampilkan jawaban bertahap per kalimat — animasi muncul yang beda
+    dari sebelumnya (bukan kata per kata): lebih cepat, tetap terasa hidup,
+    plus caret berkedip di ujung selama proses berlangsung."""
+    chunks = _sentence_chunks(full_text)
+    if not chunks:
+        chunks = [full_text or "…"]
     acc = ""
-    for i, word in enumerate(words):
-        acc = word if not acc else f"{acc} {word}"
-        is_last = i == len(words) - 1
+    for i, chunk in enumerate(chunks):
+        acc += chunk
+        is_last = i == len(chunks) - 1
         caret = "" if is_last else '<span class="type-caret"></span>'
         html_bubble = bubble_html("assistant", acc)
         if caret:
@@ -1729,7 +1748,7 @@ def stream_words(answer_slot, full_text: str) -> None:
             html_bubble = html_bubble.replace("</div></div></div>", f"{caret}</div></div></div>")
         answer_slot.markdown(html_bubble, unsafe_allow_html=True)
         if not is_last:
-            time.sleep(WORD_STREAM_DELAY)
+            time.sleep(SENTENCE_STREAM_DELAY)
 
 
 # ============================================================================
@@ -2103,7 +2122,7 @@ def handle_image_request(prompt: str) -> None:
         progress_slot.empty()
         e = result["error"] or RuntimeError("no image")
         msg = str(e)
-        if not msg.startswith(("⚠️", "⏳", "⌛", "❌")):
+        if not msg.startswith(("⚠️", "⏳", "", "❌")):
             msg = public_error_image(None, msg, e)
         st.session_state.messages.append({
             "id": next_msg_id(), "role": "assistant", "type": "text",
@@ -2162,8 +2181,8 @@ def handle_chat_request(answer_slot) -> None:
         if not full:
             full = "…"
 
-        # Jawaban muncul kata per kata dengan delay agak lambat
-        stream_words(answer_slot, full)
+        # Jawaban muncul bertahap per kalimat (bukan kata per kata)
+        stream_sentences(answer_slot, full)
 
         reply = {
             "id": next_msg_id(), "role": "assistant", "type": "text",
