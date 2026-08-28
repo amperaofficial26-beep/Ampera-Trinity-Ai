@@ -19,7 +19,7 @@ Fitur ala Claude tambahan:
   - Sidebar   → Proyek (grup ringan), Artefak (kode panjang tertangkap
                 otomatis), Sesuaikan (panggilan & instruksi custom Yuki),
                 riwayat percakapan ("Hari ini")
-  - Balasan Yuki → baris aksi kecil: salin jawaban, feedback 👍/👎, jam kirim
+  - Balasan Yuki → baris aksi kecil: salin jawaban, feedback 👍/, jam kirim
 
 Catatan: fitur "Suara Yuki" (TTS) sudah dihapus karena tidak berfungsi.
 
@@ -569,6 +569,17 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     font-size: 0.92rem; font-weight: 600; color: #3D3929;
     margin-bottom: 6px;
 }
+/* bintang ✳ fallback di label jawaban Yuki: tanpa warna latar belakang,
+   ukuran disamakan dengan logo agar layout tidak lompat */
+.ai-label .star {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none; box-shadow: none;
+    color: #DA7756;
+    font-size: 1.45rem; line-height: 1;
+    width: 30px; height: 30px;
+    display: inline-flex; align-items: center; justify-content: center;
+}
 
 /* ===== ukuran logo custom di berbagai tempat (statis, tanpa animasi) ===== */
 .logo-label {
@@ -1020,6 +1031,12 @@ div.stDownloadButton > button:hover {
 @keyframes thinkFadeIn {
     from { opacity: 0; transform: translateY(4px); }
     to   { opacity: 1; transform: none; }
+}
+/* bintang ✳ fallback: pastikan tidak pernah ada warna latar belakang/kotak */
+.star {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none; box-shadow: none;
 }
 /* bintang ✳ terracotta berdenyut & berputar pelan (fallback) */
 .claude-think .star {
