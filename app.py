@@ -10,12 +10,18 @@ Gabungan 3 aplikasi AI menjadi 1:
 
 Fitur suara & gambar (via Groq, satu API key yang sama):
   - Mic 🎤       → bicara ke Yuki, ditranskrip dengan Whisper (whisper-large-v3-turbo)
-  - Suara Yuki 🔊 → toggle "Suara"; jawaban dibacakan dengan TTS Orpheus
-                   (canopylabs/orpheus-v1-english — paling pas utk teks Inggris)
   - Gambar 📎    → kirim/paste/drag-drop gambar, dianalisis model vision
                    Llama-4 Scout (meta-llama/llama-4-scout-17b-16e-instruct)
-  - Menu ➕      → popup ala Claude: lampiran gambar, mode chat/gambar,
-                   pencarian web (Compound), suara Yuki, unduh chat, chat baru
+  - Menu ➕      → popup minimalist ala Claude: upload file/gambar, tip
+                   tangkapan layar, toggle pencarian web (Compound)
+
+Fitur ala Claude tambahan:
+  - Sidebar   → Proyek (grup ringan), Artefak (kode panjang tertangkap
+                otomatis), Sesuaikan (panggilan & instruksi custom Yuki),
+                riwayat percakapan ("Hari ini")
+  - Balasan Yuki → baris aksi kecil: salin jawaban, feedback 👍/👎, jam kirim
+
+Catatan: fitur "Suara Yuki" (TTS) sudah dihapus karena tidak berfungsi.
 
 Catatan sesuai kesepakatan:
   - Style/CSS       : buatan sendiri (bukan bawaan app lama) — bebas diedit nanti
@@ -37,6 +43,7 @@ import html
 import inspect
 import io
 import os
+import re
 import threading
 import time
 from datetime import datetime
@@ -117,11 +124,8 @@ CF_API_BASE = "https://api.cloudflare.com/client/v4/accounts"
 CF_IMAGE_MODEL = "@cf/black-forest-labs/flux-1-schnell"
 CF_DEFAULT_STEPS = 4
 
-# --- Suara & gambar (Groq — pakai GROQ_API_KEY yang sama) ---
-STT_MODEL = "whisper-large-v3-turbo"          # transkrip suara → teks
-TTS_MODEL = "canopylabs/orpheus-v1-english"   # teks → suara (Orpheus)
-TTS_VOICE = "tara"                            # suara Yuki (perempuan, hangat)
-TTS_MAX_CHARS = 1200                          # batas teks yang dibacakan
+# --- Suara (Groq — pakai GROQ_API_KEY yang sama) ---
+STT_MODEL = "whisper-large-v3-turbo"          # transkrip suara → teks (mic tetap ada)
 MAX_IMAGES_PER_MESSAGE = 5                    # batas model vision (Llama-4)
 IMAGE_INPUT_TYPES = ["png", "jpg", "jpeg", "webp", "gif"]
 VISION_RECENT_MESSAGES = 4  # pesan terakhir yang gambarnya ikut ke API
@@ -528,10 +532,35 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     border: 1px solid rgba(61,57,41,0.08);
 }
 
-/* pemutar suara Yuki (TTS) — kompak di bawah jawaban */
-[data-testid="stAudio"] {
-    max-width: 320px !important;
-    margin: 2px 0 8px;
+/* ---------- baris aksi kecil di bawah jawaban Yuki (ala Claude) ---------- */
+.msg-action-btn {
+    background: transparent; border: none; cursor: pointer;
+    color: #A8A69E; font-size: 0.95rem; line-height: 1;
+    padding: 4px 6px; border-radius: 8px;
+    transition: background .15s ease, color .15s ease;
+}
+.msg-action-btn:hover { background: #EAE8DE; color: #57544A; }
+[class*="st-key-msg_actions_"] { margin: -4px 0 4px !important; }
+[class*="st-key-msg_actions_"] [data-testid="stHorizontalBlock"] {
+    gap: 0 !important; align-items: center !important;
+}
+[class*="st-key-msg_actions_"] div.stButton > button {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 4px 6px !important;
+    min-height: 26px !important;
+    height: 26px !important;
+    font-size: 0.85rem !important;
+    color: #A8A69E !important;
+}
+[class*="st-key-msg_actions_"] div.stButton > button:hover {
+    background: #EAE8DE !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+.msg-action-time {
+    font-size: 0.7rem; color: #B8B6AC; padding: 6px 4px 0;
 }
 
 /* label "Yuki" dengan logo custom di atas jawaban AI */
@@ -635,7 +664,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     flex: 0 0 auto !important;
     min-width: 0 !important;
 }
-.st-key-chat_controls [data-testid="stHorizontalBlock"]:last-of-type > [data-testid="stColumn"]:nth-child(4) {
+.st-key-chat_controls [data-testid="stHorizontalBlock"]:last-of-type > [data-testid="stColumn"]:nth-child(3) {
     flex: 1 1 auto !important;
 }
 /* disclaimer kecil di tengah (ala Claude) */
@@ -761,6 +790,23 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 .plus-menu-hint {
     font-size: 0.72rem; color: #A8A69E;
     padding: 2px 4px 4px;
+}
+.plus-menu-divider {
+    height: 1px; background: #E3E0D5; margin: 6px 4px;
+}
+/* baris menu tambahan di popover + (screenshot, pencarian web) —
+   sama gayanya dengan item lain: teks polos, hover krem */
+[data-testid="stPopoverBody"] .st-key-plus_menu div.stButton > button,
+.st-key-plus_menu [data-testid="stPopoverBody"] div.stButton > button {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    text-align: left !important;
+    justify-content: flex-start !important;
+    padding: 8px 12px !important;
+    font-size: 0.92rem !important;
+    font-weight: 500 !important;
+    color: #3D3929 !important;
 }
 /* ---- reskin st.file_uploader jadi baris menu polos: ikon + teks saja,
    TANPA tombol "Upload"/"Browse files" terpisah yang terlihat.
@@ -1219,6 +1265,19 @@ def build_chat_client() -> OpenAI:
     return OpenAI(api_key=GROQ_API_KEY, base_url=GROQ_BASE_URL)
 
 
+def build_system_prompt() -> str:
+    """Gabungkan persona dasar Yuki + preferensi dari halaman "Sesuaikan"
+    (panggilan & instruksi tambahan), bila diisi user."""
+    parts = [YUKI_SYSTEM_PROMPT]
+    nickname = (st.session_state.get("custom_nickname") or "").strip()
+    if nickname:
+        parts.append(f"Panggil User dengan sebutan: {nickname}.")
+    extra = (st.session_state.get("custom_instruction") or "").strip()
+    if extra:
+        parts.append(f"Instruksi tambahan dari User yang harus selalu diikuti:\n{extra}")
+    return "\n\n".join(parts)
+
+
 def messages_for_api(history: list[dict]) -> list[dict]:
     """System prompt Yuki + riwayat terakhir (ramah free-tier).
     Pesan yang membawa gambar dikirim sebagai konten multimodal (vision),
@@ -1227,7 +1286,7 @@ def messages_for_api(history: list[dict]) -> list[dict]:
         m for m in history
         if m.get("role") in ("user", "assistant") and m.get("type", "text") == "text"
     ][-MAX_HISTORY_MESSAGES:]
-    msgs: list[dict] = [{"role": "system", "content": YUKI_SYSTEM_PROMPT}]
+    msgs: list[dict] = [{"role": "system", "content": build_system_prompt()}]
     n = len(trimmed)
     for i, m in enumerate(trimmed):
         imgs = m.get("images") or []
@@ -1297,7 +1356,7 @@ def stream_chat_with_fallback(client: OpenAI, preferred_model: str, history: lis
 
 
 # ============================================================================
-# ENGINE 3: SUARA & GAMBAR (Groq — Whisper STT, Orpheus TTS, Llama-4 vision)
+# ENGINE 3: SUARA & GAMBAR (Groq — Whisper STT, Llama-4 vision)
 # ============================================================================
 def transcribe_audio(client: OpenAI, audio_bytes: bytes) -> str:
     """Ubah rekaman suara (wav) menjadi teks dengan Groq Whisper."""
@@ -1307,31 +1366,6 @@ def transcribe_audio(client: OpenAI, audio_bytes: bytes) -> str:
         response_format="json",
     )
     return (getattr(resp, "text", "") or "").strip()
-
-
-def synthesize_speech(client: OpenAI, text: str) -> bytes | None:
-    """Bacakan teks dengan Groq Orpheus TTS → bytes wav (None bila gagal)."""
-    clean = " ".join((text or "").split())
-    if not clean:
-        return None
-    if len(clean) > TTS_MAX_CHARS:
-        cut = clean[:TTS_MAX_CHARS]
-        for punct in (". ", "! ", "? "):
-            idx = cut.rfind(punct)
-            if idx > 200:
-                cut = cut[: idx + 1]
-                break
-        clean = cut
-    try:
-        resp = client.audio.speech.create(
-            model=TTS_MODEL,
-            voice=TTS_VOICE,
-            input=clean,
-            response_format="wav",
-        )
-        return resp.content or None
-    except Exception:
-        return None
 
 
 def normalize_image(data: bytes) -> tuple[bytes, str]:
@@ -1524,14 +1558,53 @@ def render_message(msg: dict) -> None:
                         msg.get("time", ""), imgs_html, note),
             unsafe_allow_html=True,
         )
-        # pemutar suara Yuki (hasil TTS) di bawah jawaban
-        if msg.get("audio"):
-            st.audio(msg["audio"], format="audio/wav")
-        elif msg.get("audio_note"):
-            st.markdown(
-                f'<div class="bubble-meta">{html.escape(msg["audio_note"])}</div>',
-                unsafe_allow_html=True,
-            )
+        # baris aksi kecil ala Claude: copy jawaban, feedback (👍/👎), jam kirim
+        if msg.get("role") == "assistant":
+            render_message_actions(msg)
+
+
+def _copy_button_html(text: str, key: str) -> str:
+    """Tombol salin ala Claude (ikon polos) — teks disisipkan sebagai
+    base64 di atribut data-* supaya aman dari karakter kutip/baris baru,
+    lalu didekode & disalin ke clipboard lewat sedikit JS di sisi klien."""
+    b64 = base64.b64encode((text or "").encode("utf-8")).decode("ascii")
+    return (
+        f'<button class="msg-action-btn" data-b64="{b64}" '
+        f'onclick="const t=atob(this.dataset.b64);'
+        f"navigator.clipboard.writeText(decodeURIComponent(escape(t)));"
+        f"const o=this.innerHTML;this.innerHTML='✓';"
+        f'setTimeout(()=>{{this.innerHTML=o;}},1200);" '
+        f'title="Salin jawaban">⧉</button>'
+    )
+
+
+def render_message_actions(msg: dict) -> None:
+    """Baris kecil di bawah jawaban Yuki: salin, feedback 👍/👎, jam kirim."""
+    mid = msg.get("id", id(msg))
+    feedback = msg.get("feedback")
+    with st.container(key=f"msg_actions_{mid}"):
+        cols = st.columns([0.05, 0.05, 0.05, 0.85])
+        with cols[0]:
+            st.markdown(_copy_button_html(msg.get("content", ""), f"copy_{mid}"),
+                        unsafe_allow_html=True)
+        with cols[1]:
+            up_active = feedback == "up"
+            if st.button("👍" if not up_active else "👍🏻", key=f"fb_up_{mid}",
+                         help="Jawaban membantu"):
+                msg["feedback"] = None if up_active else "up"
+                st.rerun()
+        with cols[2]:
+            down_active = feedback == "down"
+            if st.button("👎" if not down_active else "👎🏻", key=f"fb_down_{mid}",
+                         help="Jawaban kurang membantu"):
+                msg["feedback"] = None if down_active else "down"
+                st.rerun()
+        with cols[3]:
+            if msg.get("time"):
+                st.markdown(
+                    f'<div class="msg-action-time">{html.escape(msg["time"])}</div>',
+                    unsafe_allow_html=True,
+                )
 
 
 # ============================================================================
@@ -1645,6 +1718,25 @@ def stream_words(answer_slot, full_text: str) -> None:
 # ============================================================================
 # EXPORT CHAT (.md — diadaptasi dari App 2)
 # ============================================================================
+def _capture_artifacts_from_reply(full_text: str) -> None:
+    """Deteksi blok kode (```...```) di jawaban Yuki & simpan sebagai
+    "Artefak" ringan ala Claude — supaya kode panjang gampang dibuka lagi
+    / disalin lewat sidebar, tanpa harus scroll riwayat chat."""
+    blocks = re.findall(r"```(\w*)\n(.*?)```", full_text or "", flags=re.S)
+    for lang, code in blocks:
+        code = code.strip("\n")
+        if len(code) < 40:  # blok terlalu pendek, tidak perlu dijadikan artefak
+            continue
+        first_line = code.splitlines()[0][:40] if code.splitlines() else "Kode"
+        st.session_state.artifacts.insert(0, {
+            "id": len(st.session_state.artifacts) + 1,
+            "title": f"{lang or 'kode'} · {first_line}",
+            "content": code,
+            "lang": lang,
+            "time": datetime.now().strftime("%H:%M"),
+        })
+
+
 def get_chat_export_text() -> str:
     lines = [
         "# Riwayat Obrolan — Ampera Trinity AI",
@@ -1681,8 +1773,23 @@ def init_state() -> None:
         st.session_state.selected_model_key = DEFAULT_MODEL_KEY
     if "image_mode" not in st.session_state:
         st.session_state.image_mode = False
-    if "voice_reply" not in st.session_state:
-        st.session_state.voice_reply = False
+    if "web_search_on" not in st.session_state:
+        st.session_state.web_search_on = False
+    # Sesuaikan (custom instruction persona Yuki)
+    if "custom_nickname" not in st.session_state:
+        st.session_state.custom_nickname = ""
+    if "custom_instruction" not in st.session_state:
+        st.session_state.custom_instruction = ""
+    # Proyek ringan: nama & catatan/instruksi khusus per proyek
+    if "projects" not in st.session_state:
+        st.session_state.projects = []  # list[{id, name}]
+    if "project_counter" not in st.session_state:
+        st.session_state.project_counter = 0
+    if "active_project_id" not in st.session_state:
+        st.session_state.active_project_id = None
+    # Artefak: kode/tulisan panjang dari jawaban Yuki, dikumpulkan otomatis
+    if "artifacts" not in st.session_state:
+        st.session_state.artifacts = []  # list[{id, title, content, time}]
     # Lampiran yang di-stage lewat menu ➕ (menunggu dikirim bersama pesan)
     if "pending_images" not in st.session_state:
         st.session_state.pending_images = []
@@ -1760,6 +1867,84 @@ def open_conversation(conv_id: int) -> None:
 # SIDEBAR ALA CLAUDE
 #   Brand serif · + Baru · menu · riwayat "Hari ini" · akun di bawah
 # ============================================================================
+HAS_DIALOG = hasattr(st, "dialog")
+
+
+def _register_dialog(title: str, func):
+    """Bungkus fungsi jadi @st.dialog kalau tersedia; kalau versi Streamlit
+    lama tidak mendukung, tampilkan pesan singkat sebagai fallback."""
+    if HAS_DIALOG:
+        return st.dialog(title)(func)
+
+    def _fallback(*a, **kw):
+        st.info("Fitur ini butuh Streamlit versi lebih baru untuk tampil sebagai jendela popup.")
+    return _fallback
+
+
+def _proyek_dialog_body() -> None:
+    st.text_input("Cari proyek", key="proj_search", placeholder="Cari proyek…",
+                  label_visibility="collapsed")
+    query = (st.session_state.get("proj_search") or "").strip().lower()
+    projects = st.session_state.get("projects", [])
+    shown = [p for p in projects if query in p["name"].lower()] if query else projects
+
+    if not shown:
+        st.caption("Belum ada proyek." if not projects else "Tidak ada proyek yang cocok.")
+    else:
+        for p in shown:
+            active = st.session_state.get("active_project_id") == p["id"]
+            label = f"📁 {p['name']}" + ("  ✓" if active else "")
+            if st.button(label, key=f"proj_pick_{p['id']}", use_container_width=True):
+                st.session_state.active_project_id = None if active else p["id"]
+                st.rerun()
+
+    st.divider()
+    new_name = st.text_input("Nama proyek baru", key="proj_new_name",
+                              placeholder="Nama proyek baru…", label_visibility="collapsed")
+    if st.button("＋ Mulai proyek baru", use_container_width=True):
+        name = (new_name or "").strip()
+        if name:
+            st.session_state.project_counter += 1
+            st.session_state.projects.append({"id": st.session_state.project_counter, "name": name})
+            st.rerun()
+
+
+def _artefak_dialog_body() -> None:
+    artifacts = st.session_state.get("artifacts", [])
+    if not artifacts:
+        st.caption("Belum ada artefak. Kode panjang dari jawaban Yuki akan "
+                   "otomatis muncul di sini.")
+        return
+    for art in artifacts[:20]:
+        with st.expander(f"🧩 {art['title']}  ·  {art.get('time', '')}"):
+            st.code(art["content"], language=art.get("lang") or None)
+
+
+def _sesuaikan_dialog_body() -> None:
+    st.text_input(
+        "Bagaimana Yuki memanggil Anda?",
+        key="custom_nickname_input",
+        value=st.session_state.get("custom_nickname", ""),
+        placeholder="mis. Kak Budi",
+    )
+    st.text_area(
+        "Instruksi tambahan untuk Yuki",
+        key="custom_instruction_input",
+        value=st.session_state.get("custom_instruction", ""),
+        placeholder="mis. Jawab selalu singkat & pakai bahasa santai.",
+        height=120,
+    )
+    if st.button("Simpan", type="primary", use_container_width=True):
+        st.session_state.custom_nickname = st.session_state.get("custom_nickname_input", "")
+        st.session_state.custom_instruction = st.session_state.get("custom_instruction_input", "")
+        st.rerun()
+
+
+show_proyek_dialog = _register_dialog("Proyek", _proyek_dialog_body)
+show_artefak_dialog = _register_dialog("Artefak", _artefak_dialog_body)
+show_sesuaikan_dialog = _register_dialog("Sesuaikan", _sesuaikan_dialog_body)
+
+
 def render_sidebar() -> None:
     with st.sidebar:
         # Brand serif ala "Claude"
@@ -1780,6 +1965,23 @@ def render_sidebar() -> None:
             if st.button(":material/palette: &nbsp;Gambar", use_container_width=True):
                 st.session_state.image_mode = True
                 st.rerun()
+
+        st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
+
+        with st.container(key="sb_menu_proyek"):
+            if st.button(":material/deployed_code: &nbsp;Proyek", use_container_width=True):
+                show_proyek_dialog()
+        with st.container(key="sb_menu_artefak"):
+            n_art = len(st.session_state.get("artifacts", []))
+            art_label = f":material/data_object: &nbsp;Artefak" + (f"  ({n_art})" if n_art else "")
+            if st.button(art_label, use_container_width=True):
+                show_artefak_dialog()
+        with st.container(key="sb_menu_sesuaikan"):
+            if st.button(":material/tune: &nbsp;Sesuaikan", use_container_width=True):
+                show_sesuaikan_dialog()
+
+        st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
+
         with st.container(key="sb_download"):
             st.download_button(
                 label=":material/download: &nbsp;Unduh Chat",
@@ -1914,6 +2116,10 @@ def handle_chat_request(answer_slot) -> None:
     has_images = bool(last_user and last_user.get("images"))
     if has_images:
         model_id = VISION_MODEL_ID
+    elif st.session_state.get("web_search_on"):
+        # Toggle "Pencarian web" ala Claude → pakai model Compound
+        # (satu-satunya model Groq di katalog ini yang bisa browsing).
+        model_id = AVAILABLE_MODELS["compound"]
 
     # Thinking ala Claude — frasa berganti-ganti selama beberapa detik
     think_slot = st.empty()
@@ -1930,16 +2136,6 @@ def handle_chat_request(answer_slot) -> None:
             )
         )
 
-        # TTS jalan di background selama animasi berpikir + efek ketik,
-        # supaya suara tidak menambah waktu tunggu user
-        tts_box: dict = {}
-        tts_thread: threading.Thread | None = None
-        if st.session_state.get("voice_reply") and full:
-            def _tts() -> None:
-                tts_box["data"] = synthesize_speech(client, full)
-            tts_thread = threading.Thread(target=_tts, daemon=True)
-            tts_thread.start()
-
         # Tahan sampai proses berpikir genap minimal beberapa detik
         elapsed = time.time() - t0
         if elapsed < THINKING_MIN_SECONDS:
@@ -1952,21 +2148,12 @@ def handle_chat_request(answer_slot) -> None:
         # Jawaban muncul kata per kata dengan delay agak lambat
         stream_words(answer_slot, full)
 
-        audio_wav = None
-        if tts_thread is not None:
-            tts_thread.join(timeout=90)
-            audio_wav = tts_box.get("data")
-
         reply = {
             "id": next_msg_id(), "role": "assistant", "type": "text",
             "content": full, "time": datetime.now().strftime("%H:%M"),
         }
-        if audio_wav:
-            reply["audio"] = audio_wav
-            st.audio(audio_wav, format="audio/wav")  # langsung tampil sebelum rerun
-        elif tts_thread is not None:
-            reply["audio_note"] = "🔇 Suara gagal dibuat (limit TTS / teks tak didukung)"
         st.session_state.messages.append(reply)
+        _capture_artifacts_from_reply(full)
     except Exception as e:
         think_slot.empty()
         err = public_error_chat(e)
@@ -2074,9 +2261,9 @@ html, body {
                             unsafe_allow_html=True,
                         )
 
-            # [➕ menu] [Gambar] [Suara] ....spacer.... [Nama Model]
-            ctrl_plus, ctrl_mode, ctrl_voice, _sp, ctrl_model = st.columns(
-                [0.08, 0.2, 0.18, 1.04, 0.28]
+            # [➕ menu] [Gambar] ....spacer.... [Nama Model]
+            ctrl_plus, ctrl_mode, _sp, ctrl_model = st.columns(
+                [0.08, 0.22, 1.22, 0.28]
             )
 
             # ---- Menu ➕ ala Claude: MINIMALIST — hanya 2 baris ikon+teks
@@ -2118,21 +2305,31 @@ html, body {
                         _stage_uploaded(picked_file)
                         _stage_uploaded(picked_image)
 
+                        st.markdown('<div class="plus-menu-divider"></div>',
+                                    unsafe_allow_html=True)
+
+                        # Ambil tangkapan layar — browser murni tidak bisa
+                        # memicu screen-capture dari Streamlit, jadi diarahkan
+                        # ke cara tercepat: screenshot OS lalu tempel (Ctrl+V).
+                        if st.button("📷  Ambil tangkapan layar", key="pm_screenshot",
+                                     use_container_width=True):
+                            st.toast("Ambil screenshot dengan tombol OS kamu, lalu "
+                                     "tempel (Ctrl+V) di kotak chat.", icon="📷")
+
+                        # Pencarian web — beralih otomatis ke model Compound
+                        # (browsing) tanpa mengubah pilihan model utama.
+                        web_check = " :orange[✓]" if st.session_state.get("web_search_on") else ""
+                        if st.button(f"🌐  Pencarian web{web_check}", key="pm_web",
+                                     use_container_width=True):
+                            st.session_state.web_search_on = not st.session_state.get("web_search_on", False)
+                            st.rerun()
+
             with ctrl_mode:
                 st.session_state.image_mode = st.toggle(
                     "Gambar",
                     value=st.session_state.image_mode,
                     help="Nyalakan untuk membuat gambar dari teks. "
                          "Matikan untuk chat biasa dengan Yuki.",
-                )
-
-            with ctrl_voice:
-                st.session_state.voice_reply = st.toggle(
-                    "Suara",
-                    value=st.session_state.get("voice_reply", False),
-                    help="Saat aktif, Yuki membacakan jawabannya (TTS Groq Orpheus). "
-                         "Paling pas untuk teks Inggris — teks Indonesia bisa "
-                         "terdengar berlogat asing.",
                 )
 
             with _sp:
