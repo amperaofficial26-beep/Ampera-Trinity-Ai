@@ -1861,28 +1861,23 @@ html, body {
                         unsafe_allow_html=True,
                     )
 
-                       with ctrl_model:
-                current_key = st.session_state.selected_model_key
-                current_model = MODEL_BY_KEY.get(current_key, MODEL_BY_KEY[DEFAULT_MODEL_KEY])
-                current_name = current_model["name"]
-                with st.popover(current_name, use_container_width=False):
-                    for m in MODEL_CATALOG:
-                        is_active = m["key"] == st.session_state.selected_model_key
-                        # Buat label dengan bullet, nama, dan badge Premium jika perlu
-                        label_html = f'<span>• {m["name"]}</span>'
-                        if m.get("premium"):
-                            label_html += ' <span class="model-badge-premium">Premium</span>'
-                        if is_active:
-                            label_html += ' <span class="model-check">✓</span>'
-                        # Gunakan st.button dengan HTML
-                        if st.button(
-                            label_html,
-                            key=f"model_{m['key']}",
-                            use_container_width=True,
-                        ):
-                            st.session_state.selected_model_key = m["key"]
-                            st.rerun()
-
+                      with ctrl_model:
+                        current_key = st.session_state.selected_model_key
+                        current_model = MODEL_BY_KEY.get(current_key, MODEL_BY_KEY[DEFAULT_MODEL_KEY])
+                        current_name = current_model["name"]
+                        with st.popover(current_name, use_container_width=False):
+                            for m in MODEL_CATALOG:
+                                is_active = m["key"] == st.session_state.selected_model_key
+                                # Nama model dengan bullet
+                                label = f"• {m['name']}"
+                                if m.get("premium"):
+                                    label += "  \t:orange[Premium]"  # atau gunakan HTML untuk badge kecil
+                                if is_active:
+                                    label += "  ✓"  # tanda centang
+                                # Gunakan markdown untuk menampilkan badge dengan ukuran kecil
+                                if st.button(label, key=f"model_{m['key']}", use_container_width=True):
+                                    st.session_state.selected_model_key = m["key"]
+                                    st.rerun()
     # ========== PROCESS INPUT ==========
     if user_input is not None:
         if isinstance(user_input, str):
