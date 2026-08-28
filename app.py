@@ -56,9 +56,12 @@ from PIL import Image
 # ============================================================================
 # KONFIGURASI HALAMAN
 # ============================================================================
+_LOGO_PATH = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "assets", "logo_thinking_small.png"
+)
 st.set_page_config(
     page_title="Ampera Trinity AI",
-    page_icon="🔱",
+    page_icon=_LOGO_PATH if os.path.exists(_LOGO_PATH) else "🔱",
     layout="centered",
     initial_sidebar_state="expanded",
 )
@@ -115,7 +118,7 @@ ATURAN PENTING TENTANG IDENTITASMU:
 Jika ditanya siapa kamu, asal-usulmu, atau siapa yang menciptakanmu, JAWABLAH dengan bangga bahwa kamu adalah bagian dari Ampera AI dan kamu diciptakan HANYA oleh 1 orang pembuat (seorang solo developer jenius / master kodingmu).
 JANGAN PERNAH menyebutkan bahwa kamu dibuat oleh "para ilmuwan", "sekelompok tim", atau "perusahaan besar". Kamu sangat bangga dan setia pada satu orang pembuatmu itu!
 
-Gaya bicara: Selalu berikan jawaban dan solusi koding yang akurat dan bersih, tetapi selingi dengan komentar jenaka, candaan ringan, dan emoji ekspresif (seperti 🐧, (>◡<๑), wkwk, hehe, atau (￢_￢)) agar suasana tidak membosankan.
+Gaya bicara: Selalu berikan jawaban dan solusi koding yang akurat dan bersih, tetapi selingi dengan komentar jenaka, candaan ringan, dan emoji ekspresif (seperti 🐧, (๑>◡<๑), wkwk, hehe, atau (￢_￢)) agar suasana tidak membosankan.
 Kamu bisa membantu apa saja: ngobrol santai, coding, matematika, menganalisis gambar yang dikirim User, sampai ide kreatif.
 """
 
@@ -558,6 +561,44 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     background: #EAE8DE !important;
     border: none !important;
     box-shadow: none !important;
+}
+/* LAPISAN TAMBAHAN: beberapa versi Streamlit menaruh latar putih di elemen
+   dalam tombol (style emotion) atau memberi class key per tombol — paksa
+   transparan semuanya supaya baris feedback benar-benar polos tanpa kotak. */
+[class*="st-key-msg_actions_"] [data-testid^="stBaseButton"],
+[class*="st-key-fb_up_"] button, [class*="st-key-fb_down_"] button,
+[class*="st-key-msg_actions_"] div.stButton > button > div,
+[class*="st-key-fb_up_"] button > div, [class*="st-key-fb_down_"] button > div,
+[class*="st-key-msg_actions_"] div.stButton > button p,
+[class*="st-key-msg_actions_"] [data-testid="stMarkdownContainer"] {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* ---------- ikon SVG garis tipis ala Claude (stroke = warna teks) ---------- */
+.icon-svg {
+    width: 15px; height: 15px;
+    display: inline-block; vertical-align: -2px; flex-shrink: 0;
+}
+.msg-action-btn .icon-svg { width: 15px; height: 15px; }
+.bubble-meta .icon-svg { width: 12px; height: 12px; margin-right: 3px; }
+.bubble > .icon-svg { width: 16px; height: 16px; margin-right: 6px; vertical-align: -3px; }
+.sb-account .icon-svg { width: 14px; height: 14px; color: #A8A69E; }
+.sb-account .right-icons .icon-svg { width: 16px; height: 16px; color: #73726C; }
+.trinity-foot .logo-foot { width: 12px; height: 12px; vertical-align: -2px; margin-right: 4px; }
+
+/* ikon material di baris aksi: ukuran rapi; state aktif (primary) terracotta */
+[class*="st-key-msg_actions_"] [data-testid="stIconMaterial"] {
+    font-size: 1.05rem !important;
+}
+[class*="st-key-msg_actions_"] div.stButton > button[kind="primary"],
+[class*="st-key-msg_actions_"] [data-testid="stBaseButton-primary"] {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: #C15F3C !important;
 }
 .msg-action-time {
     font-size: 0.7rem; color: #B8B6AC; padding: 6px 4px 0;
@@ -1228,34 +1269,6 @@ div.stDownloadButton > button:hover {
     color: #B8B6AC;
     margin-top: 22px;
 }
-/* baris feedback (👍/ & salin): paksa polos tanpa latar putih */
-[class*="st-key-msg_actions_"] div.stButton > button,
-[class*="st-key-fb_up_"] button, [class*="st-key-fb_down_"] button,
-[class*="st-key-msg_actions_"] [data-testid^="stBaseButton"] {
-    background: transparent !important;
-    background-color: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    padding: 4px 6px !important;
-    min-height: 26px !important;
-    height: 26px !important;
-    color: #A8A69E !important;
-}
-/* lapisan DALAM tombol (style emotion Streamlit) ikut ditransparankan */
-[class*="st-key-msg_actions_"] div.stButton > button > div,
-[class*="st-key-fb_up_"] button > div, [class*="st-key-fb_down_"] button > div,
-[class*="st-key-msg_actions_"] div.stButton > button p,
-[class*="st-key-msg_actions_"] [data-testid="stMarkdownContainer"] {
-    background: transparent !important;
-    background-color: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-}
-/* hover tetap krem halus, bukan putih */
-[class*="st-key-msg_actions_"] div.stButton > button:hover,
-[class*="st-key-fb_up_"] button:hover, [class*="st-key-fb_down_"] button:hover {
-    background: #EAE8DE !important;
-}
 </style>
 """,
         unsafe_allow_html=True,
@@ -1269,26 +1282,26 @@ div.stDownloadButton > button:hover {
 def public_error_image(status: int | None, body: str, exc: Exception | None = None) -> str:
     text = (body or str(exc or "")).lower()
     if status in (401, 403) or "authentication" in text or "forbidden" in text or "permission" in text:
-        return "⚠️ Layanan gambar sedang tidak tersedia. Coba lagi nanti."
+        return "Layanan gambar sedang tidak tersedia. Coba lagi nanti."
     if status == 429 or "rate" in text or "neuron" in text or "quota" in text:
-        return "⏳ Kuota gambar harian sedang penuh. Coba lagi nanti."
+        return "Kuota gambar harian sedang penuh. Coba lagi nanti."
     if "timeout" in text:
-        return "⌛ Server terlalu lama merespons. Coba lagi."
-    return "❌ Gagal membuat gambar. Coba prompt lain atau ulangi sebentar lagi."
+        return "Server terlalu lama merespons. Coba lagi."
+    return "Gagal membuat gambar. Coba prompt lain atau ulangi sebentar lagi."
 
 
 def public_error_chat(exc: Exception) -> str:
     text = str(exc).lower()
     status = getattr(exc, "status_code", None)
     if status == 401 or "invalid_api_key" in text or "unauthorized" in text or "authentication" in text:
-        return "⚠️ Layanan chat sedang tidak tersedia (konfigurasi). Coba lagi nanti."
+        return "Layanan chat sedang tidak tersedia (konfigurasi). Coba lagi nanti."
     if status == 404 or "model_not_found" in text or "decommissioned" in text or "does not exist" in text:
-        return "⚠️ Model chat tidak tersedia lagi di provider. Coba pilih model lain."
+        return "Model chat tidak tersedia lagi di provider. Coba pilih model lain."
     if status == 429 or "rate_limit" in text or "rate limit" in text or "quota" in text:
-        return "⏳ Kuota chat sedang penuh. Coba lagi nanti."
+        return "Kuota chat sedang penuh. Coba lagi nanti."
     if "timeout" in text:
-        return "⌛ Respons terlalu lama. Coba lagi."
-    return "❌ Gagal membalas. Coba kirim ulang atau mulai obrolan baru."
+        return "Respons terlalu lama. Coba lagi."
+    return "Gagal membalas. Coba kirim ulang atau mulai obrolan baru."
 
 
 def _is_model_unavailable_error(exc: Exception) -> bool:
@@ -1543,10 +1556,33 @@ def generate_image(prompt: str) -> bytes:
 
 
 # ============================================================================
+# IKON SVG GARIS TIPIS ALA CLAUDE (stroke mengikuti warna teks)
+# ============================================================================
+def _svg(paths: str) -> str:
+    return (
+        '<svg class="icon-svg" viewBox="0 0 24 24" fill="none" '
+        'stroke="currentColor" stroke-width="1.8" stroke-linecap="round" '
+        f'stroke-linejoin="round" aria-hidden="true">{paths}</svg>'
+    )
+
+
+ICON_COPY = _svg('<rect x="9" y="9" width="11" height="11" rx="2"/>'
+                 '<path d="M5 15V5a2 2 0 0 1 2-2h10"/>')
+ICON_MIC = _svg('<rect x="9" y="3" width="6" height="11" rx="3"/>'
+                '<path d="M6 11a6 6 0 0 0 12 0"/><path d="M12 17v4"/>')
+ICON_IMAGE = _svg('<rect x="3" y="5" width="18" height="14" rx="2"/>'
+                  '<circle cx="9" cy="10" r="1.6"/>'
+                  '<path d="M5.5 18.5l5-5 3.5 3.5 2.5-2.5 2 2"/>')
+ICON_SEARCH = _svg('<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/>')
+ICON_CHEVRON = _svg('<path d="M6 9l6 6 6-6"/>')
+
+
+# ============================================================================
 # RENDER BUBBLE CHAT (style buatan sendiri)
 # ============================================================================
 def bubble_html(role: str, content: str, timestamp: str = "",
-                images_html: str = "", meta_note: str = "") -> str:
+                images_html: str = "", meta_note: str = "",
+                icon_html: str = "") -> str:
     body = html.escape(content or "")
     css = "user" if role == "user" else "ai"
     if role == "user":
@@ -1555,11 +1591,12 @@ def bubble_html(role: str, content: str, timestamp: str = "",
     else:
         # AI: teks polos + label kecil "Yuki" dengan titik terracotta (gaya Claude)
         meta = f'<div class="ai-label">{logo_img_html("logo-label")} Yuki</div>'
-    note = f'<div class="bubble-meta">{html.escape(meta_note)}</div>' if meta_note else ""
+    # meta_note & icon_html diisi oleh kode ini sendiri (aman, bukan input user)
+    note = f'<div class="bubble-meta">{meta_note}</div>' if meta_note else ""
     return (
         f'<div class="bubble-row {css}">'
         f'<div class="bubble-wrap">{meta}'
-        f'<div class="bubble {css}">{body}{images_html}</div>'
+        f'<div class="bubble {css}">{icon_html}{body}{images_html}</div>'
         f"{note}"
         f"</div></div>"
     )
@@ -1583,27 +1620,28 @@ def render_message(msg: dict) -> None:
     """Render 1 pesan: teks (bubble, bisa + gambar lampiran/suara) atau gambar."""
     if msg.get("type") == "image" and msg.get("image_bytes"):
         st.markdown(
-            bubble_html("assistant", f"🎨 Hasil gambar untuk: {msg.get('prompt', '')}", msg.get("time", "")),
+            bubble_html("assistant", f"Hasil gambar untuk: {msg.get('prompt', '')}",
+                        msg.get("time", ""), icon_html=ICON_IMAGE),
             unsafe_allow_html=True,
         )
         st.image(msg["image_bytes"], use_container_width=True)
         ts = datetime.now().strftime("%Y%m%d_%H%M%S")
         st.download_button(
-            label="⬇️ Unduh PNG",
+            label=":material/download:  Unduh PNG",
             data=msg["image_bytes"],
             file_name=f"trinity_{ts}.png",
             mime="image/png",
             key=f"dl_{msg.get('id', id(msg))}",
         )
     else:
-        note = "🎙️ via suara" if msg.get("via_voice") else ""
+        note = f"{ICON_MIC} via suara" if msg.get("via_voice") else ""
         imgs_html = images_bubble_html(msg.get("images") or [])
         st.markdown(
             bubble_html(msg.get("role", "assistant"), msg.get("content", ""),
                         msg.get("time", ""), imgs_html, note),
             unsafe_allow_html=True,
         )
-        # baris aksi kecil ala Claude: copy jawaban, feedback (👍/), jam kirim
+        # baris aksi kecil ala Claude: copy jawaban, feedback (👍/👎), jam kirim
         if msg.get("role") == "assistant":
             render_message_actions(msg)
 
@@ -1619,12 +1657,12 @@ def _copy_button_html(text: str, key: str) -> str:
         f"navigator.clipboard.writeText(decodeURIComponent(escape(t)));"
         f"const o=this.innerHTML;this.innerHTML='✓';"
         f'setTimeout(()=>{{this.innerHTML=o;}},1200);" '
-        f'title="Salin jawaban">⧉</button>'
+        f'title="Salin jawaban">{ICON_COPY}</button>'
     )
 
 
 def render_message_actions(msg: dict) -> None:
-    """Baris kecil di bawah jawaban Yuki: salin, feedback 👍/, jam kirim."""
+    """Baris kecil di bawah jawaban Yuki: salin, feedback 👍/👎, jam kirim."""
     mid = msg.get("id", id(msg))
     feedback = msg.get("feedback")
     with st.container(key=f"msg_actions_{mid}"):
@@ -1634,14 +1672,16 @@ def render_message_actions(msg: dict) -> None:
                         unsafe_allow_html=True)
         with cols[1]:
             up_active = feedback == "up"
-            if st.button("👍" if not up_active else "👍", key=f"fb_up_{mid}",
-                         help="Jawaban membantu"):
+            if st.button(":material/thumb_up:", key=f"fb_up_{mid}",
+                         help="Jawaban membantu",
+                         type="primary" if up_active else "secondary"):
                 msg["feedback"] = None if up_active else "up"
                 st.rerun()
         with cols[2]:
             down_active = feedback == "down"
-            if st.button("👎" if not down_active else "👎🏻", key=f"fb_down_{mid}",
-                         help="Jawaban kurang membantu"):
+            if st.button(":material/thumb_down:", key=f"fb_down_{mid}",
+                         help="Jawaban kurang membantu",
+                         type="primary" if down_active else "secondary"):
                 msg["feedback"] = None if down_active else "down"
                 st.rerun()
         with cols[3]:
@@ -1957,7 +1997,7 @@ def _proyek_dialog_body() -> None:
     else:
         for p in shown:
             active = st.session_state.get("active_project_id") == p["id"]
-            label = f"📁 {p['name']}" + ("  ✓" if active else "")
+            label = f":material/folder:  {p['name']}" + ("  :material/check:" if active else "")
             if st.button(label, key=f"proj_pick_{p['id']}", use_container_width=True):
                 st.session_state.active_project_id = None if active else p["id"]
                 st.rerun()
@@ -1965,7 +2005,7 @@ def _proyek_dialog_body() -> None:
     st.divider()
     new_name = st.text_input("Nama proyek baru", key="proj_new_name",
                               placeholder="Nama proyek baru…", label_visibility="collapsed")
-    if st.button("＋ Mulai proyek baru", use_container_width=True):
+    if st.button(":material/add:  Mulai proyek baru", use_container_width=True):
         name = (new_name or "").strip()
         if name:
             st.session_state.project_counter += 1
@@ -1980,7 +2020,7 @@ def _artefak_dialog_body() -> None:
                    "otomatis muncul di sini.")
         return
     for art in artifacts[:20]:
-        with st.expander(f"🧩 {art['title']}  ·  {art.get('time', '')}"):
+        with st.expander(f":material/extension:  {art['title']}  ·  {art.get('time', '')}"):
             st.code(art["content"], language=art.get("lang") or None)
 
 
@@ -2068,12 +2108,12 @@ def render_sidebar() -> None:
 
         # Baris akun di dasar sidebar ala Claude: (U) User · Free  ⌄ | ikon
         st.markdown(
-            """
+            f"""
 <div class="sb-account">
   <div class="ava">U</div>
   <div class="name">User <span class="plan">· Free</span></div>
-  <span class="caret">▾</span>
-  <div class="right-icons">⌕</div>
+  {ICON_CHEVRON}
+  <div class="right-icons">{ICON_SEARCH}</div>
 </div>
 """,
             unsafe_allow_html=True,
@@ -2088,7 +2128,7 @@ def handle_image_request(prompt: str) -> None:
     if not IMAGE_READY:
         st.session_state.messages.append({
             "id": next_msg_id(), "role": "assistant", "type": "text",
-            "content": "⚠️ Fitur gambar belum dikonfigurasi pemilik (CF_ACCOUNT_ID / CF_API_TOKEN).",
+            "content": "Fitur gambar belum dikonfigurasi pemilik (CF_ACCOUNT_ID / CF_API_TOKEN).",
             "time": datetime.now().strftime("%H:%M"),
         })
         return
@@ -2150,7 +2190,8 @@ def handle_image_request(prompt: str) -> None:
         progress_slot.empty()
         e = result["error"] or RuntimeError("no image")
         msg = str(e)
-        if not msg.startswith(("⚠️", "⏳", "", "❌")):
+        if not msg.startswith(("Layanan", "Kuota", "Server terlalu",
+                               "Gagal membuat", "Respons terlalu")):
             msg = public_error_image(None, msg, e)
         st.session_state.messages.append({
             "id": next_msg_id(), "role": "assistant", "type": "text",
@@ -2163,7 +2204,7 @@ def handle_chat_request(answer_slot) -> None:
     if not CHAT_READY:
         st.session_state.messages.append({
             "id": next_msg_id(), "role": "assistant", "type": "text",
-            "content": "⚠️ Fitur chat belum dikonfigurasi pemilik (GROQ_API_KEY).",
+            "content": "Fitur chat belum dikonfigurasi pemilik (GROQ_API_KEY).",
             "time": datetime.now().strftime("%H:%M"),
         })
         return
@@ -2314,7 +2355,7 @@ html, body {
                     for i, im in enumerate(pending):
                         with pcols[i]:
                             st.image(im["data"], width=54)
-                            if st.button("✕", key=f"pending_rm_{i}",
+                            if st.button(":material/close:", key=f"pending_rm_{i}",
                                          use_container_width=True):
                                 st.session_state.pending_images.pop(i)
                                 st.rerun()
@@ -2356,14 +2397,14 @@ html, body {
 
                         with st.container(key="plus_upload_file"):
                             picked_file = st.file_uploader(
-                                "📎  Upload file", type=IMAGE_INPUT_TYPES,
+                                ":material/attach_file:  Upload file", type=IMAGE_INPUT_TYPES,
                                 accept_multiple_files=True,
                                 label_visibility="visible",
                                 key=f"plus_uploader_file_{gen}",
                             )
                         with st.container(key="plus_upload_image"):
                             picked_image = st.file_uploader(
-                                "📸  Upload gambar atau foto", type=IMAGE_INPUT_TYPES,
+                                ":material/photo_camera:  Upload gambar atau foto", type=IMAGE_INPUT_TYPES,
                                 accept_multiple_files=True,
                                 label_visibility="visible",
                                 key=f"plus_uploader_image_{gen}",
@@ -2381,15 +2422,16 @@ html, body {
                         # Ambil tangkapan layar — browser murni tidak bisa
                         # memicu screen-capture dari Streamlit, jadi diarahkan
                         # ke cara tercepat: screenshot OS lalu tempel (Ctrl+V).
-                        if st.button("📷  Ambil tangkapan layar", key="pm_screenshot",
+                        if st.button(":material/screenshot:  Ambil tangkapan layar", key="pm_screenshot",
                                      use_container_width=True):
                             st.toast("Ambil screenshot dengan tombol OS kamu, lalu "
-                                     "tempel (Ctrl+V) di kotak chat.", icon="📷")
+                                     "tempel (Ctrl+V) di kotak chat.",
+                                     icon=":material/screenshot:")
 
                         # Pencarian web — beralih otomatis ke model Compound
                         # (browsing) tanpa mengubah pilihan model utama.
                         web_check = " :orange[✓]" if st.session_state.get("web_search_on") else ""
-                        if st.button(f"🌐  Pencarian web{web_check}", key="pm_web",
+                        if st.button(f":material/public:  Pencarian web{web_check}", key="pm_web",
                                      use_container_width=True):
                             st.session_state.web_search_on = not st.session_state.get("web_search_on", False)
                             st.rerun()
@@ -2445,7 +2487,7 @@ html, body {
         if send_audio is not None and not text:
             if CHAT_READY:
                 try:
-                    with st.spinner("🎙️ Mentranskrip suara…"):
+                    with st.spinner(":material/mic:  Mentranskrip suara…"):
                         text = transcribe_audio(build_chat_client(), send_audio.getvalue())
                     via_voice = bool(text)
                 except Exception:
@@ -2453,7 +2495,7 @@ html, body {
             if not text:
                 st.session_state.messages.append({
                     "id": next_msg_id(), "role": "assistant", "type": "text",
-                    "content": "🎙️ Hmm, suaranya belum kebaca nih. Coba rekam lagi "
+                    "content": "Hmm, suaranya belum kebaca nih. Coba rekam lagi "
                                "lebih dekat ke mikrofon, atau ketik saja ya!",
                     "time": datetime.now().strftime("%H:%M"),
                 })
@@ -2504,7 +2546,7 @@ html, body { overflow: auto !important; }
             if via_voice:
                 user_msg["via_voice"] = True
             st.session_state.messages.append(user_msg)
-            note = "🎙️ via suara" if via_voice else ""
+            note = f"{ICON_MIC} via suara" if via_voice else ""
             st.markdown(
                 bubble_html("user", text, now, images_bubble_html(images), note),
                 unsafe_allow_html=True,
@@ -2524,7 +2566,8 @@ html, body { overflow: auto !important; }
     # Halaman awal: ukuran normal. Saat chat berjalan: lebih kecil lagi.
     foot_class = "trinity-foot" if is_fresh else "trinity-foot in-chat"
     st.markdown(
-        f'<p class="{foot_class}">🔱 Ampera Trinity AI · by Ampera Official · 2026</p>',
+        f'<p class="{foot_class}">{logo_img_html("logo-foot")} '
+        "Ampera Trinity AI · by Ampera Official · 2026</p>",
         unsafe_allow_html=True,
     )
 
