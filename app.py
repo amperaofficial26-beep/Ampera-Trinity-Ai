@@ -731,8 +731,8 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 /* tombol ➕ di baris kontrol: lingkaran putih bersih ala Claude, menyatu
    di dalam kartu (tanpa bayangan berlebih karena kartu sudah punya shadow) */
 .st-key-chat_controls .st-key-plus_menu [data-testid="stPopover"] button {
-    background: #FFFFFF !important;
-    border: 1px solid #E3E0D5 !important;
+    background: transparent !important;
+    border: none !important;
     border-radius: 999px !important;
     min-width: 32px !important;
     width: 32px !important;
@@ -762,51 +762,58 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     font-size: 0.72rem; color: #A8A69E;
     padding: 2px 4px 4px;
 }
-/* ---- reskin st.file_uploader jadi baris menu polos: ikon + teks saja ----
-   (label uploader disembunyikan; teks kustom disisipkan lewat ::before
-   pada tombol "Browse files" bawaan, dropzone/caption bawaan disembunyikan) */
-.st-key-plus_upload_file [data-testid="stFileUploaderDropzone"],
-.st-key-plus_upload_image [data-testid="stFileUploaderDropzone"] {
-    background: transparent !important;
-    border: none !important;
-    padding: 0 !important;
-    min-height: 0 !important;
+/* ---- reskin st.file_uploader jadi baris menu polos: ikon + teks saja,
+   TANPA tombol "Upload"/"Browse files" terpisah yang terlihat.
+   Triknya: dropzone (berisi tombol upload bawaan) dibuat transparan penuh
+   dan direntangkan menutupi seluruh baris (overlay), sedangkan LABEL
+   uploader (teks ikon+nama yang kita isi dari Python) tetap terlihat
+   sebagai satu-satunya representasi visual — klik di mana saja pada
+   baris tetap membuka dialog pilih file karena overlay ada di atasnya. */
+.st-key-plus_upload_file, .st-key-plus_upload_image {
+    position: relative !important;
+    border-radius: 10px !important;
+    transition: background .15s ease;
+}
+.st-key-plus_upload_file:hover, .st-key-plus_upload_image:hover {
+    background: #F0EEE6 !important;
 }
 .st-key-plus_upload_file [data-testid="stFileUploaderDropzoneInstructions"],
 .st-key-plus_upload_image [data-testid="stFileUploaderDropzoneInstructions"] {
     display: none !important;
 }
-.st-key-plus_upload_file [data-testid="stBaseButton-secondary"],
-.st-key-plus_upload_image [data-testid="stBaseButton-secondary"] {
+.st-key-plus_upload_file [data-testid="stFileUploaderDropzone"],
+.st-key-plus_upload_image [data-testid="stFileUploaderDropzone"] {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    opacity: 0 !important;
+    cursor: pointer !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
     background: transparent !important;
     border: none !important;
-    box-shadow: none !important;
-    border-radius: 10px !important;
-    width: 100% !important;
-    display: flex !important;
-    justify-content: flex-start !important;
-    padding: 8px 12px !important;
-    min-height: 40px !important;
-    font-size: 0 !important;   /* sembunyikan teks bawaan "Browse files" */
-}
-.st-key-plus_upload_file [data-testid="stBaseButton-secondary"]:hover,
-.st-key-plus_upload_image [data-testid="stBaseButton-secondary"]:hover {
-    background: #F0EEE6 !important;
-}
-.st-key-plus_upload_file [data-testid="stBaseButton-secondary"]::before {
-    content: "📎  Upload file";
-    font-size: 0.92rem; font-weight: 500; color: #3D3929;
-}
-.st-key-plus_upload_image [data-testid="stBaseButton-secondary"]::before {
-    content: "📸  Upload gambar atau foto";
-    font-size: 0.92rem; font-weight: 500; color: #3D3929;
-}
-.st-key-plus_upload_file [data-testid="stFileUploader"] label,
-.st-key-plus_upload_image [data-testid="stFileUploader"] label {
-    display: none !important;
 }
 .st-key-plus_upload_file [data-testid="stFileUploader"],
 .st-key-plus_upload_image [data-testid="stFileUploader"] {
+    margin: 0 !important;
+}
+.st-key-plus_upload_file [data-testid="stWidgetLabel"],
+.st-key-plus_upload_image [data-testid="stWidgetLabel"] {
+    position: relative !important;
+    z-index: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 9px 12px !important;
+    margin: 0 !important;
+    pointer-events: none !important;  /* klik tembus ke overlay dropzone */
+}
+.st-key-plus_upload_file [data-testid="stWidgetLabel"] p,
+.st-key-plus_upload_image [data-testid="stWidgetLabel"] p {
+    font-size: 0.92rem !important;
+    font-weight: 500 !important;
+    color: #3D3929 !important;
     margin: 0 !important;
 }
 /* strip lampiran yang menunggu dikirim (hasil menu ➕) */
@@ -2096,16 +2103,16 @@ html, body {
 
                         with st.container(key="plus_upload_file"):
                             picked_file = st.file_uploader(
-                                "Upload file", type=IMAGE_INPUT_TYPES,
+                                "📎  Upload file", type=IMAGE_INPUT_TYPES,
                                 accept_multiple_files=True,
-                                label_visibility="collapsed",
+                                label_visibility="visible",
                                 key=f"plus_uploader_file_{gen}",
                             )
                         with st.container(key="plus_upload_image"):
                             picked_image = st.file_uploader(
-                                "Upload gambar atau foto", type=IMAGE_INPUT_TYPES,
+                                "📸  Upload gambar atau foto", type=IMAGE_INPUT_TYPES,
                                 accept_multiple_files=True,
-                                label_visibility="collapsed",
+                                label_visibility="visible",
                                 key=f"plus_uploader_image_{gen}",
                             )
                         _stage_uploaded(picked_file)
