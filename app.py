@@ -768,79 +768,59 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     padding: 0 !important;
 }
 
-/* ========== POPOVER MODEL (kecil, rapi, ala Claude) ========== */
-/* Popover body menjadi lebih kecil dan tanpa padding berlebihan */
+/* ========== POPOVER MODEL (sederhana, rata kiri nama, badge kanan) ========== */
 [data-testid="stPopoverBody"] {
+    padding: 4px 0 !important;
+    min-width: 200px !important;
+    max-width: 260px !important;
     background: #FFFFFF !important;
     border: 1px solid #E3E0D5 !important;
     border-radius: 12px !important;
     box-shadow: 0 8px 30px rgba(61,57,41,0.12) !important;
-    padding: 4px 0 !important;
-    min-width: 200px !important;
-    max-width: 260px !important;
 }
 [data-testid="stPopoverBody"] .stButton {
     margin: 0 !important;
 }
 [data-testid="stPopoverBody"] div.stButton > button {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 6px 14px !important;
     background: transparent !important;
     border: none !important;
     border-radius: 0 !important;
-    box-shadow: none !important;
-    padding: 6px 14px !important;
-    margin: 0 !important;
     width: 100% !important;
-    justify-content: flex-start !important;
-    align-items: center !important;
     min-height: 32px !important;
-    height: auto !important;
-    display: flex !important;
-    gap: 0 !important;
-}
-[data-testid="stPopoverBody"] div.stButton > button:hover {
-    background: #F5F4EF !important;
-}
-[data-testid="stPopoverBody"] div.stButton > button p {
-    margin: 0 !important;
     font-size: 0.9rem !important;
     font-weight: 400 !important;
     color: #3D3929 !important;
     text-align: left !important;
-    width: 100% !important;
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
 }
-[data-testid="stPopoverBody"] .model-level {
-    font-size: 0.65rem !important;
-    font-weight: 500 !important;
-    color: #A8A69E !important;
-    background: #F0EEE6 !important;
+[data-testid="stPopoverBody"] div.stButton > button:hover {
+    background: #F5F4EF !important;
+}
+[data-testid="stPopoverBody"] .model-name {
+    flex: 1 !important;
+    text-align: left !important;
+}
+[data-testid="stPopoverBody"] .model-badge-premium {
+    font-size: 0.6rem !important;
+    font-weight: 600 !important;
+    color: #C15F3C !important;
+    background: rgba(218,119,86,0.12) !important;
+    border: 1px solid rgba(218,119,86,0.2) !important;
     padding: 1px 8px !important;
     border-radius: 99px !important;
-    letter-spacing: 0.02em !important;
-    flex-shrink: 0 !important;
     margin-left: 12px !important;
-}
-[data-testid="stPopoverBody"] .model-level.hard,
-[data-testid="stPopoverBody"] .model-level.extreme {
-    background: rgba(218,119,86,0.12) !important;
-    color: #C15F3C !important;
-    border: 1px solid rgba(218,119,86,0.2) !important;
-}
-[data-testid="stPopoverBody"] .model-level.premium {
-    background: #DA7756 !important;
-    color: #FFFFFF !important;
-    border: none !important;
-    font-size: 0.6rem !important;
-    padding: 1px 8px !important;
+    flex-shrink: 0 !important;
 }
 [data-testid="stPopoverBody"] .model-check {
     color: #DA7756 !important;
-    margin-right: 6px !important;
+    margin-left: 6px !important;
+    flex-shrink: 0 !important;
 }
-[data-testid="stPopoverBody"] .element-container {
-    margin: 0 !important;
+[data-testid="stPopoverBody"] .stButton + .stButton {
+    border-top: 1px solid #F0EEE6 !important;
 }
 [data-testid="stPopoverBody"] [data-testid="stVerticalBlock"] {
     gap: 0 !important;
@@ -1861,23 +1841,27 @@ html, body {
                         unsafe_allow_html=True,
                     )
 
-            with ctrl_model:
-              current_key = st.session_state.selected_model_key
-              current_model = MODEL_BY_KEY.get(current_key, MODEL_BY_KEY[DEFAULT_MODEL_KEY])
-              current_name = current_model["name"]
-              with st.popover(current_name, use_container_width=False):
-                  for m in MODEL_CATALOG:
-                      is_active = m["key"] == st.session_state.selected_model_key
-                      # Nama model dengan bullet
-                      label = f"• {m['name']}"
-                      if m.get("premium"):
-                          label += "  \t:orange[Premium]"  # atau gunakan HTML untuk badge kecil
-                      if is_active:
-                          label += "  ✓"  # tanda centang
-                      # Gunakan markdown untuk menampilkan badge dengan ukuran kecil
-                      if st.button(label, key=f"model_{m['key']}", use_container_width=True):
-                          st.session_state.selected_model_key = m["key"]
-                          st.rerun()
+             with ctrl_model:
+                current_key = st.session_state.selected_model_key
+                current_model = MODEL_BY_KEY.get(current_key, MODEL_BY_KEY[DEFAULT_MODEL_KEY])
+                current_name = current_model["name"]
+                with st.popover(current_name, use_container_width=False):
+                    for m in MODEL_CATALOG:
+                        is_active = m["key"] == st.session_state.selected_model_key
+                        # Buat label dengan struktur: nama di kiri, badge premium di kanan
+                        # Kita gunakan markdown atau HTML di dalam button
+                        # Karena st.button menerima string yang bisa berisi HTML, kita buat label dengan elemen span
+                        name_span = f'<span class="model-name">• {m["name"]}</span>'
+                        badge = f' <span class="model-badge-premium">Premium</span>' if m.get("premium") else ''
+                        check = f' <span class="model-check">✓</span>' if is_active else ''
+                        label_html = name_span + badge + check
+                        if st.button(
+                            label_html,
+                            key=f"model_{m['key']}",
+                            use_container_width=True,
+                        ):
+                            st.session_state.selected_model_key = m["key"]
+                            st.rerun()
     # ========== PROCESS INPUT ==========
     if user_input is not None:
         if isinstance(user_input, str):
