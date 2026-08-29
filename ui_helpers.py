@@ -1,4 +1,3 @@
-cd /home/claude/trinity_app && cat > ui_helpers.py << 'PYEOF'
 # -*- coding: utf-8 -*-
 """
 Komponen UI kecil yang dipakai berulang: render bubble chat, indikator
@@ -50,11 +49,39 @@ IMAGE_MIN_SECONDS = 10.0
 # Delay antar potongan kalimat saat jawaban muncul bertahap
 SENTENCE_STREAM_DELAY = 0.15
 
+# ----------------------------------------------------------------------
+# UKURAN LOGO PER TEMPAT PAKAI (FIX: logo greeting kegedean)
+#   Ditulis sebagai inline style (bukan cuma class CSS) supaya PASTI
+#   menang walau ada aturan lain di stylesheet (styles.py) yang
+#   mengira logo harus tampil besar. Ubah angkanya di sini kalau masih
+#   kurang pas.
+# ----------------------------------------------------------------------
+_LOGO_SIZES = {
+    "logo-greeting": "48px",   # logo di sebelah "Selamat pagi" — SEBELUMNYA kegedean
+    "logo-label":    "16px",   # logo kecil di label "Yuki" pada bubble jawaban
+    "logo-progress": "18px",   # logo di progress bar generate gambar
+    "logo-foot":     "14px",   # logo di footer halaman
+    "logo-inline":   "18px",   # default umum
+    "logo-shimmer":  "22px",   # logo di indikator "berpikir"
+}
+
 
 def logo_img_html(css_class: str = "logo-inline") -> str:
-    """Logo brand (PNG base64) — identik dengan logo tab/thinking."""
-    return (f'<span class="{css_class}" role="img" aria-label="logo Trinity">'
-            f'<img src="data:image/png;base64,{LOGO_B64}" alt=""/></span>')
+    """Logo brand (PNG base64) — identik dengan logo tab/thinking.
+
+    Ukurannya dipatok inline per css_class (lihat _LOGO_SIZES) supaya
+    selalu tampil proporsional, tidak lagi bisa "kebobolan" jadi besar
+    sekali seperti sebelumnya.
+    """
+    size = _LOGO_SIZES.get(css_class, "18px")
+    return (
+        f'<span class="{css_class}" role="img" aria-label="logo Trinity" '
+        f'style="display:inline-block;width:{size};height:{size};'
+        f'vertical-align:middle;line-height:0;">'
+        f'<img src="data:image/png;base64,{LOGO_B64}" alt="" '
+        f'style="width:100%;height:100%;object-fit:contain;display:block;"/>'
+        f'</span>'
+    )
 
 
 # Kumpulan sapaan per waktu; dipilih acak tiap sesi agar halaman utama
@@ -82,8 +109,7 @@ def thinking_html(phrases: list[str]) -> str:
         f'<span class="phrase">{html.escape(p)}…</span>' for p in phrases
     )
     # Logo brand dengan pita cahaya berjalan (shimmer).
-    icon = ('<span class="logo-shimmer">'
-            f'<img src="data:image/png;base64,{LOGO_B64}" alt=""/></span>')
+    icon = logo_img_html("logo-shimmer")
     return (
         '<div class="claude-think">'
         f"{icon}"
@@ -308,6 +334,12 @@ def get_chat_export_text() -> str:
 
 # ============================================================================
 # CSS posisi dok input (halaman awal vs sudah ada chat)
+#   FIX: sebelumnya halaman awal MENGUNCI overflow (overflow:hidden) di
+#   html/body/section.main. Itulah penyebab "nggak bisa discroll" — di
+#   banyak browser (terutama mobile Safari), reset overflow:auto yang
+#   dikirim belakangan tidak selalu menang balik, jadi kadang halaman
+#   tetap terkunci. Solusinya: JANGAN sentuh overflow sama sekali. Cukup
+#   geser posisi kotak input (transform) tanpa mengunci scroll.
 # ============================================================================
 _FRESH_BOTTOM_CSS = """
 <style>
@@ -326,23 +358,12 @@ _FRESH_BOTTOM_CSS = """
   background: transparent !important;
   background-color: transparent !important;
 }
-/* HALAMAN AWAL TIDAK BISA DI-SCROLL (atas/bawah) */
-[data-testid="stAppViewContainer"],
-[data-testid="stMain"],
-section.main,
-html, body {
-  overflow: hidden !important;
-}
 </style>
 """
 
 _BOTTOM_RESET_CSS = """
 <style>
 [data-testid="stBottom"] { transform: translateY(0) !important; }
-[data-testid="stAppViewContainer"],
-[data-testid="stMain"],
-section.main,
-html, body { overflow: auto !important; }
 </style>
 """
 
@@ -354,5 +375,3 @@ def _page_footer(in_chat: bool = False) -> None:
         "Ampera Trinity AI · by Ampera Official · 2026</p>",
         unsafe_allow_html=True,
     )
-PYEOF
-python3 -c "import ast; ast.parse(open('ui_helpers.py').read())" && echo OK
