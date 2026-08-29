@@ -1,4 +1,3 @@
-cd /home/claude/trinity_app && cat > chat_handlers.py << 'PYEOF'
 # -*- coding: utf-8 -*-
 """
 Handler inti pengiriman pesan: mode gambar (Cloudflare FLUX), mode chat
@@ -412,5 +411,3 @@ def process_user_input(user_input, answer_slot, is_fresh: bool = False) -> bool:
         handle_chat_request(answer_slot)
 
     return True
-PYEOF
-python3 -c "import ast; ast.parse(open('chat_handlers.py').read())" && echo OK
