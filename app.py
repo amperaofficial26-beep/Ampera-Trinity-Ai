@@ -269,7 +269,7 @@ DEFAULT_SETTINGS: dict = {
     # Umum
     "ui_lang": DEFAULT_LANG_CODE,
     "yuki_lang": DEFAULT_LANG_CODE,
-    "theme": "Krem (Claude)",
+    "theme": "Beige hangat",
     "font_size": "Normal",
     "compact_mode": False,
     "stream_speed": "Sedang",
@@ -376,20 +376,20 @@ def inject_css() -> None:
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
-/* ============ PALET WARNA CLAUDE ============
-   Latar utama : #F0EEE6 (krem hangat)
-   Permukaan   : #FAF9F5 (putih gading)
-   Bubble user : #E8E5D8 / #EDEAE0
-   Teks utama  : #3D3929 (cokelat gelap hangat)
-   Teks sekunder: #73726C
-   Aksen       : #DA7756 (terracotta) / hover #C15F3C
-   Border      : #E3E0D5
-============================================== */
+/* ========= PALET WARNA TRINITY (beige + ungu) =========
+   Latar halaman  : #E8DCC8 (warm beige)
+   Permukaan      : #F2E8D6 (beige terang, untuk kartu)
+   Gelembung user : #E0D2BB / #E5D8C3
+   Teks utama     : #2C1F33 (Deep Violet)
+   Teks sekunder  : #6B6172
+   Aksen          : #2C1F33 (Deep Violet) / ikon & teks aksen #4A3559
+   Border         : #DBCEB9
+======================================================= */
 
 /* ---------- dasar ---------- */
 html, body, [data-testid="stAppViewContainer"], .stApp {
-    background: #F0EEE6 !important;
-    color: #3D3929;
+    background: #E8DCC8 !important;
+    color: #2C1F33;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     -webkit-font-smoothing: antialiased;
 }
@@ -398,8 +398,8 @@ html, body, [data-testid="stAppViewContainer"], .stApp {
 
 /* ---------- SIDEBAR ala Claude ---------- */
 section[data-testid="stSidebar"] {
-    background: #F5F4EF !important;
-    border-right: 1px solid #E3E0D5 !important;
+    background: #EDE2D1 !important;
+    border-right: 1px solid #DBCEB9 !important;
     width: 260px !important;
     display: flex !important;
     visibility: visible !important;
@@ -428,24 +428,24 @@ section[data-testid="stSidebar"] [data-testid="stSidebarUserContent"] {
     display: flex !important;
     visibility: visible !important;
     opacity: 1 !important;
-    color: #3D3929 !important;
+    color: #2C1F33 !important;
     z-index: 999990 !important;
 }
 [data-testid="stSidebarCollapsedControl"] button,
 [data-testid="collapsedControl"] button {
-    color: #3D3929 !important;
-    background: #FAF9F5 !important;
-    border: 1px solid #E3E0D5 !important;
+    color: #2C1F33 !important;
+    background: #F2E8D6 !important;
+    border: 1px solid #DBCEB9 !important;
     border-radius: 10px !important;
 }
-[data-testid="stSidebarCollapseButton"] button { color: #73726C !important; }
+[data-testid="stSidebarCollapseButton"] button { color: #6B6172 !important; }
 /* varian testid tombol expand sidebar di Streamlit versi baru */
 [data-testid="stExpandSidebarButton"],
 button[kind="headerNoPadding"] {
     display: inline-flex !important;
     visibility: visible !important;
     opacity: 1 !important;
-    color: #3D3929 !important;
+    color: #2C1F33 !important;
 }
 [data-testid="stHeader"] {
     visibility: visible !important;
@@ -455,7 +455,7 @@ button[kind="headerNoPadding"] {
 /* judul brand serif ala "Claude" — rapat ke atas, besar */
 .sb-brand {
     font-family: 'Source Serif 4', Georgia, serif;
-    font-size: 1.5rem; font-weight: 700; color: #1a1915;
+    font-size: 1.5rem; font-weight: 700; color: #1B1220;
     letter-spacing: -0.02em;
     padding: 0 6px 8px;
     margin-top: 0;
@@ -475,15 +475,15 @@ section[data-testid="stSidebar"] div.stButton > button {
     align-items: center !important;
     padding: 6px 10px !important;
     min-height: 34px !important;
-    color: #3D3929 !important;
+    color: #2C1F33 !important;
     font-size: 0.9rem !important;
     font-weight: 500 !important;
 }
 section[data-testid="stSidebar"] div.stButton > button:hover {
-    background: #EAE8DE !important;
+    background: #E2D6C1 !important;
     border: none !important;
     box-shadow: none !important;
-    color: #3D3929 !important;
+    color: #2C1F33 !important;
 }
 /* paksa SEMUA lapisan dalam tombol rata kiri (markdown container ikut) */
 section[data-testid="stSidebar"] div.stButton > button > div,
@@ -495,27 +495,27 @@ section[data-testid="stSidebar"] div.stButton > button [data-testid="stMarkdownC
 section[data-testid="stSidebar"] div.stButton > button p {
     text-align: left !important;
     font-size: 0.9rem !important;
-    color: #3D3929 !important;
+    color: #2C1F33 !important;
     margin: 0 !important;
 }
 /* tombol "+ Baru" menonjol sedikit (latar krem seperti Claude) */
 section[data-testid="stSidebar"] .st-key-sb_new button {
-    background: #EAE8DE !important;
+    background: #E2D6C1 !important;
     font-weight: 600 !important;
 }
 section[data-testid="stSidebar"] .st-key-sb_new button:hover {
-    background: #E3E0D5 !important;
+    background: #DBCEB9 !important;
 }
 
 /* label grup riwayat: "Hari ini" abu kecil */
 .sb-group {
-    font-size: 0.85rem; font-weight: 500; color: #8B887D;
+    font-size: 0.85rem; font-weight: 500; color: #7D7484;
     padding: 16px 12px 6px; letter-spacing: 0.01em;
 }
 /* item riwayat: bulatan kecil ○ di depan + teks abu gelap, elipsis 1 baris */
 section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] button {
     font-weight: 400 !important;
-    color: #57544A !important;
+    color: #4E4553 !important;
     min-height: 36px !important;
     padding: 6px 12px 6px 12px !important;
     position: relative;
@@ -523,7 +523,7 @@ section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] button {
 section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] button::before {
     content: "";
     width: 8px; height: 8px;
-    border: 1.5px solid #C9C6B9;
+    border: 1.5px solid #C1B49F;
     border-radius: 50%;
     margin-right: 12px;
     flex-shrink: 0;
@@ -532,7 +532,7 @@ section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] button::before {
 section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] button p {
     font-size: 0.98rem !important;
     font-weight: 400 !important;
-    color: #57544A !important;
+    color: #4E4553 !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
@@ -540,7 +540,7 @@ section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] button p {
 }
 /* item riwayat aktif */
 section[data-testid="stSidebar"] [class*="st-key-sb_hist_"].sb-active button {
-    background: #EAE8DE !important;
+    background: #E2D6C1 !important;
 }
 
 /* tombol unduh di sidebar: sama polosnya dengan menu lain */
@@ -556,7 +556,7 @@ section[data-testid="stSidebar"] div.stDownloadButton > button {
     align-items: center !important;
     padding: 6px 10px !important;
     min-height: 34px !important;
-    color: #3D3929 !important;
+    color: #2C1F33 !important;
     font-size: 0.9rem !important;
     font-weight: 500 !important;
 }
@@ -567,20 +567,20 @@ section[data-testid="stSidebar"] div.stDownloadButton > button [data-testid="stM
     justify-content: flex-start !important;
 }
 section[data-testid="stSidebar"] div.stDownloadButton > button:hover {
-    background: #EAE8DE !important;
+    background: #E2D6C1 !important;
     border: none !important;
-    color: #3D3929 !important;
+    color: #2C1F33 !important;
 }
 section[data-testid="stSidebar"] div.stDownloadButton > button p {
     text-align: left !important;
     font-size: 0.9rem !important;
-    color: #3D3929 !important;
+    color: #2C1F33 !important;
     margin: 0 !important;
 }
 
 /* garis pemisah tipis */
 .sb-divider {
-    height: 1px; background: #E3E0D5; margin: 6px 2px;
+    height: 1px; background: #DBCEB9; margin: 6px 2px;
 }
 
 /* baris akun ala Claude — DIPAKU di dasar layar, selebar sidebar */
@@ -590,8 +590,8 @@ section[data-testid="stSidebar"] div.stDownloadButton > button p {
     width: 260px;              /* = lebar sidebar */
     display: flex; align-items: center; gap: 10px;
     padding: 12px 16px 14px;
-    border-top: 1px solid #E3E0D5;
-    background: #F5F4EF;
+    border-top: 1px solid #DBCEB9;
+    background: #EDE2D1;
     z-index: 999995;
     box-sizing: border-box;
 }
@@ -601,19 +601,19 @@ section[data-testid="stSidebar"] > div:first-child {
 }
 .sb-account .ava {
     width: 28px; height: 28px; border-radius: 50%;
-    background: #E8E5D8; color: #57544A;
+    background: #E0D2BB; color: #4E4553;
     display: grid; place-items: center;
     font-size: 0.78rem; font-weight: 600;
     flex-shrink: 0;
-    border: 1px solid #D5D1C3;
+    border: 1px solid #CDBFA8;
 }
-.sb-account .name { font-size: 1rem; font-weight: 600; color: #3D3929; }
-.sb-account .plan { font-size: 0.88rem; color: #A8A69E; font-weight: 400; }
-.sb-account .caret { color: #A8A69E; font-size: 0.7rem; margin-left: 2px; }
+.sb-account .name { font-size: 1rem; font-weight: 600; color: #2C1F33; }
+.sb-account .plan { font-size: 0.88rem; color: #7E7387; font-weight: 400; }
+.sb-account .caret { color: #7E7387; font-size: 0.7rem; margin-left: 2px; }
 .sb-account .right-icons {
     margin-left: auto;
     display: flex; align-items: center; gap: 12px;
-    color: #73726C; font-size: 0.95rem;
+    color: #6B6172; font-size: 0.95rem;
 }
 /* rapatkan jarak antar elemen sidebar */
 section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] { gap: 2px !important; }
@@ -627,10 +627,10 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 /* scrollbar halus ala Claude */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #D5D1C3; border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: #BFBAA8; }
+::-webkit-scrollbar-thumb { background: #CDBFA8; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #B7A88F; }
 
-::selection { background: rgba(218,119,86,0.25); }
+::selection { background: rgba(44,31,51,0.25); }
 
 /* ---------- header app (minimal, serif ala Claude) ---------- */
 .trinity-head {
@@ -640,31 +640,31 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 .trinity-logo {
     width: 34px; height: 34px; border-radius: 10px;
     display: grid; place-items: center; font-size: 17px;
-    background: #DA7756; color: #FFFFFF;
+    background: #2C1F33; color: #FFFFFF;
     flex-shrink: 0;
 }
 .trinity-head h1 {
     margin: 0;
     font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif;
     font-size: 1.45rem; font-weight: 600;
-    color: #3D3929; letter-spacing: -0.01em;
+    color: #2C1F33; letter-spacing: -0.01em;
 }
 .trinity-head p {
-    margin: 0; color: #73726C; font-size: 0.78rem; font-weight: 400;
+    margin: 0; color: #6B6172; font-size: 0.78rem; font-weight: 400;
 }
 .trinity-sub {
-    text-align: center; color: #73726C; font-size: 0.8rem;
+    text-align: center; color: #6B6172; font-size: 0.8rem;
     margin: 0 0 22px;
 }
 
 /* sapaan besar serif ala halaman awal Claude */
 .trinity-greeting {
     font-family: 'Source Serif 4', Georgia, serif;
-    font-size: 3.4rem; font-weight: 500; color: #3D3929;
+    font-size: 3.4rem; font-weight: 500; color: #2C1F33;
     text-align: center; margin: 26px 0 4px;
     letter-spacing: -0.02em;
 }
-.trinity-greeting .star { color: #DA7756; }
+.trinity-greeting .star { color: #2C1F33; }
 
 /* ---------- pesan: gaya percakapan Claude ---------- */
 /* User: bubble krem membulat di kanan */
@@ -701,22 +701,22 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 }
 .bubble.user {
     max-width: 78%;
-    background: #E8E5D8;
-    color: #3D3929;
+    background: #E0D2BB;
+    color: #2C1F33;
     border-radius: 18px;
     padding: 11px 16px;
-    border: 1px solid rgba(61,57,41,0.05);
+    border: 1px solid rgba(44,31,51,0.05);
 }
 /* AI: teks polos di atas latar — persis gaya Claude */
 .bubble.ai {
     max-width: 100%;
     background: transparent;
-    color: #3D3929;
+    color: #2C1F33;
     padding: 0 2px;
     border: none;
 }
 .bubble-meta {
-    font-size: 0.7rem; color: #A8A69E;
+    font-size: 0.7rem; color: #7E7387;
     margin: 0 4px 4px; font-weight: 500;
 }
 .bubble-wrap { display: flex; flex-direction: column; max-width: 78%; }
@@ -732,17 +732,17 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 .bubble-img {
     max-width: 180px; max-height: 180px;
     border-radius: 12px; display: block;
-    border: 1px solid rgba(61,57,41,0.08);
+    border: 1px solid rgba(44,31,51,0.08);
 }
 
 /* ---------- baris aksi kecil di bawah jawaban Yuki (ala Claude) ---------- */
 .msg-action-btn {
     background: transparent; border: none; cursor: pointer;
-    color: #A8A69E; font-size: 0.95rem; line-height: 1;
+    color: #7E7387; font-size: 0.95rem; line-height: 1;
     padding: 4px 6px; border-radius: 8px;
     transition: background .15s ease, color .15s ease;
 }
-.msg-action-btn:hover { background: #EAE8DE; color: #57544A; }
+.msg-action-btn:hover { background: #E2D6C1; color: #4E4553; }
 [class*="st-key-msg_actions_"] { margin: -4px 0 4px !important; }
 [class*="st-key-msg_actions_"] [data-testid="stHorizontalBlock"] {
     gap: 0 !important; align-items: center !important;
@@ -755,10 +755,10 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     min-height: 26px !important;
     height: 26px !important;
     font-size: 0.85rem !important;
-    color: #A8A69E !important;
+    color: #7E7387 !important;
 }
 [class*="st-key-msg_actions_"] div.stButton > button:hover {
-    background: #EAE8DE !important;
+    background: #E2D6C1 !important;
     border: none !important;
     box-shadow: none !important;
 }
@@ -785,8 +785,8 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 .msg-action-btn .icon-svg { width: 15px; height: 15px; }
 .bubble-meta .icon-svg { width: 12px; height: 12px; margin-right: 3px; }
 .bubble > .icon-svg { width: 16px; height: 16px; margin-right: 6px; vertical-align: -3px; }
-.sb-account .icon-svg { width: 14px; height: 14px; color: #A8A69E; }
-.sb-account .right-icons .icon-svg { width: 16px; height: 16px; color: #73726C; }
+.sb-account .icon-svg { width: 14px; height: 14px; color: #7E7387; }
+.sb-account .right-icons .icon-svg { width: 16px; height: 16px; color: #6B6172; }
 .trinity-foot .logo-foot { width: 12px; height: 12px; vertical-align: -2px; margin-right: 4px; }
 
 /* ikon material di baris aksi: ukuran rapi; state aktif (primary) terracotta */
@@ -798,16 +798,16 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
-    color: #C15F3C !important;
+    color: #4A3559 !important;
 }
 .msg-action-time {
-    font-size: 0.7rem; color: #B8B6AC; padding: 6px 4px 0;
+    font-size: 0.7rem; color: #827788; padding: 6px 4px 0;
 }
 
 /* label "Yuki" dengan logo custom di atas jawaban AI */
 .ai-label {
     display: inline-flex; align-items: center; gap: 4px;
-    font-size: 0.92rem; font-weight: 600; color: #3D3929;
+    font-size: 0.92rem; font-weight: 600; color: #2C1F33;
     margin-bottom: 6px;
 }
 /* bintang ✳ fallback di label jawaban Yuki: tanpa warna latar belakang,
@@ -816,7 +816,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     background: transparent !important;
     background-color: transparent !important;
     border: none; box-shadow: none;
-    color: #DA7756;
+    color: #2C1F33;
     font-size: 1.45rem; line-height: 1;
     width: 30px; height: 30px;
     display: inline-flex; align-items: center; justify-content: center;
@@ -840,22 +840,22 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 /* ---------- chat input: kartu putih membulat ala Claude ---------- */
 [data-testid="stBottom"], [data-testid="stBottomBlockContainer"],
 [data-testid="stBottom"] > div {
-    background: #F0EEE6 !important; border: none !important; box-shadow: none !important;
+    background: #E8DCC8 !important; border: none !important; box-shadow: none !important;
 }
 /* KARTU GABUNGAN ala Claude: kotak teks + baris kontrol (+, toggle, model)
    dibungkus jadi SATU kartu membulat, supaya tombol + terlihat menyatu
    di dalam kotak chat input (bukan komponen terpisah di bawahnya). */
 [data-testid="stBottomBlockContainer"] {
-    background: #FAF9F5 !important;
-    border: 1px solid #E3E0D5 !important;
+    background: #F2E8D6 !important;
+    border: 1px solid #DBCEB9 !important;
     border-radius: 22px !important;
-    box-shadow: 0 4px 14px rgba(61,57,41,0.07) !important;
+    box-shadow: 0 4px 14px rgba(44,31,51,0.07) !important;
     padding: 6px 6px 4px !important;
     transition: border-color .18s ease, box-shadow .18s ease !important;
 }
 [data-testid="stBottomBlockContainer"]:focus-within {
-    border-color: #DA7756 !important;
-    box-shadow: 0 4px 18px rgba(218,119,86,0.16) !important;
+    border-color: #2C1F33 !important;
+    box-shadow: 0 4px 18px rgba(44,31,51,0.16) !important;
 }
 /* kotak input itu sendiri melebur transparan ke dalam kartu gabungan */
 [data-testid="stChatInput"] {
@@ -871,29 +871,29 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 }
 [data-testid="stChatInput"] textarea {
     background: transparent !important;
-    color: #3D3929 !important;
+    color: #2C1F33 !important;
     font-family: 'Inter', sans-serif !important;
     font-size: 0.95rem !important;
 }
 [data-testid="stChatInput"] textarea::placeholder {
-    color: #A8A69E !important;
+    color: #7E7387 !important;
 }
 /* tombol kirim: bulat terracotta khas Claude */
 [data-testid="stChatInput"] button {
-    background: #DA7756 !important;
+    background: #2C1F33 !important;
     border: none !important;
     border-radius: 10px !important;
     color: #FFFFFF !important;
     transition: background .18s ease !important;
 }
 [data-testid="stChatInput"] button:hover {
-    background: #C15F3C !important;
+    background: #4A3559 !important;
 }
 [data-testid="stChatInput"] button svg { fill: #FFFFFF !important; color: #FFFFFF !important; }
 [data-testid="stChatInput"] button:disabled {
-    background: #E3E0D5 !important;
+    background: #DBCEB9 !important;
 }
-[data-testid="stChatInput"] button:disabled svg { fill: #A8A69E !important; color: #A8A69E !important; }
+[data-testid="stChatInput"] button:disabled svg { fill: #7E7387 !important; color: #7E7387 !important; }
 
 /* ---------- baris kontrol DI DALAM kartu, tepat di bawah teks (ala Claude) ---------- */
 /* Berada di dok bawah Streamlit (satu wadah dengan st.chat_input)
@@ -923,7 +923,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 .input-disclaimer {
     text-align: center;
     font-size: 0.76rem;
-    color: #A8A69E;
+    color: #7E7387;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -932,7 +932,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 /* toggle Gambar: teks kecil abu senada */
 .st-key-chat_controls [data-testid="stCheckbox"] label p {
     font-size: 0.8rem !important;
-    color: #73726C !important;
+    color: #6B6172 !important;
 }
 /* tombol model = TULISAN BIASA tanpa kotak (ala Claude) */
 .st-key-chat_controls [data-testid="stPopover"] button,
@@ -949,7 +949,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     height: 30px !important;
     font-size: 0.8rem !important;
     font-weight: 500 !important;
-    color: #73726C !important;
+    color: #6B6172 !important;
     box-shadow: none !important;
     white-space: nowrap;
     justify-content: flex-start !important;
@@ -957,8 +957,8 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 }
 .st-key-chat_controls [data-testid="stPopover"] button:hover,
 .st-key-chat_controls button[data-testid="stPopoverButton"]:hover {
-    background: rgba(61,57,41,0.06) !important;
-    color: #3D3929 !important;
+    background: rgba(44,31,51,0.06) !important;
+    color: #2C1F33 !important;
     border: none !important;
     box-shadow: none !important;
 }
@@ -978,7 +978,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 }
 .st-key-chat_controls [data-testid="stCheckbox"] label p {
     font-size: 0.78rem !important;
-    color: #73726C !important;
+    color: #6B6172 !important;
     white-space: nowrap;
 }
 /* rapikan tinggi elemen di baris kontrol */
@@ -995,19 +995,19 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 [data-testid="stChatInput"] [data-testid="stChatInputMicButton"],
 [data-testid="stChatInput"] [data-testid="stChatInputCancelButton"],
 [data-testid="stChatInput"] [data-testid="stChatInputApproveButton"] {
-    background: #FAF9F5 !important;
-    border: 1px solid #E3E0D5 !important;
+    background: #F2E8D6 !important;
+    border: 1px solid #DBCEB9 !important;
     border-radius: 10px !important;
-    color: #57544A !important;
+    color: #4E4553 !important;
     box-shadow: none !important;
 }
 [data-testid="stChatInput"] [data-testid="stChatInputMicButton"] svg,
 [data-testid="stChatInput"] [data-testid="stChatInputCancelButton"] svg,
 [data-testid="stChatInput"] [data-testid="stChatInputApproveButton"] svg {
-    fill: #57544A !important; color: #57544A !important;
+    fill: #4E4553 !important; color: #4E4553 !important;
 }
 [data-testid="stChatInput"] [data-testid="stChatInputMicButton"]:hover {
-    border-color: #DA7756 !important;
+    border-color: #2C1F33 !important;
 }
 /* tombol ➕ di baris kontrol: lingkaran putih bersih ala Claude, menyatu
    di dalam kartu (tanpa bayangan berlebih karena kartu sudah punya shadow) */
@@ -1022,14 +1022,14 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     padding: 0 !important;
     font-size: 1.05rem !important;
     font-weight: 400 !important;
-    color: #3D3929 !important;
+    color: #2C1F33 !important;
     box-shadow: none !important;
     justify-content: center !important;
 }
 .st-key-chat_controls [class*="st-key-plus_menu"] [data-testid="stPopover"] button:hover {
-    background: #F5F4EF !important;
-    border-color: #DA7756 !important;
-    color: #C15F3C !important;
+    background: #EDE2D1 !important;
+    border-color: #2C1F33 !important;
+    color: #4A3559 !important;
 }
 /* Streamlit menambahkan ikon panah kecil di ujung tombol popover secara
    otomatis (indikator dropdown) — disembunyikan supaya tombol ➕ tetap
@@ -1040,11 +1040,11 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 }
 /* isi popover ➕ minimalist: cukup tombol unggah, tanpa label/hint besar */
 .plus-menu-hint {
-    font-size: 0.72rem; color: #A8A69E;
+    font-size: 0.72rem; color: #7E7387;
     padding: 2px 4px 4px;
 }
 .plus-menu-divider {
-    height: 1px; background: #E3E0D5; margin: 6px 4px;
+    height: 1px; background: #DBCEB9; margin: 6px 4px;
 }
 /* baris menu tambahan di popover + (screenshot, pencarian web) —
    sama gayanya dengan item lain: teks polos, hover krem */
@@ -1058,7 +1058,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     padding: 8px 12px !important;
     font-size: 0.92rem !important;
     font-weight: 500 !important;
-    color: #3D3929 !important;
+    color: #2C1F33 !important;
 }
 /* ---- reskin st.file_uploader jadi baris menu polos: ikon + teks saja,
    TANPA tombol "Upload"/"Browse files" terpisah yang terlihat.
@@ -1073,7 +1073,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     transition: background .15s ease;
 }
 [class*="st-key-plus_upload_file"]:hover, [class*="st-key-plus_upload_image"]:hover {
-    background: #F0EEE6 !important;
+    background: #E8DCC8 !important;
 }
 [class*="st-key-plus_upload_file"] [data-testid="stFileUploaderDropzoneInstructions"],
 [class*="st-key-plus_upload_image"] [data-testid="stFileUploaderDropzoneInstructions"] {
@@ -1111,7 +1111,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 [class*="st-key-plus_upload_image"] [data-testid="stWidgetLabel"] p {
     font-size: 0.92rem !important;
     font-weight: 500 !important;
-    color: #3D3929 !important;
+    color: #2C1F33 !important;
     margin: 0 !important;
 }
 /* strip lampiran yang menunggu dikirim (hasil menu ➕) */
@@ -1132,34 +1132,34 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 /* ---------- tombol & popover: pill lembut ala Claude ---------- */
 div.stButton > button, [data-testid="stPopover"] > button,
 div.stDownloadButton > button {
-    background: #FAF9F5 !important;
-    border: 1px solid #E3E0D5 !important;
-    color: #3D3929 !important;
+    background: #F2E8D6 !important;
+    border: 1px solid #DBCEB9 !important;
+    color: #2C1F33 !important;
     border-radius: 12px !important;
     font-family: 'Inter', sans-serif !important;
     font-weight: 500 !important;
     font-size: 0.85rem !important;
-    box-shadow: 0 1px 3px rgba(61,57,41,0.05) !important;
+    box-shadow: 0 1px 3px rgba(44,31,51,0.05) !important;
     transition: all .18s ease !important;
 }
 div.stButton > button:hover, [data-testid="stPopover"] > button:hover,
 div.stDownloadButton > button:hover {
-    background: #F5F4EF !important;
-    border-color: #DA7756 !important;
-    color: #C15F3C !important;
-    box-shadow: 0 2px 8px rgba(218,119,86,0.14) !important;
+    background: #EDE2D1 !important;
+    border-color: #2C1F33 !important;
+    color: #4A3559 !important;
+    box-shadow: 0 2px 8px rgba(44,31,51,0.14) !important;
 }
 /* ---------- pop-up model ala Claude: SATU panel, item = teks polos ---------- */
 [data-testid="stPopoverBody"] {
     background: #FFFFFF !important;
-    border: 1px solid #E3E0D5 !important;
+    border: 1px solid #DBCEB9 !important;
     border-radius: 16px !important;
-    box-shadow: 0 16px 48px rgba(61,57,41,0.18) !important;
+    box-shadow: 0 16px 48px rgba(44,31,51,0.18) !important;
     min-width: 300px !important;
     padding: 8px 6px !important;
 }
 [data-testid="stPopoverBody"] p, [data-testid="stPopoverBody"] div {
-    color: #3D3929;
+    color: #2C1F33;
 }
 /* item model: TANPA kotak sendiri-sendiri — hanya teks, hover baru menyala */
 [data-testid="stPopoverBody"] div.stButton > button {
@@ -1176,7 +1176,7 @@ div.stDownloadButton > button:hover {
     display: flex !important;
 }
 [data-testid="stPopoverBody"] div.stButton > button:hover {
-    background: #F0EEE6 !important;
+    background: #E8DCC8 !important;
     border: none !important;
     box-shadow: none !important;
     color: inherit !important;
@@ -1201,16 +1201,16 @@ div.stDownloadButton > button:hover {
     margin: 0 !important;
     font-size: 0.92rem !important;
     font-weight: 500 !important;
-    color: #3D3929 !important;
+    color: #2C1F33 !important;
     line-height: 1.45 !important;
 }
 /* label PREMIUM kecil di sebelah nama model (tier Hard & Extreme) */
 .model-premium-badge {
     display: inline-block;
     font-size: 0.62rem; font-weight: 700;
-    color: #C15F3C;
-    background: rgba(218,119,86,0.12);
-    border: 1px solid rgba(218,119,86,0.35);
+    color: #4A3559;
+    background: rgba(44,31,51,0.12);
+    border: 1px solid rgba(44,31,51,0.35);
     border-radius: 999px;
     padding: 1px 7px;
     margin-left: 6px;
@@ -1229,9 +1229,9 @@ div.stDownloadButton > button:hover {
     font-size: 0.55rem;
     font-weight: 600;
     letter-spacing: 0.02em;
-    color: #B0774F;
-    background: rgba(218,119,86,0.10);
-    border: 1px solid rgba(218,119,86,0.25);
+    color: #5C4470;
+    background: rgba(44,31,51,0.10);
+    border: 1px solid rgba(44,31,51,0.25);
     border-radius: 999px;
     padding: 1px 6px;
     pointer-events: none;
@@ -1242,14 +1242,14 @@ div.stDownloadButton > button:hover {
 
 /* ---------- toggle mode gambar ---------- */
 [data-testid="stCheckbox"] label p, .stToggle label p {
-    color: #3D3929 !important;
+    color: #2C1F33 !important;
     font-size: 0.85rem !important;
     font-weight: 500 !important;
 }
 /* warna track toggle saat aktif → terracotta */
 [data-testid="stCheckbox"] [data-checked="true"],
 .stToggle [aria-checked="true"] > div:first-child {
-    background: #DA7756 !important;
+    background: #2C1F33 !important;
 }
 
 /* ---------- badge status mode ---------- */
@@ -1260,15 +1260,15 @@ div.stDownloadButton > button:hover {
     margin-bottom: 6px;
 }
 .mode-badge.img {
-    background: rgba(218,119,86,0.10);
-    border: 1px solid rgba(218,119,86,0.35); color: #C15F3C;
+    background: rgba(44,31,51,0.10);
+    border: 1px solid rgba(44,31,51,0.35); color: #4A3559;
 }
 
 /* ---------- spinner ala Claude ---------- */
 [data-testid="stSpinner"] > div {
-    border-top-color: #DA7756 !important;
+    border-top-color: #2C1F33 !important;
 }
-[data-testid="stSpinner"] p { color: #73726C !important; }
+[data-testid="stSpinner"] p { color: #6B6172 !important; }
 
 /* ---------- thinking indicator ala Claude ---------- */
 .claude-think {
@@ -1288,7 +1288,7 @@ div.stDownloadButton > button:hover {
 }
 /* bintang ✳ terracotta berdenyut & berputar pelan (fallback) */
 .claude-think .star {
-    font-size: 1.05rem; color: #DA7756; line-height: 1;
+    font-size: 1.05rem; color: #2C1F33; line-height: 1;
     animation: starPulse 2.2s ease-in-out infinite;
     display: inline-block;
 }
@@ -1323,7 +1323,7 @@ div.stDownloadButton > button:hover {
     background: linear-gradient(
         100deg,
         rgba(255,255,255,0) 0%,
-        rgba(255,240,225,0.85) 50%,
+        rgba(236,228,244,0.85) 50%,
         rgba(255,255,255,0) 100%
     );
     filter: blur(3px);
@@ -1346,9 +1346,9 @@ div.stDownloadButton > button:hover {
     font-size: 0.92rem; font-weight: 500;
     background: linear-gradient(
         90deg,
-        #A8A69E 0%, #A8A69E 35%,
-        #3D3929 50%,
-        #A8A69E 65%, #A8A69E 100%
+        #7E7387 0%, #7E7387 35%,
+        #2C1F33 50%,
+        #7E7387 65%, #7E7387 100%
     );
     background-size: 220% 100%;
     -webkit-background-clip: text;
@@ -1390,7 +1390,7 @@ div.stDownloadButton > button:hover {
 .type-caret {
     display: inline-block; width: 7px; height: 1.05em;
     margin-left: 3px; vertical-align: -2px;
-    background: #DA7756; border-radius: 2px;
+    background: #2C1F33; border-radius: 2px;
     animation: caretBlink 0.8s step-end infinite;
 }
 @keyframes caretBlink { 50% { opacity: 0; } }
@@ -1398,10 +1398,10 @@ div.stDownloadButton > button:hover {
 /* ---------- progress bar gambar: % + shimmer (ala Claude) ---------- */
 .img-progress {
     padding: 14px 16px 16px;
-    background: #FAF9F5;
-    border: 1px solid #E3E0D5;
+    background: #F2E8D6;
+    border: 1px solid #DBCEB9;
     border-radius: 16px;
-    box-shadow: 0 2px 10px rgba(61,57,41,0.06);
+    box-shadow: 0 2px 10px rgba(44,31,51,0.06);
     animation: thinkFadeIn 1s ease both;
     margin: 6px 0 14px;
 }
@@ -1415,9 +1415,9 @@ div.stDownloadButton > button:hover {
     /* teks shimmer sama seperti thinking */
     background: linear-gradient(
         90deg,
-        #A8A69E 0%, #A8A69E 35%,
-        #3D3929 50%,
-        #A8A69E 65%, #A8A69E 100%
+        #7E7387 0%, #7E7387 35%,
+        #2C1F33 50%,
+        #7E7387 65%, #7E7387 100%
     );
     background-size: 220% 100%;
     -webkit-background-clip: text;
@@ -1426,22 +1426,22 @@ div.stDownloadButton > button:hover {
     animation: shimmerSweep 4s linear infinite;
 }
 .img-progress-label .star {
-    -webkit-text-fill-color: #DA7756;
+    -webkit-text-fill-color: #2C1F33;
     animation: starPulse 2.2s ease-in-out infinite;
     display: inline-block; font-size: 1rem;
 }
 .img-progress-pct {
-    font-size: 0.92rem; font-weight: 600; color: #C15F3C;
+    font-size: 0.92rem; font-weight: 600; color: #4A3559;
     font-variant-numeric: tabular-nums;
 }
 .img-progress-track {
     height: 8px; border-radius: 99px;
-    background: #E8E5D8; overflow: hidden;
+    background: #E0D2BB; overflow: hidden;
     position: relative;
 }
 .img-progress-fill {
     height: 100%; border-radius: 99px;
-    background: linear-gradient(90deg, #DA7756, #E89B7F, #DA7756);
+    background: linear-gradient(90deg, #2C1F33, #6E5482, #2C1F33);
     background-size: 200% 100%;
     animation: shimmerSweep 2.2s linear infinite;
     transition: width 0.5s ease;
@@ -1459,21 +1459,21 @@ div.stDownloadButton > button:hover {
 
 /* ---------- alert / error ---------- */
 [data-testid="stAlert"] {
-    background: #FAF9F5 !important;
-    border: 1px solid #E3E0D5 !important;
+    background: #F2E8D6 !important;
+    border: 1px solid #DBCEB9 !important;
     border-radius: 12px !important;
-    color: #3D3929 !important;
+    color: #2C1F33 !important;
 }
 
 /* ---------- footer ---------- */
 .trinity-foot {
-    text-align: center; color: #A8A69E; font-size: 0.6rem;
+    text-align: center; color: #7E7387; font-size: 0.6rem;
     margin-top: 34px; font-family: 'Inter', sans-serif;
 }
 /* versi saat chat berjalan: lebih kecil lagi dari versi halaman awal */
 .trinity-foot.in-chat {
     font-size: 0.5rem;
-    color: #B8B6AC;
+    color: #827788;
     margin-top: 22px;
 }
 
@@ -1495,13 +1495,13 @@ div.stDownloadButton > button:hover {
 .st-key-acct_menu [data-testid="stPopover"] button {
     background: transparent !important;
     border: none !important; box-shadow: none !important;
-    color: #73726C !important;
+    color: #6B6172 !important;
     width: 32px !important; min-width: 32px !important; height: 32px !important;
     border-radius: 8px !important; padding: 0 !important;
     display: grid !important; place-items: center !important;
 }
 .st-key-acct_menu button:hover {
-    background: #E8E5D8 !important; color: #3D3929 !important;
+    background: #E0D2BB !important; color: #2C1F33 !important;
 }
 .st-key-acct_menu button svg { width: 20px !important; height: 20px !important; }
 
@@ -1513,9 +1513,9 @@ div.stDownloadButton > button:hover {
 .page-head-icon {
     width: 40px; height: 40px; flex-shrink: 0;
     border-radius: 12px;
-    background: #E8E5D8; border: 1px solid #D5D1C3;
+    background: #E0D2BB; border: 1px solid #CDBFA8;
     display: grid; place-items: center;
-    color: #C15F3C;
+    color: #4A3559;
 }
 .page-head-icon [data-testid="stIconMaterial"],
 .page-head-icon span[data-testid="stIconMaterial"] { font-size: 21px !important; }
@@ -1530,24 +1530,24 @@ div.stDownloadButton > button:hover {
 .feat-row .chip-on .mi, .feat-row .chip-off .mi { font-size: 15px; vertical-align: -3px; }
 .page-head h2.page-title {
     font-family: 'Source Serif 4', Georgia, serif;
-    font-size: 1.55rem; font-weight: 600; color: #1a1915;
+    font-size: 1.55rem; font-weight: 600; color: #1B1220;
     margin: 0 0 2px; line-height: 1.15; letter-spacing: -0.01em;
 }
 .page-head p.page-sub {
-    margin: 0; font-size: 0.9rem; color: #73726C; line-height: 1.45;
+    margin: 0; font-size: 0.9rem; color: #6B6172; line-height: 1.45;
 }
 
 /* --- kartu kategori berbentuk PERSEGI (halaman Artefak & Trinity kursus) ---
    Susunan: IKON BESAR di atas, lalu judul, lalu deskripsi kecil — semua
    di tengah. Ikon sengaja jauh lebih besar daripada teksnya. */
 button[kind="secondary"] > div > p > strong,
-div.stButton > button p strong { color: #3D3929; }
+div.stButton > button p strong { color: #2C1F33; }
 .st-key-cat_app button, .st-key-cat_doc button, .st-key-cat_game button,
 .st-key-cat_prod button, .st-key-cat_kre button, .st-key-cat_quiz button,
 .st-key-cat_new button,
 [class*="st-key-kurs_"] button {
-    background: #FAF9F5 !important;
-    border: 1px solid #E3E0D5 !important;
+    background: #F2E8D6 !important;
+    border: 1px solid #DBCEB9 !important;
     border-radius: 18px !important;
     padding: 18px 14px !important;
     /* PERSEGI: tinggi mengikuti lebar, dibatasi agar tidak raksasa */
@@ -1571,10 +1571,10 @@ div.stButton > button p strong { color: #3D3929; }
 .st-key-cat_kre button:hover, .st-key-cat_quiz button:hover,
 .st-key-cat_new button:hover,
 [class*="st-key-kurs_"] button:hover {
-    border-color: #C9A99A !important;
-    background: #FFFDF8 !important;
+    border-color: #8B7499 !important;
+    background: #F7ECD9 !important;
     transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(61,57,41,0.09) !important;
+    box-shadow: 0 6px 18px rgba(44,31,51,0.09) !important;
 }
 [class*="st-key-cat_"] button [data-testid="stMarkdownContainer"],
 [class*="st-key-kurs_"] button [data-testid="stMarkdownContainer"] {
@@ -1596,7 +1596,7 @@ div.stButton > button p strong { color: #3D3929; }
     display: block !important;
     font-size: 2.7rem !important;
     line-height: 1 !important;
-    color: #C15F3C !important;
+    color: #4A3559 !important;
     margin: 0 0 12px !important;
     vertical-align: baseline !important;
 }
@@ -1617,15 +1617,15 @@ div.stButton > button p strong { color: #3D3929; }
 
 /* --- kartu kosong --- */
 .empty-card {
-    background: #FAF9F5; border: 1px dashed #D5D1C3;
+    background: #F2E8D6; border: 1px dashed #CDBFA8;
     border-radius: 14px; padding: 18px;
-    color: #73726C; font-size: 0.9rem; line-height: 1.55;
+    color: #6B6172; font-size: 0.9rem; line-height: 1.55;
     margin: 2px 0 16px;
 }
 
 /* --- hero halaman --- */
 .trinity-hero {
-    background: #FAF9F5; border: 1px solid #E3E0D5; border-radius: 18px;
+    background: #F2E8D6; border: 1px solid #DBCEB9; border-radius: 18px;
     padding: 22px; display: flex; gap: 18px; align-items: center;
     margin-bottom: 16px;
 }
@@ -1633,43 +1633,43 @@ div.stButton > button p strong { color: #3D3929; }
 .trinity-hero .logo-greeting { width: 54px; height: 54px; }
 .trinity-hero .hero-text h1 {
     font-family: 'Source Serif 4', Georgia, serif;
-    font-size: 1.8rem; font-weight: 600; color: #1a1915;
+    font-size: 1.8rem; font-weight: 600; color: #1B1220;
     margin: 0 0 6px; letter-spacing: -0.01em;
 }
 .trinity-hero .hero-text p {
-    margin: 0; color: #73726C; font-size: 0.92rem; line-height: 1.55;
+    margin: 0; color: #6B6172; font-size: 0.92rem; line-height: 1.55;
 }
 
 /* --- judul bagian di dalam halaman --- */
 .set-section {
     font-family: 'Source Serif 4', Georgia, serif;
-    font-size: 1.06rem; font-weight: 600; color: #3D3929;
+    font-size: 1.06rem; font-weight: 600; color: #2C1F33;
     margin: 22px 0 10px;
 }
 
 /* --- kartu kemampuan --- */
 .cap-card {
-    background: #FAF9F5; border: 1px solid #E3E0D5; border-radius: 14px;
+    background: #F2E8D6; border: 1px solid #DBCEB9; border-radius: 14px;
     padding: 6px 14px; margin: 4px 0 8px;
 }
 .cap-row {
     display: flex; align-items: center; gap: 12px;
-    padding: 11px 0; border-bottom: 1px solid #EFECDF;
+    padding: 11px 0; border-bottom: 1px solid #E7D9C1;
     font-size: 0.9rem;
 }
 .cap-row:last-child { border-bottom: none; }
-.cap-row .cap-icon { color: #C15F3C; display: grid; place-items: center; width: 22px; }
-.cap-row .cap-name { flex: 1; color: #3D3929; }
+.cap-row .cap-icon { color: #4A3559; display: grid; place-items: center; width: 22px; }
+.cap-row .cap-name { flex: 1; color: #2C1F33; }
 .cap-row .cap-state {
     display: inline-flex; align-items: center; gap: 6px;
-    color: #A8A69E; font-size: 0.82rem;
+    color: #7E7387; font-size: 0.82rem;
 }
 
 /* --- baris fitur / status kecil --- */
 .feat-row {
     display: flex; align-items: center; justify-content: space-between;
-    gap: 12px; padding: 9px 2px; font-size: 0.88rem; color: #3D3929;
-    border-bottom: 1px solid #EFECDF;
+    gap: 12px; padding: 9px 2px; font-size: 0.88rem; color: #2C1F33;
+    border-bottom: 1px solid #E7D9C1;
 }
 .feat-row:last-child { border-bottom: none; }
 .chip-on, .chip-off {
@@ -1677,107 +1677,107 @@ div.stButton > button p strong { color: #3D3929; }
     font-size: 0.76rem; font-weight: 600;
     padding: 2px 8px; border-radius: 99px; white-space: nowrap;
 }
-.chip-on { background: #EAF1E4; color: #4C7A3C; }
-.chip-off { background: #EFEDE4; color: #8A877E; }
+.chip-on { background: #E4EAD8; color: #3F6B33; }
+.chip-off { background: #E7DBC6; color: #7D7484; }
 
 /* --- kartu paket (Trinity Pro) --- */
 .plan-card {
-    background: #FAF9F5; border: 1px solid #E3E0D5; border-radius: 16px;
+    background: #F2E8D6; border: 1px solid #DBCEB9; border-radius: 16px;
     padding: 20px; height: 100%; box-sizing: border-box;
 }
 .plan-card.is-pro {
-    border-color: #DA7756; background: #FFF9F5;
-    box-shadow: 0 6px 22px rgba(218,119,86,0.14);
+    border-color: #2C1F33; background: #F7EBD6;
+    box-shadow: 0 6px 22px rgba(44,31,51,0.14);
 }
 .plan-name {
     font-family: 'Source Serif 4', Georgia, serif;
-    font-size: 1.2rem; font-weight: 600; color: #1a1915;
+    font-size: 1.2rem; font-weight: 600; color: #1B1220;
 }
 .plan-price {
-    font-size: 1.75rem; font-weight: 700; color: #C15F3C;
+    font-size: 1.75rem; font-weight: 700; color: #4A3559;
     margin: 6px 0 2px; letter-spacing: -0.02em;
 }
-.plan-note { font-size: 0.8rem; color: #A8A69E; margin-bottom: 12px; }
+.plan-note { font-size: 0.8rem; color: #7E7387; margin-bottom: 12px; }
 .feat-list { margin-top: 4px; }
 
 /* --- memori --- */
 .mem-item {
-    background: #FAF9F5; border: 1px solid #E3E0D5; border-radius: 10px;
-    padding: 9px 12px; font-size: 0.88rem; color: #3D3929; margin-bottom: 6px;
+    background: #F2E8D6; border: 1px solid #DBCEB9; border-radius: 10px;
+    padding: 9px 12px; font-size: 0.88rem; color: #2C1F33; margin-bottom: 6px;
 }
 
 /* --- daftar bahasa --- */
 .lang-card {
-    background: #FAF9F5; border: 1px solid #E3E0D5; border-radius: 14px;
+    background: #F2E8D6; border: 1px solid #DBCEB9; border-radius: 14px;
     padding: 4px 14px;
 }
 .lang-row {
     display: flex; align-items: center; gap: 12px;
-    padding: 10px 0; border-bottom: 1px solid #EFECDF; font-size: 0.9rem;
+    padding: 10px 0; border-bottom: 1px solid #E7D9C1; font-size: 0.9rem;
 }
 .lang-row:last-child { border-bottom: none; }
 .lang-row .flag { font-size: 1.15rem; line-height: 1; }
 .lang-row .lang-name {
-    flex: 1; color: #3D3929; font-weight: 500;
+    flex: 1; color: #2C1F33; font-weight: 500;
     display: flex; flex-direction: column;
 }
-.lang-row .lang-native { font-size: 0.76rem; color: #A8A69E; font-weight: 400; }
+.lang-row .lang-native { font-size: 0.76rem; color: #7E7387; font-weight: 400; }
 .lang-row .lang-level { display: inline-flex; align-items: center; gap: 6px; }
 
 /* --- langkah bantuan & tips --- */
 .help-step {
     display: flex; align-items: flex-start; gap: 12px;
-    padding: 10px 0; font-size: 0.9rem; color: #3D3929; line-height: 1.5;
+    padding: 10px 0; font-size: 0.9rem; color: #2C1F33; line-height: 1.5;
 }
 .help-step .step-no {
     width: 24px; height: 24px; flex-shrink: 0;
-    border-radius: 50%; background: #E8E5D8; color: #57544A;
+    border-radius: 50%; background: #E0D2BB; color: #4E4553;
     display: grid; place-items: center;
     font-size: 0.74rem; font-weight: 700;
 }
-.help-step .step-icon { color: #C15F3C; padding-top: 2px; }
+.help-step .step-icon { color: #4A3559; padding-top: 2px; }
 .tip-row {
     display: flex; gap: 10px; align-items: flex-start;
-    padding: 8px 0; font-size: 0.89rem; color: #3D3929; line-height: 1.5;
+    padding: 8px 0; font-size: 0.89rem; color: #2C1F33; line-height: 1.5;
 }
 .tip-row .tip-no {
     width: 22px; height: 22px; flex-shrink: 0; border-radius: 50%;
-    background: #F1E5DC; color: #C15F3C;
+    background: #DDD2E4; color: #4A3559;
     display: grid; place-items: center; font-size: 0.72rem; font-weight: 700;
 }
 
 /* --- mini card (tentang aplikasi) --- */
 .mini-card {
-    background: #FAF9F5; border: 1px solid #E3E0D5; border-radius: 14px;
+    background: #F2E8D6; border: 1px solid #DBCEB9; border-radius: 14px;
     padding: 16px; height: 100%; box-sizing: border-box;
 }
-.mini-card .mini-icon { color: #C15F3C; margin-bottom: 8px; }
-.mini-card .mini-title { font-weight: 600; color: #3D3929; margin-bottom: 4px; }
-.mini-card .mini-desc { font-size: 0.84rem; color: #73726C; line-height: 1.5; }
+.mini-card .mini-icon { color: #4A3559; margin-bottom: 8px; }
+.mini-card .mini-title { font-weight: 600; color: #2C1F33; margin-bottom: 4px; }
+.mini-card .mini-desc { font-size: 0.84rem; color: #6B6172; line-height: 1.5; }
 
 /* --- kartu ponsel (halaman Dapatkan aplikasi) --- */
 .phone-card {
-    background: #FAF9F5; border: 1px solid #E3E0D5; border-radius: 22px;
+    background: #F2E8D6; border: 1px solid #DBCEB9; border-radius: 22px;
     padding: 30px 20px; text-align: center;
 }
 .phone-card .logo-greeting { width: 68px; height: 68px; margin: 0 auto 12px; }
-.phone-card .phone-name { font-weight: 600; color: #3D3929; }
-.phone-card .phone-tag { font-size: 0.78rem; color: #A8A69E; margin-top: 2px; }
+.phone-card .phone-name { font-weight: 600; color: #2C1F33; }
+.phone-card .phone-tag { font-size: 0.78rem; color: #7E7387; margin-top: 2px; }
 
 /* --- baris modul kursus --- */
 .mod-row {
-    background: #FAF9F5; border: 1px solid #E3E0D5; border-radius: 10px;
-    padding: 9px 12px; font-size: 0.88rem; color: #3D3929; margin-bottom: 6px;
+    background: #F2E8D6; border: 1px solid #DBCEB9; border-radius: 10px;
+    padding: 9px 12px; font-size: 0.88rem; color: #2C1F33; margin-bottom: 6px;
 }
 
 /* --- tab Pengaturan: rapikan --- */
-[data-baseweb="tab-list"] { gap: 4px !important; border-bottom: 1px solid #E3E0D5 !important; }
+[data-baseweb="tab-list"] { gap: 4px !important; border-bottom: 1px solid #DBCEB9 !important; }
 [data-baseweb="tab"] {
     font-size: 0.86rem !important; padding: 8px 10px !important;
-    color: #73726C !important; background: transparent !important;
+    color: #6B6172 !important; background: transparent !important;
 }
-[data-baseweb="tab"][aria-selected="true"] { color: #3D3929 !important; font-weight: 600 !important; }
-[data-baseweb="tab-highlight"] { background-color: #DA7756 !important; }
+[data-baseweb="tab"][aria-selected="true"] { color: #2C1F33 !important; font-weight: 600 !important; }
+[data-baseweb="tab-highlight"] { background-color: #2C1F33 !important; }
 </style>
 """,
         unsafe_allow_html=True,
@@ -3426,7 +3426,16 @@ def page_artefak() -> None:
 # HALAMAN: PENGATURAN (Umum · Akun · Privasi · Penagihan · Kemampuan ·
 #                      Memori · Refleksi · Waktu dan fokus · Trinity Code)
 # ============================================================================
-THEME_OPTIONS = ["Krem (Claude)", "Gelap", "Ikut sistem"]
+def _opt_index(options: list, value) -> int:
+    """Indeks `value` di `options`; jatuh ke 0 kalau nilainya sudah tidak dikenal.
+
+    Menjaga halaman Pengaturan tetap terbuka walau ada nilai setelan lama yang
+    tersimpan di session_state (mis. nama tema yang pernah diganti).
+    """
+    return options.index(value) if value in options else 0
+
+
+THEME_OPTIONS = ["Beige hangat", "Gelap", "Ikut sistem"]
 FONT_OPTIONS = ["Kecil", "Normal", "Besar"]
 SPEED_OPTIONS = ["Lambat", "Sedang", "Cepat"]
 PERSONA_OPTIONS = ["Santai & kocak", "Serius & ringkas", "Mentor sabar",
@@ -3490,10 +3499,10 @@ def _set_umum() -> None:
     st.markdown('<div class="set-section">Tampilan</div>', unsafe_allow_html=True)
     c1, c2 = st.columns(2)
     with c1:
-        theme = st.selectbox("Tema", THEME_OPTIONS, index=THEME_OPTIONS.index(s["theme"]),
-                             key="set_theme", help="Tema krem adalah tampilan bawaan Trinity.")
+        theme = st.selectbox("Tema", THEME_OPTIONS, index=_opt_index(THEME_OPTIONS, s["theme"]),
+                             key="set_theme", help="Tema beige hangat adalah tampilan bawaan Trinity.")
     with c2:
-        font = st.selectbox("Ukuran teks", FONT_OPTIONS, index=FONT_OPTIONS.index(s["font_size"]),
+        font = st.selectbox("Ukuran teks", FONT_OPTIONS, index=_opt_index(FONT_OPTIONS, s["font_size"]),
                             key="set_font")
     c3, c4 = st.columns(2)
     with c3:
@@ -3501,21 +3510,21 @@ def _set_umum() -> None:
                             help="Jarak antar pesan dipersempit supaya lebih banyak terlihat.")
     with c4:
         speed = st.selectbox("Kecepatan aliran jawaban", SPEED_OPTIONS,
-                             index=SPEED_OPTIONS.index(s["stream_speed"]), key="set_speed",
+                             index=_opt_index(SPEED_OPTIONS, s["stream_speed"]), key="set_speed",
                              help="Seberapa cepat kalimat Yuki muncul satu per satu.")
 
     st.markdown('<div class="set-section">Perilaku Yuki</div>', unsafe_allow_html=True)
     c5, c6 = st.columns(2)
     with c5:
         persona = st.selectbox("Kepribadian", PERSONA_OPTIONS,
-                               index=PERSONA_OPTIONS.index(s["personality"]), key="set_persona")
+                               index=_opt_index(PERSONA_OPTIONS, s["personality"]), key="set_persona")
     with c6:
         min_think = st.slider("Durasi \"berpikir\" minimum (detik)", 0.0, 20.0,
                               float(s["min_think_seconds"]), 0.5, key="set_think",
                               help="Animasi berpikir ditahan minimal selama ini "
                                    "sebelum jawaban ditampilkan.")
     mode = st.radio("Mode bawaan saat membuka aplikasi", ["Chat", "Gambar"],
-                    index=["Chat", "Gambar"].index(s["default_mode"]),
+                    index=_opt_index(["Chat", "Gambar"], s["default_mode"]),
                     key="set_mode", horizontal=True)
 
     if st.button(":material/save:  Simpan perubahan", key="save_umum", type="primary"):
@@ -3649,7 +3658,7 @@ def _plan_col(title: str, price: str, note: str, is_pro: bool, key: str) -> None
 def _set_penagihan() -> None:
     s = get_settings()
     cycle = st.radio("Siklus penagihan", ["Bulanan", "Tahunan (hemat 20%)"],
-                     index=["Bulanan", "Tahunan (hemat 20%)"].index(s["billing_cycle"]),
+                     index=_opt_index(["Bulanan", "Tahunan (hemat 20%)"], s["billing_cycle"]),
                      key="set_cycle", horizontal=True)
     if st.button(":material/credit_card:  Atur metode pembayaran", key="bayar_metode"):
         st.toast("Metode pembayaran akan dibuka setelah gerbang pembayaran aktif.",
@@ -3758,11 +3767,11 @@ def _set_refleksi() -> None:
     c1, c2 = st.columns(2)
     with c1:
         freq = st.selectbox("Yuki menanyakan progres", REFL_FREQ_OPTIONS,
-                            index=REFL_FREQ_OPTIONS.index(s["reflection_freq"]),
+                            index=_opt_index(REFL_FREQ_OPTIONS, s["reflection_freq"]),
                             key="refl_freq")
     with c2:
         tone = st.selectbox("Gaya dorongan", REFL_TONE_OPTIONS,
-                            index=REFL_TONE_OPTIONS.index(s["reflection_tone"]),
+                            index=_opt_index(REFL_TONE_OPTIONS, s["reflection_tone"]),
                             key="refl_tone")
 
     c3, c4 = st.columns(2)
@@ -4134,7 +4143,7 @@ ABOUT_CARDS = [
      "tidak tersedia."),
     (":material/image:", "Generate Foto",
      "Nyalakan toggle Gambar lalu tulis deskripsi. Gambar dibuat dengan "
-     "model FLUX di Cloudflare, ada progress bar bergaya Claude."),
+     "model FLUX di Cloudflare, ada progress bar bergaya Trinity."),
     (":material/record_voice_over:", "Suara &amp; Gambar Masuk",
      "Rekam suara (ditranskrip Whisper) atau kirim foto untuk dianalisis "
      "model vision Llama-4 Scout."),
