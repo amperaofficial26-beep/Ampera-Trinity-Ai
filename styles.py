@@ -694,6 +694,34 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 .trinity-foot.in-chat {
     display: none !important;
 }
+[class*="st-key-pending_card_"] {
+    position: relative !important;
+    width: 72px !important;
+}
+[class*="st-key-pending_card_"] .pending-row {
+    padding: 0;
+    gap: 0;
+}
+[class*="st-key-pending_card_"] div.stButton {
+    position: absolute !important;
+    top: -6px !important;
+    right: -6px !important;
+    z-index: 5 !important;
+    width: 20px !important;
+}
+[class*="st-key-pending_card_"] div.stButton > button {
+    min-width: 20px !important;
+    width: 20px !important;
+    height: 20px !important;
+    min-height: 20px !important;
+    padding: 0 !important;
+    border-radius: 999px !important;
+    font-size: 12px !important;
+    line-height: 20px !important;
+    background: #2C1F33 !important;
+    color: #F2E8D6 !important;
+    border: none !important;
+}
 /* tombol ➕ di baris kontrol: lingkaran putih bersih ala Claude, menyatu
    di dalam kartu (tanpa bayangan berlebih karena kartu sudah punya shadow) */
 .st-key-chat_controls [class*="st-key-plus_menu"] [data-testid="stPopover"] button {
