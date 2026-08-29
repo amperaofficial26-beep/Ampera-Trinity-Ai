@@ -57,12 +57,12 @@ SENTENCE_STREAM_DELAY = 0.15
 #   kurang pas.
 # ----------------------------------------------------------------------
 _LOGO_SIZES = {
-    "logo-greeting": "48px",   # logo di sebelah "Selamat pagi" — SEBELUMNYA kegedean
-    "logo-label":    "16px",   # logo kecil di label "Yuki" pada bubble jawaban
+    "logo-greeting": "60px",   # logo di sebelah "Selamat pagi" — SEBELUMNYA kegedean
+    "logo-label":    "20px",   # logo kecil di label "Yuki" pada bubble jawaban
     "logo-progress": "18px",   # logo di progress bar generate gambar
-    "logo-foot":     "14px",   # logo di footer halaman
+    "logo-foot":     "18px",   # logo di footer halaman
     "logo-inline":   "18px",   # default umum
-    "logo-shimmer":  "22px",   # logo di indikator "berpikir"
+    "logo-shimmer":  "25px",   # logo di indikator "berpikir"
 }
 
 
