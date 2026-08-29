@@ -9,17 +9,37 @@ Gabungan 3 aplikasi AI menjadi 1:
   3. AI Chat       → chat biasa dengan persona Yuki, streaming, konteks panjang
 
 Fitur suara & gambar (via Groq, satu API key yang sama):
-  - Mic 🎤       → bicara ke Yuki, ditranskrip dengan Whisper (whisper-large-v3-turbo)
-  - Gambar 📎    → kirim/paste/drag-drop gambar, dianalisis model vision
+  - Mic          → bicara ke Yuki, ditranskrip dengan Whisper (whisper-large-v3-turbo)
+  - Lampiran     → kirim/paste/drag-drop gambar, dianalisis model vision
                    Llama-4 Scout (meta-llama/llama-4-scout-17b-16e-instruct)
-  - Menu ➕      → popup minimalist ala Claude: upload file/gambar, tip
+  - Menu "+"     → popup minimalist ala Claude: upload file/gambar, tip
                    tangkapan layar, toggle pencarian web (Compound)
 
 Fitur ala Claude tambahan:
-  - Sidebar   → Proyek (grup ringan), Artefak (kode panjang tertangkap
-                otomatis), Sesuaikan (panggilan & instruksi custom Yuki),
-                riwayat percakapan ("Hari ini")
-  - Balasan Yuki → baris aksi kecil: salin jawaban, feedback 👍/, jam kirim
+  - Sidebar   → Proyek (grup ringan), Artefak, Sesuaikan (panggilan &
+                instruksi custom Yuki), riwayat percakapan ("Hari ini")
+  - Balasan Yuki → baris aksi kecil: salin jawaban, feedback, jam kirim
+
+HALAMAN (routing internal lewat st.session_state.page, tanpa file terpisah):
+  - chat        → halaman utama (default)
+  - artefak     → kotak kategori ala Claude: Aplikasi dan situs web, Dokumen
+                  dan templat, Permainan, Alat produktivitas, Proyek kreatif,
+                  Kuis atau survei, Mulai dari awal. Begitu satu kotak
+                  dipilih, Yuki LANGSUNG menjawab di halaman itu (thread
+                  sendiri, chat utama tidak ikut terisi) + artefak tersimpan
+  - pengaturan  → 9 tab: Umum · Akun · Privasi · Penagihan · Kemampuan ·
+                  Memori · Refleksi · Waktu dan fokus · Trinity Code
+  - bahasa      → 14 bahasa (antarmuka + bahasa jawaban Yuki)
+  - bantuan     → petunjuk detail pemakaian aplikasi + FAQ + kontak
+  - tingkatkan  → promosi paket "Trinity Pro" (harga menyusul)
+  - aplikasi    → rencana rilis aplikasi Android/iOS + daftar kabar rilis
+  - kursus      → Trinity kursus: pemasaran, penjualan, desain, copywriting,
+                  branding, keuangan, produktivitas, public speaking, konten
+                  kreator, AI untuk bisnis (Yuki jadi mentor, thread sendiri)
+  - pelajari    → tentang aplikasi + cara pakai + tips
+Semua halaman kecuali chat dibuka dari menu titik tiga (⋯) di baris akun
+sidebar; Pengaturan/Privasi/Memori/Refleksi/Trinity Code ikut memengaruhi
+system prompt Yuki (build_system_prompt).
 
 Catatan: fitur "Suara Yuki" (TTS) sudah dihapus karena tidak berfungsi.
 
@@ -52,39 +72,6 @@ import requests
 import streamlit as st
 from openai import OpenAI
 from PIL import Image
-import subprocess, sys
-
-cd /mount/src/ampera-trinity-ai
-git fetch origin arena/01a04a12-ampera-trinity-ai
-git checkout arena/01a04a12-ampera-trinity-ai
-git pull origin arena/01a04a12-ampera-trinity-ai
-python3 -m py_compile app.py && echo "OK"
-PATH = "app.py"
-MAP = {
-    "\u201c": '"',   # “  -> "
-    "\u201d": '"',   # ”  -> "
-    "\u2018": "'",   # ‘  -> '
-    "\u2019": "'",   # ’  -> '
-    "\u00a0": " ",   # NBSP -> spasi biasa
-    "\u200b": "",    # zero-width space -> hapus
-    "\ufeff": "",    # BOM -> hapus
-}
-
-src = open(PATH, encoding="utf-8").read()
-total = 0
-for lama, baru in MAP.items():
-    n = src.count(lama)
-    if n:
-        total += n
-        src = src.replace(lama, baru)
-        print(f"{n:5d}x  {lama!r} -> {baru!r}")
-open(PATH, "w", encoding="utf-8").write(src)
-print(f"\nTotal {total} karakter diganti.")
-
-r = subprocess.run([sys.executable, "-m", "py_compile", PATH],
-                   capture_output=True, text=True)
-print("\npy_compile:", "OK — tidak ada SyntaxError" if r.returncode == 0
-      else "\n" + r.stderr)
 
 # ============================================================================
 # KONFIGURASI HALAMAN
@@ -165,6 +152,7 @@ STT_MODEL = "whisper-large-v3-turbo"          # transkrip suara → teks (mic te
 MAX_IMAGES_PER_MESSAGE = 5                    # batas model vision (Llama-4)
 IMAGE_INPUT_TYPES = ["png", "jpg", "jpeg", "webp", "gif"]
 VISION_RECENT_MESSAGES = 4  # pesan terakhir yang gambarnya ikut ke API
+
 # ============================================================================
 # KATALOG HALAMAN BARU
 #   (halaman Artefak, Bahasa, Pengaturan, Bantuan, Trinity Pro, Aplikasi,
@@ -1023,7 +1011,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 }
 /* tombol ➕ di baris kontrol: lingkaran putih bersih ala Claude, menyatu
    di dalam kartu (tanpa bayangan berlebih karena kartu sudah punya shadow) */
-.st-key-chat_controls .st-key-plus_menu [data-testid="stPopover"] button {
+.st-key-chat_controls [class*="st-key-plus_menu"] [data-testid="stPopover"] button {
     background: transparent !important;
     border: none !important;
     border-radius: 999px !important;
@@ -1038,7 +1026,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     box-shadow: none !important;
     justify-content: center !important;
 }
-.st-key-chat_controls .st-key-plus_menu [data-testid="stPopover"] button:hover {
+.st-key-chat_controls [class*="st-key-plus_menu"] [data-testid="stPopover"] button:hover {
     background: #F5F4EF !important;
     border-color: #DA7756 !important;
     color: #C15F3C !important;
@@ -1046,8 +1034,8 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 /* Streamlit menambahkan ikon panah kecil di ujung tombol popover secara
    otomatis (indikator dropdown) — disembunyikan supaya tombol ➕ tetap
    polos, hanya ikon plus saja tanpa panah di sebelahnya. */
-.st-key-chat_controls .st-key-plus_menu [data-testid="stPopover"] button svg:last-child,
-.st-key-chat_controls .st-key-plus_menu [data-testid="stPopover"] button [data-testid="stIconMaterial"]:last-child {
+.st-key-chat_controls [class*="st-key-plus_menu"] [data-testid="stPopover"] button svg:last-child,
+.st-key-chat_controls [class*="st-key-plus_menu"] [data-testid="stPopover"] button [data-testid="stIconMaterial"]:last-child {
     display: none !important;
 }
 /* isi popover ➕ minimalist: cukup tombol unggah, tanpa label/hint besar */
@@ -1060,8 +1048,8 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 }
 /* baris menu tambahan di popover + (screenshot, pencarian web) —
    sama gayanya dengan item lain: teks polos, hover krem */
-[data-testid="stPopoverBody"] .st-key-plus_menu div.stButton > button,
-.st-key-plus_menu [data-testid="stPopoverBody"] div.stButton > button {
+[data-testid="stPopoverBody"] [class*="st-key-plus_menu"] div.stButton > button,
+[class*="st-key-plus_menu"] [data-testid="stPopoverBody"] div.stButton > button {
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
@@ -1079,20 +1067,20 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
    uploader (teks ikon+nama yang kita isi dari Python) tetap terlihat
    sebagai satu-satunya representasi visual — klik di mana saja pada
    baris tetap membuka dialog pilih file karena overlay ada di atasnya. */
-.st-key-plus_upload_file, .st-key-plus_upload_image {
+[class*="st-key-plus_upload_file"], [class*="st-key-plus_upload_image"] {
     position: relative !important;
     border-radius: 10px !important;
     transition: background .15s ease;
 }
-.st-key-plus_upload_file:hover, .st-key-plus_upload_image:hover {
+[class*="st-key-plus_upload_file"]:hover, [class*="st-key-plus_upload_image"]:hover {
     background: #F0EEE6 !important;
 }
-.st-key-plus_upload_file [data-testid="stFileUploaderDropzoneInstructions"],
-.st-key-plus_upload_image [data-testid="stFileUploaderDropzoneInstructions"] {
+[class*="st-key-plus_upload_file"] [data-testid="stFileUploaderDropzoneInstructions"],
+[class*="st-key-plus_upload_image"] [data-testid="stFileUploaderDropzoneInstructions"] {
     display: none !important;
 }
-.st-key-plus_upload_file [data-testid="stFileUploaderDropzone"],
-.st-key-plus_upload_image [data-testid="stFileUploaderDropzone"] {
+[class*="st-key-plus_upload_file"] [data-testid="stFileUploaderDropzone"],
+[class*="st-key-plus_upload_image"] [data-testid="stFileUploaderDropzone"] {
     position: absolute !important;
     inset: 0 !important;
     width: 100% !important;
@@ -1105,12 +1093,12 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     background: transparent !important;
     border: none !important;
 }
-.st-key-plus_upload_file [data-testid="stFileUploader"],
-.st-key-plus_upload_image [data-testid="stFileUploader"] {
+[class*="st-key-plus_upload_file"] [data-testid="stFileUploader"],
+[class*="st-key-plus_upload_image"] [data-testid="stFileUploader"] {
     margin: 0 !important;
 }
-.st-key-plus_upload_file [data-testid="stWidgetLabel"],
-.st-key-plus_upload_image [data-testid="stWidgetLabel"] {
+[class*="st-key-plus_upload_file"] [data-testid="stWidgetLabel"],
+[class*="st-key-plus_upload_image"] [data-testid="stWidgetLabel"] {
     position: relative !important;
     z-index: 0 !important;
     display: flex !important;
@@ -1119,21 +1107,21 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     margin: 0 !important;
     pointer-events: none !important;  /* klik tembus ke overlay dropzone */
 }
-.st-key-plus_upload_file [data-testid="stWidgetLabel"] p,
-.st-key-plus_upload_image [data-testid="stWidgetLabel"] p {
+[class*="st-key-plus_upload_file"] [data-testid="stWidgetLabel"] p,
+[class*="st-key-plus_upload_image"] [data-testid="stWidgetLabel"] p {
     font-size: 0.92rem !important;
     font-weight: 500 !important;
     color: #3D3929 !important;
     margin: 0 !important;
 }
 /* strip lampiran yang menunggu dikirim (hasil menu ➕) */
-.st-key-pending_strip { padding: 2px 2px 0; }
-.st-key-pending_strip [data-testid="stHorizontalBlock"] {
+[class*="st-key-pending_strip"] { padding: 2px 2px 0; }
+[class*="st-key-pending_strip"] [data-testid="stHorizontalBlock"] {
     gap: 10px !important;
     align-items: flex-start !important;
 }
-.st-key-pending_strip [data-testid="stImage"] { margin: 0 !important; }
-.st-key-pending_strip button {
+[class*="st-key-pending_strip"] [data-testid="stImage"] { margin: 0 !important; }
+[class*="st-key-pending_strip"] button {
     min-height: 24px !important;
     height: 24px !important;
     font-size: 0.72rem !important;
@@ -1481,6 +1469,7 @@ div.stDownloadButton > button:hover {
     color: #B8B6AC;
     margin-top: 22px;
 }
+
 /* ============ HALAMAN BARU (Artefak · Pengaturan · Bahasa ·
    Bantuan · Trinity Pro · Aplikasi · Trinity Kursus · Pelajari) ============ */
 /* --- baris akun + menu titik tiga --- */
@@ -1729,12 +1718,6 @@ div.stButton > button p strong { color: #3D3929; }
 }
 [data-baseweb="tab"][aria-selected="true"] { color: #3D3929 !important; font-weight: 600 !important; }
 [data-baseweb="tab-highlight"] { background-color: #DA7756 !important; }
-.st-key-chat_controls [class*="st-key-plus_menu"] [data-testid="stPopover"] button { … }
-[data-testid="stPopoverBody"] [class*="st-key-plus_menu"] div.stButton > button,
-[class*="st-key-plus_menu"] [data-testid="stPopoverBody"] div.stButton > button { … }
-[class*="st-key-plus_upload_file"], [class*="st-key-plus_upload_image"] { … }
-[class*="st-key-pending_strip"] { … }
-
 </style>
 """,
         unsafe_allow_html=True,
@@ -1785,6 +1768,10 @@ def _is_model_unavailable_error(exc: Exception) -> bool:
 # ============================================================================
 # ENGINE 1: CHAT MULTI AI (Groq + persona Yuki + streaming + fallback)
 # ============================================================================
+def build_chat_client() -> OpenAI:
+    return OpenAI(api_key=GROQ_API_KEY, base_url=GROQ_BASE_URL)
+
+
 def get_settings() -> dict:
     """Pengaturan user (halaman Pengaturan) — nilai yang belum diset
     otomatis diisi dari DEFAULT_SETTINGS, jadi aman walau state lama."""
@@ -1858,6 +1845,7 @@ def build_system_prompt() -> str:
         parts.append(f"Instruksi tambahan dari User yang harus selalu diikuti:\n{extra}")
     return "\n\n".join(parts)
 
+
 def messages_for_api(history: list[dict]) -> list[dict]:
     """System prompt Yuki + riwayat terakhir (ramah free-tier).
     Pesan yang membawa gambar dikirim sebagai konten multimodal (vision),
@@ -1898,7 +1886,7 @@ def stream_chat_reply(client: OpenAI, model: str, history: list[dict]):
     stream = client.chat.completions.create(
         model=model,
         messages=messages_for_api(history),
-               # Suhu bisa diatur user di Pengaturan → Trinity Code (0,3 = kaku,
+        # Suhu bisa diatur user di Pengaturan → Trinity Code (0,3 = kaku,
         # 1,2 = liar). Dibaca tiap request supaya perubahan langsung terasa.
         temperature=float(get_settings().get("temperature", 0.7)),
         stream=True,
@@ -2427,7 +2415,14 @@ def active_thread() -> list[dict]:
             return course_thread(cid)
         return []
     return st.session_state.messages
-      # Halaman aktif (routing internal): chat / artefak / pengaturan / bahasa /
+
+
+def init_state() -> None:
+    # Halaman awal bersih ala Claude: tanpa pesan sambutan,
+    # hanya sapaan besar + input di tengah.
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+    # Halaman aktif (routing internal): chat / artefak / pengaturan / bahasa /
     # bantuan / tingkatkan / aplikasi / kursus / pelajari
     if "page" not in st.session_state:
         st.session_state.page = "chat"
@@ -2443,35 +2438,6 @@ def active_thread() -> list[dict]:
         st.session_state.course_active_key = None
     if "logged_out" not in st.session_state:
         st.session_state.logged_out = False
-
-def reset_conversation() -> None:
-    """Chat baru: arsipkan obrolan utama, lalu kosongkan thread utama."""
-    _archive_current_conversation()
-    st.session_state.active_conv_id = None
-    for key in ("messages", "msg_counter"):
-        st.session_state.pop(key, None)
-    init_state()
-    st.session_state.page = "chat"
-
-
-def open_conversation(conv_id: int) -> None:
-    """Buka kembali percakapan lama dari riwayat sidebar."""
-    _archive_current_conversation()
-    for c in st.session_state.conversations:
-        if c["id"] == conv_id:
-            st.session_state.messages = c["messages"]
-            st.session_state.page = "chat"
-            st.session_state.active_conv_id = conv_id
-            st.session_state.msg_counter = max(
-                (m.get("id", 0) for m in c["messages"]), default=1
-            )
-            return
-
-def init_state() -> None:
-    # Halaman awal bersih ala Claude: tanpa pesan sambutan,
-    # hanya sapaan besar + input di tengah.
-    if "messages" not in st.session_state:
-        st.session_state.messages = []
     if "selected_model_key" not in st.session_state:
         st.session_state.selected_model_key = DEFAULT_MODEL_KEY
     if "image_mode" not in st.session_state:
@@ -2546,11 +2512,13 @@ def _archive_current_conversation() -> None:
 
 
 def reset_conversation() -> None:
+    """Chat baru: arsipkan obrolan utama, lalu kosongkan thread utama."""
     _archive_current_conversation()
     st.session_state.active_conv_id = None
     for key in ("messages", "msg_counter"):
         st.session_state.pop(key, None)
     init_state()
+    st.session_state.page = "chat"
 
 
 def open_conversation(conv_id: int) -> None:
@@ -2559,6 +2527,7 @@ def open_conversation(conv_id: int) -> None:
     for c in st.session_state.conversations:
         if c["id"] == conv_id:
             st.session_state.messages = c["messages"]
+            st.session_state.page = "chat"
             st.session_state.active_conv_id = conv_id
             st.session_state.msg_counter = max(
                 (m.get("id", 0) for m in c["messages"]), default=1
@@ -2571,12 +2540,15 @@ def open_conversation(conv_id: int) -> None:
 #   Brand serif · + Baru · menu · riwayat "Hari ini" · akun di bawah
 # ============================================================================
 HAS_DIALOG = hasattr(st, "dialog")
+
+
 def go(page: str, **extra) -> None:
     """Pindah halaman internal (chat / artefak / pengaturan / …)."""
     for k, v in extra.items():
         st.session_state[k] = v
     st.session_state.page = page
     st.rerun()
+
 
 def _register_dialog(title: str, func):
     """Bungkus fungsi jadi @st.dialog kalau tersedia; kalau versi Streamlit
@@ -2711,16 +2683,13 @@ def render_sidebar() -> None:
                         open_conversation(c["id"])
                         st.rerun()
 
-        # Baris akun di dasar sidebar ala Claude: (U) User · Free  ⌄ | ikon
-        st.markdown(
-            f"""
         # ---- Baris akun di dasar sidebar ala Claude ----
         # (U) Nama · Paket   [⋮ menu akun]
         s = get_settings()
         name = (s.get("display_name") or "User").strip() or "User"
         plan = s.get("plan") or "Free"
         initial = name[0].upper()
-                with st.container(key="sb_account"):
+        with st.container(key="sb_account"):
             acc_col, menu_col = st.columns([5, 1.05], gap="small")
             with acc_col:
                 # Baris akun. Disusun dari potongan string biasa (bukan
@@ -2771,10 +2740,12 @@ def render_sidebar() -> None:
 # ============================================================================
 # HANDLER PESAN
 # ============================================================================
-def handle_image_request(prompt: str) -> None:thread = active_thread()
-    """Mode gambar: prompt → Cloudflare FLUX → bubble gambar."""
+def handle_image_request(prompt: str) -> None:
+    """Mode gambar: prompt → Cloudflare FLUX → bubble gambar.
+    Hasil masuk ke thread aktif (chat utama, artefak, atau kursus)."""
+    thread = active_thread()
     if not IMAGE_READY:
-        st.session_state.messages.append({
+        thread.append({
             "id": next_msg_id(), "role": "assistant", "type": "text",
             "content": "Fitur gambar belum dikonfigurasi pemilik (CF_ACCOUNT_ID / CF_API_TOKEN).",
             "time": datetime.now().strftime("%H:%M"),
@@ -2829,7 +2800,7 @@ def handle_image_request(prompt: str) -> None:thread = active_thread()
         progress_slot.markdown(image_progress_html(100, "Selesai"), unsafe_allow_html=True)
         time.sleep(0.6)
         progress_slot.empty()
-        st.session_state.messages.append({
+        thread.append({
             "id": next_msg_id(), "role": "assistant", "type": "image",
             "image_bytes": result["data"], "prompt": prompt,
             "time": datetime.now().strftime("%H:%M"),
@@ -2841,7 +2812,7 @@ def handle_image_request(prompt: str) -> None:thread = active_thread()
         if not msg.startswith(("Layanan", "Kuota", "Server terlalu",
                                "Gagal membuat", "Respons terlalu")):
             msg = public_error_image(None, msg, e)
-        st.session_state.messages.append({
+        thread.append({
             "id": next_msg_id(), "role": "assistant", "type": "text",
             "content": msg, "time": datetime.now().strftime("%H:%M"),
         })
@@ -2922,9 +2893,8 @@ def handle_chat_request(answer_slot) -> None:
 
 
 # ============================================================================
-# MAIN
+# KONTROL KOTAK INPUT (dipakai bersama oleh chat utama, Artefak, dan Kursus)
 # ============================================================================
-
 def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> None:
     """Isi dok bawah: [⋯ menu lampiran] [Gambar] ... [Nama Model].
     Dipanggil DI DALAM st.bottom / st._bottom oleh halaman pemanggilnya."""
@@ -3239,6 +3209,8 @@ def render_chat_page() -> None:
         st.rerun()
 
     _page_footer(in_chat=not is_fresh)
+
+
 # ============================================================================
 # HALAMAN: ARTEFAK (kotak kategori ala Claude + ruang kerja Yuki)
 # ============================================================================
@@ -3353,6 +3325,20 @@ def page_artefak() -> None:
             "halaman ini.</div>",
             unsafe_allow_html=True,
         )
+
+    _artifact_grid("cat")
+
+    if artifacts:
+        st.markdown('<div class="sb-group" style="margin-top:14px;">Artefak tersimpan</div>',
+                    unsafe_allow_html=True)
+        for art in artifacts[:20]:
+            with st.container(key=f"art_saved_{art['id']}"):
+                with st.expander(f":material/extension:  {art['title']}  ·  {art.get('time', '')}"):
+                    st.code(art["content"], language=art.get("lang") or None)
+
+    _page_footer()
+
+
 # ============================================================================
 # HALAMAN: PENGATURAN (Umum · Akun · Privasi · Penagihan · Kemampuan ·
 #                      Memori · Refleksi · Waktu dan fokus · Trinity Code)
@@ -3863,7 +3849,9 @@ def page_pengaturan() -> None:
         _set_trinity_code()
 
     _page_footer()
-    # ============================================================================
+
+
+# ============================================================================
 # HALAMAN: BAHASA
 # ============================================================================
 def page_bahasa() -> None:
@@ -3938,7 +3926,9 @@ def page_bahasa() -> None:
                "yang dipilih untuk Yuki langsung dipakai pada jawaban "
                "berikutnya.")
     _page_footer()
-    # ============================================================================
+
+
+# ============================================================================
 # HALAMAN: DAPATKAN BANTUAN (petunjuk detail pemakaian aplikasi)
 # ============================================================================
 HELP_STEPS = [
@@ -4041,7 +4031,9 @@ def page_bantuan() -> None:
                      use_container_width=True):
             go("pelajari")
     _page_footer()
-    # ============================================================================
+
+
+# ============================================================================
 # HALAMAN: PELAJARI LEBIH LANJUT (tentang aplikasi + cara memakainya)
 # ============================================================================
 ABOUT_CARDS = [
@@ -4143,7 +4135,9 @@ def page_pelajari() -> None:
                      use_container_width=True):
             go("tingkatkan")
     _page_footer()
-    # ============================================================================
+
+
+# ============================================================================
 # HALAMAN: TINGKATKAN PAKET (promosi Trinity Pro)
 # ============================================================================
 def page_tingkatkan() -> None:
@@ -4340,18 +4334,9 @@ def page_kursus() -> None:
     )
     _course_grid("kurs")
     _page_footer()
-    _artifact_grid("cat")
 
-    if artifacts:
-        st.markdown('<div class="sb-group" style="margin-top:14px;">Artefak tersimpan</div>',
-                    unsafe_allow_html=True)
-        for art in artifacts[:20]:
-            with st.container(key=f"art_saved_{art['id']}"):
-                with st.expander(f":material/extension:  {art['title']}  ·  {art.get('time', '')}"):
-                    st.code(art["content"], language=art.get("lang") or None)
 
-    _page_footer()
-    # ============================================================================
+# ============================================================================
 # MAIN — pengalih halaman
 # ============================================================================
 def main() -> None:
