@@ -761,17 +761,45 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     flex-wrap: wrap;
     align-items: flex-end;
     gap: 10px;
-    padding: 8px 8px 4px;
+    padding: 10px 8px 6px;
 }
 .pending-card { width: 72px; text-align: center; }
-.pending-card img {
+.pending-square {
+    width: 72px;
+    height: 72px;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #DBCEB9;
+    background: #E8DCC8;
+}
+.pending-square img {
     width: 72px;
     height: 72px;
     object-fit: cover;
-    border-radius: 12px;
-    border: 1px solid #DBCEB9;
+    object-position: center;
     display: block;
-    background: #E8DCC8;
+}
+.pending-loading {
+    background: linear-gradient(90deg, #E8DCC8 0%, #F2E8D6 45%, #E8DCC8 100%);
+    background-size: 200% 100%;
+    animation: pendingShimmer 1.1s ease-in-out infinite;
+    position: relative;
+}
+.pending-loading::after {
+    content: "";
+    position: absolute;
+    inset: 26px;
+    border: 2px solid #C1B49F;
+    border-top-color: #2C1F33;
+    border-radius: 50%;
+    animation: pendingSpin 0.8s linear infinite;
+}
+@keyframes pendingShimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+@keyframes pendingSpin {
+    to { transform: rotate(360deg); }
 }
 .pending-name {
     font-size: 0.65rem;
