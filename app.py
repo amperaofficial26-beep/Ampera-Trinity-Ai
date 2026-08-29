@@ -28,11 +28,11 @@ from config import (
     get_secret,
 )
 
-es.flux_service import FluxService
+import FluxService
 from components.chat_ui import render_chat_tab
 from components.gallery_ui import render_gallery_tab
 from components.metrics_ui import render_metrics_tab
-
+es.flux_service
 # ============================================================================
 # KONFIGURASI HALAMAN UTAMA STREAMLIT
 # ============================================================================
