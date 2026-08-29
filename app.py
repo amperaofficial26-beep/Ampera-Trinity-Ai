@@ -63,6 +63,7 @@ import html
 import inspect
 import io
 import os
+import random
 import re
 import threading
 import time
@@ -824,16 +825,16 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 
 /* ===== ukuran logo custom di berbagai tempat (statis, tanpa animasi) ===== */
 .logo-label {
-    width: 30px; height: 30px;
+    width: 26px; height: 26px;
     display: inline-block; vertical-align: middle;
 }
 .logo-greeting {
-    width: 76px; height: 76px;
-    display: inline-block; vertical-align: -16px;
+    width: 48px; height: 48px;
+    display: inline-block; vertical-align: -12px;
     margin-right: 2px;
 }
 .logo-progress {
-    width: 22px; height: 22px;
+    width: 20px; height: 20px;
     display: inline-block; vertical-align: middle;
 }
 /* logo SVG selalu memakai warna aksen, ikut tema, tanpa file PNG */
@@ -1634,7 +1635,7 @@ div.stButton > button p strong { color: #2C1F33; }
     margin-bottom: 16px;
 }
 .trinity-hero > div:first-child { flex-shrink: 0; }
-.trinity-hero .logo-greeting { width: 54px; height: 54px; }
+.trinity-hero .logo-greeting { width: 42px; height: 42px; }
 .trinity-hero .hero-text h1 {
     font-family: 'Source Serif 4', Georgia, serif;
     font-size: 1.8rem; font-weight: 600; color: #1B1220;
@@ -1764,7 +1765,7 @@ div.stButton > button p strong { color: #2C1F33; }
     background: #F2E8D6; border: 1px solid #DBCEB9; border-radius: 22px;
     padding: 30px 20px; text-align: center;
 }
-.phone-card .logo-greeting { width: 68px; height: 68px; margin: 0 auto 12px; }
+.phone-card .logo-greeting { width: 54px; height: 54px; margin: 0 auto 12px; }
 .phone-card .phone-name { font-weight: 600; color: #2C1F33; }
 .phone-card .phone-tag { font-size: 0.78rem; color: #7E7387; margin-top: 2px; }
 
@@ -2325,9 +2326,11 @@ LOGO_SVG = (
     # jadi otomatis ikut tema tanpa bergantung file PNG di assets/.
     '<svg viewBox="0 0 100 100" fill="currentColor" '
     'xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+    '<g transform="translate(11 11) scale(0.78)">'
     '<path d="M50 2 L57 43 L98 50 L57 57 L50 98 L43 57 L2 50 L43 43 Z"/>'
     '<path d="M50 20 L54.5 45.5 L80 50 L54.5 54.5 L50 80 L45.5 54.5 '
     'L20 50 L45.5 45.5 Z" transform="rotate(45 50 50)"/>'
+    '</g>'
     '</svg>'
 )
 
@@ -2336,6 +2339,26 @@ def logo_img_html(css_class: str = "logo-inline") -> str:
     """Logo sebagai SVG inline (ikut warna teks/tema); tidak butuh file PNG."""
     return (f'<span class="{css_class}" role="img" '
             'aria-label="logo Trinity">' + LOGO_SVG + '</span>')
+
+
+# Kumpulan sapaan per waktu; dipilih acak tiap sesi agar halaman utama
+# tidak monoton saat aplikasi dibuka berulang kali.
+SAPAAN = {
+    "pagi":  ["Selamat pagi", "Pagi! Siap berkarya?", "Halo, selamat pagi"],
+    "siang": ["Selamat siang", "Halo! Ada yang bisa kubantu?", "Selamat datang kembali"],
+    "sore":  ["Selamat sore", "Sore! Lanjut berkarya?", "Halo, selamat sore"],
+    "malam": ["Selamat malam", "Malam! Masih semangat?", "Halo, selamat malam"],
+}
+
+
+def get_greeting() -> str:
+    """Sapaan halaman utama; acak per sesi, sesuai waktu, tidak monoton."""
+    if "sapaan" not in st.session_state:
+        h = datetime.now().hour
+        periode = ("pagi" if 4 <= h < 11 else "siang" if 11 <= h < 15
+                   else "sore" if 15 <= h < 19 else "malam")
+        st.session_state["sapaan"] = random.choice(SAPAAN[periode])
+    return st.session_state["sapaan"]
 
 
 def thinking_html(phrases: list[str]) -> str:
@@ -3241,7 +3264,7 @@ def render_chat_page() -> None:
         st.markdown(_FRESH_BOTTOM_CSS, unsafe_allow_html=True)
         st.markdown(
             '<div class="trinity-greeting" style="margin-top:18vh;">'
-            f'{logo_img_html("logo-greeting")} Semangat lagi!'
+            f'{logo_img_html("logo-greeting")} {get_greeting()}'
             "</div>",
             unsafe_allow_html=True,
         )
