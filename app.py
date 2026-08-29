@@ -54,7 +54,11 @@ from openai import OpenAI
 from PIL import Image
 import subprocess, sys
 
-python3 fix_quotes.py
+cd /mount/src/ampera-trinity-ai
+git fetch origin arena/01a04a12-ampera-trinity-ai
+git checkout arena/01a04a12-ampera-trinity-ai
+git pull origin arena/01a04a12-ampera-trinity-ai
+python3 -m py_compile app.py && echo "OK"
 PATH = "app.py"
 MAP = {
     "\u201c": '"',   # “  -> "
