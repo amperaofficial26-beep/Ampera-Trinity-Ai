@@ -46,9 +46,7 @@ def mi(name: str) -> str:
         '-webkit-font-smoothing:antialiased;user-select:none;">'
         f"{glyph}</span>"
     )
-PYEOF
 
-cat > errors.py << 'PYEOF'
 # -*- coding: utf-8 -*-
 """
 Pesan error ramah pengguna umum untuk mode chat & mode generate gambar,
