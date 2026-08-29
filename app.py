@@ -96,8 +96,7 @@ def render_chat_page() -> None:
         chat_kwargs["file_type"] = IMAGE_INPUT_TYPES
     if CHAT_INPUT_SUPPORTS_AUDIO:
         chat_kwargs["accept_audio"] = True
-    user_input = st.chat_input(placeholder_text, **chat_kwargs)
-
+    
     bottom_dock = getattr(st, "bottom", None) or st._bottom
     with bottom_dock:
         with st.container(key="chat_controls"):
