@@ -1188,6 +1188,13 @@ div.stDownloadButton > button:hover {
     text-align: left !important;
     justify-content: flex-start !important;
 }
+/* deskripsi model: lebih kecil dari nama modelnya */
+[data-testid="stPopoverBody"] div.stButton > button .stMarkdownColoredText {
+    font-size: 0.78rem !important;
+    font-weight: 400 !important;
+    line-height: 1.35 !important;
+    display: block;
+}
 /* nama model (baris pertama) tebal gelap, deskripsi kecil abu */
 [data-testid="stPopoverBody"] div.stButton > button p {
     text-align: left !important;
@@ -1530,7 +1537,9 @@ div.stDownloadButton > button:hover {
     margin: 0; font-size: 0.9rem; color: #73726C; line-height: 1.45;
 }
 
-/* --- tombol besar bergaya kartu (kategori artefak, kursus) --- */
+/* --- kartu kategori berbentuk PERSEGI (halaman Artefak & Trinity kursus) ---
+   Susunan: IKON BESAR di atas, lalu judul, lalu deskripsi kecil — semua
+   di tengah. Ikon sengaja jauh lebih besar daripada teksnya. */
 button[kind="secondary"] > div > p > strong,
 div.stButton > button p strong { color: #3D3929; }
 .st-key-cat_app button, .st-key-cat_doc button, .st-key-cat_game button,
@@ -1539,11 +1548,22 @@ div.stButton > button p strong { color: #3D3929; }
 [class*="st-key-kurs_"] button {
     background: #FAF9F5 !important;
     border: 1px solid #E3E0D5 !important;
-    border-radius: 14px !important;
-    padding: 16px 16px !important;
-    min-height: 86px !important; height: auto !important;
-    text-align: left !important;
-    align-items: flex-start !important;
+    border-radius: 18px !important;
+    padding: 18px 14px !important;
+    /* PERSEGI: tinggi mengikuti lebar, dibatasi agar tidak raksasa */
+    aspect-ratio: 1 / 1 !important;
+    width: 100% !important;
+    max-width: 220px !important;
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 0 auto !important;
+    /* isi ditumpuk vertikal & dipusatkan */
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    gap: 0 !important;
     transition: border-color .16s ease, background .16s ease, transform .16s ease;
 }
 .st-key-cat_app button:hover, .st-key-cat_doc button:hover,
@@ -1553,15 +1573,46 @@ div.stButton > button p strong { color: #3D3929; }
 [class*="st-key-kurs_"] button:hover {
     border-color: #C9A99A !important;
     background: #FFFDF8 !important;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 14px rgba(61,57,41,0.07) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(61,57,41,0.09) !important;
 }
 [class*="st-key-cat_"] button [data-testid="stMarkdownContainer"],
 [class*="st-key-kurs_"] button [data-testid="stMarkdownContainer"] {
-    width: 100%; text-align: left;
+    width: 100%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 [class*="st-key-cat_"] button p, [class*="st-key-kurs_"] button p {
-    white-space: normal !important; line-height: 1.35;
+    white-space: normal !important;
+    line-height: 1.3 !important;
+    text-align: center !important;
+    margin: 0 !important;
+}
+/* IKON: paling besar, jadi baris tersendiri di paling atas */
+[class*="st-key-cat_"] button span[role="img"],
+[class*="st-key-kurs_"] button span[role="img"] {
+    display: block !important;
+    font-size: 2.7rem !important;
+    line-height: 1 !important;
+    color: #C15F3C !important;
+    margin: 0 0 12px !important;
+    vertical-align: baseline !important;
+}
+/* judul: sedang, tebal */
+[class*="st-key-cat_"] button p strong, [class*="st-key-kurs_"] button p strong {
+    font-size: 0.98rem;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 6px;
+}
+/* deskripsi: paling kecil & abu (sintaks "small" tidak ada di Streamlit) */
+[class*="st-key-cat_"] button .stMarkdownColoredText,
+[class*="st-key-kurs_"] button .stMarkdownColoredText {
+    display: block;
+    font-size: 0.78rem;
+    line-height: 1.35;
 }
 
 /* --- kartu kosong --- */
@@ -3041,7 +3092,7 @@ def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> Non
             for m in MODEL_CATALOG:
                 is_active = m["key"] == st.session_state.selected_model_key
                 check = " :orange[✓]" if is_active else ""
-                label = f"{m['name']}{check}  \n:small[:gray[{m['desc']}]]"
+                label = f"{m['name']}{check}  \n:gray[{m['desc']}]"
                 row_key = f"{kp}model_row_{m['key']}" + ("_premium" if m.get("premium") else "")
                 with st.container(key=row_key):
                     if st.button(label, key=f"{kp}model_{m['key']}", use_container_width=True):
@@ -3264,14 +3315,15 @@ def start_artifact_thread(key: str) -> None:
 
 
 def _artifact_grid(prefix: str) -> None:
-    """Grid 2 kolom berisi kotak-kotak kategori ala Claude."""
+    """Grid 3 kolom berisi kartu kategori berbentuk persegi."""
     cats = ARTIFACT_CATEGORIES
-    for i in range(0, len(cats), 2):
-        cols = st.columns(2)
-        for j, cat in enumerate(cats[i:i + 2]):
+    for i in range(0, len(cats), 3):
+        cols = st.columns(3)
+        for j, cat in enumerate(cats[i:i + 3]):
             with cols[j]:
-                label = (f"{cat['icon']}  **{cat['title']}**"
-                         f"  \n:small[:gray[{cat['desc']}]]")
+                label = (f"{cat['icon']}  \n"
+                         f"**{cat['title']}**  \n"
+                         f":gray[{cat['desc']}]")
                 if st.button(label, key=f"{prefix}_{cat['key']}",
                              use_container_width=True):
                     start_artifact_thread(cat["key"])
@@ -4292,12 +4344,14 @@ def page_aplikasi() -> None:
 # HALAMAN: TRINITY KURSUS (fokus belajar: pemasaran, penjualan, desain, dll)
 # ============================================================================
 def _course_grid(prefix: str) -> None:
-    for i in range(0, len(COURSE_CATALOG), 2):
-        cols = st.columns(2)
-        for j, c in enumerate(COURSE_CATALOG[i:i + 2]):
+    """Grid 3 kolom berisi kartu kursus berbentuk persegi."""
+    for i in range(0, len(COURSE_CATALOG), 3):
+        cols = st.columns(3)
+        for j, c in enumerate(COURSE_CATALOG[i:i + 3]):
             with cols[j]:
-                label = (f"{c['icon']}  **{c['title']}**"
-                         f"  \n:small[:gray[{c['desc']} · {c['level']}]]")
+                label = (f"{c['icon']}  \n"
+                         f"**{c['title']}**  \n"
+                         f":gray[{c['desc']} \u00b7 {c['level']}]")
                 if st.button(label, key=f"{prefix}_{c['key']}", use_container_width=True):
                     st.session_state.course_active_key = c["key"]
                     go("kursus")
