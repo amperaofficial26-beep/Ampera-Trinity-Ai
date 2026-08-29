@@ -15,7 +15,7 @@ import base64
 import io
 from datetime import datetime
 
-import PIL import Image
+from PIL import Image
 import streamlit as st
 
 from config import (
