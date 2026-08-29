@@ -205,17 +205,33 @@ def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> Non
     kp = "" if page_key == "chat" else f"{page_key}_"
 
     # ---- Strip lampiran yang menunggu dikirim (dari menu ⋯) ----
+        # ---- Preview lampiran (langsung di kartu kotak chat, sebelum kirim) ----
     pending = st.session_state.get("pending_images", [])
     if pending:
-        with st.container(key=f"{kp}pending_strip"):
-            pcols = st.columns([0.1] * len(pending) + [1.0])
-            for i, im in enumerate(pending):
-                with pcols[i]:
-                    st.image(im["data"], width=54)
-                    if st.button(":material/close:", key=f"{kp}pending_rm_{i}",
-                                 use_container_width=True):
-                        st.session_state.pending_images.pop(i)
-                        st.rerun()
+        thumbs = []
+        for im in pending:
+            b64 = base64.b64encode(im["data"]).decode("ascii")
+            mime = im.get("mime") or "image/png"
+            name = (im.get("name") or "gambar").replace("<", "").replace(">", "")[:40]
+            thumbs.append(
+                f'<div class="pending-card">'
+                f'<img src="data:{mime};base64,{b64}" alt="{name}"/>'
+                f'<div class="pending-name">{name}</div>'
+                f"</div>"
+            )
+        st.markdown(
+            '<div class="pending-row">'
+            + "".join(thumbs)
+            + '<span class="plus-menu-hint">Siap dikirim — ketik pesan lalu Enter</span>'
+            "</div>",
+            unsafe_allow_html=True,
+        )
+        rm_cols = st.columns(list(pending) and [1] * len(pending) + [6])
+        for i, _im in enumerate(pending):
+            with rm_cols[i]:
+                if st.button("✕", key=f"{kp}pending_rm_{i}", help="Hapus lampiran"):
+                    st.session_state.pending_images.pop(i)
+                    st.rerun()
             with pcols[-1]:
                 st.markdown(
                     '<div class="plus-menu-hint">Siap dikirim…</div>',
