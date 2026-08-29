@@ -1,4 +1,3 @@
-cd /home/claude/trinity_app && cat > state.py << 'PYEOF'
 # -*- coding: utf-8 -*-
 """
 Pengelolaan st.session_state: inisialisasi, pengaturan (settings), dan
@@ -183,5 +182,3 @@ def open_conversation(conv_id: int) -> None:
                 (m.get("id", 0) for m in c["messages"]), default=1
             )
             return
-PYEOF
-python3 -c "import ast; ast.parse(open('state.py').read())" && echo OK
