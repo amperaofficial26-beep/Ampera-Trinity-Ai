@@ -13,26 +13,30 @@ import os
 import sys
 import streamlit as st
 
-# Tambahkan direktori utama tempat app.py berada ke sys.path Python
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+# Paksa Python menambahkan folder lokasi app.py ke sys.path
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+if BASE_DIR not in sys.path:
+    sys.path.insert(0, BASE_DIR)
 
-# Baru kemudian impor config dan modul lainnya
-from config import (
-    APP_NAME,
-    APP_TAGLINE,
-    LOGO_B64,
-    MODEL_CATALOG,
-    MODEL_BY_KEY,
-    DEFAULT_MODEL_KEY,
-    DEFAULT_SETTINGS,
-    get_secret,
-)
+# Impor langsung file config
+import config
 
-import FluxService
+# Ambil variabel dari config
+APP_NAME = config.APP_NAME
+APP_TAGLINE = config.APP_TAGLINE
+LOGO_B64 = config.LOGO_B64
+MODEL_CATALOG = config.MODEL_CATALOG
+MODEL_BY_KEY = config.MODEL_BY_KEY
+DEFAULT_MODEL_KEY = config.DEFAULT_MODEL_KEY
+DEFAULT_SETTINGS = config.DEFAULT_SETTINGS
+get_secret = config.get_secret
+
+from services.groq_service import GroqService
+from services.flux_service import FluxService
 from components.chat_ui import render_chat_tab
 from components.gallery_ui import render_gallery_tab
 from components.metrics_ui import render_metrics_tab
-es.flux_service
+
 # ============================================================================
 # KONFIGURASI HALAMAN UTAMA STREAMLIT
 # ============================================================================
