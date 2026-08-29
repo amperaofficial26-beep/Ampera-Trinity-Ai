@@ -649,6 +649,19 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 [data-testid="stChatInput"] [data-testid="stChatInputMicButton"]:hover {
     border-color: #2C1F33 !important;
 }
+/* Urutan dok: preview → kotak ketik → tombol + / model */
+[data-testid="stBottomBlockContainer"] {
+    display: flex !important;
+    flex-direction: column !important;
+}
+[class*="st-key-pending_preview"] { order: 1 !important; }
+[data-testid="stChatInput"] { order: 2 !important; }
+[class*="st-key-chat_controls"] { order: 3 !important; }
+
+/* Footer jangan nempel di kartu chat */
+.trinity-foot.in-chat {
+    display: none !important;
+}
 /* tombol ➕ di baris kontrol: lingkaran putih bersih ala Claude, menyatu
    di dalam kartu (tanpa bayangan berlebih karena kartu sudah punya shadow) */
 .st-key-chat_controls [class*="st-key-plus_menu"] [data-testid="stPopover"] button {
