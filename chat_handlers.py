@@ -298,7 +298,7 @@ def render_pending_preview(page_key: str = "chat") -> None:
                 )
                 if st.button("×", key=f"{kp}pending_rm_{i}", help="Hapus"):
                     st.session_state.pending_images.pop(i)
-                    st.rerun())
+                    st.rerun()
                 
 def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> None:
     """Isi dok bawah: [+] [Gambar] ... [Nama Model], preview tepat di atas chat input."""
