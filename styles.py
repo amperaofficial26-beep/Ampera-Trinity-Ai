@@ -686,41 +686,51 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     display: flex !important;
     flex-direction: column !important;
 }
-[class*="st-key-pending_preview"] { order: 1 !important; }
-[data-testid="stChatInput"] { order: 2 !important; }
-[class*="st-key-chat_controls"] { order: 3 !important; }
-
-/* Footer jangan nempel di kartu chat */
-.trinity-foot.in-chat {
-    display: none !important;
+.pending-card {
+    position: relative;
+    width: 72px;
+}
+.pending-x {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    z-index: 3;
+    font-size: 16px;
+    line-height: 1;
+    color: #2C1F33;
+    pointer-events: none;
+    text-shadow: 0 0 3px #F2E8D6;
 }
 [class*="st-key-pending_card_"] {
     position: relative !important;
     width: 72px !important;
 }
-[class*="st-key-pending_card_"] .pending-row {
-    padding: 0;
-    gap: 0;
+[class*="st-key-pending_card_"] [data-testid="stVerticalBlock"] {
+    position: relative !important;
 }
-[class*="st-key-pending_card_"] div.stButton {
+[class*="st-key-pending_card_"] div.stButton,
+[class*="st-key-pending_card_"] [data-testid="stButton"] {
     position: absolute !important;
-    top: -6px !important;
-    right: -6px !important;
-    z-index: 5 !important;
-    width: 20px !important;
+    top: 0 !important;
+    right: 0 !important;
+    width: 22px !important;
+    height: 22px !important;
+    z-index: 4 !important;
+    margin: 0 !important;
 }
-[class*="st-key-pending_card_"] div.stButton > button {
-    min-width: 20px !important;
-    width: 20px !important;
-    height: 20px !important;
-    min-height: 20px !important;
+[class*="st-key-pending_card_"] button,
+[class*="st-key-pending_card_"] [data-testid="stBaseButton-secondary"] {
+    min-width: 22px !important;
+    width: 22px !important;
+    height: 22px !important;
+    min-height: 22px !important;
     padding: 0 !important;
-    border-radius: 999px !important;
-    font-size: 12px !important;
-    line-height: 20px !important;
-    background: #2C1F33 !important;
-    color: #F2E8D6 !important;
+    margin: 0 !important;
+    opacity: 0 !important;
+    background: transparent !important;
+    background-color: transparent !important;
     border: none !important;
+    box-shadow: none !important;
 }
 /* tombol ➕ di baris kontrol: lingkaran putih bersih ala Claude, menyatu
    di dalam kartu (tanpa bayangan berlebih karena kartu sudah punya shadow) */
