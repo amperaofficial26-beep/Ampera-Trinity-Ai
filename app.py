@@ -116,7 +116,7 @@ def render_chat_page() -> None:
             render_input_controls("chat", show_mode=True)
 
       for msg in main_thread():
-        render_message(msg)
+            render_message(msg)
 
     if maybe_run_yuki(st.empty()):
         st.rerun()
@@ -196,7 +196,7 @@ def _artifact_workspace(aid: int) -> None:
 
     for msg in thread:
         render_message(msg)
-          for msg in main_thread():
+    for msg in main_thread():
         render_message(msg)
 
     if maybe_run_yuki(st.empty()):
