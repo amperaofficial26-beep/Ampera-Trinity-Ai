@@ -2687,18 +2687,22 @@ def render_sidebar() -> None:
         name = (s.get("display_name") or "User").strip() or "User"
         plan = s.get("plan") or "Free"
         initial = name[0].upper()
-        with st.container(key="sb_account"):
+                with st.container(key="sb_account"):
             acc_col, menu_col = st.columns([5, 1.05], gap="small")
             with acc_col:
-                st.markdown(
-                    f"""
-<div class="sb-account">
-  <div class="ava">{html.escape(initial)}</div>
-  <div class="name">{html.escape(name)} <span class="plan">· {html.escape(plan)}</span></div>
-</div>
-""",
-                    unsafe_allow_html=True,
+                # Baris akun. Disusun dari potongan string biasa (bukan
+                # f-string tiga kutip) supaya aman saat kode ini di-copy
+                # paste ke editor lain, dan bebas karakter non-ASCII di
+                # luar string.
+                acc_html = (
+                    '<div class="sb-account">'
+                    '<div class="ava">' + html.escape(initial) + '</div>'
+                    '<div class="name">' + html.escape(name)
+                    + ' <span class="plan">&middot; ' + html.escape(plan)
+                    + '</span></div>'
+                    '</div>'
                 )
+                st.markdown(acc_html, unsafe_allow_html=True)
             with menu_col:
                 with st.container(key="acct_menu"):
                     with st.popover(":material/more_horiz:", use_container_width=False,
