@@ -304,4 +304,3 @@ CF_API_TOKEN = _get_secret("CF_API_TOKEN", "CLOUDFLARE_API_TOKEN")
 
 CHAT_READY = bool(GROQ_API_KEY)
 IMAGE_READY = bool(CF_ACCOUNT_ID and CF_API_TOKEN)
-python3 -c "import ast; ast.parse(open('config.py').read())" && echo OK
