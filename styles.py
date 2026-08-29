@@ -756,6 +756,32 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 }
 /* strip lampiran yang menunggu dikirim (hasil menu ➕) */
 [class*="st-key-pending_strip"] { padding: 2px 2px 0; }
+.pending-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 10px;
+    padding: 8px 8px 4px;
+}
+.pending-card { width: 72px; text-align: center; }
+.pending-card img {
+    width: 72px;
+    height: 72px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 1px solid #DBCEB9;
+    display: block;
+    background: #E8DCC8;
+}
+.pending-name {
+    font-size: 0.65rem;
+    color: #6B6172;
+    margin-top: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 72px;
+}
 [class*="st-key-pending_strip"] [data-testid="stHorizontalBlock"] {
     gap: 10px !important;
     align-items: flex-start !important;
@@ -768,7 +794,17 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     padding: 0 10px !important;
     border-radius: 8px !important;
 }
-
+/* chip file bawaan st.chat_input supaya kelihatan di dalam kotak */
+[data-testid="stChatInput"] [data-testid="stChatInputUploadedFiles"],
+[data-testid="stChatInput"] [class*="uploadedFile"] {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    padding: 8px 8px 0 !important;
+    visibility: visible !important;
+    height: auto !important;
+    overflow: visible !important;
+}
 /* ---------- tombol & popover: pill lembut ala Claude ---------- */
 div.stButton > button, [data-testid="stPopover"] > button,
 div.stDownloadButton > button {
