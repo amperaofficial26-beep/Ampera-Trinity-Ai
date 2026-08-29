@@ -57,8 +57,10 @@ from ui_helpers import (
     logo_img_html, render_message,
 )
 from styles import inject_css
-
-
+from chat_handlers import (
+    process_user_input, render_input_controls, render_pending_preview,
+    maybe_run_yuki,
+)
 
 # ============================================================================
 # KONFIGURASI HALAMAN
@@ -113,6 +115,11 @@ def render_chat_page() -> None:
         with st.container(key="chat_controls"):
             render_input_controls("chat", show_mode=True)
 
+      for msg in main_thread():
+        render_message(msg)
+
+    if maybe_run_yuki(st.empty()):
+        st.rerun()
     user_input = st.chat_input(placeholder_text, **chat_kwargs)
     if pending_prompt and user_input is None:
         user_input = pending_prompt
@@ -189,6 +196,11 @@ def _artifact_workspace(aid: int) -> None:
 
     for msg in thread:
         render_message(msg)
+          for msg in main_thread():
+        render_message(msg)
+
+    if maybe_run_yuki(st.empty()):
+        st.rerun()
 
     chat_kwargs: dict = {}
     if CHAT_INPUT_SUPPORTS_FILE:
@@ -1219,6 +1231,11 @@ def _course_workspace(key: str) -> None:
 
     for msg in thread:
         render_message(msg)
+    for msg in main_thread():
+        render_message(msg)
+
+    if maybe_run_yuki(st.empty()):
+        st.rerun()
 
     chat_kwargs: dict = {}
     if CHAT_INPUT_SUPPORTS_FILE:
