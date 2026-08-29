@@ -836,6 +836,9 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     width: 22px; height: 22px;
     display: inline-block; vertical-align: middle;
 }
+/* logo SVG selalu memakai warna aksen, ikut tema, tanpa file PNG */
+.logo-greeting, .logo-label, .logo-progress, .logo-foot,
+.claude-think .logo-shimmer { color: #2C1F33; }
 
 /* ---------- chat input: kartu putih membulat ala Claude ---------- */
 [data-testid="stBottom"], [data-testid="stBottomBlockContainer"],
@@ -1310,7 +1313,8 @@ div.stDownloadButton > button:hover {
     border-radius: 6px;
     animation: logoPulse 3s ease-in-out infinite;
 }
-.claude-think .logo-shimmer img {
+.claude-think .logo-shimmer svg,
+.logo-label svg, .logo-greeting svg, .logo-progress svg, .logo-foot svg {
     width: 100%; height: 100%;
     display: block;
 }
@@ -2316,42 +2320,30 @@ IMAGE_MIN_SECONDS = 10.0
 SENTENCE_STREAM_DELAY = 0.15
 
 
-@st.cache_data(show_spinner=False)
-def _thinking_logo_b64() -> str:
-    """Logo custom (PNG transparan) sebagai base64 untuk inline HTML."""
-    path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                        "assets", "logo_thinking_small.png")
-    try:
-        with open(path, "rb") as fh:
-            return base64.b64encode(fh.read()).decode("ascii")
-    except Exception:
-        return ""
+LOGO_SVG = (
+    # Bintang kompas 8-sudut (4 panjang + 4 pendek) mengikuti warna teks,
+    # jadi otomatis ikut tema tanpa bergantung file PNG di assets/.
+    '<svg viewBox="0 0 100 100" fill="currentColor" '
+    'xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+    '<path d="M50 2 L57 43 L98 50 L57 57 L50 98 L43 57 L2 50 L43 43 Z"/>'
+    '<path d="M50 20 L54.5 45.5 L80 50 L54.5 54.5 L50 80 L45.5 54.5 '
+    'L20 50 L45.5 45.5 Z" transform="rotate(45 50 50)"/>'
+    '</svg>'
+)
 
 
 def logo_img_html(css_class: str = "logo-inline") -> str:
-    """Tag <img> logo custom; fallback ke bintang ✳ bila file tidak ada."""
-    b64 = _thinking_logo_b64()
-    if b64:
-        return f'<img class="{css_class}" src="data:image/png;base64,{b64}" alt="✳"/>'
-    return '<span class="star">✳</span>'
+    """Logo sebagai SVG inline (ikut warna teks/tema); tidak butuh file PNG."""
+    return (f'<span class="{css_class}" role="img" '
+            'aria-label="logo Trinity">' + LOGO_SVG + '</span>')
 
 
 def thinking_html(phrases: list[str]) -> str:
     spans = "".join(
         f'<span class="phrase">{html.escape(p)}…</span>' for p in phrases
     )
-    logo_b64 = _thinking_logo_b64()
-    if logo_b64:
-        # Logo dengan glow halus bernapas (halo radial + drop-shadow
-        # bertingkat + denyut) — semua ease-in-out, mulus.
-        src = f"data:image/png;base64,{logo_b64}"
-        icon = (
-            '<span class="logo-shimmer">'
-            f'<img src="{src}" alt=""/>'
-            "</span>"
-        )
-    else:
-        icon = '<span class="star">✳</span>'  # fallback bila file logo hilang
+    # Logo SVG dengan pita cahaya berjalan (shimmer) — ikut warna tema.
+    icon = '<span class="logo-shimmer">' + LOGO_SVG + '</span>'
     return (
         '<div class="claude-think">'
         f"{icon}"
