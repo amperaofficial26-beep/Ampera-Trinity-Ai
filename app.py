@@ -26,6 +26,12 @@ from __future__ import annotations
 
 import html
 from datetime import datetime
+from zoneinfo import ZoneInfo
+
+WIB = ZoneInfo("Asia/Jakarta")
+
+def now_wib() -> str:
+    return datetime.now(WIB).strftime("%H:%M")
 
 import streamlit as st
 from openai import OpenAI
@@ -51,6 +57,7 @@ from ui_helpers import (
     logo_img_html, render_message,
 )
 from styles import inject_css
+
 
 
 # ============================================================================
