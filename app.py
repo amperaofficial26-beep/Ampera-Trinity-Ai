@@ -29,6 +29,7 @@ from datetime import datetime
 
 import streamlit as st
 from openai import OpenAI
+from chat_handlers import process_user_input, render_input_controls, render_pending_preview
 
 from config import (
     AVAILABLE_MODELS, CHAT_INPUT_SUPPORTS_AUDIO, CHAT_INPUT_SUPPORTS_FILE,
@@ -50,6 +51,7 @@ from ui_helpers import (
     logo_img_html, render_message,
 )
 from styles import inject_css
+
 
 # ============================================================================
 # KONFIGURASI HALAMAN
@@ -97,8 +99,10 @@ def render_chat_page() -> None:
     if CHAT_INPUT_SUPPORTS_AUDIO:
         chat_kwargs["accept_audio"] = True
     
-    bottom_dock = getattr(st, "bottom", None) or st._bottom
+        bottom_dock = getattr(st, "bottom", None) or st._bottom
     with bottom_dock:
+        with st.container(key="pending_preview"):
+            render_pending_preview("chat")
         with st.container(key="chat_controls"):
             render_input_controls("chat", show_mode=True)
 
@@ -185,13 +189,14 @@ def _artifact_workspace(aid: int) -> None:
         chat_kwargs["file_type"] = IMAGE_INPUT_TYPES
     if CHAT_INPUT_SUPPORTS_AUDIO:
         chat_kwargs["accept_audio"] = True
-    bottom_dock = getattr(st, "bottom", None) or st._bottom
+        bottom_dock = getattr(st, "bottom", None) or st._bottom
     with bottom_dock:
-        with st.container(key="chat_controls"):
-            render_input_controls("artefak", show_mode=False)
+        with st.container(key="pending_preview"):
+            render_pending_preview("artefak")
+        with st.container(key="artefak"):
+            render_input_controls("artefak", show_mode=True)
 
-    user_input = st.chat_input("Jelaskan apa yang mau dibuat…", **chat_kwargs)
-
+    user_input = st.chat_input(placeholder_text, **chat_kwargs)
     if process_user_input(user_input, st.empty()):
         st.rerun()
 
@@ -1214,12 +1219,14 @@ def _course_workspace(key: str) -> None:
         chat_kwargs["file_type"] = IMAGE_INPUT_TYPES
     if CHAT_INPUT_SUPPORTS_AUDIO:
         chat_kwargs["accept_audio"] = True
-    bottom_dock = getattr(st, "bottom", None) or st._bottom
+        bottom_dock = getattr(st, "bottom", None) or st._bottom
     with bottom_dock:
-        with st.container(key="chat_controls"):
-            render_input_controls(f"kursus_{key}", show_mode=False)
+        with st.container(key="pending_preview"):
+            render_pending_preview("kursus")
+        with st.container(key=f"kursus_{key}"):
+            render_input_controls("kursus", show_mode=True)
 
-    user_input = st.chat_input(f"Tanya apa saja tentang {course['title']}…", **chat_kwargs)
+    user_input = st.chat_input(placeholder_text, **chat_kwargs)
     if process_user_input(user_input, st.empty()):
         st.rerun()
 
