@@ -245,6 +245,7 @@ def _pending_cards_html(pending: list) -> str:
                 f"</div>"
             )
     return '<div class="pending-row">' + "".join(cards) + "</div>"
+    
 def render_pending_preview(page_key: str = "chat") -> None:
     """Thumbnail lampiran — dipanggil di container sendiri di atas chat input."""
     kp = "" if page_key == "chat" else f"{page_key}_"
@@ -258,6 +259,7 @@ def render_pending_preview(page_key: str = "chat") -> None:
             if st.button("✕", key=f"{kp}pending_rm_{i}", help="Hapus lampiran"):
                 st.session_state.pending_images.pop(i)
                 st.rerun()
+                
 def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> None:
     """Isi dok bawah: [+] [Gambar] ... [Nama Model], preview tepat di atas chat input."""
     kp = "" if page_key == "chat" else f"{page_key}_"
