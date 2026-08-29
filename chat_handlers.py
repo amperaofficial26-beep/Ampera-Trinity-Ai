@@ -245,6 +245,19 @@ def _pending_cards_html(pending: list) -> str:
                 f"</div>"
             )
     return '<div class="pending-row">' + "".join(cards) + "</div>"
+def render_pending_preview(page_key: str = "chat") -> None:
+    """Thumbnail lampiran — dipanggil di container sendiri di atas chat input."""
+    kp = "" if page_key == "chat" else f"{page_key}_"
+    pending = st.session_state.get("pending_images", [])
+    if not pending:
+        return
+    st.markdown(_pending_cards_html(pending), unsafe_allow_html=True)
+    rm_cols = st.columns([1] * len(pending) + [6])
+    for i, _im in enumerate(pending):
+        with rm_cols[i]:
+            if st.button("✕", key=f"{kp}pending_rm_{i}", help="Hapus lampiran"):
+                st.session_state.pending_images.pop(i)
+                st.rerun()
 def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> None:
     """Isi dok bawah: [+] [Gambar] ... [Nama Model], preview tepat di atas chat input."""
     kp = "" if page_key == "chat" else f"{page_key}_"
