@@ -1,11 +1,7 @@
-cd /home/claude/trinity_app && cat > engines/groq_engine.py << 'PYEOF'
 # -*- coding: utf-8 -*-
 """
-ENGINE 1 & 3: CHAT MULTI AI + SUARA/VISION (Groq)
-
-Semua interaksi dengan API Groq (chat teks, streaming, fallback model,
-transkrip suara Whisper) dan pra-pemrosesan gambar sebelum dikirim ke
-model vision hidup di sini.
+ENGINE 1 & 3: CHAT MULTI AI (Groq + persona Yuki + streaming + fallback)
+          + SUARA & GAMBAR MASUK (Whisper STT, siapkan gambar utk vision)
 """
 
 from __future__ import annotations
@@ -22,6 +18,7 @@ from config import (
     MAX_IMAGES_PER_MESSAGE, STT_MODEL, VISION_MODEL_FALLBACKS,
     VISION_RECENT_MESSAGES, YUKI_SYSTEM_PROMPT, LANG_BY_CODE, DEFAULT_LANG_CODE,
 )
+from errors import _is_model_unavailable_error
 from state import get_settings
 
 
@@ -35,7 +32,6 @@ def build_system_prompt() -> str:
     s = get_settings()
     parts = [YUKI_SYSTEM_PROMPT]
 
-    # Kepribadian & bahasa dari Pengaturan → Umum / Bahasa
     persona_map = {
         "Santai & kocak": "Pertahankan gaya santai, kocak, dan penuh candaan receh.",
         "Serius & ringkas": (
@@ -66,7 +62,6 @@ def build_system_prompt() -> str:
     if display_name and display_name.lower() != "user":
         parts.append(f"Nama User adalah {display_name}.")
 
-    # Memori jangka panjang (Pengaturan → Memori)
     if s.get("memory_on"):
         facts = [str(f).strip() for f in (s.get("memories") or []) if str(f).strip()]
         if facts:
@@ -75,7 +70,6 @@ def build_system_prompt() -> str:
                 "jangan disebut satu per satu):\n- " + "\n- ".join(facts)
             )
 
-    # Refleksi: target & kebiasaan yang sedang diperjuangkan User
     goal = (s.get("reflection_goal") or "").strip()
     habit = (s.get("reflection_habit") or "").strip()
     if goal or habit:
@@ -154,8 +148,6 @@ def stream_chat_with_fallback(client: OpenAI, preferred_model: str, history: lis
                               vision: bool = False):
     """Coba model pilihan user; kalau sudah dihapus provider, pakai fallback.
     vision=True → pakai rantai model vision (untuk pesan bergambar)."""
-    from errors import _is_model_unavailable_error
-
     last_exc: Exception | None = None
     for model in resolve_model_chain(preferred_model, vision=vision):
         try:
@@ -221,5 +213,3 @@ def collect_images(files) -> list[dict]:
         if len(imgs) >= MAX_IMAGES_PER_MESSAGE:
             break
     return imgs
-PYEOF
-python3 -c "import ast; ast.parse(open('engines/groq_engine.py').read())" && echo OK
