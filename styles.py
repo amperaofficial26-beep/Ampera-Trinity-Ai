@@ -1,13 +1,9 @@
-cd /home/claude/trinity_app && cat > styles.py << 'PYEOF'
 # -*- coding: utf-8 -*-
-"""
-CSS — TEMA ALA CLAUDE.AI (buatan sendiri)
-Latar krem hangat, judul serif, aksen terracotta, UI kalem & bersih.
+"""CSS — TEMA TRINITY (beige + ungu).
 
-Satu-satunya fungsi publik di sini adalah inject_css(); seluruh gaya visual
-aplikasi diedit lewat file ini saja tanpa menyentuh logika halaman lain.
+Seluruh gaya visual aplikasi tinggal di file ini; app.py cukup memanggil
+inject_css(). Dipisah dari app.py supaya tidak terlalu panjang.
 """
-
 import streamlit as st
 
 
@@ -1427,5 +1423,3 @@ div.stButton > button p strong { color: #2C1F33; }
 """,
         unsafe_allow_html=True,
     )
-PYEOF
-python3 -c "import ast; ast.parse(open('styles.py').read())" && echo OK
