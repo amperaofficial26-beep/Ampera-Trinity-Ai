@@ -283,7 +283,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 .trinity-head h1 {
     margin: 0;
     font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif;
-    font-size: 1.45rem; font-weight: 600;
+    font-size: 0.90rem; font-weight: 600;
     color: #2C1F33; letter-spacing: -0.01em;
 }
 .trinity-head p {
