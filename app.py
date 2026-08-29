@@ -84,7 +84,7 @@ _LOGO_PATH = os.path.join(
 )
 st.set_page_config(
     page_title="Ampera Trinity AI",
-    page_icon=f"data:image/png;base64,{LOGO_B64}",
+    page_icon=(f"data:image/png;base64,{LOGO_B64}" if LOGO_B64 else "🔱"),
     layout="centered",
     initial_sidebar_state="expanded",
 )
