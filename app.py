@@ -107,19 +107,17 @@ def render_chat_page() -> None:
         chat_kwargs["file_type"] = IMAGE_INPUT_TYPES
     if CHAT_INPUT_SUPPORTS_AUDIO:
         chat_kwargs["accept_audio"] = True
-    
-        bottom_dock = getattr(st, "bottom", None) or st._bottom
+
+    bottom_dock = getattr(st, "bottom", None) or st._bottom
     with bottom_dock:
         with st.container(key="pending_preview"):
             render_pending_preview("chat")
         with st.container(key="chat_controls"):
             render_input_controls("chat", show_mode=True)
 
-      for msg in main_thread():
-            render_message(msg)
-
     if maybe_run_yuki(st.empty()):
         st.rerun()
+
     user_input = st.chat_input(placeholder_text, **chat_kwargs)
     if pending_prompt and user_input is None:
         user_input = pending_prompt
@@ -193,9 +191,7 @@ def _artifact_workspace(aid: int) -> None:
         thread[-1].pop("awaiting_reply", None)
         handle_chat_request(st.empty())
         st.rerun()
-
-    for msg in thread:
-        render_message(msg)
+    
     for msg in main_thread():
         render_message(msg)
 
@@ -1229,8 +1225,7 @@ def _course_workspace(key: str) -> None:
             unsafe_allow_html=True,
         )
 
-    for msg in thread:
-        render_message(msg)
+
     for msg in main_thread():
         render_message(msg)
 
