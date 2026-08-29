@@ -403,16 +403,6 @@ def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> Non
                         st.session_state.selected_model_key = m["key"]
                         st.rerun()
 
-    # Preview TEPAT di atas kotak chat (elemen terakhir di st.bottom)
-    pending = st.session_state.get("pending_images", [])
-    if pending:
-        st.markdown(_pending_cards_html(pending), unsafe_allow_html=True)
-        rm_cols = st.columns([1] * len(pending) + [6])
-        for i, _im in enumerate(pending):
-            with rm_cols[i]:
-                if st.button("✕", key=f"{kp}pending_rm_{i}", help="Hapus lampiran"):
-                    st.session_state.pending_images.pop(i)
-                    st.rerun()
 # ============================================================================
 # PEMROSESAN KIRIMAN USER
 # ============================================================================
