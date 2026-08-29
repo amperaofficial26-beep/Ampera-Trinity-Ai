@@ -297,7 +297,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 /* sapaan besar serif ala halaman awal Claude */
 .trinity-greeting {
     font-family: 'Source Serif 4', Georgia, serif;
-    font-size: 3.4rem; font-weight: 500; color: #2C1F33;
+    font-size: 2.5rem; font-weight: 500; color: #2C1F33;
     text-align: center; margin: 26px 0 4px;
     letter-spacing: -0.02em;
 }
@@ -1217,7 +1217,7 @@ div.stDownloadButton > button:hover {
 
 /* ---------- footer ---------- */
 .trinity-foot {
-    text-align: center; color: #7E7387; font-size: 0.6rem;
+    text-align: center; color: #7E7387; font-size: 0.3rem;
     margin-top: 34px; font-family: 'Inter', sans-serif;
 }
 /* versi saat chat berjalan: lebih kecil lagi dari versi halaman awal */
