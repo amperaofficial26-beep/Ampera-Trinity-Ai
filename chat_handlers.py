@@ -199,64 +199,42 @@ def handle_chat_request(answer_slot) -> None:
 # ============================================================================
 # KONTROL KOTAK INPUT (dipakai bersama oleh chat utama, Artefak, dan Kursus)
 # ============================================================================
-def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> None:
-    """Isi dok bawah: [⋯ menu lampiran] [Gambar] ... [Nama Model].
-    Dipanggil DI DALAM st.bottom / st._bottom oleh halaman pemanggilnya."""
-    kp = "" if page_key == "chat" else f"{page_key}_"
-
-    # ---- Strip lampiran yang menunggu dikirim (dari menu ⋯) ----
-        # ---- Preview lampiran (langsung di kartu kotak chat, sebelum kirim) ----
-    pending = st.session_state.get("pending_images", [])
-    if pending:
-        thumbs = []
-        for im in pending:
-            b64 = base64.b64encode(im["data"]).decode("ascii")
-            mime = im.get("mime") or "image/png"
-            name = (im.get("name") or "gambar").replace("<", "").replace(">", "")[:40]
-            thumbs.append(
+def _pending_cards_html(pending: list) -> str:
+    """Thumbnail persegi untuk lampiran. Hanya tampilan — bytes asli tidak diubah."""
+    cards = []
+    for im in pending:
+        name = (im.get("name") or "gambar").replace("<", "").replace(">", "")[:32]
+        if im.get("status") == "loading" or not im.get("data"):
+            cards.append(
                 f'<div class="pending-card">'
-                f'<img src="data:{mime};base64,{b64}" alt="{name}"/>'
+                f'<div class="pending-square pending-loading" title="{name}"></div>'
                 f'<div class="pending-name">{name}</div>'
                 f"</div>"
             )
-        st.markdown(
-            '<div class="pending-row">'
-            + "".join(thumbs)
-            + '<span class="plus-menu-hint">Siap dikirim — ketik pesan lalu Enter</span>'
-            "</div>",
-            unsafe_allow_html=True,
-        )
-        rm_cols = st.columns(list(pending) and [1] * len(pending) + [6])
-        for i, _im in enumerate(pending):
-            with rm_cols[i]:
-                if st.button("✕", key=f"{kp}pending_rm_{i}", help="Hapus lampiran"):
-                    st.session_state.pending_images.pop(i)
-                    st.rerun()
-                    
+        else:
+            b64 = base64.b64encode(im["data"]).decode("ascii")
+            mime = im.get("mime") or "image/png"
+            cards.append(
+                f'<div class="pending-card">'
+                f'<div class="pending-square">'
+                f'<img src="data:{mime};base64,{b64}" alt="{name}"/>'
+                f"</div>"
+                f'<div class="pending-name">{name}</div>'
+                f"</div>"
+            )
+    return '<div class="pending-row">' + "".join(cards) + "</div>"
+def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> None:
+    """Isi dok bawah: [+] [Gambar] ... [Nama Model], preview tepat di atas chat input."""
+    kp = "" if page_key == "chat" else f"{page_key}_"
+
     # [menu] [Gambar] ....spacer.... [Nama Model]
     ctrl_plus, ctrl_mode, _sp, ctrl_model = st.columns([0.08, 0.22, 1.22, 0.28])
 
-    # ---- Menu lampiran ala Claude: MINIMALIST (ikon + teks saja) ----
     with ctrl_plus:
         with st.container(key=f"{kp}plus_menu"):
             with st.popover(":material/add:", use_container_width=False,
                             help="Unggah file atau gambar"):
                 gen = st.session_state.get("plus_uploader_gen", 0)
-
-                def _stage_uploaded(files) -> bool:
-                    if not files:
-                        return False
-                    staged = st.session_state.get("pending_images", [])
-                    seen = {(im["name"], len(im["data"])) for im in staged}
-                    added = False
-                    for im in collect_images(files):
-                        k = (im["name"], len(im["data"]))
-                        if k not in seen:
-                            staged.append(im)
-                            seen.add(k)
-                            added = True
-                    st.session_state.pending_images = staged
-                    return added
 
                 with st.container(key=f"{kp}plus_upload_file"):
                     picked_file = st.file_uploader(
@@ -273,25 +251,66 @@ def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> Non
                         label_visibility="visible",
                         key=f"{kp}plus_uploader_image_{gen}",
                     )
-                added_file = _stage_uploaded(picked_file)
-                added_image = _stage_uploaded(picked_image)
-                if added_file or added_image:
-                    # tutup popover & langsung tampilkan thumbnail lampiran
+
+                picked = list(picked_file or []) + list(picked_image or [])
+                sig = tuple(getattr(f, "name", "") for f in picked)
+                last_sig = st.session_state.get(f"{kp}picked_sig")
+
+                # Fase 1: user tekan OK → kotak loading langsung muncul
+                if picked and sig != last_sig:
+                    ready = [
+                        im for im in st.session_state.get("pending_images", [])
+                        if im.get("status") != "loading"
+                    ]
+                    loaders = [{
+                        "name": getattr(f, "name", "gambar"),
+                        "data": b"",
+                        "mime": "image/png",
+                        "status": "loading",
+                    } for f in picked]
+                    st.session_state.pending_images = ready + loaders
+                    st.session_state[f"{kp}picked_sig"] = sig
+                    st.session_state[f"{kp}stage_now"] = True
+                    st.rerun()
+
+                # Fase 2: baca bytes ASLI (tidak di-resize) lalu ganti loading → foto
+                if picked and st.session_state.get(f"{kp}stage_now"):
+                    ready = [
+                        im for im in st.session_state.get("pending_images", [])
+                        if im.get("status") != "loading"
+                    ]
+                    seen = {(im["name"], len(im.get("data") or b"")) for im in ready}
+                    for f in picked:
+                        try:
+                            data = f.getvalue()
+                        except Exception:
+                            continue
+                        if not data:
+                            continue
+                        name = getattr(f, "name", "gambar")
+                        mime = (getattr(f, "type", "") or "image/png").lower()
+                        if not mime.startswith("image/"):
+                            mime = "image/png"
+                        key = (name, len(data))
+                        if key not in seen:
+                            ready.append({
+                                "name": name, "data": data, "mime": mime,
+                                "status": "ready",
+                            })
+                            seen.add(key)
+                    st.session_state.pending_images = ready
+                    st.session_state[f"{kp}stage_now"] = False
                     st.rerun()
 
                 st.markdown('<div class="plus-menu-divider"></div>',
                             unsafe_allow_html=True)
 
-                # Browser murni tidak bisa memicu screen-capture dari
-                # Streamlit → diarahkan ke cara tercepat: screenshot OS
-                # lalu tempel (Ctrl+V) di kotak chat.
                 if st.button(":material/screenshot:  Ambil tangkapan layar",
                              key=f"{kp}pm_screenshot", use_container_width=True):
                     st.toast("Ambil screenshot dengan tombol OS kamu, lalu "
                              "tempel (Ctrl+V) di kotak chat.",
                              icon=":material/screenshot:")
 
-                # Pencarian web → otomatis pindah ke model Compound (browsing)
                 web_check = " :orange[✓]" if st.session_state.get("web_search_on") else ""
                 if st.button(f":material/public:  Pencarian web{web_check}",
                              key=f"{kp}pm_web", use_container_width=True):
@@ -321,7 +340,6 @@ def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> Non
         current_key = st.session_state.selected_model_key
         current_name = MODEL_BY_KEY.get(current_key, MODEL_BY_KEY[DEFAULT_MODEL_KEY])["name"]
         with st.popover(current_name, use_container_width=False):
-            # Daftar model ala Claude, terurut dari tingkat termudah → tertinggi
             for m in MODEL_CATALOG:
                 is_active = m["key"] == st.session_state.selected_model_key
                 check = " :orange[✓]" if is_active else ""
@@ -332,7 +350,16 @@ def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> Non
                         st.session_state.selected_model_key = m["key"]
                         st.rerun()
 
-
+    # Preview TEPAT di atas kotak chat (elemen terakhir di st.bottom)
+    pending = st.session_state.get("pending_images", [])
+    if pending:
+        st.markdown(_pending_cards_html(pending), unsafe_allow_html=True)
+        rm_cols = st.columns([1] * len(pending) + [6])
+        for i, _im in enumerate(pending):
+            with rm_cols[i]:
+                if st.button("✕", key=f"{kp}pending_rm_{i}", help="Hapus lampiran"):
+                    st.session_state.pending_images.pop(i)
+                    st.rerun()
 # ============================================================================
 # PEMROSESAN KIRIMAN USER
 # ============================================================================
