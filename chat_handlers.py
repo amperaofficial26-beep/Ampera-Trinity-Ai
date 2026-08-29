@@ -232,12 +232,7 @@ def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> Non
                 if st.button("✕", key=f"{kp}pending_rm_{i}", help="Hapus lampiran"):
                     st.session_state.pending_images.pop(i)
                     st.rerun()
-            with pcols[-1]:
-                st.markdown(
-                    '<div class="plus-menu-hint">Siap dikirim…</div>',
-                    unsafe_allow_html=True,
-                )
-
+                    
     # [menu] [Gambar] ....spacer.... [Nama Model]
     ctrl_plus, ctrl_mode, _sp, ctrl_model = st.columns([0.08, 0.22, 1.22, 0.28])
 
