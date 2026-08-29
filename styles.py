@@ -389,7 +389,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 }
 [class*="st-key-msg_actions_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(2),
 [class*="st-key-msg_actions_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(3) {
-    margin-top: -15px !important;
+    margin-top: -18px !important;
 }
 [class*="st-key-msg_actions_"] [data-testid="stHorizontalBlock"] {
     display: flex !important;
