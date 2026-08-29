@@ -12,9 +12,10 @@ from __future__ import annotations
 import threading
 import time
 import base64
-import PIL import image
+import io
 from datetime import datetime
 
+import PIL import Image
 import streamlit as st
 
 from config import (
