@@ -103,6 +103,7 @@ def render_chat_page() -> None:
         with st.container(key="chat_controls"):
             render_input_controls("chat", show_mode=True)
 
+    user_input = st.chat_input(placeholder_text, **chat_kwargs)
     if pending_prompt and user_input is None:
         user_input = pending_prompt
     if process_user_input(user_input, st.empty(), is_fresh=is_fresh):
@@ -185,12 +186,12 @@ def _artifact_workspace(aid: int) -> None:
         chat_kwargs["file_type"] = IMAGE_INPUT_TYPES
     if CHAT_INPUT_SUPPORTS_AUDIO:
         chat_kwargs["accept_audio"] = True
-    user_input = st.chat_input("Jelaskan apa yang mau dibuat…", **chat_kwargs)
-
     bottom_dock = getattr(st, "bottom", None) or st._bottom
     with bottom_dock:
         with st.container(key="chat_controls"):
             render_input_controls("artefak", show_mode=False)
+
+    user_input = st.chat_input("Jelaskan apa yang mau dibuat…", **chat_kwargs))
 
     if process_user_input(user_input, st.empty()):
         st.rerun()
@@ -1214,13 +1215,12 @@ def _course_workspace(key: str) -> None:
         chat_kwargs["file_type"] = IMAGE_INPUT_TYPES
     if CHAT_INPUT_SUPPORTS_AUDIO:
         chat_kwargs["accept_audio"] = True
-    user_input = st.chat_input(f"Tanya apa saja tentang {course['title']}…", **chat_kwargs)
-
     bottom_dock = getattr(st, "bottom", None) or st._bottom
     with bottom_dock:
         with st.container(key="chat_controls"):
             render_input_controls(f"kursus_{key}", show_mode=False)
 
+    user_input = st.chat_input(f"Tanya apa saja tentang {course['title']}…", **chat_kwargs)
     if process_user_input(user_input, st.empty()):
         st.rerun()
 
