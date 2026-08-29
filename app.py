@@ -84,7 +84,7 @@ CLAUDE_STYLE_CSS = """
         margin: 0;
     }
 
-    /* 4. Chat Messages Styling (Bentuk Kartu Rapi ala Claude) */
+    /* 4. Chat Messages Styling */
     div[data-testid="stChatMessage"]:nth-child(even) {
         background-color: #f9f9fb !important;
         border: 1px solid #ececef !important;
@@ -101,13 +101,19 @@ CLAUDE_STYLE_CSS = """
         margin-bottom: 12px !important;
     }
 
-    /* 5. Custom Control Area di Bawah Input Chat */
-    .input-tools-bar {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-top: -10px;
-        padding: 8px 4px;
+    /* 5. Custom Styling untuk Tombol Plus Tanpa Latar Belakang */
+    .btn-plus-transparent {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        color: #555555 !important;
+        cursor: pointer;
+        padding: 4px 8px !important;
+    }
+    .btn-plus-transparent:hover {
+        color: #1a1a1a !important;
+        background: rgba(0,0,0,0.04) !important;
+        border-radius: 6px;
     }
 
     /* Sembunyikan Elemen Default Streamlit */
@@ -134,6 +140,8 @@ if "selected_model_key" not in st.session_state:
     st.session_state.selected_model_key = config.DEFAULT_MODEL_KEY
 if "attached_image_b64" not in st.session_state:
     st.session_state.attached_image_b64 = None
+if "show_attachment" not in st.session_state:
+    st.session_state.show_attachment = False
 
 # ============================================================================
 # HEADER UTAMA
@@ -160,21 +168,15 @@ with st.sidebar:
     st.markdown("""
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
             <span class="material-symbols-outlined">tune</span>
-            <span style="font-weight: 600; font-size: 0.95rem;">Model & Sistem</span>
+            <span style="font-weight: 600; font-size: 0.95rem;">Informasi Sistem</span>
         </div>
     """, unsafe_allow_html=True)
     
-    model_options = {m["key"]: f"{m['name']}" for m in config.MODEL_CATALOG}
-    st.session_state.selected_model_key = st.selectbox(
-        "Pilih Model:",
-        options=list(model_options.keys()),
-        format_func=lambda x: model_options[x],
-        index=0,
-        label_visibility="collapsed"
-    )
+    groq_status = "Aktif" if GROQ_API_KEY else "Tidak Aktif"
+    flux_status = "Aktif" if flux_service.is_ready() else "Tidak Aktif"
     
-    curr_model = config.MODEL_BY_KEY.get(st.session_state.selected_model_key, config.MODEL_CATALOG[0])
-    st.caption(f"_{curr_model['desc']}_")
+    st.write(f"• **Groq AI:** {groq_status}")
+    st.write(f"• **Cloudflare Flux:** {flux_status}")
 
     st.markdown("---")
     
@@ -194,36 +196,53 @@ for msg in st.session_state.messages:
         if "image_b64" in msg and msg["image_b64"]:
             st.image(base64.b64decode(msg["image_b64"]), width=220)
 
-# 2. Area Input Chat + Tombol Gambar Di Bawah Input
+# 2. Area Input Chat Utama
 user_input = st.chat_input("Tulis pesan untuk Yuki...")
 
-# Expander Tombol Lampirkan Gambar / Mode Gambar (Diletakkan di Bawah Input)
-with st.expander("📷 Lampirkan Gambar / Mode Vision", expanded=False):
-    uploaded_file = st.file_uploader(
-        "Pilih gambar untuk dianalisis oleh AI", 
-        type=["png", "jpg", "jpeg"],
+# 3. Baris Toolbar Di Bawah Input Chat (+ Icon, Mode Gambar Centang, Pilih Model)
+col_plus, col_mode, col_model = st.columns([1, 2.5, 4.5])
+
+with col_plus:
+    # Tombol Transparan Icon Plus
+    if st.button("➕ Lampirkan", key="btn_plus", help="Tambah Lampiran Gambar"):
+        st.session_state.show_attachment = not st.session_state.show_attachment
+
+with col_mode:
+    # Mode Gambar (Centang/Checkbox)
+    is_vision_mode = st.checkbox("Mode Gambar (Vision)", value=False, key="chk_vision")
+
+with col_model:
+    # Pemilih Model Langsung di Bawah Input
+    model_options = {m["key"]: m["name"] for m in config.MODEL_CATALOG}
+    st.session_state.selected_model_key = st.selectbox(
+        "Model AI",
+        options=list(model_options.keys()),
+        format_func=lambda x: model_options[x],
+        index=0,
         label_visibility="collapsed"
+    )
+
+# 4. Panel Upload Gambar (Muncul saat tombol + diklik atau Mode Gambar dicentang)
+if st.session_state.show_attachment or is_vision_mode:
+    st.markdown("---")
+    uploaded_file = st.file_uploader(
+        "Upload Gambar / File Lampiran", 
+        type=["png", "jpg", "jpeg"],
+        key="file_uploader_input"
     )
     if uploaded_file:
         file_bytes = uploaded_file.read()
         st.session_state.attached_image_b64 = base64.b64encode(file_bytes).decode("utf-8")
-        col_img, col_info = st.columns([1, 4])
-        with col_img:
-            st.image(file_bytes, width=100)
-        with col_info:
-            st.caption("Gambar siap dikirim bersama pesan berikutnya.")
-            if st.button("Hapus Gambar"):
-                st.session_state.attached_image_b64 = None
-                st.rerun()
+        st.image(file_bytes, caption="Gambar Siap Dikirim", width=150)
 
-# 3. Logika Eksekusi Pesan
+# 5. Logika Eksekusi Pesan
 if user_input:
-    # Simpan pesan user
     msg_data = {"role": "user", "content": user_input}
     if st.session_state.attached_image_b64:
         msg_data["image_b64"] = st.session_state.attached_image_b64
+        # Reset lampiran setelah dikirim
+        st.session_state.attached_image_b64 = None
+        st.session_state.show_attachment = False
     
     st.session_state.messages.append(msg_data)
-    
-    # Rerun untuk merender tampilan pesan terbaru
     st.rerun()
