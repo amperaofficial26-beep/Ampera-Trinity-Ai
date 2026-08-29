@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import threading
 import time
+import base64
 from datetime import datetime
 
 import streamlit as st
