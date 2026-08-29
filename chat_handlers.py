@@ -47,6 +47,17 @@ def now_wib() -> str:
 # ============================================================================
 # MODE GAMBAR
 # ============================================================================
+def maybe_run_yuki(answer_slot) -> bool:
+    """Jalan di run BERIKUTNYA, setelah preview sudah hilang."""
+    job = st.session_state.pop("_yuki_job", None)
+    if not job:
+        return False
+    if job.get("image_mode"):
+        handle_image_request(job.get("text") or "")
+    else:
+        handle_chat_request(answer_slot)
+    return True
+    
 def handle_image_request(prompt: str) -> None:
     """Mode gambar: prompt → Cloudflare FLUX → bubble gambar.
     Hasil masuk ke thread aktif (chat utama, artefak, atau kursus)."""
@@ -488,9 +499,10 @@ def process_user_input(user_input, answer_slot, is_fresh: bool = False) -> bool:
 
     # Ada lampiran gambar → selalu chat vision (Yuki melihat gambarnya),
     # walau toggle "Gambar" sedang aktif sekalipun.
-    if st.session_state.image_mode and not images:
-        handle_image_request(text)
-    else:
-        handle_chat_request(answer_slot)
-
+    st.session_state.pending_images = []
+    st.session_state.plus_uploader_gen = st.session_state.get("plus_uploader_gen", 0) + 1
+    st.session_state["_yuki_job"] = {
+        "image_mode": bool(st.session_state.image_mode and not images),
+        "text": text,
+    }
     return True
