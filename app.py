@@ -1,32 +1,23 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Ampera Trinity AI — Main Application
-====================================
-Jalankan dengan:
-    streamlit run app.py
+Ampera Trinity AI — Main Application (Claude-Style Layout)
+==========================================================
 """
 
 import os
 import sys
+import base64
 import streamlit as st
 
-# Ensure root directory is in system path for clean imports
+# Setup Root Directory Path
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 
-# Import Configuration
 import config
-
-# Import Services
 from services.groq_service import GroqService
 from services.flux_service import FluxService
-
-# Import UI Components
-from components.chat_ui import render_chat_tab
-from components.gallery_ui import render_gallery_tab
-from components.metrics_ui import render_metrics_tab
 
 # ============================================================================
 # PAGE CONFIGURATION
@@ -39,61 +30,96 @@ st.set_page_config(
 )
 
 # ============================================================================
-# MATERIAL ICONS CDN & CLEAN LAYOUT STYLING
+# CLAUDE-STYLE CLEAN UI & MATERIAL SYMBOLS CSS
 # ============================================================================
-MATERIAL_STYLE_CSS = """
+CLAUDE_STYLE_CSS = """
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 
 <style>
-    /* Google Material Symbols Class */
+    /* 1. Typography & Polos (Tanpa Background Berlebihan) */
+    html, body, [data-testid="stAppViewContainer"] {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+        background-color: #ffffff !important;
+        color: #2d2d2d !important;
+    }
+    
+    /* 2. Material Symbols Setup */
     .material-symbols-outlined {
         font-family: 'Material Symbols Outlined';
         font-weight: normal;
         font-style: normal;
-        font-size: 22px;
+        font-size: 20px;
         display: inline-block;
         line-height: 1;
-        text-transform: none;
-        letter-spacing: normal;
-        word-wrap: normal;
-        white-space: nowrap;
-        direction: ltr;
         vertical-align: middle;
     }
 
-    /* Clean Header Styling */
-    .main-header {
+    /* 3. Header Utama Ala Claude (Minimalis & Clean) */
+    .claude-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 0 20px 0;
+        border-bottom: 1px solid #f0f0f0;
+        margin-bottom: 24px;
+    }
+    
+    .claude-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .claude-title {
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin: 0;
+        letter-spacing: -0.3px;
+    }
+
+    .claude-subtitle {
+        font-size: 0.85rem;
+        color: #707070;
+        margin: 0;
+    }
+
+    /* 4. Chat Messages Styling (Bentuk Kartu Rapi ala Claude) */
+    div[data-testid="stChatMessage"]:nth-child(even) {
+        background-color: #f9f9fb !important;
+        border: 1px solid #ececef !important;
+        border-radius: 12px !important;
+        padding: 12px 16px !important;
+        margin-bottom: 12px !important;
+    }
+
+    div[data-testid="stChatMessage"]:nth-child(odd) {
+        background-color: #ffffff !important;
+        border: 1px solid #f0f0f0 !important;
+        border-radius: 12px !important;
+        padding: 12px 16px !important;
+        margin-bottom: 12px !important;
+    }
+
+    /* 5. Custom Control Area di Bawah Input Chat */
+    .input-tools-bar {
         display: flex;
         align-items: center;
         gap: 12px;
-        padding: 10px 0 15px 0;
-        border-bottom: 1px solid #e5e5e5;
-        margin-bottom: 20px;
-    }
-    
-    .main-header-title {
-        font-size: 1.8rem;
-        font-weight: 600;
-        margin: 0;
-        line-height: 1.2;
+        margin-top: -10px;
+        padding: 8px 4px;
     }
 
-    .main-header-sub {
-        font-size: 0.88rem;
-        color: #666666;
-        margin: 2px 0 0 0;
-    }
-
-    /* Clean Tab & Card Overrides */
+    /* Sembunyikan Elemen Default Streamlit */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
 </style>
 """
 
-st.markdown(MATERIAL_STYLE_CSS, unsafe_allow_html=True)
+st.markdown(CLAUDE_STYLE_CSS, unsafe_allow_html=True)
 
 # ============================================================================
-# SERVICE INITIALIZATION
+# INITIALIZE SERVICES & SESSION
 # ============================================================================
 GROQ_API_KEY = config.get_secret("GROQ_API_KEY", "GROQ_KEY")
 CF_ACCOUNT_ID = config.get_secret("CF_ACCOUNT_ID", "CLOUDFLARE_ACCOUNT_ID")
@@ -102,28 +128,25 @@ CF_API_TOKEN = config.get_secret("CF_API_TOKEN", "CLOUDFLARE_API_TOKEN")
 groq_service = GroqService(GROQ_API_KEY)
 flux_service = FluxService(CF_ACCOUNT_ID, CF_API_TOKEN)
 
-# ============================================================================
-# SESSION STATE INITIALIZATION
-# ============================================================================
 if "messages" not in st.session_state:
     st.session_state.messages = []
 if "selected_model_key" not in st.session_state:
     st.session_state.selected_model_key = config.DEFAULT_MODEL_KEY
-if "settings" not in st.session_state:
-    st.session_state.settings = config.DEFAULT_SETTINGS.copy()
-if "generated_images" not in st.session_state:
-    st.session_state.generated_images = []
+if "attached_image_b64" not in st.session_state:
+    st.session_state.attached_image_b64 = None
 
 # ============================================================================
-# MAIN HEADER (Material Icons Only)
+# HEADER UTAMA
 # ============================================================================
 st.markdown(
     f"""
-    <div class="main-header">
-        <span class="material-symbols-outlined" style="font-size: 34px;">auto_awesome</span>
-        <div>
-            <h1 class="main-header-title">{config.APP_NAME}</h1>
-            <p class="main-header-sub">{config.APP_TAGLINE}</p>
+    <div class="claude-header">
+        <div class="claude-brand">
+            <span class="material-symbols-outlined" style="font-size: 28px; color: #d97706;">auto_awesome</span>
+            <div>
+                <h1 class="claude-title">{config.APP_NAME}</h1>
+                <p class="claude-subtitle">{config.APP_TAGLINE}</p>
+            </div>
         </div>
     </div>
     """,
@@ -135,63 +158,72 @@ st.markdown(
 # ============================================================================
 with st.sidebar:
     st.markdown("""
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-            <span class="material-symbols-outlined">smart_toy</span>
-            <strong style="font-size: 1rem;">Model AI</strong>
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+            <span class="material-symbols-outlined">tune</span>
+            <span style="font-weight: 600; font-size: 0.95rem;">Model & Sistem</span>
         </div>
     """, unsafe_allow_html=True)
     
     model_options = {m["key"]: f"{m['name']}" for m in config.MODEL_CATALOG}
-    selected_key = st.selectbox(
-        "Pilih Model Otak:",
+    st.session_state.selected_model_key = st.selectbox(
+        "Pilih Model:",
         options=list(model_options.keys()),
         format_func=lambda x: model_options[x],
         index=0,
         label_visibility="collapsed"
     )
-    st.session_state.selected_model_key = selected_key
     
-    curr_model = config.MODEL_BY_KEY.get(selected_key, config.MODEL_CATALOG[0])
-    st.caption(f"ID: `{curr_model['id']}`")
+    curr_model = config.MODEL_BY_KEY.get(st.session_state.selected_model_key, config.MODEL_CATALOG[0])
     st.caption(f"_{curr_model['desc']}_")
 
     st.markdown("---")
     
-    st.markdown("""
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-            <span class="material-symbols-outlined">key</span>
-            <strong style="font-size: 1rem;">Status Server API</strong>
-        </div>
-    """, unsafe_allow_html=True)
-    
-    groq_status = "Aktif" if GROQ_API_KEY else "Tidak Aktif"
-    flux_status = "Aktif" if flux_service.is_ready() else "Tidak Aktif"
-    
-    st.write(f"• **Groq AI:** {groq_status}")
-    st.write(f"• **Cloudflare Flux:** {flux_status}")
-    
-    st.markdown("---")
-    
-    if st.button("Bersihkan Chat", use_container_width=True):
+    if st.button("Bersihkan Percakapan", use_container_width=True):
         st.session_state.messages = []
+        st.session_state.attached_image_b64 = None
         st.rerun()
 
-    st.caption(f"© Ampera Official — {config.APP_NAME}")
-
 # ============================================================================
-# MAIN NAVIGATION TABS
+# AREA UTAMA CHAT (CLAUDE STYLE)
 # ============================================================================
-tab_chat, tab_gallery, tab_metrics = st.tabs([
-    "Chat AI & Vision", 
-    "Generator Foto", 
-    "System & Export"
-])
 
-with tab_chat:
-    render_chat_tab(groq_service)
+# 1. Tampilkan Riwayat Chat
+for msg in st.session_state.messages:
+    with st.chat_message(msg["role"]):
+        st.markdown(msg["content"])
+        if "image_b64" in msg and msg["image_b64"]:
+            st.image(base64.b64decode(msg["image_b64"]), width=220)
 
-with tab_gallery:
-    render_gallery_tab(flux_service)
+# 2. Area Input Chat + Tombol Gambar Di Bawah Input
+user_input = st.chat_input("Tulis pesan untuk Yuki...")
 
-with tab_metrics:
-    render_metrics_tab(groq_service, flux_service)
+# Expander Tombol Lampirkan Gambar / Mode Gambar (Diletakkan di Bawah Input)
+with st.expander("📷 Lampirkan Gambar / Mode Vision", expanded=False):
+    uploaded_file = st.file_uploader(
+        "Pilih gambar untuk dianalisis oleh AI", 
+        type=["png", "jpg", "jpeg"],
+        label_visibility="collapsed"
+    )
+    if uploaded_file:
+        file_bytes = uploaded_file.read()
+        st.session_state.attached_image_b64 = base64.b64encode(file_bytes).decode("utf-8")
+        col_img, col_info = st.columns([1, 4])
+        with col_img:
+            st.image(file_bytes, width=100)
+        with col_info:
+            st.caption("Gambar siap dikirim bersama pesan berikutnya.")
+            if st.button("Hapus Gambar"):
+                st.session_state.attached_image_b64 = None
+                st.rerun()
+
+# 3. Logika Eksekusi Pesan
+if user_input:
+    # Simpan pesan user
+    msg_data = {"role": "user", "content": user_input}
+    if st.session_state.attached_image_b64:
+        msg_data["image_b64"] = st.session_state.attached_image_b64
+    
+    st.session_state.messages.append(msg_data)
+    
+    # Rerun untuk merender tampilan pesan terbaru
+    st.rerun()
