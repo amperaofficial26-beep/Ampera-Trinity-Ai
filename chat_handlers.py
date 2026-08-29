@@ -274,7 +274,7 @@ def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> Non
                         key=f"{kp}plus_uploader_image_{gen}",
                     )
 
-                                picked = list(picked_file or []) + list(picked_image or [])
+                picked = list(picked_file or []) + list(picked_image or [])
                 sig = tuple(getattr(f, "name", "") for f in picked)
                 last_sig = st.session_state.get(f"{kp}picked_sig")
 
