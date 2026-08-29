@@ -48,10 +48,16 @@ def now_wib() -> str:
 # MODE GAMBAR
 # ============================================================================
 def maybe_run_yuki(answer_slot) -> bool:
-    """Jalan di run BERIKUTNYA, setelah preview sudah hilang."""
-    job = st.session_state.pop("_yuki_job", None)
+    job = st.session_state.get("_yuki_job")
     if not job:
         return False
+    # Run 1 setelah kirim: preview sudah kosong, jangan jalankan Yuki dulu
+    if not st.session_state.get("_yuki_ui_flushed"):
+        st.session_state["_yuki_ui_flushed"] = True
+        return True
+    # Run 2: preview sudah hilang di layar, baru Yuki bicara
+    st.session_state.pop("_yuki_job", None)
+    st.session_state.pop("_yuki_ui_flushed", None)
     if job.get("image_mode"):
         handle_image_request(job.get("text") or "")
     else:
@@ -262,21 +268,37 @@ def _pending_cards_html(pending: list) -> str:
                 f"</div>"
             )
     return '<div class="pending-row">' + "".join(cards) + "</div>"
+    
 def render_pending_preview(page_key: str = "chat") -> None:
     kp = "" if page_key == "chat" else f"{page_key}_"
     pending = st.session_state.get("pending_images", [])
     if not pending:
         return
-    st.markdown('<div class="pending-row">', unsafe_allow_html=True)
     cols = st.columns(len(pending))
     for i, im in enumerate(pending):
         with cols[i]:
             with st.container(key=f"{kp}pending_card_{i}"):
-                st.markdown(_pending_cards_html([im]), unsafe_allow_html=True)
-                if st.button("×", key=f"{kp}pending_rm_{i}", help="Hapus lampiran"):
+                name = (im.get("name") or "gambar").replace("<", "")[:32]
+                preview = im.get("preview") or b""
+                if im.get("status") == "loading" or not preview:
+                    inner = '<div class="pending-square pending-loading"></div>'
+                else:
+                    b64 = base64.b64encode(preview).decode("ascii")
+                    mime = im.get("preview_mime") or "image/jpeg"
+                    inner = (
+                        f'<div class="pending-square">'
+                        f'<img src="data:{mime};base64,{b64}" alt="{name}"/>'
+                        f"</div>"
+                    )
+                st.markdown(
+                    f'<div class="pending-card">{inner}'
+                    f'<span class="pending-x">×</span>'
+                    f'<div class="pending-name">{name}</div></div>',
+                    unsafe_allow_html=True,
+                )
+                if st.button("×", key=f"{kp}pending_rm_{i}", help="Hapus"):
                     st.session_state.pending_images.pop(i)
-                    st.rerun()
-    st.markdown("</div>", unsafe_allow_html=True)
+                    st.rerun())
                 
 def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> None:
     """Isi dok bawah: [+] [Gambar] ... [Nama Model], preview tepat di atas chat input."""
