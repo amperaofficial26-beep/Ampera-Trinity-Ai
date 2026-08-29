@@ -384,6 +384,24 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 [class*="st-key-msg_actions_"] [data-testid="stHorizontalBlock"] {
     gap: 0 !important; align-items: center !important;
 }
+[class*="st-key-msg_actions_"] [data-testid="stHorizontalBlock"] {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    gap: 2px !important;
+}
+[class*="st-key-msg_actions_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {
+    width: auto !important;
+    flex: 0 0 auto !important;
+    min-width: 28px !important;
+    max-width: 40px !important;
+}
+[class*="st-key-msg_actions_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:last-child {
+    flex: 1 1 auto !important;
+    max-width: none !important;
+    min-width: 0 !important;
+}
 [class*="st-key-msg_actions_"] div.stButton > button {
     background: transparent !important;
     border: none !important;
