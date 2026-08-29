@@ -13,7 +13,6 @@ import threading
 import time
 import base64
 import io
-from datetime import datetime
 
 from PIL import Image
 import streamlit as st
