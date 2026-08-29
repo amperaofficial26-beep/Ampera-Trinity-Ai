@@ -132,6 +132,185 @@ STT_MODEL = "whisper-large-v3-turbo"          # transkrip suara → teks (mic te
 MAX_IMAGES_PER_MESSAGE = 5                    # batas model vision (Llama-4)
 IMAGE_INPUT_TYPES = ["png", "jpg", "jpeg", "webp", "gif"]
 VISION_RECENT_MESSAGES = 4  # pesan terakhir yang gambarnya ikut ke API
+# ============================================================================
+# KATALOG HALAMAN BARU
+#   (halaman Artefak, Bahasa, Pengaturan, Bantuan, Trinity Pro, Aplikasi,
+#    Trinity Kursus, Pelajari lebih lanjut)
+# ============================================================================
+
+# --- Bahasa yang bisa dipakai (halaman "Bahasa") ---
+SUPPORTED_LANGUAGES = [
+    {"code": "id", "flag": "🇮🇩", "name": "Bahasa Indonesia", "native": "Baku",  "level": "Penuh",       "yuki": True},
+    {"code": "en", "flag": "🇬🇧", "name": "English",          "native": "British", "level": "Penuh",     "yuki": True},
+    {"code": "ms", "flag": "🇲🇾", "name": "Bahasa Melayu",    "native": "Malaysia", "level": "Penuh",    "yuki": True},
+    {"code": "su", "flag": "🇮🇩", "name": "Basa Sunda",       "native": "Sunda",    "level": "Beta",     "yuki": True},
+    {"code": "jv", "flag": "🇮🇩", "name": "Basa Jawa",        "native": "Ngoko",    "level": "Beta",     "yuki": True},
+    {"code": "ja", "flag": "🇯🇵", "name": "日本語",           "native": "Nihongo",  "level": "Penuh",    "yuki": True},
+    {"code": "ko", "flag": "🇰🇷", "name": "한국어",           "native": "Hangugeo", "level": "Penuh",    "yuki": True},
+    {"code": "zh", "flag": "🇨🇳", "name": "中文",             "native": "简体",     "level": "Penuh",    "yuki": True},
+    {"code": "es", "flag": "🇪🇸", "name": "Español",          "native": "España",   "level": "Penuh",    "yuki": True},
+    {"code": "pt", "flag": "🇧🇷", "name": "Português",        "native": "Brasil",   "level": "Penuh",    "yuki": True},
+    {"code": "fr", "flag": "🇫🇷", "name": "Français",         "native": "France",   "level": "Penuh",    "yuki": True},
+    {"code": "de", "flag": "🇩🇪", "name": "Deutsch",          "native": "Deutsch",  "level": "Penuh",    "yuki": True},
+    {"code": "ar", "flag": "🇸🇦", "name": "العربية",          "native": "Fusha",    "level": "Beta",     "yuki": True},
+    {"code": "hi", "flag": "🇮🇳", "name": "हिन्दी",            "native": "Hindi",    "level": "Beta",     "yuki": True},
+]
+LANG_BY_CODE = {l["code"]: l for l in SUPPORTED_LANGUAGES}
+DEFAULT_LANG_CODE = "id"
+
+# --- Kotak kategori halaman Artefak (ala Claude) ---
+ARTIFACT_CATEGORIES = [
+    {"key": "app",  "icon": ":material/public:",        "title": "Aplikasi dan situs web",
+     "desc": "Landing page, dashboard, web app interaktif",
+     "brief": ("Aku ingin membuat APLIKASI / SITUS WEB. Tawarkan 3 ide konkret "
+               "(judul + 1 kalimat), lalu tanyakan mana yang mau dikerjakan. "
+               "Setelah aku memilih, langsung buatkan kode lengkapnya "
+               "(HTML + CSS + JavaScript dalam satu file supaya gampang "
+               "dijalankan) beserta penjelasan singkat cara pakainya.")},
+    {"key": "doc",  "icon": ":material/description:",   "title": "Dokumen dan templat",
+     "desc": "Proposal, CV, surat, laporan, template siap pakai",
+     "brief": ("Aku ingin membuat DOKUMEN / TEMPLATE. Tawarkan 3 opsi dokumen "
+               "yang paling berguna untukku, lalu tanyakan mana yang dibuat. "
+               "Setelah aku memilih, tuliskan dokumen lengkapnya dengan "
+               "struktur rapi (judul, sub-bagian, tabel bila perlu) dan beri "
+               "versi siap salin.")},
+    {"key": "game", "icon": ":material/sports_esports:", "title": "Permainan",
+     "desc": "Game mini di browser: teka-teki, arcade, kuis",
+     "brief": ("Aku ingin membuat PERMAINAN. Tawarkan 3 ide game sederhana yang "
+               "bisa jalan di browser, lalu tanyakan pilihanku. Setelah aku "
+               "memilih, buatkan kode lengkapnya dalam satu file HTML "
+               "(Canvas / JavaScript) plus cara mainnya.")},
+    {"key": "prod", "icon": ":material/task_alt:",      "title": "Alat produktivitas",
+     "desc": "To-do list, kalkulator, tracker, timer fokus",
+     "brief": ("Aku butuh ALAT PRODUKTIVITAS. Tawarkan 3 ide alat (to-do, "
+               "tracker, kalkulator, timer) yang paling membantu pekerjaanku, "
+               "lalu tanyakan pilihanku dan langsung buatkan alatnya dalam "
+               "satu file HTML yang bisa langsung kupakai.")},
+    {"key": "kre",  "icon": ":material/brush:",         "title": "Proyek kreatif",
+     "desc": "Cerita, puisi, skrip, konsep desain, lirik",
+     "brief": ("Aku ingin mengerjakan PROYEK KREATIF. Tawarkan 3 konsep kreatif "
+               "yang seru, lalu tanyakan mana yang mau dibuat. Setelah aku "
+               "memilih, buatkan hasil lengkapnya (naskah/cerita/konsep) "
+               "dengan gaya yang hidup.")},
+    {"key": "quiz", "icon": ":material/quiz:",          "title": "Kuis atau survei",
+     "desc": "Kuis interaktif, formulir survei, penilaian",
+     "brief": ("Aku ingin membuat KUIS / SURVEI. Tanyakan dulu topiknya dan "
+               "berapa soal yang kubutuhkan, lalu buatkan kuis interaktif "
+               "dalam satu file HTML (ada skor otomatis di akhir) atau daftar "
+               "pertanyaan survei yang rapi.")},
+    {"key": "new",  "icon": ":material/add_circle:",    "title": "Mulai dari awal",
+     "desc": "Kanvas kosong — jelaskan idemu sendiri",
+     "brief": ("Aku mau mulai ARTEFAK BARU dari nol. Tanyakan dulu apa yang "
+               "ingin kubuat, untuk siapa, dan batasan apa saja. Setelah itu "
+               "susun rencananya lalu kerjakan.")},
+]
+ARTIFACT_BY_KEY = {c["key"]: c for c in ARTIFACT_CATEGORIES}
+
+# --- Katalog kursus Trinity (halaman "Trinity kursus") ---
+COURSE_CATALOG = [
+    {"key": "pemasaran",  "icon": ":material/campaign:",         "title": "Pemasaran",
+     "desc": "Strategi promosi, branding, dan funnel", "level": "Pemula → Lanjut"},
+    {"key": "penjualan",  "icon": ":material/handshake:",        "title": "Penjualan",
+     "desc": "Closing, negosiasi, follow-up pelanggan", "level": "Pemula → Lanjut"},
+    {"key": "desain",     "icon": ":material/palette:",          "title": "Desain",
+     "desc": "Visual, layout, warna, dan tipografi", "level": "Pemula → Lanjut"},
+    {"key": "copywriting","icon": ":material/edit_note:",        "title": "Copywriting",
+     "desc": "Tulisan yang menjual & menggerakkan", "level": "Pemula → Menengah"},
+    {"key": "branding",   "icon": ":material/auto_awesome:",     "title": "Branding",
+     "desc": "Identitas merek yang diingat orang", "level": "Menengah"},
+    {"key": "keuangan",   "icon": ":material/payments:",         "title": "Keuangan",
+     "desc": "Atur uang usaha & arus kas", "level": "Pemula"},
+    {"key": "produktivitas","icon": ":material/timer:",          "title": "Produktivitas",
+     "desc": "Fokus, prioritas, dan sistem kerja", "level": "Pemula"},
+    {"key": "publik",     "icon": ":material/record_voice_over:","title": "Public speaking",
+     "desc": "Bicara di depan orang tanpa gemetar", "level": "Pemula → Menengah"},
+    {"key": "konten",     "icon": ":material/photo_camera:",     "title": "Konten kreator",
+     "desc": "Ide, skrip, dan jadwal konten", "level": "Pemula → Lanjut"},
+    {"key": "ai",         "icon": ":material/smart_toy:",        "title": "AI untuk bisnis",
+     "desc": "Pakai AI untuk kerja sehari-hari", "level": "Pemula"},
+]
+COURSE_BY_KEY = {c["key"]: c for c in COURSE_CATALOG}
+
+
+def course_curriculum(course: dict) -> list[str]:
+    """Susun 4 modul belajar otomatis dari topik kursus yang dipilih."""
+    t = course["title"]
+    return [
+        f"Modul 1 · Fondasi {t} — istilah penting & peta besar",
+        f"Modul 2 · Alat & workflow {t} yang benar-benar terpakai",
+        f"Modul 3 · Strategi tingkat lanjut + studi kasus nyata",
+        "Modul 4 · Proyek praktik & evaluasi hasil belajar",
+    ]
+
+
+# --- Nilai bawaan seluruh Pengaturan (9 tab) ---
+DEFAULT_SETTINGS: dict = {
+    # Umum
+    "ui_lang": DEFAULT_LANG_CODE,
+    "yuki_lang": DEFAULT_LANG_CODE,
+    "theme": "Krem (Claude)",
+    "font_size": "Normal",
+    "compact_mode": False,
+    "stream_speed": "Sedang",
+    "min_think_seconds": 10.0,
+    "personality": "Santai & kocak",
+    "default_mode": "Chat",
+    # Akun
+    "display_name": "User",
+    "email": "",
+    "username": "user",
+    "bio": "",
+    # Privasi
+    "allow_web_search": True,
+    "save_history": True,
+    "keep_voice": False,
+    "analytics": True,
+    "personalization": True,
+    "cloud_sync": False,
+    # Penagihan
+    "plan": "Free",
+    "billing_cycle": "Bulanan",
+    "payment_method": "Belum ada metode pembayaran",
+    # Kemampuan
+    "cap_web_search": True,
+    "cap_artifacts": True,
+    "cap_voice": True,
+    "cap_vision": True,
+    "cap_image": True,
+    # Memori
+    "memories": [],
+    "memory_on": True,
+    "memory_auto": False,
+    # Refleksi
+    "reflection_goal": "",
+    "reflection_habit": "",
+    "reflection_freq": "Setiap hari",
+    "reflection_tone": "Mendorong",
+    # Waktu dan fokus
+    "focus_minutes": 25,
+    "break_minutes": 5,
+    "work_start": "09:00",
+    "work_end": "18:00",
+    "tz_label": "Asia/Jakarta (WIB)",
+    "focus_reminder": True,
+    # Trinity Code
+    "groq_key": "",
+    "cf_account_id": "",
+    "cf_token": "",
+    "temperature": 0.7,
+    "advanced_errors": False,
+}
+
+PAGE_TITLES = {
+    "artefak": "Artefak",
+    "bahasa": "Bahasa",
+    "pengaturan": "Pengaturan",
+    "bantuan": "Dapatkan bantuan",
+    "tingkatkan": "Tingkatkan paket",
+    "aplikasi": "Dapatkan aplikasi",
+    "kursus": "Trinity kursus",
+    "pelajari": "Pelajari lebih lanjut",
+}
 
 # Fitur mic/lampiran hanya jalan di Streamlit yang mendukung (1.47+);
 # di versi lama otomatis nonaktif tanpa error.
@@ -1269,6 +1448,260 @@ div.stDownloadButton > button:hover {
     color: #B8B6AC;
     margin-top: 22px;
 }
+/* ============ HALAMAN BARU (Artefak · Pengaturan · Bahasa ·
+   Bantuan · Trinity Pro · Aplikasi · Trinity Kursus · Pelajari) ============ */
+/* --- baris akun + menu titik tiga --- */
+.sb-account {
+    padding-right: 48px;            /* ruang untuk tombol menu ⋯ */
+    border-top: none;
+    pointer-events: none;           /* teksnya saja; tombol di sebelahnya */
+}
+.st-key-sb_account [data-testid="stVerticalBlock"] { gap: 0 !important; }
+.st-key-sb_account [data-testid="stColumn"]:first-child { padding-right: 0 !important; }
+.st-key-acct_menu {
+    position: fixed; bottom: 12px; left: 208px; z-index: 999996;
+}
+.st-key-acct_menu [data-testid="stPopover"] > div { width: auto !important; }
+.st-key-acct_menu button[data-testid="stPopoverButton"],
+.st-key-acct_menu [data-testid="stPopover"] button {
+    background: transparent !important;
+    border: none !important; box-shadow: none !important;
+    color: #73726C !important;
+    width: 32px !important; min-width: 32px !important; height: 32px !important;
+    border-radius: 8px !important; padding: 0 !important;
+    display: grid !important; place-items: center !important;
+}
+.st-key-acct_menu button:hover {
+    background: #E8E5D8 !important; color: #3D3929 !important;
+}
+.st-key-acct_menu button svg { width: 20px !important; height: 20px !important; }
+
+/* --- judul halaman --- */
+.page-head {
+    display: flex; align-items: flex-start; gap: 14px;
+    margin: 4px 0 18px;
+}
+.page-head-icon {
+    width: 40px; height: 40px; flex-shrink: 0;
+    border-radius: 12px;
+    background: #E8E5D8; border: 1px solid #D5D1C3;
+    display: grid; place-items: center;
+    color: #C15F3C;
+}
+.page-head-icon [data-testid="stIconMaterial"],
+.page-head-icon span[data-testid="stIconMaterial"] { font-size: 21px !important; }
+.page-head h2.page-title {
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 1.55rem; font-weight: 600; color: #1a1915;
+    margin: 0 0 2px; line-height: 1.15; letter-spacing: -0.01em;
+}
+.page-head p.page-sub {
+    margin: 0; font-size: 0.9rem; color: #73726C; line-height: 1.45;
+}
+
+/* --- tombol besar bergaya kartu (kategori artefak, kursus) --- */
+button[kind="secondary"] > div > p > strong,
+div.stButton > button p strong { color: #3D3929; }
+.st-key-cat_app button, .st-key-cat_doc button, .st-key-cat_game button,
+.st-key-cat_prod button, .st-key-cat_kre button, .st-key-cat_quiz button,
+.st-key-cat_new button,
+[class*="st-key-kurs_"] button {
+    background: #FAF9F5 !important;
+    border: 1px solid #E3E0D5 !important;
+    border-radius: 14px !important;
+    padding: 16px 16px !important;
+    min-height: 86px !important; height: auto !important;
+    text-align: left !important;
+    align-items: flex-start !important;
+    transition: border-color .16s ease, background .16s ease, transform .16s ease;
+}
+.st-key-cat_app button:hover, .st-key-cat_doc button:hover,
+.st-key-cat_game button:hover, .st-key-cat_prod button:hover,
+.st-key-cat_kre button:hover, .st-key-cat_quiz button:hover,
+.st-key-cat_new button:hover,
+[class*="st-key-kurs_"] button:hover {
+    border-color: #C9A99A !important;
+    background: #FFFDF8 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(61,57,41,0.07) !important;
+}
+[class*="st-key-cat_"] button [data-testid="stMarkdownContainer"],
+[class*="st-key-kurs_"] button [data-testid="stMarkdownContainer"] {
+    width: 100%; text-align: left;
+}
+[class*="st-key-cat_"] button p, [class*="st-key-kurs_"] button p {
+    white-space: normal !important; line-height: 1.35;
+}
+
+/* --- kartu kosong --- */
+.empty-card {
+    background: #FAF9F5; border: 1px dashed #D5D1C3;
+    border-radius: 14px; padding: 18px;
+    color: #73726C; font-size: 0.9rem; line-height: 1.55;
+    margin: 2px 0 16px;
+}
+
+/* --- hero halaman --- */
+.trinity-hero {
+    background: #FAF9F5; border: 1px solid #E3E0D5; border-radius: 18px;
+    padding: 22px; display: flex; gap: 18px; align-items: center;
+    margin-bottom: 16px;
+}
+.trinity-hero > div:first-child { flex-shrink: 0; }
+.trinity-hero .logo-greeting { width: 54px; height: 54px; }
+.trinity-hero .hero-text h1 {
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 1.8rem; font-weight: 600; color: #1a1915;
+    margin: 0 0 6px; letter-spacing: -0.01em;
+}
+.trinity-hero .hero-text p {
+    margin: 0; color: #73726C; font-size: 0.92rem; line-height: 1.55;
+}
+
+/* --- judul bagian di dalam halaman --- */
+.set-section {
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 1.06rem; font-weight: 600; color: #3D3929;
+    margin: 22px 0 10px;
+}
+
+/* --- kartu kemampuan --- */
+.cap-card {
+    background: #FAF9F5; border: 1px solid #E3E0D5; border-radius: 14px;
+    padding: 6px 14px; margin: 4px 0 8px;
+}
+.cap-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 0; border-bottom: 1px solid #EFECDF;
+    font-size: 0.9rem;
+}
+.cap-row:last-child { border-bottom: none; }
+.cap-row .cap-icon { color: #C15F3C; display: grid; place-items: center; width: 22px; }
+.cap-row .cap-name { flex: 1; color: #3D3929; }
+.cap-row .cap-state {
+    display: inline-flex; align-items: center; gap: 6px;
+    color: #A8A69E; font-size: 0.82rem;
+}
+
+/* --- baris fitur / status kecil --- */
+.feat-row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; padding: 9px 2px; font-size: 0.88rem; color: #3D3929;
+    border-bottom: 1px solid #EFECDF;
+}
+.feat-row:last-child { border-bottom: none; }
+.chip-on, .chip-off {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 0.76rem; font-weight: 600;
+    padding: 2px 8px; border-radius: 99px; white-space: nowrap;
+}
+.chip-on { background: #EAF1E4; color: #4C7A3C; }
+.chip-off { background: #EFEDE4; color: #8A877E; }
+
+/* --- kartu paket (Trinity Pro) --- */
+.plan-card {
+    background: #FAF9F5; border: 1px solid #E3E0D5; border-radius: 16px;
+    padding: 20px; height: 100%; box-sizing: border-box;
+}
+.plan-card.is-pro {
+    border-color: #DA7756; background: #FFF9F5;
+    box-shadow: 0 6px 22px rgba(218,119,86,0.14);
+}
+.plan-name {
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 1.2rem; font-weight: 600; color: #1a1915;
+}
+.plan-price {
+    font-size: 1.75rem; font-weight: 700; color: #C15F3C;
+    margin: 6px 0 2px; letter-spacing: -0.02em;
+}
+.plan-note { font-size: 0.8rem; color: #A8A69E; margin-bottom: 12px; }
+.feat-list { margin-top: 4px; }
+
+/* --- memori --- */
+.mem-item {
+    background: #FAF9F5; border: 1px solid #E3E0D5; border-radius: 10px;
+    padding: 9px 12px; font-size: 0.88rem; color: #3D3929; margin-bottom: 6px;
+}
+
+/* --- daftar bahasa --- */
+.lang-card {
+    background: #FAF9F5; border: 1px solid #E3E0D5; border-radius: 14px;
+    padding: 4px 14px;
+}
+.lang-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 0; border-bottom: 1px solid #EFECDF; font-size: 0.9rem;
+}
+.lang-row:last-child { border-bottom: none; }
+.lang-row .flag { font-size: 1.15rem; line-height: 1; }
+.lang-row .lang-name {
+    flex: 1; color: #3D3929; font-weight: 500;
+    display: flex; flex-direction: column;
+}
+.lang-row .lang-native { font-size: 0.76rem; color: #A8A69E; font-weight: 400; }
+.lang-row .lang-level { display: inline-flex; align-items: center; gap: 6px; }
+
+/* --- langkah bantuan & tips --- */
+.help-step {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 10px 0; font-size: 0.9rem; color: #3D3929; line-height: 1.5;
+}
+.help-step .step-no {
+    width: 24px; height: 24px; flex-shrink: 0;
+    border-radius: 50%; background: #E8E5D8; color: #57544A;
+    display: grid; place-items: center;
+    font-size: 0.74rem; font-weight: 700;
+}
+.help-step .step-icon { color: #C15F3C; padding-top: 2px; }
+.tip-row {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 8px 0; font-size: 0.89rem; color: #3D3929; line-height: 1.5;
+}
+.tip-row .tip-no {
+    width: 22px; height: 22px; flex-shrink: 0; border-radius: 50%;
+    background: #F1E5DC; color: #C15F3C;
+    display: grid; place-items: center; font-size: 0.72rem; font-weight: 700;
+}
+
+/* --- mini card (tentang aplikasi) --- */
+.mini-card {
+    background: #FAF9F5; border: 1px solid #E3E0D5; border-radius: 14px;
+    padding: 16px; height: 100%; box-sizing: border-box;
+}
+.mini-card .mini-icon { color: #C15F3C; margin-bottom: 8px; }
+.mini-card .mini-title { font-weight: 600; color: #3D3929; margin-bottom: 4px; }
+.mini-card .mini-desc { font-size: 0.84rem; color: #73726C; line-height: 1.5; }
+
+/* --- kartu ponsel (halaman Dapatkan aplikasi) --- */
+.phone-card {
+    background: #FAF9F5; border: 1px solid #E3E0D5; border-radius: 22px;
+    padding: 30px 20px; text-align: center;
+}
+.phone-card .logo-greeting { width: 68px; height: 68px; margin: 0 auto 12px; }
+.phone-card .phone-name { font-weight: 600; color: #3D3929; }
+.phone-card .phone-tag { font-size: 0.78rem; color: #A8A69E; margin-top: 2px; }
+
+/* --- baris modul kursus --- */
+.mod-row {
+    background: #FAF9F5; border: 1px solid #E3E0D5; border-radius: 10px;
+    padding: 9px 12px; font-size: 0.88rem; color: #3D3929; margin-bottom: 6px;
+}
+
+/* --- tab Pengaturan: rapikan --- */
+[data-baseweb="tab-list"] { gap: 4px !important; border-bottom: 1px solid #E3E0D5 !important; }
+[data-baseweb="tab"] {
+    font-size: 0.86rem !important; padding: 8px 10px !important;
+    color: #73726C !important; background: transparent !important;
+}
+[data-baseweb="tab"][aria-selected="true"] { color: #3D3929 !important; font-weight: 600 !important; }
+[data-baseweb="tab-highlight"] { background-color: #DA7756 !important; }
+.st-key-chat_controls [class*="st-key-plus_menu"] [data-testid="stPopover"] button { … }
+[data-testid="stPopoverBody"] [class*="st-key-plus_menu"] div.stButton > button,
+[class*="st-key-plus_menu"] [data-testid="stPopoverBody"] div.stButton > button { … }
+[class*="st-key-plus_upload_file"], [class*="st-key-plus_upload_image"] { … }
+[class*="st-key-pending_strip"] { … }
+
 </style>
 """,
         unsafe_allow_html=True,
@@ -1319,22 +1752,78 @@ def _is_model_unavailable_error(exc: Exception) -> bool:
 # ============================================================================
 # ENGINE 1: CHAT MULTI AI (Groq + persona Yuki + streaming + fallback)
 # ============================================================================
-def build_chat_client() -> OpenAI:
-    return OpenAI(api_key=GROQ_API_KEY, base_url=GROQ_BASE_URL)
+def get_settings() -> dict:
+    """Pengaturan user (halaman Pengaturan) — nilai yang belum diset
+    otomatis diisi dari DEFAULT_SETTINGS, jadi aman walau state lama."""
+    base = dict(DEFAULT_SETTINGS)
+    base.update(st.session_state.get("settings") or {})
+    return base
 
 
 def build_system_prompt() -> str:
-    """Gabungkan persona dasar Yuki + preferensi dari halaman "Sesuaikan"
-    (panggilan & instruksi tambahan), bila diisi user."""
+    """Gabungkan persona dasar Yuki + preferensi dari halaman "Sesuaikan",
+    Pengaturan (kepribadian, bahasa, memori, refleksi), dan konteks mode."""
+    s = get_settings()
     parts = [YUKI_SYSTEM_PROMPT]
+
+    # Kepribadian & bahasa dari Pengaturan → Umum / Bahasa
+    persona_map = {
+        "Santai & kocak": "Pertahankan gaya santai, kocak, dan penuh candaan receh.",
+        "Serius & ringkas": (
+            "Kurangi candaan. Jawab ringkas, langsung ke inti, "
+            "pakai poin-poin bila perlu."
+        ),
+        "Mentor sabar": (
+            "Bersikaplah seperti mentor yang sabar: jelaskan langkah demi "
+            "langkah, beri contoh, dan cek pemahaman User."
+        ),
+        "Profesional formal": (
+            "Gunakan bahasa Indonesia formal dan profesional, "
+            "tanpa emoji berlebihan."
+        ),
+    }
+    if s.get("personality") in persona_map:
+        parts.append(persona_map[s["personality"]])
+
+    lang = LANG_BY_CODE.get(s.get("yuki_lang") or DEFAULT_LANG_CODE)
+    if lang and lang["code"] != "id":
+        parts.append(f"Selalu jawab dalam bahasa {lang['name']}.")
+
     nickname = (st.session_state.get("custom_nickname") or "").strip()
     if nickname:
         parts.append(f"Panggil User dengan sebutan: {nickname}.")
+
+    display_name = (s.get("display_name") or "").strip()
+    if display_name and display_name.lower() != "user":
+        parts.append(f"Nama User adalah {display_name}.")
+
+    # Memori jangka panjang (Pengaturan → Memori)
+    if s.get("memory_on"):
+        facts = [str(f).strip() for f in (s.get("memories") or []) if str(f).strip()]
+        if facts:
+            parts.append(
+                "MEMORI JANGKA PANJANG tentang User (pakai seperlunya, "
+                "jangan disebut satu per satu):\n- " + "\n- ".join(facts)
+            )
+
+    # Refleksi: target & kebiasaan yang sedang diperjuangkan User
+    goal = (s.get("reflection_goal") or "").strip()
+    habit = (s.get("reflection_habit") or "").strip()
+    if goal or habit:
+        refl = []
+        if goal:
+            refl.append(f"Target: {goal}")
+        if habit:
+            refl.append(f"Kebiasaan yang dilatih: {habit}")
+        parts.append(
+            "REFLEKSI USER — dukung dia mencapai ini, sesekali tanyakan "
+            "kemajuannya:\n" + "\n".join(refl)
+        )
+
     extra = (st.session_state.get("custom_instruction") or "").strip()
     if extra:
         parts.append(f"Instruksi tambahan dari User yang harus selalu diikuti:\n{extra}")
     return "\n\n".join(parts)
-
 
 def messages_for_api(history: list[dict]) -> list[dict]:
     """System prompt Yuki + riwayat terakhir (ramah free-tier).
@@ -1376,7 +1865,9 @@ def stream_chat_reply(client: OpenAI, model: str, history: list[dict]):
     stream = client.chat.completions.create(
         model=model,
         messages=messages_for_api(history),
-        temperature=0.7,
+               # Suhu bisa diatur user di Pengaturan → Trinity Code (0,3 = kaku,
+        # 1,2 = liar). Dibaca tiap request supaya perubahan langsung terasa.
+        temperature=float(get_settings().get("temperature", 0.7)),
         stream=True,
     )
     for chunk in stream:
@@ -1848,7 +2339,7 @@ def get_chat_export_text() -> str:
         "# by Ampera Official\n",
         "---\n",
     ]
-    for m in st.session_state.get("messages", []):
+    for m in active_thread():
         role_label = "👤 Pengguna" if m.get("role") == "user" else "🔱 Yuki"
         time_tag = f" [{m.get('time', '')}]" if m.get("time") else ""
         lines.append(f"### {role_label}{time_tag}\n")
@@ -1868,6 +2359,81 @@ def get_chat_export_text() -> str:
 # ============================================================================
 # SESSION STATE
 # ============================================================================
+# --- Thread pesan -----------------------------------------------------------
+# Chat utama, halaman Artefak, dan halaman Trinity Kursus punya riwayat
+# sendiri-sendiri supaya jawaban Yuki tidak tercampur antar halaman.
+def main_thread() -> list[dict]:
+    return st.session_state.messages
+
+
+def artifact_thread(art_id: int) -> list[dict]:
+    key = f"artifact_msgs_{art_id}"
+    if key not in st.session_state:
+        st.session_state[key] = []
+    return st.session_state[key]
+
+
+def course_thread(cid: str) -> list[dict]:
+    key = f"course_msgs_{cid}"
+    if key not in st.session_state:
+        st.session_state[key] = []
+    return st.session_state[key]
+
+
+def active_thread() -> list[dict]:
+    """Riwayat pesan milik halaman yang sedang dibuka."""
+    page = st.session_state.get("page", "chat")
+    if page == "artefak":
+        aid = st.session_state.get("artifact_active_id")
+        if aid is not None:
+            return artifact_thread(aid)
+        return []
+    if page == "kursus":
+        cid = st.session_state.get("course_active_key")
+        if cid:
+            return course_thread(cid)
+        return []
+    return st.session_state.messages
+      # Halaman aktif (routing internal): chat / artefak / pengaturan / bahasa /
+    # bantuan / tingkatkan / aplikasi / kursus / pelajari
+    if "page" not in st.session_state:
+        st.session_state.page = "chat"
+    # Pengaturan lengkap (halaman Pengaturan, 9 tab)
+    if "settings" not in st.session_state:
+        st.session_state.settings = dict(DEFAULT_SETTINGS)
+    # Artefak yang sedang dikerjakan (halaman Artefak) + thread kursusnya
+    if "artifact_active_id" not in st.session_state:
+        st.session_state.artifact_active_id = None
+    if "artifact_counter" not in st.session_state:
+        st.session_state.artifact_counter = 0
+    if "course_active_key" not in st.session_state:
+        st.session_state.course_active_key = None
+    if "logged_out" not in st.session_state:
+        st.session_state.logged_out = False
+
+def reset_conversation() -> None:
+    """Chat baru: arsipkan obrolan utama, lalu kosongkan thread utama."""
+    _archive_current_conversation()
+    st.session_state.active_conv_id = None
+    for key in ("messages", "msg_counter"):
+        st.session_state.pop(key, None)
+    init_state()
+    st.session_state.page = "chat"
+
+
+def open_conversation(conv_id: int) -> None:
+    """Buka kembali percakapan lama dari riwayat sidebar."""
+    _archive_current_conversation()
+    for c in st.session_state.conversations:
+        if c["id"] == conv_id:
+            st.session_state.messages = c["messages"]
+            st.session_state.page = "chat"
+            st.session_state.active_conv_id = conv_id
+            st.session_state.msg_counter = max(
+                (m.get("id", 0) for m in c["messages"]), default=1
+            )
+            return
+
 def init_state() -> None:
     # Halaman awal bersih ala Claude: tanpa pesan sambutan,
     # hanya sapaan besar + input di tengah.
@@ -1972,7 +2538,12 @@ def open_conversation(conv_id: int) -> None:
 #   Brand serif · + Baru · menu · riwayat "Hari ini" · akun di bawah
 # ============================================================================
 HAS_DIALOG = hasattr(st, "dialog")
-
+def go(page: str, **extra) -> None:
+    """Pindah halaman internal (chat / artefak / pengaturan / …)."""
+    for k, v in extra.items():
+        st.session_state[k] = v
+    st.session_state.page = page
+    st.rerun()
 
 def _register_dialog(title: str, func):
     """Bungkus fungsi jadi @st.dialog kalau tersedia; kalau versi Streamlit
@@ -2077,9 +2648,10 @@ def render_sidebar() -> None:
                 show_proyek_dialog()
         with st.container(key="sb_menu_artefak"):
             n_art = len(st.session_state.get("artifacts", []))
-            art_label = f":material/data_object: &nbsp;Artefak" + (f"  ({n_art})" if n_art else "")
+            art_label = ":material/data_object: &nbsp;Artefak" + (f"  ({n_art})" if n_art else "")
             if st.button(art_label, use_container_width=True):
-                show_artefak_dialog()
+                # buka HALAMAN Artefak (bukan popup lagi)
+                go("artefak")
         with st.container(key="sb_menu_sesuaikan"):
             if st.button(":material/tune: &nbsp;Sesuaikan", use_container_width=True):
                 show_sesuaikan_dialog()
@@ -2109,21 +2681,60 @@ def render_sidebar() -> None:
         # Baris akun di dasar sidebar ala Claude: (U) User · Free  ⌄ | ikon
         st.markdown(
             f"""
+        # ---- Baris akun di dasar sidebar ala Claude ----
+        # (U) Nama · Paket   [⋮ menu akun]
+        s = get_settings()
+        name = (s.get("display_name") or "User").strip() or "User"
+        plan = s.get("plan") or "Free"
+        initial = name[0].upper()
+        with st.container(key="sb_account"):
+            acc_col, menu_col = st.columns([5, 1.05], gap="small")
+            with acc_col:
+                st.markdown(
+                    f"""
 <div class="sb-account">
-  <div class="ava">U</div>
-  <div class="name">User <span class="plan">· Free</span></div>
-  {ICON_CHEVRON}
-  <div class="right-icons">{ICON_SEARCH}</div>
+  <div class="ava">{html.escape(initial)}</div>
+  <div class="name">{html.escape(name)} <span class="plan">· {html.escape(plan)}</span></div>
 </div>
 """,
-            unsafe_allow_html=True,
-        )
+                    unsafe_allow_html=True,
+                )
+            with menu_col:
+                with st.container(key="acct_menu"):
+                    with st.popover(":material/more_horiz:", use_container_width=False,
+                                    help="Menu akun"):
+                        if st.button(":material/settings:  Pengaturan", key="acct_pengaturan",
+                                     use_container_width=True):
+                            go("pengaturan")
+                        if st.button(":material/translate:  Bahasa", key="acct_bahasa",
+                                     use_container_width=True):
+                            go("bahasa")
+                        if st.button(":material/help:  Dapatkan bantuan", key="acct_bantuan",
+                                     use_container_width=True):
+                            go("bantuan")
+                        if st.button(":material/workspace_premium:  Tingkatkan paket",
+                                     key="acct_pro", use_container_width=True):
+                            go("tingkatkan")
+                        if st.button(":material/phone_iphone:  Dapatkan aplikasi",
+                                     key="acct_app", use_container_width=True):
+                            go("aplikasi")
+                        if st.button(":material/school:  Trinity kursus", key="acct_kursus",
+                                     use_container_width=True):
+                            go("kursus")
+                        if st.button(":material/menu_book:  Pelajari lebih lanjut",
+                                     key="acct_pelajari", use_container_width=True):
+                            go("pelajari")
+                        st.divider()
+                        if st.button(":material/logout:  Keluar", key="acct_keluar",
+                                     use_container_width=True):
+                            st.session_state.logged_out = True
+                            go("chat")
 
 
 # ============================================================================
 # HANDLER PESAN
 # ============================================================================
-def handle_image_request(prompt: str) -> None:
+def handle_image_request(prompt: str) -> None:thread = active_thread()
     """Mode gambar: prompt → Cloudflare FLUX → bubble gambar."""
     if not IMAGE_READY:
         st.session_state.messages.append({
@@ -2200,28 +2811,31 @@ def handle_image_request(prompt: str) -> None:
 
 
 def handle_chat_request(answer_slot) -> None:
-    """Mode chat: streaming jawaban Yuki dengan model terpilih + fallback."""
+    """Mode chat: streaming jawaban Yuki dengan model terpilih + fallback.
+    Jawaban masuk ke THREAD AKTIF (chat utama, artefak, atau kursus)."""
+    thread = active_thread()
     if not CHAT_READY:
-        st.session_state.messages.append({
+        thread.append({
             "id": next_msg_id(), "role": "assistant", "type": "text",
             "content": "Fitur chat belum dikonfigurasi pemilik (GROQ_API_KEY).",
             "time": datetime.now().strftime("%H:%M"),
         })
         return
 
+    s = get_settings()
     model_id = AVAILABLE_MODELS.get(
         st.session_state.selected_model_key,
         AVAILABLE_MODELS[DEFAULT_MODEL_KEY],
     )
     # Pesan bergambar WAJIB lewat model vision (model teks tidak bisa lihat gambar)
     last_user = next(
-        (m for m in reversed(st.session_state.messages) if m.get("role") == "user"),
+        (m for m in reversed(thread) if m.get("role") == "user"),
         None,
     )
     has_images = bool(last_user and last_user.get("images"))
     if has_images:
         model_id = VISION_MODEL_ID
-    elif st.session_state.get("web_search_on"):
+    elif st.session_state.get("web_search_on") and s.get("cap_web_search", True):
         # Toggle "Pencarian web" ala Claude → pakai model Compound
         # (satu-satunya model Groq di katalog ini yang bisa browsing).
         model_id = AVAILABLE_MODELS["compound"]
@@ -2230,6 +2844,8 @@ def handle_chat_request(answer_slot) -> None:
     think_slot = st.empty()
     think_slot.markdown(thinking_html(THINKING_PHRASES_CHAT), unsafe_allow_html=True)
     t0 = time.time()
+    # Durasi "berpikir" minimum bisa diatur di Pengaturan → Umum
+    min_think = float(s.get("min_think_seconds", THINKING_MIN_SECONDS))
 
     try:
         client = build_chat_client()
@@ -2237,14 +2853,14 @@ def handle_chat_request(answer_slot) -> None:
         full = "".join(
             piece or ""
             for piece in stream_chat_with_fallback(
-                client, model_id, st.session_state.messages, vision=has_images
+                client, model_id, thread, vision=has_images
             )
         )
 
         # Tahan sampai proses berpikir genap minimal beberapa detik
         elapsed = time.time() - t0
-        if elapsed < THINKING_MIN_SECONDS:
-            time.sleep(THINKING_MIN_SECONDS - elapsed)
+        if elapsed < min_think:
+            time.sleep(min_think - elapsed)
         think_slot.empty()
 
         if not full:
@@ -2257,12 +2873,12 @@ def handle_chat_request(answer_slot) -> None:
             "id": next_msg_id(), "role": "assistant", "type": "text",
             "content": full, "time": datetime.now().strftime("%H:%M"),
         }
-        st.session_state.messages.append(reply)
+        thread.append(reply)
         _capture_artifacts_from_reply(full)
     except Exception as e:
         think_slot.empty()
         err = public_error_chat(e)
-        st.session_state.messages.append({
+        thread.append({
             "id": next_msg_id(), "role": "assistant", "type": "text",
             "content": err, "time": datetime.now().strftime("%H:%M"),
         })
@@ -2271,45 +2887,277 @@ def handle_chat_request(answer_slot) -> None:
 # ============================================================================
 # MAIN
 # ============================================================================
-def main() -> None:
-    init_state()
-    inject_css()
-    render_sidebar()
 
-    is_fresh = len(st.session_state.messages) == 0
+def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> None:
+    """Isi dok bawah: [⋯ menu lampiran] [Gambar] ... [Nama Model].
+    Dipanggil DI DALAM st.bottom / st._bottom oleh halaman pemanggilnya."""
+    kp = "" if page_key == "chat" else f"{page_key}_"
 
+    # ---- Strip lampiran yang menunggu dikirim (dari menu ⋯) ----
+    pending = st.session_state.get("pending_images", [])
+    if pending:
+        with st.container(key=f"{kp}pending_strip"):
+            pcols = st.columns([0.1] * len(pending) + [1.0])
+            for i, im in enumerate(pending):
+                with pcols[i]:
+                    st.image(im["data"], width=54)
+                    if st.button(":material/close:", key=f"{kp}pending_rm_{i}",
+                                 use_container_width=True):
+                        st.session_state.pending_images.pop(i)
+                        st.rerun()
+            with pcols[-1]:
+                st.markdown(
+                    '<div class="plus-menu-hint">Siap dikirim…</div>',
+                    unsafe_allow_html=True,
+                )
+
+    # [menu] [Gambar] ....spacer.... [Nama Model]
+    ctrl_plus, ctrl_mode, _sp, ctrl_model = st.columns([0.08, 0.22, 1.22, 0.28])
+
+    # ---- Menu lampiran ala Claude: MINIMALIST (ikon + teks saja) ----
+    with ctrl_plus:
+        with st.container(key=f"{kp}plus_menu"):
+            with st.popover(":material/add:", use_container_width=False,
+                            help="Unggah file atau gambar"):
+                gen = st.session_state.get("plus_uploader_gen", 0)
+
+                def _stage_uploaded(files) -> bool:
+                    if not files:
+                        return False
+                    staged = st.session_state.get("pending_images", [])
+                    seen = {(im["name"], len(im["data"])) for im in staged}
+                    added = False
+                    for im in collect_images(files):
+                        k = (im["name"], len(im["data"]))
+                        if k not in seen:
+                            staged.append(im)
+                            seen.add(k)
+                            added = True
+                    st.session_state.pending_images = staged
+                    return added
+
+                with st.container(key=f"{kp}plus_upload_file"):
+                    picked_file = st.file_uploader(
+                        ":material/attach_file:  Upload file", type=IMAGE_INPUT_TYPES,
+                        accept_multiple_files=True,
+                        label_visibility="visible",
+                        key=f"{kp}plus_uploader_file_{gen}",
+                    )
+                with st.container(key=f"{kp}plus_upload_image"):
+                    picked_image = st.file_uploader(
+                        ":material/photo_camera:  Upload gambar atau foto",
+                        type=IMAGE_INPUT_TYPES,
+                        accept_multiple_files=True,
+                        label_visibility="visible",
+                        key=f"{kp}plus_uploader_image_{gen}",
+                    )
+                added_file = _stage_uploaded(picked_file)
+                added_image = _stage_uploaded(picked_image)
+                if added_file or added_image:
+                    # tutup popover & langsung tampilkan thumbnail lampiran
+                    st.rerun()
+
+                st.markdown('<div class="plus-menu-divider"></div>',
+                            unsafe_allow_html=True)
+
+                # Browser murni tidak bisa memicu screen-capture dari
+                # Streamlit → diarahkan ke cara tercepat: screenshot OS
+                # lalu tempel (Ctrl+V) di kotak chat.
+                if st.button(":material/screenshot:  Ambil tangkapan layar",
+                             key=f"{kp}pm_screenshot", use_container_width=True):
+                    st.toast("Ambil screenshot dengan tombol OS kamu, lalu "
+                             "tempel (Ctrl+V) di kotak chat.",
+                             icon=":material/screenshot:")
+
+                # Pencarian web → otomatis pindah ke model Compound (browsing)
+                web_check = " :orange[✓]" if st.session_state.get("web_search_on") else ""
+                if st.button(f":material/public:  Pencarian web{web_check}",
+                             key=f"{kp}pm_web", use_container_width=True):
+                    st.session_state.web_search_on = not st.session_state.get("web_search_on", False)
+                    st.rerun()
+
+    with ctrl_mode:
+        if show_mode:
+            st.session_state.image_mode = st.toggle(
+                "Gambar",
+                value=st.session_state.image_mode,
+                key=f"{kp}toggle_gambar",
+                help="Nyalakan untuk membuat gambar dari teks. "
+                     "Matikan untuk chat biasa dengan Yuki.",
+            )
+
+    with _sp:
+        if st.session_state.messages or st.session_state.get("page") != "chat":
+            st.markdown(
+                '<div class="input-disclaimer">'
+                "Yuki adalah AI dan bisa membuat kesalahan. Harap periksa kembali respons."
+                "</div>",
+                unsafe_allow_html=True,
+            )
+
+    with ctrl_model:
+        current_key = st.session_state.selected_model_key
+        current_name = MODEL_BY_KEY.get(current_key, MODEL_BY_KEY[DEFAULT_MODEL_KEY])["name"]
+        with st.popover(current_name, use_container_width=False):
+            # Daftar model ala Claude, terurut dari tingkat termudah → tertinggi
+            for m in MODEL_CATALOG:
+                is_active = m["key"] == st.session_state.selected_model_key
+                check = " :orange[✓]" if is_active else ""
+                label = f"{m['name']}{check}  \n:small[:gray[{m['desc']}]]"
+                row_key = f"{kp}model_row_{m['key']}" + ("_premium" if m.get("premium") else "")
+                with st.container(key=row_key):
+                    if st.button(label, key=f"{kp}model_{m['key']}", use_container_width=True):
+                        st.session_state.selected_model_key = m["key"]
+                        st.rerun()
+
+
+def process_user_input(user_input, answer_slot, is_fresh: bool = False) -> bool:
+    """Simpan kiriman user ke thread aktif, render bubble-nya, lalu panggil
+    Yuki. Return True bila halaman perlu di-rerun.
+    Dipanggil dari HALAMAN (bukan dari dalam dok bawah)."""
+    if user_input is None:
+        return False
+
+    # Bongkar nilai chat input: teks + lampiran + rekaman (bila didukung)
+    if isinstance(user_input, str):
+        raw_text, send_files, send_audio = user_input, [], None
+    else:
+        raw_text = getattr(user_input, "text", "") or ""
+        send_files = list(getattr(user_input, "files", None) or [])
+        send_audio = getattr(user_input, "audio", None)
+
+    text = (raw_text or "").strip()
+    via_voice = False
+    thread = active_thread()
+
+    # Kiriman suara tanpa teks → transkrip dulu dengan Groq Whisper
+    if send_audio is not None and not text:
+        if CHAT_READY:
+            try:
+                with st.spinner(":material/mic:  Mentranskrip suara…"):
+                    text = transcribe_audio(build_chat_client(), send_audio.getvalue())
+                via_voice = bool(text)
+            except Exception:
+                text = ""
+        if not text:
+            thread.append({
+                "id": next_msg_id(), "role": "assistant", "type": "text",
+                "content": "Hmm, suaranya belum kebaca nih. Coba rekam lagi "
+                           "lebih dekat ke mikrofon, atau ketik saja ya!",
+                "time": datetime.now().strftime("%H:%M"),
+            })
+            return True
+
+    images = collect_images(send_files)
+    # Gabungkan lampiran yang di-stage lewat menu ⋯ (hindari duplikat)
+    pending = st.session_state.get("pending_images", [])
+    if pending:
+        keys = {(im["name"], len(im["data"])) for im in images}
+        for im in pending:
+            k = (im["name"], len(im["data"]))
+            if k not in keys:
+                images.append(im)
+                keys.add(k)
+        st.session_state.pending_images = []
+        st.session_state.plus_uploader_gen = (
+            st.session_state.get("plus_uploader_gen", 0) + 1
+        )
+    images = images[:MAX_IMAGES_PER_MESSAGE]
+
+    if not (text or images):
+        return False
+
+    now = datetime.now().strftime("%H:%M")
+
+    # Begitu KIRIM ditekan: kotak input langsung turun ke bawah dan scroll
+    # diaktifkan lagi (menimpa CSS halaman awal).
     if is_fresh:
-        # ---------- HALAMAN AWAL ala Claude ----------
-        # Sapaan besar serif di tengah + input diangkat ke tengah layar (CSS)
-        st.markdown(
-            """
+        st.markdown(_BOTTOM_RESET_CSS, unsafe_allow_html=True)
+
+    # simpan & tampilkan pesan user (+ thumbnail lampiran)
+    user_msg = {
+        "id": next_msg_id(), "role": "user", "type": "text",
+        "content": text, "time": now,
+    }
+    if images:
+        user_msg["images"] = images
+    if via_voice:
+        user_msg["via_voice"] = True
+    thread.append(user_msg)
+    note = f"{ICON_MIC} via suara" if via_voice else ""
+    st.markdown(
+        bubble_html("user", text, now, images_bubble_html(images), note),
+        unsafe_allow_html=True,
+    )
+
+    # Ada lampiran gambar → selalu chat vision (Yuki melihat gambarnya),
+    # walau toggle "Gambar" sedang aktif sekalipun.
+    if st.session_state.image_mode and not images:
+        handle_image_request(text)
+    else:
+        handle_chat_request(answer_slot)
+
+    return True
+
+
+# Dua potong CSS pengatur posisi dok input (halaman awal vs sudah ada chat)
+_FRESH_BOTTOM_CSS = """
 <style>
 /* angkat dok input ke tengah layar saat belum ada percakapan
    (turun sedikit agar tidak menutupi judul sapaan) */
 [data-testid="stBottom"] {
-    transform: translateY(-26vh);
-    background: transparent !important;
-    transition: transform 0.35s ease;
+  transform: translateY(-26vh);
+  background: transparent !important;
+  transition: transform 0.35s ease;
 }
 /* SEMUA lapisan dok harus transparan agar tidak menutupi judul sapaan */
 [data-testid="stBottom"] > div,
 [data-testid="stBottom"] [data-testid="stBottomBlockContainer"],
 [data-testid="stBottom"] [data-testid="stVerticalBlock"],
 [data-testid="stBottom"] .element-container {
-    background: transparent !important;
-    background-color: transparent !important;
+  background: transparent !important;
+  background-color: transparent !important;
 }
 /* HALAMAN AWAL TIDAK BISA DI-SCROLL (atas/bawah) */
 [data-testid="stAppViewContainer"],
 [data-testid="stMain"],
 section.main,
 html, body {
-    overflow: hidden !important;
+  overflow: hidden !important;
 }
 </style>
-""",
-            unsafe_allow_html=True,
-        )
+"""
+
+_BOTTOM_RESET_CSS = """
+<style>
+[data-testid="stBottom"] { transform: translateY(0) !important; }
+[data-testid="stAppViewContainer"],
+[data-testid="stMain"],
+section.main,
+html, body { overflow: auto !important; }
+</style>
+"""
+
+
+def _page_footer(in_chat: bool = False) -> None:
+    foot_class = "trinity-foot" if not in_chat else "trinity-foot in-chat"
+    st.markdown(
+        f'<p class="{foot_class}">{logo_img_html("logo-foot")} '
+        "Ampera Trinity AI · by Ampera Official · 2026</p>",
+        unsafe_allow_html=True,
+    )
+
+
+# ============================================================================
+# HALAMAN: CHAT UTAMA
+# ============================================================================
+def render_chat_page() -> None:
+    is_fresh = len(main_thread()) == 0
+
+    if is_fresh:
+        # ---------- HALAMAN AWAL ala Claude ----------
+        # Sapaan besar serif di tengah + input diangkat ke tengah layar (CSS)
+        st.markdown(_FRESH_BOTTOM_CSS, unsafe_allow_html=True)
         st.markdown(
             '<div class="trinity-greeting" style="margin-top:18vh;">'
             f'{logo_img_html("logo-greeting")} Semangat lagi!'
@@ -2318,8 +3166,11 @@ html, body {
         )
 
     # ---------- Riwayat chat ----------
-    for msg in st.session_state.messages:
+    for msg in main_thread():
         render_message(msg)
+
+    # Prompt tertunda (mis. dari tombol "Minta refleksi sekarang")
+    pending_prompt = (st.session_state.pop("pending_prompt", "") or "").strip()
 
     # ---------- Chat input ----------
     if st.session_state.image_mode:
@@ -2328,7 +3179,7 @@ html, body {
         placeholder_text = "Apa yang bisa Yuki bantu hari ini?"
     else:
         placeholder_text = "Tulis pesan…"
-    # Mic 🎤 & lampiran 📎 native Streamlit (kirim gambar, paste, drag-drop);
+    # Mic & lampiran native Streamlit (kirim gambar, paste, drag-drop);
     # otomatis nonaktif bila versi Streamlit belum mendukung.
     chat_kwargs: dict = {}
     if CHAT_INPUT_SUPPORTS_FILE:
@@ -2339,237 +3190,1165 @@ html, body {
     user_input = st.chat_input(placeholder_text, **chat_kwargs)
 
     # ---------- Kontrol DI DALAM kotak chat input ----------
-    # Dirender ke dok bawah Streamlit (wadah yang sama dengan st.chat_input)
-    # → otomatis ikut bergeser saat sidebar dibuka/ditutup (seperti Claude).
-    # CSS menariknya naik (margin-top negatif) ke ruang padding kotak input.
-    # (st._bottom deprecated di Streamlit baru → pakai st.bottom bila tersedia)
     bottom_dock = getattr(st, "bottom", None) or st._bottom
     with bottom_dock:
         with st.container(key="chat_controls"):
+            render_input_controls("chat", show_mode=True)
 
-            # ---- Strip lampiran yang menunggu dikirim (dari menu ➕) ----
-            pending = st.session_state.get("pending_images", [])
-            if pending:
-                with st.container(key="pending_strip"):
-                    pcols = st.columns([0.1] * len(pending) + [1.0])
-                    for i, im in enumerate(pending):
-                        with pcols[i]:
-                            st.image(im["data"], width=54)
-                            if st.button(":material/close:", key=f"pending_rm_{i}",
-                                         use_container_width=True):
-                                st.session_state.pending_images.pop(i)
-                                st.rerun()
-                    with pcols[-1]:
-                        st.markdown(
-                            '<div class="plus-menu-hint">Siap dikirim…</div>',
-                            unsafe_allow_html=True,
-                        )
+    # ---------- Proses kiriman ----------
+    if pending_prompt and user_input is None:
+        user_input = pending_prompt
+    if process_user_input(user_input, st.empty(), is_fresh=is_fresh):
+        st.rerun()
 
-            # [➕ menu] [Gambar] ....spacer.... [Nama Model]
-            ctrl_plus, ctrl_mode, _sp, ctrl_model = st.columns(
-                [0.08, 0.22, 1.22, 0.28]
-            )
+    _page_footer(in_chat=not is_fresh)
+# ============================================================================
+# HALAMAN: ARTEFAK (kotak kategori ala Claude + ruang kerja Yuki)
+# ============================================================================
+def start_artifact_thread(key: str) -> None:
+    """Buka artefak baru dari kategori terpilih → Yuki langsung menjawab
+    DI HALAMAN INI (bukan di chat utama)."""
+    cat = ARTIFACT_BY_KEY.get(key) or ARTIFACT_CATEGORIES[-1]
+    st.session_state.artifact_counter += 1
+    aid = st.session_state.artifact_counter
+    now = datetime.now().strftime("%H:%M")
+    thread = artifact_thread(aid)
+    thread.append({
+        "id": next_msg_id(), "role": "user", "type": "text",
+        "content": cat["brief"], "time": now, "meta": cat["title"],
+        # tanda: Yuki harus langsung menjawab brief ini di halaman artefak
+        "awaiting_reply": True,
+    })
+    st.session_state.artifact_active_id = aid
+    go("artefak")
 
-            # ---- Menu ➕ ala Claude: MINIMALIST — hanya 2 baris ikon+teks
-            #      (📎 Upload file · 📸 Upload gambar atau foto). Mode chat/
-            #      gambar, pencarian web, suara, unduh & chat baru sudah ada
-            #      di luar popup ini, jadi tidak diduplikasi di sini. ----
-            with ctrl_plus:
-                with st.container(key="plus_menu"):
-                    with st.popover(":material/add:", use_container_width=False,
-                                    help="Unggah file atau gambar"):
-                        gen = st.session_state.get("plus_uploader_gen", 0)
 
-                        def _stage_uploaded(files) -> bool:
-                            if not files:
-                                return False
-                            staged = st.session_state.get("pending_images", [])
-                            seen = {(im["name"], len(im["data"])) for im in staged}
-                            added = False
-                            for im in collect_images(files):
-                                k = (im["name"], len(im["data"]))
-                                if k not in seen:
-                                    staged.append(im)
-                                    seen.add(k)
-                                    added = True
-                            st.session_state.pending_images = staged
-                            return added
+def _artifact_grid(prefix: str) -> None:
+    """Grid 2 kolom berisi kotak-kotak kategori ala Claude."""
+    cats = ARTIFACT_CATEGORIES
+    for i in range(0, len(cats), 2):
+        cols = st.columns(2)
+        for j, cat in enumerate(cats[i:i + 2]):
+            with cols[j]:
+                label = (f"{cat['icon']}  **{cat['title']}**"
+                         f"  \n:small[:gray[{cat['desc']}]]")
+                if st.button(label, key=f"{prefix}_{cat['key']}",
+                             use_container_width=True):
+                    start_artifact_thread(cat["key"])
 
-                        with st.container(key="plus_upload_file"):
-                            picked_file = st.file_uploader(
-                                ":material/attach_file:  Upload file", type=IMAGE_INPUT_TYPES,
-                                accept_multiple_files=True,
-                                label_visibility="visible",
-                                key=f"plus_uploader_file_{gen}",
-                            )
-                        with st.container(key="plus_upload_image"):
-                            picked_image = st.file_uploader(
-                                ":material/photo_camera:  Upload gambar atau foto", type=IMAGE_INPUT_TYPES,
-                                accept_multiple_files=True,
-                                label_visibility="visible",
-                                key=f"plus_uploader_image_{gen}",
-                            )
-                        added_file = _stage_uploaded(picked_file)
-                        added_image = _stage_uploaded(picked_image)
-                        if added_file or added_image:
-                            # tutup popover & langsung tampilkan thumbnail
-                            # lampiran di dalam kotak chat input (ala Claude)
-                            st.rerun()
 
-                        st.markdown('<div class="plus-menu-divider"></div>',
-                                    unsafe_allow_html=True)
+def _artifact_workspace(aid: int) -> None:
+    thread = artifact_thread(aid)
+    meta = ""
+    for m in thread:
+        if m.get("role") == "user":
+            meta = m.get("meta") or ""
+            break
 
-                        # Ambil tangkapan layar — browser murni tidak bisa
-                        # memicu screen-capture dari Streamlit, jadi diarahkan
-                        # ke cara tercepat: screenshot OS lalu tempel (Ctrl+V).
-                        if st.button(":material/screenshot:  Ambil tangkapan layar", key="pm_screenshot",
-                                     use_container_width=True):
-                            st.toast("Ambil screenshot dengan tombol OS kamu, lalu "
-                                     "tempel (Ctrl+V) di kotak chat.",
-                                     icon=":material/screenshot:")
+    back, _sp, new_btn = st.columns([0.18, 1.0, 0.22])
+    with back:
+        if st.button(":material/arrow_back:", key="art_back",
+                     use_container_width=True, help="Kembali ke pilihan artefak"):
+            go("artefak", artifact_active_id=None)
+    with new_btn:
+        if st.button(":material/add: &nbsp;Baru", key="art_new",
+                     use_container_width=True):
+            go("artefak", artifact_active_id=None)
 
-                        # Pencarian web — beralih otomatis ke model Compound
-                        # (browsing) tanpa mengubah pilihan model utama.
-                        web_check = " :orange[✓]" if st.session_state.get("web_search_on") else ""
-                        if st.button(f":material/public:  Pencarian web{web_check}", key="pm_web",
-                                     use_container_width=True):
-                            st.session_state.web_search_on = not st.session_state.get("web_search_on", False)
-                            st.rerun()
+    st.markdown(
+        f'<div class="page-head"><div class="page-head-icon">'
+        f":material/data_object:</div>"
+        f'<div><h2 class="page-title">{html.escape(meta or "Artefak")}</h2>'
+        '<p class="page-sub">Yuki mengerjakan artefak ini di halaman ini — '
+        "chat utamamu tetap bersih.</p></div></div>",
+        unsafe_allow_html=True,
+    )
 
-            with ctrl_mode:
-                st.session_state.image_mode = st.toggle(
-                    "Gambar",
-                    value=st.session_state.image_mode,
-                    help="Nyalakan untuk membuat gambar dari teks. "
-                         "Matikan untuk chat biasa dengan Yuki.",
-                )
+    # Kalau pesan terakhir adalah brief kategori (belum dijawab), Yuki
+    # langsung menjawabnya DI HALAMAN INI sebelum input dirender.
+    if thread and thread[-1].get("awaiting_reply"):
+        thread[-1].pop("awaiting_reply", None)
+        handle_chat_request(st.empty())
+        st.rerun()
 
-            with _sp:
-                if not is_fresh:
-                    st.markdown(
-                        '<div class="input-disclaimer">'
-                        "Yuki adalah AI dan bisa membuat kesalahan. Harap periksa kembali respons."
-                        "</div>",
-                        unsafe_allow_html=True,
-                    )
+    for msg in thread:
+        render_message(msg)
 
-            with ctrl_model:
-                current_key = st.session_state.selected_model_key
-                current_name = MODEL_BY_KEY.get(current_key, MODEL_BY_KEY[DEFAULT_MODEL_KEY])["name"]
-                with st.popover(current_name, use_container_width=False):
-                    # Daftar model ala Claude, sudah terurut dari tingkat
-                    # termudah → tertinggi. Tier Hard & Extreme diberi
-                    # label PREMIUM kecil di sebelah nama.
-                    for m in MODEL_CATALOG:
-                        is_active = m["key"] == st.session_state.selected_model_key
-                        check = " :orange[✓]" if is_active else ""
-                        label = f"{m['name']}{check}  \n:small[:gray[{m['desc']}]]"
-                        row_key = f"model_row_{m['key']}" + ("_premium" if m.get("premium") else "")
-                        with st.container(key=row_key):
-                            if st.button(label, key=f"model_{m['key']}", use_container_width=True):
-                                st.session_state.selected_model_key = m["key"]
-                                st.rerun()
+    chat_kwargs: dict = {}
+    if CHAT_INPUT_SUPPORTS_FILE:
+        chat_kwargs["accept_file"] = True
+        chat_kwargs["file_type"] = IMAGE_INPUT_TYPES
+    if CHAT_INPUT_SUPPORTS_AUDIO:
+        chat_kwargs["accept_audio"] = True
+    user_input = st.chat_input("Jelaskan apa yang mau dibuat…", **chat_kwargs)
 
-    # ---------- Proses kiriman (teks / lampiran gambar / rekaman suara) ----------
-    if user_input is not None:
-        # Bongkar nilai chat input: teks + lampiran + rekaman (bila didukung)
-        if isinstance(user_input, str):
-            raw_text, send_files, send_audio = user_input, [], None
+    bottom_dock = getattr(st, "bottom", None) or st._bottom
+    with bottom_dock:
+        with st.container(key="chat_controls"):
+            render_input_controls("artefak", show_mode=False)
+
+    if process_user_input(user_input, st.empty()):
+        st.rerun()
+
+    _page_footer(in_chat=True)
+
+
+def page_artefak() -> None:
+    aid = st.session_state.get("artifact_active_id")
+    if aid is not None:
+        _artifact_workspace(aid)
+        return
+
+    artifacts = st.session_state.get("artifacts", [])
+    st.markdown(
+        '<div class="page-head"><div class="page-head-icon">'
+        ":material/data_object:</div>"
+        '<div><h2 class="page-title">Artefak</h2>'
+        "<p class=\"page-sub\">Pilih salah satu kotak di bawah. Yuki langsung "
+        "menjawab di halaman ini — bukan di chat utama.</p></div></div>",
+        unsafe_allow_html=True,
+    )
+
+    if not artifacts:
+        st.markdown(
+            '<div class="empty-card">Belum ada artefak. Kode panjang dari '
+            "jawaban Yuki otomatis tersimpan dan muncul di bagian bawah "
+            "halaman ini.</div>",
+            unsafe_allow_html=True,
+        )
+# ============================================================================
+# HALAMAN: PENGATURAN (Umum · Akun · Privasi · Penagihan · Kemampuan ·
+#                      Memori · Refleksi · Waktu dan fokus · Trinity Code)
+# ============================================================================
+THEME_OPTIONS = ["Krem (Claude)", "Gelap", "Ikut sistem"]
+FONT_OPTIONS = ["Kecil", "Normal", "Besar"]
+SPEED_OPTIONS = ["Lambat", "Sedang", "Cepat"]
+PERSONA_OPTIONS = ["Santai & kocak", "Serius & ringkas", "Mentor sabar",
+                   "Profesional formal"]
+REFL_FREQ_OPTIONS = ["Setiap hari", "Setiap minggu", "Saat aku minta", "Nonaktif"]
+REFL_TONE_OPTIONS = ["Mendorong", "Lembut", "Tegas", "Netral"]
+TZ_OPTIONS = ["Asia/Jakarta (WIB)", "Asia/Makassar (WITA)", "Asia/Jayapura (WIT)",
+              "Asia/Singapore (SGT)", "UTC"]
+
+CAPABILITY_ROWS = [
+    ("Chat AI (Yuki)",              ":material/chat_bubble:",    "selalu"),
+    ("Generate gambar (FLUX)",      ":material/image:",          "cap_image"),
+    ("Transkrip suara (Whisper)",   ":material/mic:",            "cap_voice"),
+    ("Analisis gambar (Vision)",    ":material/visibility:",     "cap_vision"),
+    ("Pencarian web (Compound)",    ":material/public:",         "cap_web_search"),
+    ("Artefak otomatis",            ":material/data_object:",    "cap_artifacts"),
+]
+
+
+def _save_settings(patch: dict, label: str = "Perubahan disimpan.") -> None:
+    merged = dict(st.session_state.get("settings") or {})
+    merged.update(patch)
+    st.session_state.settings = merged
+    st.toast(label, icon=":material/check:")
+
+
+def _capability_state(setting_key: str) -> str:
+    """Status kemampuan: aktif / siap (butuh kredensial) / nonaktif."""
+    if setting_key == "selalu":
+        return "aktif" if CHAT_READY else "butuh GROQ_API_KEY"
+    s = get_settings()
+    if not s.get(setting_key, True):
+        return "nonaktif"
+    if setting_key == "cap_image":
+        return "aktif" if IMAGE_READY else "butuh Cloudflare"
+    if setting_key in ("cap_voice", "cap_vision"):
+        return "aktif" if CHAT_READY else "butuh GROQ_API_KEY"
+    return "aktif"
+
+
+def _cap_rows_html() -> str:
+    rows = []
+    for label, icon, key in CAPABILITY_ROWS:
+        state = _capability_state(key)
+        ok = state == "aktif"
+        mark = ":material/check_circle:" if ok else ":material/error_outline:"
+        chip = "chip-on" if ok else "chip-off"
+        rows.append(
+            f'<div class="cap-row">'
+            f'<span class="cap-icon">{icon}</span>'
+            f'<span class="cap-name">{label}</span>'
+            f'<span class="cap-state">{mark} '
+            f'<span class="{chip}">{html.escape(state)}</span></span>'
+            "</div>"
+        )
+    return f'<div class="cap-card">{"".join(rows)}</div>'
+
+
+def _set_umum() -> None:
+    s = get_settings()
+    st.markdown('<div class="set-section">Tampilan</div>', unsafe_allow_html=True)
+    c1, c2 = st.columns(2)
+    with c1:
+        theme = st.selectbox("Tema", THEME_OPTIONS, index=THEME_OPTIONS.index(s["theme"]),
+                             key="set_theme", help="Tema krem adalah tampilan bawaan Trinity.")
+    with c2:
+        font = st.selectbox("Ukuran teks", FONT_OPTIONS, index=FONT_OPTIONS.index(s["font_size"]),
+                            key="set_font")
+    c3, c4 = st.columns(2)
+    with c3:
+        compact = st.toggle("Mode ringkas", value=s["compact_mode"], key="set_compact",
+                            help="Jarak antar pesan dipersempit supaya lebih banyak terlihat.")
+    with c4:
+        speed = st.selectbox("Kecepatan aliran jawaban", SPEED_OPTIONS,
+                             index=SPEED_OPTIONS.index(s["stream_speed"]), key="set_speed",
+                             help="Seberapa cepat kalimat Yuki muncul satu per satu.")
+
+    st.markdown('<div class="set-section">Perilaku Yuki</div>', unsafe_allow_html=True)
+    c5, c6 = st.columns(2)
+    with c5:
+        persona = st.selectbox("Kepribadian", PERSONA_OPTIONS,
+                               index=PERSONA_OPTIONS.index(s["personality"]), key="set_persona")
+    with c6:
+        min_think = st.slider("Durasi \"berpikir\" minimum (detik)", 0.0, 20.0,
+                              float(s["min_think_seconds"]), 0.5, key="set_think",
+                              help="Animasi berpikir ditahan minimal selama ini "
+                                   "sebelum jawaban ditampilkan.")
+    mode = st.radio("Mode bawaan saat membuka aplikasi", ["Chat", "Gambar"],
+                    index=["Chat", "Gambar"].index(s["default_mode"]),
+                    key="set_mode", horizontal=True)
+
+    if st.button(":material/save:  Simpan perubahan", key="save_umum", type="primary"):
+        _save_settings({
+            "theme": theme, "font_size": font, "compact_mode": compact,
+            "stream_speed": speed, "personality": persona,
+            "min_think_seconds": float(min_think), "default_mode": mode,
+        }, "Pengaturan umum disimpan.")
+        st.rerun()
+
+
+def _set_akun() -> None:
+    s = get_settings()
+    st.markdown('<div class="set-section">Profil</div>', unsafe_allow_html=True)
+    c1, c2 = st.columns(2)
+    with c1:
+        name = st.text_input("Nama tampilan", value=s["display_name"], key="set_name",
+                             help="Nama ini muncul di baris akun sidebar.")
+        uname = st.text_input("Nama pengguna", value=s["username"], key="set_uname")
+    with c2:
+        email = st.text_input("Email", value=s["email"], key="set_email",
+                              placeholder="nama@email.com")
+        st.selectbox("Wilayah", ["Indonesia", "Malaysia", "Singapura", "Lainnya"],
+                     key="set_region")
+    bio = st.text_area("Tentang kamu (dibaca Yuki)", value=s["bio"], key="set_bio",
+                       height=90, placeholder="mis. Aku pemilik UMKM kopi di Lampung…")
+
+    st.markdown('<div class="set-section">Paket</div>', unsafe_allow_html=True)
+    st.markdown(
+        f'<div class="feat-row"><span>Paket aktif</span>'
+        f'<span class="chip-off">{html.escape(s["plan"])}</span></div>',
+        unsafe_allow_html=True,
+    )
+    c3, c4 = st.columns(2)
+    with c3:
+        if st.button(":material/workspace_premium:  Tingkatkan ke Trinity Pro",
+                     key="akun_pro", use_container_width=True):
+            go("tingkatkan")
+    with c4:
+        if st.button(":material/lock:  Ubah kata sandi", key="akun_pw",
+                     use_container_width=True):
+            st.toast("Tautan ubah kata sandi akan dikirim ke email kamu.",
+                     icon=":material/mail:")
+
+    if st.button(":material/save:  Simpan profil", key="save_akun", type="primary"):
+        _save_settings({"display_name": name.strip() or "User", "username": uname.strip(),
+                        "email": email.strip(), "bio": bio.strip()}, "Profil disimpan.")
+        st.rerun()
+
+
+def _set_privasi() -> None:
+    s = get_settings()
+    st.markdown('<div class="set-section">Data &amp; percakapan</div>',
+                unsafe_allow_html=True)
+    st.toggle("Simpan riwayat percakapan di perangkat ini", value=s["save_history"],
+              key="set_hist")
+    st.toggle("Simpan rekaman suara setelah ditranskrip", value=s["keep_voice"],
+              key="set_voice")
+    st.toggle("Izinkan Yuki memakai pencarian web", value=s["allow_web_search"],
+              key="set_web")
+    st.toggle("Cadangkan data ke cloud", value=s["cloud_sync"], key="set_sync")
+
+    st.markdown('<div class="set-section">Personalisasi</div>', unsafe_allow_html=True)
+    st.toggle("Kirim data pemakaian anonim untuk perbaikan aplikasi",
+              value=s["analytics"], key="set_analytics")
+    st.toggle("Gunakan memoriku untuk jawaban yang lebih personal",
+              value=s["personalization"], key="set_personal")
+
+    st.markdown('<div class="set-section">Hapus data</div>', unsafe_allow_html=True)
+    st.caption("Menghapus seluruh data akan mengosongkan percakapan, artefak, "
+               "memori, dan pengaturan. Tindakan ini tidak bisa dibatalkan.")
+    if st.button(":material/delete_forever:  Hapus seluruh data saya",
+                 key="wipe_data", type="primary"):
+        for k in list(st.session_state.keys()):
+            del st.session_state[k]
+        st.session_state.page = "chat"
+        st.rerun()
+
+    if st.button(":material/save:  Simpan pengaturan privasi", key="save_privasi",
+                 type="primary"):
+        _save_settings({
+            "save_history": st.session_state.set_hist,
+            "keep_voice": st.session_state.set_voice,
+            "allow_web_search": st.session_state.set_web,
+            "cloud_sync": st.session_state.set_sync,
+            "analytics": st.session_state.set_analytics,
+            "personalization": st.session_state.set_personal,
+        }, "Pengaturan privasi disimpan.")
+        st.rerun()
+
+
+PRO_FEATURES = [
+    ("Model Extreme & premium tanpa batas", True, False),
+    ("Generate gambar resolusi tinggi", True, False),
+    ("Memori jangka panjang tak terbatas", True, False),
+    ("Artefak & Trinity Code penuh", True, True),
+    ("Trinity kursus lengkap + mentor Yuki", True, False),
+    ("Refleksi harian otomatis", True, False),
+    ("Akses lebih awal fitur baru", True, False),
+    ("Dukungan prioritas", True, False),
+]
+
+
+def _plan_col(title: str, price: str, note: str, is_pro: bool, key: str) -> None:
+    rows = []
+    for label, _pro, free in PRO_FEATURES:
+        if is_pro:
+            mark, cls = ":material/check_circle:", "chip-on"
         else:
-            raw_text = getattr(user_input, "text", "") or ""
-            send_files = list(getattr(user_input, "files", None) or [])
-            send_audio = getattr(user_input, "audio", None)
+            mark, cls = (":material/check_circle:", "chip-on") if free else (
+                ":material/remove_circle_outline:", "chip-off")
+        rows.append(f'<div class="feat-row"><span>{label}</span>'
+                    f'<span class="{cls}">{mark}</span></div>')
+    st.markdown(
+        f'<div class="plan-card{" is-pro" if is_pro else ""}">'
+        f'<div class="plan-name">{title}</div>'
+        f'<div class="plan-price">{price}</div>'
+        f'<div class="plan-note">{note}</div>'
+        f'<div class="feat-list">{"".join(rows)}</div>'
+        "</div>",
+        unsafe_allow_html=True,
+    )
+    label = ":material/workspace_premium:  Pilih Trinity Pro" if is_pro else "Paket aktif"
+    if st.button(label, key=key, use_container_width=True,
+                 type="primary" if is_pro else "secondary", disabled=not is_pro):
+        if is_pro:
+            _save_settings({"plan": "Trinity Pro"}, "Paket diperbarui ke Trinity Pro.")
+            st.rerun()
 
-        text = (raw_text or "").strip()
-        via_voice = False
 
-        # Kiriman suara tanpa teks → transkrip dulu dengan Groq Whisper
-        if send_audio is not None and not text:
-            if CHAT_READY:
-                try:
-                    with st.spinner(":material/mic:  Mentranskrip suara…"):
-                        text = transcribe_audio(build_chat_client(), send_audio.getvalue())
-                    via_voice = bool(text)
-                except Exception:
-                    text = ""
-            if not text:
-                st.session_state.messages.append({
-                    "id": next_msg_id(), "role": "assistant", "type": "text",
-                    "content": "Hmm, suaranya belum kebaca nih. Coba rekam lagi "
-                               "lebih dekat ke mikrofon, atau ketik saja ya!",
-                    "time": datetime.now().strftime("%H:%M"),
-                })
+def _set_penagihan() -> None:
+    s = get_settings()
+    cycle = st.radio("Siklus penagihan", ["Bulanan", "Tahunan (hemat 20%)"],
+                     index=["Bulanan", "Tahunan (hemat 20%)"].index(s["billing_cycle"]),
+                     key="set_cycle", horizontal=True)
+    if st.button(":material/credit_card:  Atur metode pembayaran", key="bayar_metode"):
+        st.toast("Metode pembayaran akan dibuka setelah gerbang pembayaran aktif.",
+                 icon=":material/credit_card:")
+
+    st.markdown('<div class="set-section">Pemakaian bulan ini</div>', unsafe_allow_html=True)
+    st.markdown(
+        "| Kemampuan | Terpakai | Sisa |\n|---|---|---|\n"
+        "| Pesan chat | 0 | Tak terbatas |\n"
+        "| Gambar dibuat | 0 | 10 |\n"
+        "| Artefak | "
+        f"{len(st.session_state.get('artifacts', []))} | 20 |\n"
+        "| Kursus diikuti | 0 | 1 |",
+    )
+    st.markdown('<div class="set-section">Riwayat tagihan</div>', unsafe_allow_html=True)
+    st.caption("Belum ada tagihan. Tagihan muncul di sini setelah kamu "
+               "berlangganan Trinity Pro.")
+    st.markdown(
+        '<div class="feat-row"><span>Metode pembayaran</span>'
+        f'<span class="chip-off">{html.escape(s["payment_method"])}</span></div>',
+        unsafe_allow_html=True,
+    )
+
+
+def _set_kemampuan() -> None:
+    s = get_settings()
+    st.markdown('<div class="set-section">Status kemampuan</div>', unsafe_allow_html=True)
+    st.markdown(_cap_rows_html(), unsafe_allow_html=True)
+    st.caption("Kemampuan bertanda \"butuh …\" hanya menunggu kredensial diisi "
+               "pemilik aplikasi di tab Trinity Code.")
+
+    st.markdown('<div class="set-section">Nyalakan / matikan</div>', unsafe_allow_html=True)
+    st.toggle("Pencarian web", value=s["cap_web_search"], key="cap_web",
+              help="Bila mati, toggle pencarian web di kotak chat diabaikan.")
+    st.toggle("Transkrip suara", value=s["cap_voice"], key="cap_voice_t")
+    st.toggle("Analisis gambar (Vision)", value=s["cap_vision"], key="cap_vision_t")
+    st.toggle("Generate gambar", value=s["cap_image"], key="cap_image_t")
+    st.toggle("Tangkap artefak otomatis", value=s["cap_artifacts"], key="cap_art_t")
+
+    if st.button(":material/save:  Simpan kemampuan", key="save_kemampuan", type="primary"):
+        _save_settings({
+            "cap_web_search": st.session_state.cap_web,
+            "cap_voice": st.session_state.cap_voice_t,
+            "cap_vision": st.session_state.cap_vision_t,
+            "cap_image": st.session_state.cap_image_t,
+            "cap_artifacts": st.session_state.cap_art_t,
+        }, "Kemampuan disimpan.")
+        st.rerun()
+
+
+def _set_memori() -> None:
+    s = get_settings()
+    st.toggle("Gunakan memori jangka panjang", value=s["memory_on"], key="mem_on",
+              help="Bila mati, daftar di bawah tidak dikirim ke Yuki.")
+    st.toggle("Biarkan Yuki menambah memori otomatis", value=s["memory_auto"],
+              key="mem_auto")
+
+    st.markdown('<div class="set-section">Yang Yuki ingat tentang kamu</div>',
+                unsafe_allow_html=True)
+    facts = list(s.get("memories") or [])
+    if not facts:
+        st.caption("Belum ada memori. Tambahkan fakta singkat, misalnya "
+                   "\"Usahaku: kopi bubuk, jual lewat WhatsApp\".")
+    for i, f in enumerate(facts):
+        row = st.columns([6, 1])
+        with row[0]:
+            st.markdown(f'<div class="mem-item">{i + 1}. {html.escape(str(f))}</div>',
+                        unsafe_allow_html=True)
+        with row[1]:
+            if st.button(":material/delete:", key=f"mem_del_{i}",
+                         use_container_width=True, help="Hapus memori ini"):
+                new = dict(st.session_state.get("settings") or {})
+                new["memories"] = [x for j, x in enumerate(facts) if j != i]
+                st.session_state.settings = new
                 st.rerun()
 
-        images = collect_images(send_files)
-        # Gabungkan lampiran yang di-stage lewat menu ➕ (hindari duplikat)
-        pending = st.session_state.get("pending_images", [])
-        if pending:
-            keys = {(im["name"], len(im["data"])) for im in images}
-            for im in pending:
-                k = (im["name"], len(im["data"]))
-                if k not in keys:
-                    images.append(im)
-                    keys.add(k)
-            st.session_state.pending_images = []
-            st.session_state.plus_uploader_gen = (
-                st.session_state.get("plus_uploader_gen", 0) + 1
+    new_fact = st.text_input("Tambah memori baru", key="mem_new",
+                             placeholder="mis. Aku lebih suka jawaban singkat & pakai tabel")
+    c1, c2 = st.columns([1, 1])
+    with c1:
+        if st.button(":material/add:  Tambah memori", key="mem_add",
+                     use_container_width=True, type="primary"):
+            if new_fact.strip():
+                merged = dict(st.session_state.get("settings") or {})
+                merged["memories"] = facts + [new_fact.strip()]
+                st.session_state.settings = merged
+                st.toast("Memori ditambahkan.", icon=":material/check:")
+                st.rerun()
+    with c2:
+        if st.button(":material/save:  Simpan toggle memori", key="mem_save",
+                     use_container_width=True):
+            _save_settings({"memory_on": st.session_state.mem_on,
+                            "memory_auto": st.session_state.mem_auto},
+                           "Pengaturan memori disimpan.")
+            st.rerun()
+
+
+def _set_refleksi() -> None:
+    s = get_settings()
+    goal = st.text_area("Target yang sedang kamu kejar", value=s["reflection_goal"],
+                        key="refl_goal", height=90,
+                        placeholder="mis. Menambah 20 pelanggan baru bulan ini")
+    habit = st.text_area("Kebiasaan yang ingin dibangun", value=s["reflection_habit"],
+                         key="refl_habit", height=90,
+                         placeholder="mis. Menulis konten setiap pagi 15 menit")
+    c1, c2 = st.columns(2)
+    with c1:
+        freq = st.selectbox("Yuki menanyakan progres", REFL_FREQ_OPTIONS,
+                            index=REFL_FREQ_OPTIONS.index(s["reflection_freq"]),
+                            key="refl_freq")
+    with c2:
+        tone = st.selectbox("Gaya dorongan", REFL_TONE_OPTIONS,
+                            index=REFL_TONE_OPTIONS.index(s["reflection_tone"]),
+                            key="refl_tone")
+
+    c3, c4 = st.columns(2)
+    with c3:
+        if st.button(":material/save:  Simpan refleksi", key="save_refl",
+                     type="primary", use_container_width=True):
+            _save_settings({"reflection_goal": goal.strip(),
+                            "reflection_habit": habit.strip(),
+                            "reflection_freq": freq, "reflection_tone": tone},
+                           "Refleksi disimpan.")
+            st.rerun()
+    with c4:
+        if st.button(":material/self_improvement:  Minta refleksi sekarang",
+                     key="refl_now", use_container_width=True):
+            go("chat")
+            st.session_state.pending_prompt = (
+                "Ajak aku refleksi singkat: tanyakan progres targetku, "
+                "hambatan hari ini, dan satu langkah kecil untuk besok."
             )
-        images = images[:MAX_IMAGES_PER_MESSAGE]
 
-        if text or images:
-            now = datetime.now().strftime("%H:%M")
 
-            # Begitu KIRIM ditekan: kotak input langsung turun ke bawah
-            # dan scroll diaktifkan lagi (menimpa CSS halaman awal).
-            if is_fresh:
+def _set_waktu_fokus() -> None:
+    s = get_settings()
+    st.markdown('<div class="set-section">Sesi fokus</div>', unsafe_allow_html=True)
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        focus = st.number_input("Durasi fokus (menit)", 5, 180, int(s["focus_minutes"]),
+                                5, key="set_focus")
+    with c2:
+        brk = st.number_input("Durasi jeda (menit)", 1, 60, int(s["break_minutes"]),
+                              1, key="set_break")
+    with c3:
+        st.selectbox("Zona waktu", TZ_OPTIONS,
+                     index=TZ_OPTIONS.index(s["tz_label"]) if s["tz_label"] in TZ_OPTIONS else 0,
+                     key="set_tz")
+
+    st.markdown('<div class="set-section">Jam kerja</div>', unsafe_allow_html=True)
+    c4, c5, c6 = st.columns(3)
+    with c4:
+        start = st.text_input("Mulai", value=s["work_start"], key="set_start")
+    with c5:
+        end = st.text_input("Selesai", value=s["work_end"], key="set_end")
+    with c6:
+        st.text_input("Waktu lokal sekarang", value=datetime.now().strftime("%H:%M"),
+                      key="set_now", disabled=True)
+
+    remind = st.toggle("Ingatkan aku saat jam fokus selesai", value=s["focus_reminder"],
+                       key="set_remind")
+
+    if st.button(":material/save:  Simpan waktu & fokus", key="save_fokus", type="primary"):
+        _save_settings({"focus_minutes": int(focus), "break_minutes": int(brk),
+                        "work_start": start, "work_end": end,
+                        "tz_label": st.session_state.set_tz,
+                        "focus_reminder": remind},
+                       "Waktu & fokus disimpan.")
+        st.rerun()
+
+
+def _set_trinity_code() -> None:
+    s = get_settings()
+    st.markdown('<div class="set-section">Kredensial layanan</div>', unsafe_allow_html=True)
+    st.caption("Kosongkan bila pemilik aplikasi sudah mengisinya lewat "
+               "Streamlit Secrets / environment variable.")
+    gk = st.text_input("GROQ_API_KEY", type="password", value=s["groq_key"], key="set_gk",
+                       help="Dipakai untuk chat, transkrip suara, dan vision.")
+    ca = st.text_input("CF_ACCOUNT_ID", value=s["cf_account_id"], key="set_ca")
+    ct = st.text_input("CF_API_TOKEN", type="password", value=s["cf_token"], key="set_ct")
+    st.markdown(
+        f'<div class="feat-row"><span>Status chat</span>'
+        f'<span class="chip-{"on" if CHAT_READY else "off"}">'
+        f'{":material/check_circle: aktif" if CHAT_READY else ":material/error_outline: butuh GROQ_API_KEY"}'
+        "</span></div>",
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        f'<div class="feat-row"><span>Status generate gambar</span>'
+        f'<span class="chip-{"on" if IMAGE_READY else "off"}">'
+        f'{":material/check_circle: aktif" if IMAGE_READY else ":material/error_outline: butuh Cloudflare"}'
+        "</span></div>",
+        unsafe_allow_html=True,
+    )
+
+    st.markdown('<div class="set-section">Model &amp; perilaku</div>', unsafe_allow_html=True)
+    c1, c2 = st.columns(2)
+    with c1:
+        temp = st.slider("Suhu jawaban (kreativitas)", 0.0, 1.5,
+                         float(s["temperature"]), 0.1, key="set_temp",
+                         help="Rendah = kaku & presisi. Tinggi = liar & kreatif.")
+    with c2:
+        st.selectbox("Model bawaan", [m["name"] for m in MODEL_CATALOG],
+                     index=max(0, next((i for i, m in enumerate(MODEL_CATALOG)
+                                        if m["key"] == st.session_state.selected_model_key), 0)),
+                     key="set_model")
+    adv = st.toggle("Tampilkan error teknis apa adanya (mode pengembang)",
+                    value=s["advanced_errors"], key="set_adv")
+
+    c3, c4 = st.columns(2)
+    with c3:
+        if st.button(":material/save:  Simpan Trinity Code", key="save_code",
+                     type="primary", use_container_width=True):
+            patch = {"groq_key": gk.strip(), "cf_account_id": ca.strip(),
+                     "cf_token": ct.strip(), "temperature": float(temp),
+                     "advanced_errors": adv}
+            _save_settings(patch, "Trinity Code disimpan.")
+            st.rerun()
+    with c4:
+        if st.button(":material/terminal:  Uji koneksi", key="test_conn",
+                     use_container_width=True):
+            if not (CHAT_READY or gk.strip()):
+                st.toast("Belum ada GROQ_API_KEY untuk diuji.", icon=":material/warning:")
+            else:
+                try:
+                    client = OpenAI(api_key=(gk.strip() or GROQ_API_KEY), base_url=GROQ_BASE_URL)
+                    r = client.chat.completions.create(
+                        model=AVAILABLE_MODELS[DEFAULT_MODEL_KEY],
+                        messages=[{"role": "user", "content": "ping"}],
+                        max_tokens=5,
+                    )
+                    st.toast("Koneksi bagus: " + (r.choices[0].message.content or "pong"),
+                             icon=":material/check_circle:")
+                except Exception as e:
+                    st.toast(f"Gagal terhubung: {str(e)[:120]}", icon=":material/error:")
+
+
+def page_pengaturan() -> None:
+    back, _sp = st.columns([0.12, 1.0])
+    with back:
+        if st.button(":material/arrow_back:", key="set_back", use_container_width=True,
+                     help="Kembali ke chat"):
+            go("chat")
+    st.markdown(
+        '<div class="page-head"><div class="page-head-icon">:material/settings:</div>'
+        '<div><h2 class="page-title">Pengaturan</h2>'
+        "<p class=\"page-sub\">Sembilan bagian pengaturan Trinity. Perubahan "
+        "disimpan per bagian lewat tombol simpan.</p></div></div>",
+        unsafe_allow_html=True,
+    )
+
+    tabs = st.tabs([
+        ":material/tune:  Umum",
+        ":material/person:  Akun",
+        ":material/shield:  Privasi",
+        ":material/receipt_long:  Penagihan",
+        ":material/bolt:  Kemampuan",
+        ":material/history_edu:  Memori",
+        ":material/self_improvement:  Refleksi",
+        ":material/schedule:  Waktu dan fokus",
+        ":material/terminal:  Trinity Code",
+    ])
+    with tabs[0]:
+        _set_umum()
+    with tabs[1]:
+        _set_akun()
+    with tabs[2]:
+        _set_privasi()
+    with tabs[3]:
+        _set_penagihan()
+    with tabs[4]:
+        _set_kemampuan()
+    with tabs[5]:
+        _set_memori()
+    with tabs[6]:
+        _set_refleksi()
+    with tabs[7]:
+        _set_waktu_fokus()
+    with tabs[8]:
+        _set_trinity_code()
+
+    _page_footer()
+    # ============================================================================
+# HALAMAN: BAHASA
+# ============================================================================
+def page_bahasa() -> None:
+    back, _sp = st.columns([0.12, 1.0])
+    with back:
+        if st.button(":material/arrow_back:", key="lang_back", use_container_width=True,
+                     help="Kembali ke chat"):
+            go("chat")
+    s = get_settings()
+    ui_code = s.get("ui_lang", DEFAULT_LANG_CODE)
+    yuki_code = s.get("yuki_lang", DEFAULT_LANG_CODE)
+
+    st.markdown(
+        '<div class="page-head"><div class="page-head-icon">:material/translate:</div>'
+        '<div><h2 class="page-title">Bahasa</h2>'
+        "<p class=\"page-sub\">Bahasa antarmuka Trinity dan bahasa yang dipakai "
+        "Yuki saat menjawab.</p></div></div>",
+        unsafe_allow_html=True,
+    )
+
+    c1, c2 = st.columns(2)
+    with c1:
+        ui_name = st.selectbox(
+            "Bahasa antarmuka",
+            [l["name"] for l in SUPPORTED_LANGUAGES],
+            index=next((i for i, l in enumerate(SUPPORTED_LANGUAGES)
+                        if l["code"] == ui_code), 0),
+            key="lang_ui",
+        )
+    with c2:
+        yuki_name = st.selectbox(
+            "Yuki menjawab dengan bahasa",
+            [l["name"] for l in SUPPORTED_LANGUAGES],
+            index=next((i for i, l in enumerate(SUPPORTED_LANGUAGES)
+                        if l["code"] == yuki_code), 0),
+            key="lang_yuki",
+        )
+
+    if st.button(":material/save:  Simpan bahasa", key="lang_save", type="primary"):
+        ui_sel = next(l for l in SUPPORTED_LANGUAGES if l["name"] == ui_name)
+        yuki_sel = next(l for l in SUPPORTED_LANGUAGES if l["name"] == yuki_name)
+        _save_settings({"ui_lang": ui_sel["code"], "yuki_lang": yuki_sel["code"]},
+                       f"Bahasa disimpan — Yuki akan menjawab dalam {yuki_sel['name']}.")
+        st.rerun()
+
+    st.markdown('<div class="set-section">Daftar bahasa yang tersedia</div>',
+                unsafe_allow_html=True)
+    rows = []
+    for l in SUPPORTED_LANGUAGES:
+        active_ui = l["code"] == ui_code
+        active_yuki = l["code"] == yuki_code
+        badge = ""
+        if active_ui and active_yuki:
+            badge = '<span class="chip-on">Antarmuka + Yuki</span>'
+        elif active_ui:
+            badge = '<span class="chip-on">Antarmuka</span>'
+        elif active_yuki:
+            badge = '<span class="chip-on">Yuki</span>'
+        level_cls = "chip-on" if l["level"] == "Penuh" else "chip-off"
+        rows.append(
+            f'<div class="lang-row">'
+            f'<span class="flag">{l["flag"]}</span>'
+            f'<span class="lang-name">{html.escape(l["name"])}'
+            f'<span class="lang-native">{html.escape(l["native"])}</span></span>'
+            f'<span class="lang-level"><span class="{level_cls}">{l["level"]}</span>'
+            f"{badge}</span>"
+            "</div>"
+        )
+    st.markdown(f'<div class="lang-card">{"".join(rows)}</div>', unsafe_allow_html=True)
+
+    st.caption("Level \"Beta\" berarti terjemahan masih disempurnakan. Bahasa "
+               "yang dipilih untuk Yuki langsung dipakai pada jawaban "
+               "berikutnya.")
+    _page_footer()
+    # ============================================================================
+# HALAMAN: DAPATKAN BANTUAN (petunjuk detail pemakaian aplikasi)
+# ============================================================================
+HELP_STEPS = [
+    (":material/edit_note:", "Tulis pesan",
+     "Ketik di kotak paling bawah lalu tekan Enter. Jawaban Yuki muncul "
+     "per kalimat, ada animasi berpikir lebih dulu."),
+    (":material/photo_camera:", "Kirim gambar",
+     "Klik ikon ⋯ di kiri kotak chat → Upload gambar atau foto. Bisa juga "
+     "tempel (Ctrl+V) atau seret file ke kotak chat. Yuki menganalisisnya "
+     "dengan model vision."),
+    (":material/mic:", "Bicara lewat suara",
+     "Klik ikon mikrofon di kotak chat, bicara, lalu hentikan. Rekaman "
+     "diubah jadi teks otomatis dan ditandai \"via suara\"."),
+    (":material/public:", "Nyalakan pencarian web",
+     "Ikon ⋯ → Pencarian web. Trinity otomatis pindah ke model Compound "
+     "yang bisa membuka internet."),
+    (":material/memory:", "Ganti model AI",
+     "Klik nama model di kanan kotak chat, pilih tingkat yang kamu mau "
+     "(Easy sampai Extreme)."),
+    (":material/image:", "Membuat gambar",
+     "Nyalakan toggle Gambar, lalu tulis deskripsi gambar yang kamu mau."),
+    (":material/data_object:", "Membuat artefak",
+     "Sidebar → Artefak → pilih salah satu kotak (aplikasi, permainan, "
+     "kuis, dll). Yuki menjawab di halaman itu, chat utama tidak terganggu."),
+    (":material/school:", "Belajar lewat kursus",
+     "Menu akun (⋯) → Trinity kursus → pilih topik. Yuki jadi mentor dan "
+     "menyusun modul belajar."),
+    (":material/content_copy:", "Salin jawaban",
+     "Di bawah tiap jawaban Yuki ada ikon salin, jempol atas, dan jempol "
+     "bawah untuk memberi umpan balik."),
+    (":material/download:", "Unduh riwayat chat",
+     "Sidebar → Unduh Chat. Riwayat tersimpan sebagai file .md."),
+]
+
+HELP_FAQ = [
+    ("Kenapa Yuki tidak menjawab?",
+     "Periksa koneksi internet, lalu buka Pengaturan → Trinity Code dan "
+     "lakukan \"Uji koneksi\". Bila statusnya \"butuh GROQ_API_KEY\", "
+     "kredensial belum diisi pemilik aplikasi."),
+    ("Kenapa generate gambar gagal?",
+     "Generate gambar butuh CF_ACCOUNT_ID dan CF_API_TOKEN (Cloudflare). "
+     "Statusnya terlihat di Pengaturan → Kemampuan."),
+    ("Apakah percakapanku tersimpan di server?",
+     "Tidak. Riwayat hidup di sesi browser kamu dan hilang saat sesi "
+     "berakhir, kecuali kamu mengunduhnya lewat \"Unduh Chat\"."),
+    ("Bagaimana cara menghapus semua data?",
+     "Pengaturan → Privasi → \"Hapus seluruh data saya\"."),
+    ("Apa itu Memori dan Refleksi?",
+     "Memori = fakta tentang kamu yang selalu diingat Yuki. Refleksi = "
+     "target & kebiasaan yang Yuki bantu pantau. Keduanya ada di "
+     "Pengaturan."),
+    ("Bisakah Yuki menjawab dalam bahasa lain?",
+     "Bisa. Buka menu akun (⋯) → Bahasa, lalu pilih bahasa untuk Yuki."),
+]
+
+
+def page_bantuan() -> None:
+    back, _sp = st.columns([0.12, 1.0])
+    with back:
+        if st.button(":material/arrow_back:", key="help_back", use_container_width=True,
+                     help="Kembali ke chat"):
+            go("chat")
+    st.markdown(
+        '<div class="page-head"><div class="page-head-icon">:material/help:</div>'
+        '<div><h2 class="page-title">Dapatkan bantuan</h2>'
+        "<p class=\"page-sub\">Petunjuk lengkap memakai Ampera Trinity AI, "
+        "dari kirim pesan sampai membuat artefak.</p></div></div>",
+        unsafe_allow_html=True,
+    )
+
+    st.markdown('<div class="set-section">Mulai cepat</div>', unsafe_allow_html=True)
+    for i, (icon, title, desc) in enumerate(HELP_STEPS):
+        st.markdown(
+            f'<div class="help-step"><span class="step-no">{i + 1}</span>'
+            f'<span class="step-icon">{icon}</span>'
+            f'<span class="step-text"><b>{title}</b><br>{desc}</span></div>',
+            unsafe_allow_html=True,
+        )
+
+    st.markdown('<div class="set-section">Pertanyaan yang sering muncul</div>',
+                unsafe_allow_html=True)
+    for fi, (q, a) in enumerate(HELP_FAQ):
+        with st.container(key=f"faq_{fi}"):
+            with st.expander(f":material/help_outline:  {q}"):
+                st.write(a)
+
+    st.markdown('<div class="set-section">Butuh bantuan manusia?</div>',
+                unsafe_allow_html=True)
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        if st.button(":material/mail:  Email dukungan", key="help_mail",
+                     use_container_width=True):
+            st.toast("Kirim email ke dukungan@amperaofficial.id", icon=":material/mail:")
+    with c2:
+        if st.button(":material/forum:  Grup komunitas", key="help_group",
+                     use_container_width=True):
+            st.toast("Tautan grup komunitas akan segera dibuka.", icon=":material/forum:")
+    with c3:
+        if st.button(":material/menu_book:  Pelajari lebih lanjut", key="help_more",
+                     use_container_width=True):
+            go("pelajari")
+    _page_footer()
+    # ============================================================================
+# HALAMAN: PELAJARI LEBIH LANJUT (tentang aplikasi + cara memakainya)
+# ============================================================================
+ABOUT_CARDS = [
+    (":material/chat_bubble:", "Multi AI",
+     "Pilih tingkat model Groq dari Easy sampai Extreme lewat nama model di "
+     "kotak chat, lengkap dengan fallback otomatis bila satu model sedang "
+     "tidak tersedia."),
+    (":material/image:", "Generate Foto",
+     "Nyalakan toggle Gambar lalu tulis deskripsi. Gambar dibuat dengan "
+     "model FLUX di Cloudflare, ada progress bar bergaya Claude."),
+    (":material/record_voice_over:", "Suara &amp; Gambar Masuk",
+     "Rekam suara (ditranskrip Whisper) atau kirim foto untuk dianalisis "
+     "model vision Llama-4 Scout."),
+    (":material/data_object:", "Artefak",
+     "Kode panjang dari jawaban Yuki otomatis ditangkap, plus halaman "
+     "khusus untuk membangun aplikasi, game, kuis, dan dokumen."),
+    (":material/school:", "Trinity kursus",
+     "Sepuluh topik belajar dengan Yuki sebagai mentor: pemasaran, "
+     "penjualan, desain, copywriting, dan lainnya."),
+    (":material/tune:", "Pengaturan dalam",
+     "Sembilan bagian: Umum, Akun, Privasi, Penagihan, Kemampuan, Memori, "
+     "Refleksi, Waktu dan fokus, Trinity Code."),
+]
+
+TIPS_LIST = [
+    "Beri konteks di awal: siapa kamu, untuk apa, dan batasannya. Jawaban "
+    "Yuki langsung lebih tepat sasaran.",
+    "Isi Memori dengan fakta penting (usaha, gaya jawaban favorit) supaya "
+    "tidak perlu mengulang-ulang.",
+    "Pakai halaman Artefak untuk pekerjaan besar supaya chat utama tetap "
+    "rapi.",
+    "Turunkan suhu (Pengaturan → Trinity Code) bila butuh jawaban presisi "
+    "seperti kode atau hitungan.",
+    "Nyalakan Pencarian web hanya saat benar-benar butuh data terbaru.",
+    "Unduh Chat secara berkala sebagai arsip pekerjaanmu.",
+]
+
+
+def page_pelajari() -> None:
+    back, _sp = st.columns([0.12, 1.0])
+    with back:
+        if st.button(":material/arrow_back:", key="pel_back", use_container_width=True,
+                     help="Kembali ke chat"):
+            go("chat")
+    st.markdown(
+        f'<div class="trinity-hero">{logo_img_html("logo-greeting")}'
+        '<div class="hero-text"><h1>Ampera Trinity AI</h1>'
+        "<p>Tiga mesin AI dalam satu tempat: mengobrol dengan Yuki, membuat "
+        "gambar, dan menganalisis gambar atau suara yang kamu kirim. "
+        "Dibuat oleh Ampera Official.</p></div></div>",
+        unsafe_allow_html=True,
+    )
+
+    st.markdown('<div class="set-section">Apa saja di dalamnya</div>', unsafe_allow_html=True)
+    for i in range(0, len(ABOUT_CARDS), 3):
+        cols = st.columns(3)
+        for j, (icon, title, desc) in enumerate(ABOUT_CARDS[i:i + 3]):
+            with cols[j]:
                 st.markdown(
-                    """
-<style>
-[data-testid="stBottom"] { transform: translateY(0) !important; }
-[data-testid="stAppViewContainer"],
-[data-testid="stMain"],
-section.main,
-html, body { overflow: auto !important; }
-</style>
-""",
+                    f'<div class="mini-card"><div class="mini-icon">{icon}</div>'
+                    f'<div class="mini-title">{title}</div>'
+                    f'<div class="mini-desc">{desc}</div></div>',
                     unsafe_allow_html=True,
                 )
 
-            # simpan & tampilkan pesan user (+ thumbnail lampiran)
-            user_msg = {
-                "id": next_msg_id(), "role": "user", "type": "text",
-                "content": text, "time": now,
-            }
-            if images:
-                user_msg["images"] = images
-            if via_voice:
-                user_msg["via_voice"] = True
-            st.session_state.messages.append(user_msg)
-            note = f"{ICON_MIC} via suara" if via_voice else ""
-            st.markdown(
-                bubble_html("user", text, now, images_bubble_html(images), note),
-                unsafe_allow_html=True,
-            )
+    st.markdown('<div class="set-section">Cara memakainya</div>', unsafe_allow_html=True)
+    for i, (icon, title, desc) in enumerate(HELP_STEPS[:6]):
+        st.markdown(
+            f'<div class="help-step"><span class="step-no">{i + 1}</span>'
+            f'<span class="step-icon">{icon}</span>'
+            f'<span class="step-text"><b>{title}</b><br>{desc}</span></div>',
+            unsafe_allow_html=True,
+        )
 
-            # Ada lampiran gambar → selalu chat vision (Yuki melihat gambarnya),
-            # walau toggle "Gambar" sedang aktif sekalipun.
-            if st.session_state.image_mode and not images:
-                handle_image_request(text)
-            else:
-                answer_slot = st.empty()
-                handle_chat_request(answer_slot)
+    st.markdown('<div class="set-section">Enam tips dari Yuki</div>', unsafe_allow_html=True)
+    for i, tip in enumerate(TIPS_LIST):
+        st.markdown(
+            f'<div class="tip-row"><span class="tip-no">{i + 1}</span>'
+            f"<span>{tip}</span></div>",
+            unsafe_allow_html=True,
+        )
 
-            st.rerun()
-
-    # ---------- Footer ----------
-    # Halaman awal: ukuran normal. Saat chat berjalan: lebih kecil lagi.
-    foot_class = "trinity-foot" if is_fresh else "trinity-foot in-chat"
+    st.markdown('<div class="set-section">Lanjutkan ke</div>', unsafe_allow_html=True)
+    c1, c2, c3, c4 = st.columns(4)
+    with c1:
+        if st.button(":material/help:  Petunjuk lengkap", key="pel_bantuan",
+                     use_container_width=True):
+            go("bantuan")
+    with c2:
+        if st.button(":material/school:  Trinity kursus", key="pel_kursus",
+                     use_container_width=True):
+            go("kursus")
+    with c3:
+        if st.button(":material/data_object:  Artefak", key="pel_artefak",
+                     use_container_width=True):
+            go("artefak")
+    with c4:
+        if st.button(":material/workspace_premium:  Trinity Pro", key="pel_pro",
+                     use_container_width=True):
+            go("tingkatkan")
+    _page_footer()
+    # ============================================================================
+# HALAMAN: TINGKATKAN PAKET (promosi Trinity Pro)
+# ============================================================================
+def page_tingkatkan() -> None:
+    back, _sp = st.columns([0.12, 1.0])
+    with back:
+        if st.button(":material/arrow_back:", key="pro_back", use_container_width=True,
+                     help="Kembali ke chat"):
+            go("chat")
+    s = get_settings()
     st.markdown(
-        f'<p class="{foot_class}">{logo_img_html("logo-foot")} '
-        "Ampera Trinity AI · by Ampera Official · 2026</p>",
+        '<div class="trinity-hero"><div class="hero-text">'
+        '<h1>Trinity Pro</h1>'
+        "<p>Semua kemampuan Trinity dibuka penuh: model tertinggi tanpa batas, "
+        "gambar resolusi tinggi, memori tak terbatas, artefak & Trinity Code, "
+        "serta seluruh Trinity kursus dengan Yuki sebagai mentor pribadi.</p>"
+        "</div></div>",
         unsafe_allow_html=True,
     )
+
+    c1, c2 = st.columns(2)
+    with c1:
+        _plan_col("Free", "Rp 0", "Selamanya gratis · untuk mencoba", False, "plan_free")
+    with c2:
+        _plan_col("Trinity Pro", "Rp …", "Harga menyusul · batal kapan saja", True, "plan_pro")
+
+    st.markdown('<div class="set-section">Cara berlangganan</div>', unsafe_allow_html=True)
+    for i, (icon, title, desc) in enumerate([
+        (":material/tap_and_play:", "Pilih paket",
+         "Tentukan siklus bulanan atau tahunan di tab Pengaturan → Penagihan."),
+        (":material/credit_card:", "Atur pembayaran",
+         "Kartu, transfer bank, atau e-wallet. Gerbang pembayaran akan "
+         "diaktifkan pemilik aplikasi."),
+        (":material/bolt:", "Langsung aktif",
+         "Paket berubah menjadi Trinity Pro dan semua kemampuan terbuka "
+         "saat itu juga."),
+    ]):
+        st.markdown(
+            f'<div class="help-step"><span class="step-no">{i + 1}</span>'
+            f'<span class="step-icon">{icon}</span>'
+            f'<span class="step-text"><b>{title}</b><br>{desc}</span></div>',
+            unsafe_allow_html=True,
+        )
+
+    st.caption("Harga resmi Trinity Pro belum ditetapkan — akan diumumkan "
+               "pemilik aplikasi. Status paket kamu saat ini: "
+               f"{s.get('plan', 'Free')}.")
+    _page_footer()
+
+
+# ============================================================================
+# HALAMAN: DAPATKAN APLIKASI
+# ============================================================================
+def page_aplikasi() -> None:
+    back, _sp = st.columns([0.12, 1.0])
+    with back:
+        if st.button(":material/arrow_back:", key="app_back", use_container_width=True,
+                     help="Kembali ke chat"):
+            go("chat")
+    st.markdown(
+        f'<div class="trinity-hero">{logo_img_html("logo-greeting")}'
+        '<div class="hero-text"><h1>Trinity di genggaman</h1>'
+        "<p>Ampera Trinity AI sedang disiapkan menjadi aplikasi Android & iOS. "
+        "Semua fitur yang ada di sini — Yuki, gambar, suara, artefak, dan "
+        "kursus — ikut terbawa.</p></div></div>",
+        unsafe_allow_html=True,
+    )
+
+    c1, c2 = st.columns([1, 1.35])
+    with c1:
+        st.markdown(
+            f'<div class="phone-card">{logo_img_html("logo-greeting")}'
+            '<div class="phone-name">Ampera Trinity AI</div>'
+            '<div class="phone-tag">pratinjau aplikasi</div></div>',
+            unsafe_allow_html=True,
+        )
+    with c2:
+        st.markdown('<div class="set-section">Unduh</div>', unsafe_allow_html=True)
+        b1, b2 = st.columns(2)
+        with b1:
+            if st.button(":material/android:  Android", key="app_android",
+                         use_container_width=True):
+                st.toast("Versi Android belum dirilis. Daftar beta di bawah ya!",
+                         icon=":material/android:")
+        with b2:
+            if st.button(":material/apple:  iOS", key="app_ios", use_container_width=True):
+                st.toast("Versi iOS belum dirilis. Daftar beta di bawah ya!",
+                         icon=":material/apple:")
+        st.markdown('<div class="set-section">Rencana rilis</div>', unsafe_allow_html=True)
+        st.markdown(
+            '<div class="feat-row"><span>Android (APK & Play Store)</span>'
+            '<span class="chip-off">Tahap 1</span></div>'
+            '<div class="feat-row"><span>iOS (App Store)</span>'
+            '<span class="chip-off">Tahap 2</span></div>'
+            '<div class="feat-row"><span>Desktop (Windows & macOS)</span>'
+            '<span class="chip-off">Tahap 3</span></div>'
+            '<div class="feat-row"><span>Sinkronisasi antar perangkat</span>'
+            '<span class="chip-off">Menyusul</span></div>',
+            unsafe_allow_html=True,
+        )
+        email = st.text_input("Email untuk kabar rilis", key="app_email",
+                              placeholder="nama@email.com")
+        if st.button(":material/notifications_active:  Kabari saya saat rilis",
+                     key="app_notify", type="primary", use_container_width=True):
+            if email.strip():
+                st.toast("Terima kasih! Kami kabari begitu aplikasi siap.",
+                         icon=":material/check_circle:")
+            else:
+                st.toast("Isi dulu email kamu ya.", icon=":material/warning:")
+    _page_footer()
+
+
+# ============================================================================
+# HALAMAN: TRINITY KURSUS (fokus belajar: pemasaran, penjualan, desain, dll)
+# ============================================================================
+def _course_grid(prefix: str) -> None:
+    for i in range(0, len(COURSE_CATALOG), 2):
+        cols = st.columns(2)
+        for j, c in enumerate(COURSE_CATALOG[i:i + 2]):
+            with cols[j]:
+                label = (f"{c['icon']}  **{c['title']}**"
+                         f"  \n:small[:gray[{c['desc']} · {c['level']}]]")
+                if st.button(label, key=f"{prefix}_{c['key']}", use_container_width=True):
+                    st.session_state.course_active_key = c["key"]
+                    go("kursus")
+
+
+def _course_workspace(key: str) -> None:
+    course = COURSE_BY_KEY.get(key) or COURSE_CATALOG[0]
+    thread = course_thread(key)
+
+    back, _sp = st.columns([0.12, 1.0])
+    with back:
+        if st.button(":material/arrow_back:", key="course_back", use_container_width=True,
+                     help="Kembali ke daftar kursus"):
+            go("kursus", course_active_key=None)
+
+    st.markdown(
+        f'<div class="page-head"><div class="page-head-icon">{course["icon"]}</div>'
+        f'<div><h2 class="page-title">Trinity kursus · {html.escape(course["title"])}</h2>'
+        f'<p class="page-sub">{html.escape(course["desc"])} — '
+        f'{html.escape(course["level"])}</p></div></div>',
+        unsafe_allow_html=True,
+    )
+
+    with st.container(key="course_modules"):
+        with st.expander(f":material/menu_book:  Kurikulum {course['title']} (4 modul)"):
+            for mod in course_curriculum(course):
+                st.markdown(
+                    f'<div class="mod-row">{mod}</div>', unsafe_allow_html=True
+                )
+
+    if not thread:
+        st.markdown(
+            '<div class="empty-card">Mulai belajar: tulis tujuanmu di bawah, '
+            "misalnya \"Aku ingin bisa jualan kopi lewat WhatsApp\". Yuki "
+            "menyusun jalur belajar di halaman ini.</div>",
+            unsafe_allow_html=True,
+        )
+
+    for msg in thread:
+        render_message(msg)
+
+    chat_kwargs: dict = {}
+    if CHAT_INPUT_SUPPORTS_FILE:
+        chat_kwargs["accept_file"] = True
+        chat_kwargs["file_type"] = IMAGE_INPUT_TYPES
+    if CHAT_INPUT_SUPPORTS_AUDIO:
+        chat_kwargs["accept_audio"] = True
+    user_input = st.chat_input(f"Tanya apa saja tentang {course['title']}…", **chat_kwargs)
+
+    bottom_dock = getattr(st, "bottom", None) or st._bottom
+    with bottom_dock:
+        with st.container(key="chat_controls"):
+            render_input_controls(f"kursus_{key}", show_mode=False)
+
+    if process_user_input(user_input, st.empty()):
+        st.rerun()
+
+    _page_footer(in_chat=True)
+
+
+def page_kursus() -> None:
+    key = st.session_state.get("course_active_key")
+    if key:
+        _course_workspace(key)
+        return
+
+    st.markdown(
+        '<div class="page-head"><div class="page-head-icon">:material/school:</div>'
+        '<div><h2 class="page-title">Trinity kursus</h2>'
+        "<p class=\"page-sub\">Pilih fokus belajar. Yuki jadi mentor dan "
+        "menjawab langsung di halaman kursus ini.</p></div></div>",
+        unsafe_allow_html=True,
+    )
+    _course_grid("kurs")
+    _page_footer()
+    _artifact_grid("cat")
+
+    if artifacts:
+        st.markdown('<div class="sb-group" style="margin-top:14px;">Artefak tersimpan</div>',
+                    unsafe_allow_html=True)
+        for art in artifacts[:20]:
+            with st.container(key=f"art_saved_{art['id']}"):
+                with st.expander(f":material/extension:  {art['title']}  ·  {art.get('time', '')}"):
+                    st.code(art["content"], language=art.get("lang") or None)
+
+    _page_footer()
+    # ============================================================================
+# MAIN — pengalih halaman
+# ============================================================================
+def main() -> None:
+    init_state()
+    inject_css()
+
+    # "Keluar" dari menu akun: bersihkan sesi lalu kembali ke halaman awal
+    if st.session_state.get("logged_out"):
+        st.session_state.logged_out = False
+        for k in list(st.session_state.keys()):
+            del st.session_state[k]
+        st.rerun()
+
+    render_sidebar()
+
+    page = st.session_state.get("page", "chat")
+    if page == "artefak":
+        page_artefak()
+    elif page == "pengaturan":
+        page_pengaturan()
+    elif page == "bahasa":
+        page_bahasa()
+    elif page == "bantuan":
+        page_bantuan()
+    elif page == "tingkatkan":
+        page_tingkatkan()
+    elif page == "aplikasi":
+        page_aplikasi()
+    elif page == "kursus":
+        page_kursus()
+    elif page == "pelajari":
+        page_pelajari()
+    else:
+        render_chat_page()
 
 
 if __name__ == "__main__":
