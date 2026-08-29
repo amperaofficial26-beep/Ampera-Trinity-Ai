@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+"""
 ENGINE 2: GENERATE GAMBAR (Cloudflare FLUX)
 """
 
