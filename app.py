@@ -191,7 +191,7 @@ def _artifact_workspace(aid: int) -> None:
         with st.container(key="chat_controls"):
             render_input_controls("artefak", show_mode=False)
 
-    user_input = st.chat_input("Jelaskan apa yang mau dibuat…", **chat_kwargs))
+    user_input = st.chat_input("Jelaskan apa yang mau dibuat…", **chat_kwargs)
 
     if process_user_input(user_input, st.empty()):
         st.rerun()
