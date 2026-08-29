@@ -385,6 +385,13 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     gap: 0 !important; align-items: center !important;
 }
 [class*="st-key-msg_actions_"] [data-testid="stHorizontalBlock"] {
+    align-items: center !important;
+}
+[class*="st-key-msg_actions_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(2),
+[class*="st-key-msg_actions_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(3) {
+    margin-top: -6px !important;
+}
+[class*="st-key-msg_actions_"] [data-testid="stHorizontalBlock"] {
     display: flex !important;
     flex-direction: row !important;
     flex-wrap: nowrap !important;
