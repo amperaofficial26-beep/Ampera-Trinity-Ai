@@ -52,6 +52,35 @@ import requests
 import streamlit as st
 from openai import OpenAI
 from PIL import Image
+import subprocess, sys
+
+python3 fix_quotes.py
+PATH = "app.py"
+MAP = {
+    "\u201c": '"',   # “  -> "
+    "\u201d": '"',   # ”  -> "
+    "\u2018": "'",   # ‘  -> '
+    "\u2019": "'",   # ’  -> '
+    "\u00a0": " ",   # NBSP -> spasi biasa
+    "\u200b": "",    # zero-width space -> hapus
+    "\ufeff": "",    # BOM -> hapus
+}
+
+src = open(PATH, encoding="utf-8").read()
+total = 0
+for lama, baru in MAP.items():
+    n = src.count(lama)
+    if n:
+        total += n
+        src = src.replace(lama, baru)
+        print(f"{n:5d}x  {lama!r} -> {baru!r}")
+open(PATH, "w", encoding="utf-8").write(src)
+print(f"\nTotal {total} karakter diganti.")
+
+r = subprocess.run([sys.executable, "-m", "py_compile", PATH],
+                   capture_output=True, text=True)
+print("\npy_compile:", "OK — tidak ada SyntaxError" if r.returncode == 0
+      else "\n" + r.stderr)
 
 # ============================================================================
 # KONFIGURASI HALAMAN
