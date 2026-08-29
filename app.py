@@ -1,27 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Ampera Trinity AI — Main Application Orchestrator
-=================================================
-File utama penggerak aplikasi Streamlit yang mengintegrasikan
-layanan API (Groq, Cloudflare Flux) dan Komponen UI.
-
-Jalankan dengan:
-    streamlit run app.py
+Ampera Trinity AI — Main Application Orchestrator (Claude Style UI)
+===================================================================
 """
+
 import os
 import sys
 import streamlit as st
 
-# Paksa Python menambahkan folder lokasi app.py ke sys.path
+# Fix Module Import Path untuk Streamlit Cloud
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 
-# Impor langsung file config
 import config
 
-# Ambil variabel dari config
 APP_NAME = config.APP_NAME
 APP_TAGLINE = config.APP_TAGLINE
 LOGO_B64 = config.LOGO_B64
@@ -48,6 +42,125 @@ st.set_page_config(
 )
 
 # ============================================================================
+# CLAUDE AI MINIMALIST CUSTOM CSS
+# ============================================================================
+CLAUDE_STYLE_CSS = """
+<style>
+    /* Global Background & Typography khas Claude (Warm Beige / Warm Neutral) */
+    .stApp {
+        background-color: #faf8f5 !important;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+        color: #2c2b29 !important;
+    }
+
+    /* Sidebar Clean styling */
+    section[data-testid="stSidebar"] {
+        background-color: #f3f0ea !important;
+        border-right: 1px solid #e6e2d8 !important;
+    }
+
+    /* Header Title styling */
+    .claude-header {
+        text-align: center;
+        padding: 20px 0 10px 0;
+    }
+    .claude-title {
+        font-size: 2.2rem;
+        font-weight: 600;
+        color: #1e1e1e;
+        letter-spacing: -0.5px;
+        margin: 0;
+    }
+    .claude-sub {
+        font-size: 0.95rem;
+        color: #6e6b63;
+        margin-top: 5px;
+        font-weight: 400;
+    }
+
+    /* Custom Styling untuk Chat Messages */
+    .stChatMessage {
+        background-color: transparent !important;
+        border: none !important;
+        padding: 1rem 0 !important;
+    }
+    
+    /* User Chat Bubble */
+    div[data-testid="stChatMessage"]:nth-child(even) {
+        background-color: #f0ebe1 !important;
+        border-radius: 16px !important;
+        padding: 14px 18px !important;
+        margin-bottom: 12px !important;
+    }
+    
+    /* Assistant Chat Bubble */
+    div[data-testid="stChatMessage"]:nth-child(odd) {
+        background-color: #ffffff !important;
+        border: 1px solid #e8e4dc !important;
+        border-radius: 16px !important;
+        padding: 14px 18px !important;
+        margin-bottom: 12px !important;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.02) !important;
+    }
+
+    /* Custom Input Textbox seperti Claude */
+    .stChatInputContainer textarea {
+        background-color: #ffffff !important;
+        border: 1px solid #dcd7cd !important;
+        border-radius: 20px !important;
+        color: #2c2b29 !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
+    }
+    .stChatInputContainer textarea:focus {
+        border-color: #da7756 !important;
+        box-shadow: 0 0 0 2px rgba(218, 119, 86, 0.2) !important;
+    }
+
+    /* Button Styling ala Claude (Terracotta Accent) */
+    .stButton > button {
+        background-color: #da7756 !important;
+        color: #ffffff !important;
+        border: none !important;
+        border-radius: 10px !important;
+        font-weight: 500 !important;
+        padding: 0.5rem 1rem !important;
+        transition: all 0.2s ease !important;
+    }
+    .stButton > button:hover {
+        background-color: #c46445 !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 10px rgba(218, 119, 86, 0.25) !important;
+    }
+
+    /* Tabs Minimalis khas Anthropic */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+        background-color: transparent;
+        border-bottom: 1px solid #e6e2d8;
+        padding-bottom: 5px;
+    }
+    .stTabs [data-baseweb="tab"] {
+        height: 40px;
+        white-space: pre;
+        border-radius: 8px;
+        color: #6e6b63;
+        font-weight: 500;
+        background-color: transparent;
+    }
+    .stTabs [aria-selected="true"] {
+        background-color: #e8e2d5 !important;
+        color: #1e1e1e !important;
+        font-weight: 600 !important;
+    }
+    
+    /* Hide Streamlit Branding Element */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+</style>
+"""
+st.markdown(CLAUDE_STYLE_CSS, unsafe_allow_html=True)
+
+# ============================================================================
 # INITIALIZE SERVICES & KREDENSIAL
 # ============================================================================
 GROQ_API_KEY = get_secret("GROQ_API_KEY", "GROQ_KEY")
@@ -70,27 +183,27 @@ if "generated_images" not in st.session_state:
     st.session_state.generated_images = []
 
 # ============================================================================
-# HEADER BRANDING
+# HEADER BRANDING (CLAUDE STYLE)
 # ============================================================================
 st.markdown(
     f"""
-    <div style="text-align: center; padding: 10px 0;">
-        <img src="data:image/png;base64,{LOGO_B64}" width="65" height="65">
-        <h1 style="margin: 5px 0 0 0; font-size: 2.3rem;">{APP_NAME}</h1>
-        <p style="color: #666; font-size: 0.95rem;">{APP_TAGLINE}</p>
+    <div class="claude-header">
+        <img src="data:image/png;base64,{LOGO_B64}" width="55" height="55" style="margin-bottom: 5px;">
+        <h1 class="claude-title">{APP_NAME}</h1>
+        <p class="claude-sub">{APP_TAGLINE}</p>
     </div>
     """,
     unsafe_allow_html=True
 )
 
 # ============================================================================
-# SIDEBAR CONTROL & CONFIGURATION
+# SIDEBAR CONTROL
 # ============================================================================
 with st.sidebar:
-    st.markdown("### 🤖 Otak AI (Yuki)")
+    st.markdown("### 🤖 Model AI")
     model_options = {m["key"]: f"{m['name']} ({m['desc']})" for m in MODEL_CATALOG}
     selected_key = st.selectbox(
-        "Pilih Model Utama:",
+        "Pilih Model Otak:",
         options=list(model_options.keys()),
         format_func=lambda x: model_options[x],
         index=0
@@ -98,15 +211,15 @@ with st.sidebar:
     st.session_state.selected_model_key = selected_key
     
     curr_model = MODEL_BY_KEY.get(selected_key, MODEL_CATALOG[0])
-    st.info(f"**Model Aktif:**\n`{curr_model['id']}`\n\n_{curr_model['desc']}_")
+    st.info(f"**Model Aktif:**\n`{curr_model['id']}`")
 
     st.markdown("---")
-    st.markdown("### 🔑 Status API Key")
+    st.markdown("### 🔑 Status API")
     st.write(f"• **Groq AI:** {'✅ Aktif' if GROQ_API_KEY else '❌ Belum Set'}")
     st.write(f"• **Cloudflare Flux:** {'✅ Aktif' if flux_service.is_ready() else '❌ Belum Set'}")
     
     st.markdown("---")
-    if st.button("🗑️ Bersihkan Sesi Obrolan", use_container_width=True):
+    if st.button("🗑️ Bersihkan Percakapan", use_container_width=True):
         st.session_state.messages = []
         st.rerun()
 
