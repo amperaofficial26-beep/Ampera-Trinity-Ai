@@ -1,4 +1,3 @@
-cd /home/claude/trinity_app && cat > icons.py << 'PYEOF'
 # -*- coding: utf-8 -*-
 """
 Ikon SVG garis tipis ala Claude (stroke mengikuti warna teks) + helper
@@ -92,5 +91,3 @@ def _is_model_unavailable_error(exc: Exception) -> bool:
         or "decommissioned" in text
         or ("not_found" in text and "model" in text)
     )
-PYEOF
-for f in icons.py errors.py; do python3 -c "import ast; ast.parse(open('$f').read())" && echo "$f OK"; done
