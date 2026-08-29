@@ -94,6 +94,11 @@ APP_TAGLINE = "Multi AI · Generate Foto · Chat — by Ampera Official"
 
 # --- Multi AI (dari App 3: Ampera Multi AI) ---
 GROQ_BASE_URL = "https://api.groq.com/openai/v1"
+# Katalog model ala Claude: nama polos + deskripsi kecil (tanpa emoji)
+# Setiap entri punya "key" unik (dipakai internal & sebagai Streamlit key)
+# terpisah dari "name" (label tampilan) karena dua model boleh berbagi nama
+# tier yang sama (mis. dua model "Trinity Normal").
+# Diurutkan dari tingkat termudah → tertinggi; tier Hard & Extreme = premium.
 MODEL_CATALOG = [
     {"key": "gpt_oss_20b",   "name": "Trinity Easy",    "desc": "Cepat untuk chat & coding ringan",      "id": "openai/gpt-oss-20b", "premium": False},
     {"key": "compound_mini", "name": "Trinity Normal",  "desc": "Web search ringkas & cepat",            "id": "groq/compound-mini", "premium": False},
@@ -106,6 +111,7 @@ AVAILABLE_MODELS = {m["key"]: m["id"] for m in MODEL_CATALOG}
 MODEL_BY_KEY = {m["key"]: m for m in MODEL_CATALOG}
 DEFAULT_MODEL_KEY = "gpt_oss_20b"
 
+# Model vision (wajib dipakai saat pesan membawa gambar)
 VISION_MODEL_ID = "meta-llama/llama-4-scout-17b-16e-instruct"
 VISION_MODEL_LABEL = "Llama-4 Scout"
 VISION_MODEL_FALLBACKS = (
@@ -113,12 +119,14 @@ VISION_MODEL_FALLBACKS = (
     "meta-llama/llama-4-maverick-17b-128e-instruct",
 )
 
+# Fallback jika model terpilih sudah tidak tersedia di provider (dari App 1)
 GROQ_MODEL_FALLBACKS = (
     "openai/gpt-oss-120b",
     "openai/gpt-oss-20b",
     "qwen/qwen3.6-27b",
 )
 
+# Konteks panjang tapi tetap ramah free-tier (dari App 1)
 MAX_HISTORY_MESSAGES = 40
 
 # --- Persona Yuki (dari App 3) ---
@@ -140,14 +148,18 @@ CF_IMAGE_MODEL = "@cf/black-forest-labs/flux-1-schnell"
 CF_DEFAULT_STEPS = 4
 
 # --- Suara (Groq — pakai GROQ_API_KEY yang sama) ---
-STT_MODEL = "whisper-large-v3-turbo"
-MAX_IMAGES_PER_MESSAGE = 5
+STT_MODEL = "whisper-large-v3-turbo"          # transkrip suara → teks (mic tetap ada)
+MAX_IMAGES_PER_MESSAGE = 5                    # batas model vision (Llama-4)
 IMAGE_INPUT_TYPES = ["png", "jpg", "jpeg", "webp", "gif"]
-VISION_RECENT_MESSAGES = 4
+VISION_RECENT_MESSAGES = 4  # pesan terakhir yang gambarnya ikut ke API
 
 # ============================================================================
 # KATALOG HALAMAN BARU
+#   (halaman Artefak, Bahasa, Pengaturan, Bantuan, Trinity Pro, Aplikasi,
+#    Trinity Kursus, Pelajari lebih lanjut)
 # ============================================================================
+
+# --- Bahasa yang bisa dipakai (halaman "Bahasa") ---
 SUPPORTED_LANGUAGES = [
     {"code": "id", "flag": "🇮🇩", "name": "Bahasa Indonesia", "native": "Baku",  "level": "Penuh",       "yuki": True},
     {"code": "en", "flag": "🇬🇧", "name": "English",          "native": "British", "level": "Penuh",     "yuki": True},
@@ -167,6 +179,7 @@ SUPPORTED_LANGUAGES = [
 LANG_BY_CODE = {l["code"]: l for l in SUPPORTED_LANGUAGES}
 DEFAULT_LANG_CODE = "id"
 
+# --- Kotak kategori halaman Artefak (ala Claude) ---
 ARTIFACT_CATEGORIES = [
     {"key": "app",  "icon": ":material/public:",        "title": "Aplikasi dan situs web",
      "desc": "Landing page, dashboard, web app interaktif",
@@ -214,6 +227,7 @@ ARTIFACT_CATEGORIES = [
 ]
 ARTIFACT_BY_KEY = {c["key"]: c for c in ARTIFACT_CATEGORIES}
 
+# --- Katalog kursus Trinity (halaman "Trinity kursus") ---
 COURSE_CATALOG = [
     {"key": "pemasaran",  "icon": ":material/campaign:",         "title": "Pemasaran",
      "desc": "Strategi promosi, branding, dan funnel", "level": "Pemula → Lanjut"},
@@ -250,7 +264,9 @@ def course_curriculum(course: dict) -> list[str]:
     ]
 
 
+# --- Nilai bawaan seluruh Pengaturan (9 tab) ---
 DEFAULT_SETTINGS: dict = {
+    # Umum
     "ui_lang": DEFAULT_LANG_CODE,
     "yuki_lang": DEFAULT_LANG_CODE,
     "theme": "Krem (Claude)",
@@ -260,37 +276,45 @@ DEFAULT_SETTINGS: dict = {
     "min_think_seconds": 10.0,
     "personality": "Santai & kocak",
     "default_mode": "Chat",
+    # Akun
     "display_name": "User",
     "email": "",
     "username": "user",
     "bio": "",
+    # Privasi
     "allow_web_search": True,
     "save_history": True,
     "keep_voice": False,
     "analytics": True,
     "personalization": True,
     "cloud_sync": False,
+    # Penagihan
     "plan": "Free",
     "billing_cycle": "Bulanan",
     "payment_method": "Belum ada metode pembayaran",
+    # Kemampuan
     "cap_web_search": True,
     "cap_artifacts": True,
     "cap_voice": True,
     "cap_vision": True,
     "cap_image": True,
+    # Memori
     "memories": [],
     "memory_on": True,
     "memory_auto": False,
+    # Refleksi
     "reflection_goal": "",
     "reflection_habit": "",
     "reflection_freq": "Setiap hari",
     "reflection_tone": "Mendorong",
+    # Waktu dan fokus
     "focus_minutes": 25,
     "break_minutes": 5,
     "work_start": "09:00",
     "work_end": "18:00",
     "tz_label": "Asia/Jakarta (WIB)",
     "focus_reminder": True,
+    # Trinity Code
     "groq_key": "",
     "cf_account_id": "",
     "cf_token": "",
@@ -309,13 +333,15 @@ PAGE_TITLES = {
     "pelajari": "Pelajari lebih lanjut",
 }
 
+# Fitur mic/lampiran hanya jalan di Streamlit yang mendukung (1.47+);
+# di versi lama otomatis nonaktif tanpa error.
 _CHAT_INPUT_PARAMS = inspect.signature(st.chat_input).parameters
 CHAT_INPUT_SUPPORTS_FILE = "accept_file" in _CHAT_INPUT_PARAMS
 CHAT_INPUT_SUPPORTS_AUDIO = "accept_audio" in _CHAT_INPUT_PARAMS
 
 
 # ============================================================================
-# KREDENSIAL
+# KREDENSIAL (Secrets → Environment Variable)
 # ============================================================================
 def _get_secret(*keys: str) -> str:
     """Ambil kredensial dari st.secrets lalu fallback ke env var."""
@@ -338,6 +364,8 @@ CF_API_TOKEN = _get_secret("CF_API_TOKEN", "CLOUDFLARE_API_TOKEN")
 
 CHAT_READY = bool(GROQ_API_KEY)
 IMAGE_READY = bool(CF_ACCOUNT_ID and CF_API_TOKEN)
+
+
 # ============================================================================
 # CSS — TEMA ALA CLAUDE.AI (buatan sendiri)
 #   Latar krem hangat, judul serif, aksen terracotta, UI kalem & bersih
@@ -1240,7 +1268,7 @@ div.stDownloadButton > button:hover {
     display: flex; align-items: center; gap: 10px;
     padding: 2px 2px 6px;
     animation: thinkFadeIn 1.4s ease both;
-    }
+}
 @keyframes thinkFadeIn {
     from { opacity: 0; transform: translateY(4px); }
     to   { opacity: 1; transform: none; }
@@ -1484,6 +1512,15 @@ div.stDownloadButton > button:hover {
 }
 .page-head-icon [data-testid="stIconMaterial"],
 .page-head-icon span[data-testid="stIconMaterial"] { font-size: 21px !important; }
+/* Ikon Material yang kita buat sendiri lewat mi() (dipakai di dalam HTML,
+   karena sintaks ikon material tidak diterjemahkan Streamlit di dalam HTML).
+   Ukurannya disamakan dengan ikon bawaan Streamlit di posisi yang sama. */
+.page-head-icon .mi { font-size: 21px; }
+.cap-row .cap-icon .mi { font-size: 18px; }
+.cap-row .cap-state .mi { font-size: 15px; vertical-align: -3px; }
+.help-step .step-icon .mi { font-size: 18px; }
+.mini-card .mini-icon .mi { font-size: 22px; }
+.feat-row .chip-on .mi, .feat-row .chip-off .mi { font-size: 15px; vertical-align: -3px; }
 .page-head h2.page-title {
     font-family: 'Source Serif 4', Georgia, serif;
     font-size: 1.55rem; font-weight: 600; color: #1a1915;
@@ -1694,7 +1731,10 @@ div.stButton > button p strong { color: #3D3929; }
 """,
         unsafe_allow_html=True,
     )
-  # ============================================================================
+
+
+
+# ============================================================================
 # UTIL: ERROR PUBLIK (dari App 1 — pesan ramah untuk pengguna umum)
 # ============================================================================
 def public_error_image(status: int | None, body: str, exc: Exception | None = None) -> str:
@@ -2058,6 +2098,28 @@ ICON_SEARCH = _svg('<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/>
 ICON_CHEVRON = _svg('<path d="M6 9l6 6 6-6"/>')
 
 
+def mi(name: str) -> str:
+    """Ikon Material untuk dipakai DI DALAM string HTML (st.markdown).
+
+    Streamlit hanya menerjemahkan sintaks ikon material pada TEKS markdown biasa.
+    Begitu string itu berada di dalam tag HTML, penggantinya tidak jalan dan
+    yang tampil justru teks mentah ':material_nama:' di layar. Karena itu
+    setiap ikon yang masuk ke HTML dibuat manual sebagai <span> dengan font
+    ikon yang sama persis seperti yang dipakai Streamlit sendiri
+    ("Material Symbols Rounded"), lengkap dengan ligature nama ikonnya.
+    """
+    glyph = name.split("/")[-1].rstrip(":")
+    return (
+        '<span class="mi" aria-hidden="true" translate="no" '
+        "style=\"font-family:'Material Symbols Rounded';font-weight:normal;"
+        "font-style:normal;display:inline-block;line-height:1;"
+        "text-transform:none;letter-spacing:normal;word-wrap:normal;"
+        "white-space:nowrap;direction:ltr;vertical-align:bottom;"
+        '-webkit-font-smoothing:antialiased;user-select:none;">'
+        f"{glyph}</span>"
+    )
+
+
 # ============================================================================
 # RENDER BUBBLE CHAT (style buatan sendiri)
 # ============================================================================
@@ -2345,7 +2407,8 @@ def get_chat_export_text() -> str:
         lines.append("\n---\n")
     return "\n".join(lines)
 
-  # ============================================================================
+
+# ============================================================================
 # SESSION STATE
 # ============================================================================
 # --- Thread pesan -----------------------------------------------------------
@@ -3122,6 +3185,7 @@ def _page_footer(in_chat: bool = False) -> None:
         unsafe_allow_html=True,
     )
 
+
 # ============================================================================
 # HALAMAN: CHAT UTAMA
 # ============================================================================
@@ -3233,7 +3297,7 @@ def _artifact_workspace(aid: int) -> None:
 
     st.markdown(
         f'<div class="page-head"><div class="page-head-icon">'
-        f":material/data_object:</div>"
+        f'{mi(":material/data_object:")}</div>'
         f'<div><h2 class="page-title">{html.escape(meta or "Artefak")}</h2>'
         '<p class="page-sub">Yuki mengerjakan artefak ini di halaman ini — '
         "chat utamamu tetap bersih.</p></div></div>",
@@ -3278,7 +3342,7 @@ def page_artefak() -> None:
     artifacts = st.session_state.get("artifacts", [])
     st.markdown(
         '<div class="page-head"><div class="page-head-icon">'
-        ":material/data_object:</div>"
+        f'{mi(":material/data_object:")}</div>'
         '<div><h2 class="page-title">Artefak</h2>'
         "<p class=\"page-sub\">Pilih salah satu kotak di bawah. Yuki langsung "
         "menjawab di halaman ini — bukan di chat utama.</p></div></div>",
@@ -3356,11 +3420,11 @@ def _cap_rows_html() -> str:
     for label, icon, key in CAPABILITY_ROWS:
         state = _capability_state(key)
         ok = state == "aktif"
-        mark = ":material/check_circle:" if ok else ":material/error_outline:"
+        mark = mi(":material/check_circle:") if ok else mi(":material/error_outline:")
         chip = "chip-on" if ok else "chip-off"
         rows.append(
             f'<div class="cap-row">'
-            f'<span class="cap-icon">{icon}</span>'
+            f'<span class="cap-icon">{mi(icon)}</span>'
             f'<span class="cap-name">{label}</span>'
             f'<span class="cap-state">{mark} '
             f'<span class="{chip}">{html.escape(state)}</span></span>'
@@ -3507,10 +3571,10 @@ def _plan_col(title: str, price: str, note: str, is_pro: bool, key: str) -> None
     rows = []
     for label, _pro, free in PRO_FEATURES:
         if is_pro:
-            mark, cls = ":material/check_circle:", "chip-on"
+            mark, cls = mi(":material/check_circle:"), "chip-on"
         else:
-            mark, cls = (":material/check_circle:", "chip-on") if free else (
-                ":material/remove_circle_outline:", "chip-off")
+            mark, cls = (mi(":material/check_circle:"), "chip-on") if free else (
+                mi(":material/remove_circle_outline:"), "chip-off")
         rows.append(f'<div class="feat-row"><span>{label}</span>'
                     f'<span class="{cls}">{mark}</span></div>')
     st.markdown(
@@ -3714,17 +3778,25 @@ def _set_trinity_code() -> None:
                        help="Dipakai untuk chat, transkrip suara, dan vision.")
     ca = st.text_input("CF_ACCOUNT_ID", value=s["cf_account_id"], key="set_ca")
     ct = st.text_input("CF_API_TOKEN", type="password", value=s["cf_token"], key="set_ct")
+    chat_state = (
+        mi(":material/check_circle:") + " aktif" if CHAT_READY
+        else mi(":material/error_outline:") + " butuh GROQ_API_KEY"
+    )
     st.markdown(
         f'<div class="feat-row"><span>Status chat</span>'
         f'<span class="chip-{"on" if CHAT_READY else "off"}">'
-        f'{":material/check_circle: aktif" if CHAT_READY else ":material/error_outline: butuh GROQ_API_KEY"}'
+        f"{chat_state}"
         "</span></div>",
         unsafe_allow_html=True,
+    )
+    img_state = (
+        mi(":material/check_circle:") + " aktif" if IMAGE_READY
+        else mi(":material/error_outline:") + " butuh Cloudflare"
     )
     st.markdown(
         f'<div class="feat-row"><span>Status generate gambar</span>'
         f'<span class="chip-{"on" if IMAGE_READY else "off"}">'
-        f'{":material/check_circle: aktif" if IMAGE_READY else ":material/error_outline: butuh Cloudflare"}'
+        f"{img_state}"
         "</span></div>",
         unsafe_allow_html=True,
     )
@@ -3778,7 +3850,7 @@ def page_pengaturan() -> None:
                      help="Kembali ke chat"):
             go("chat")
     st.markdown(
-        '<div class="page-head"><div class="page-head-icon">:material/settings:</div>'
+        f'<div class="page-head"><div class="page-head-icon">{mi(":material/settings:")}</div>'
         '<div><h2 class="page-title">Pengaturan</h2>'
         "<p class=\"page-sub\">Sembilan bagian pengaturan Trinity. Perubahan "
         "disimpan per bagian lewat tombol simpan.</p></div></div>",
@@ -3817,6 +3889,7 @@ def page_pengaturan() -> None:
 
     _page_footer()
 
+
 # ============================================================================
 # HALAMAN: BAHASA
 # ============================================================================
@@ -3831,7 +3904,7 @@ def page_bahasa() -> None:
     yuki_code = s.get("yuki_lang", DEFAULT_LANG_CODE)
 
     st.markdown(
-        '<div class="page-head"><div class="page-head-icon">:material/translate:</div>'
+        f'<div class="page-head"><div class="page-head-icon">{mi(":material/translate:")}</div>'
         '<div><h2 class="page-title">Bahasa</h2>'
         "<p class=\"page-sub\">Bahasa antarmuka Trinity dan bahasa yang dipakai "
         "Yuki saat menjawab.</p></div></div>",
@@ -3958,7 +4031,7 @@ def page_bantuan() -> None:
                      help="Kembali ke chat"):
             go("chat")
     st.markdown(
-        '<div class="page-head"><div class="page-head-icon">:material/help:</div>'
+        f'<div class="page-head"><div class="page-head-icon">{mi(":material/help:")}</div>'
         '<div><h2 class="page-title">Dapatkan bantuan</h2>'
         "<p class=\"page-sub\">Petunjuk lengkap memakai Ampera Trinity AI, "
         "dari kirim pesan sampai membuat artefak.</p></div></div>",
@@ -3969,7 +4042,7 @@ def page_bantuan() -> None:
     for i, (icon, title, desc) in enumerate(HELP_STEPS):
         st.markdown(
             f'<div class="help-step"><span class="step-no">{i + 1}</span>'
-            f'<span class="step-icon">{icon}</span>'
+            f'<span class="step-icon">{mi(icon)}</span>'
             f'<span class="step-text"><b>{title}</b><br>{desc}</span></div>',
             unsafe_allow_html=True,
         )
@@ -4059,7 +4132,7 @@ def page_pelajari() -> None:
         for j, (icon, title, desc) in enumerate(ABOUT_CARDS[i:i + 3]):
             with cols[j]:
                 st.markdown(
-                    f'<div class="mini-card"><div class="mini-icon">{icon}</div>'
+                    f'<div class="mini-card"><div class="mini-icon">{mi(icon)}</div>'
                     f'<div class="mini-title">{title}</div>'
                     f'<div class="mini-desc">{desc}</div></div>',
                     unsafe_allow_html=True,
@@ -4069,7 +4142,7 @@ def page_pelajari() -> None:
     for i, (icon, title, desc) in enumerate(HELP_STEPS[:6]):
         st.markdown(
             f'<div class="help-step"><span class="step-no">{i + 1}</span>'
-            f'<span class="step-icon">{icon}</span>'
+            f'<span class="step-icon">{mi(icon)}</span>'
             f'<span class="step-text"><b>{title}</b><br>{desc}</span></div>',
             unsafe_allow_html=True,
         )
@@ -4142,7 +4215,7 @@ def page_tingkatkan() -> None:
     ]):
         st.markdown(
             f'<div class="help-step"><span class="step-no">{i + 1}</span>'
-            f'<span class="step-icon">{icon}</span>'
+            f'<span class="step-icon">{mi(icon)}</span>'
             f'<span class="step-text"><b>{title}</b><br>{desc}</span></div>',
             unsafe_allow_html=True,
         )
@@ -4188,9 +4261,9 @@ def page_aplikasi() -> None:
                 st.toast("Versi Android belum dirilis. Daftar beta di bawah ya!",
                          icon=":material/android:")
         with b2:
-            if st.button(":material/apple:  iOS", key="app_ios", use_container_width=True):
+            if st.button(":material/smartphone:  iOS", key="app_ios", use_container_width=True):
                 st.toast("Versi iOS belum dirilis. Daftar beta di bawah ya!",
-                         icon=":material/apple:")
+                         icon=":material/smartphone:")
         st.markdown('<div class="set-section">Rencana rilis</div>', unsafe_allow_html=True)
         st.markdown(
             '<div class="feat-row"><span>Android (APK & Play Store)</span>'
@@ -4241,7 +4314,7 @@ def _course_workspace(key: str) -> None:
             go("kursus", course_active_key=None)
 
     st.markdown(
-        f'<div class="page-head"><div class="page-head-icon">{course["icon"]}</div>'
+        f'<div class="page-head"><div class="page-head-icon">{mi(course["icon"])}</div>'
         f'<div><h2 class="page-title">Trinity kursus · {html.escape(course["title"])}</h2>'
         f'<p class="page-sub">{html.escape(course["desc"])} — '
         f'{html.escape(course["level"])}</p></div></div>',
@@ -4292,7 +4365,7 @@ def page_kursus() -> None:
         return
 
     st.markdown(
-        '<div class="page-head"><div class="page-head-icon">:material/school:</div>'
+        f'<div class="page-head"><div class="page-head-icon">{mi(":material/school:")}</div>'
         '<div><h2 class="page-title">Trinity kursus</h2>'
         "<p class=\"page-sub\">Pilih fokus belajar. Yuki jadi mentor dan "
         "menjawab langsung di halaman kursus ini.</p></div></div>",
