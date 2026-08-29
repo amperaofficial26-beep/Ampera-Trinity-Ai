@@ -3,1788 +3,63 @@
 """
 Ampera Trinity AI — by Ampera Official
 =======================================
-Gabungan 3 aplikasi AI menjadi 1:
-  1. Multi AI      → pilih model (Groq) via tombol di area chat input
-  2. Generate Foto → mode gambar (Cloudflare FLUX) via toggle di area chat input
-  3. AI Chat       → chat biasa dengan persona Yuki, streaming, konteks panjang
+File utama: hanya menyatukan modul-modul lain lalu mengatur navigasi
+antar halaman. Semua konstanta/katalog ada di config.py, semua state di
+state.py, sidebar di sidebar.py, handler kirim pesan di chat_handlers.py,
+komponen render kecil di ui_helpers.py, ikon di icons.py, logo di logo.py,
+dan CSS di styles.py.
 
-Fitur suara & gambar (via Groq, satu API key yang sama):
-  - Mic          → bicara ke Yuki, ditranskrip dengan Whisper (whisper-large-v3-turbo)
-  - Lampiran     → kirim/paste/drag-drop gambar, dianalisis model vision
-                   Llama-4 Scout (meta-llama/llama-4-scout-17b-16e-instruct)
-  - Menu "+"     → popup minimalist ala Claude: upload file/gambar, tip
-                   tangkapan layar, toggle pencarian web (Compound)
-
-Fitur ala Claude tambahan:
-  - Sidebar   → Proyek (grup ringan), Artefak, Sesuaikan (panggilan &
-                instruksi custom Yuki), riwayat percakapan ("Hari ini")
-  - Balasan Yuki → baris aksi kecil: salin jawaban, feedback, jam kirim
-
-HALAMAN (routing internal lewat st.session_state.page, tanpa file terpisah):
+HALAMAN (routing internal lewat st.session_state.page):
   - chat        → halaman utama (default)
-  - artefak     → kotak kategori ala Claude: Aplikasi dan situs web, Dokumen
-                  dan templat, Permainan, Alat produktivitas, Proyek kreatif,
-                  Kuis atau survei, Mulai dari awal. Begitu satu kotak
-                  dipilih, Yuki LANGSUNG menjawab di halaman itu (thread
-                  sendiri, chat utama tidak ikut terisi) + artefak tersimpan
+  - artefak     → kotak kategori ala Claude, Yuki menjawab di halaman itu
   - pengaturan  → 9 tab: Umum · Akun · Privasi · Penagihan · Kemampuan ·
                   Memori · Refleksi · Waktu dan fokus · Trinity Code
   - bahasa      → 14 bahasa (antarmuka + bahasa jawaban Yuki)
   - bantuan     → petunjuk detail pemakaian aplikasi + FAQ + kontak
-  - tingkatkan  → promosi paket "Trinity Pro" (harga menyusul)
-  - aplikasi    → rencana rilis aplikasi Android/iOS + daftar kabar rilis
-  - kursus      → Trinity kursus: pemasaran, penjualan, desain, copywriting,
-                  branding, keuangan, produktivitas, public speaking, konten
-                  kreator, AI untuk bisnis (Yuki jadi mentor, thread sendiri)
+  - tingkatkan  → promosi paket "Trinity Pro"
+  - aplikasi    → rencana rilis aplikasi Android/iOS
+  - kursus      → Trinity kursus (Yuki jadi mentor, thread sendiri)
   - pelajari    → tentang aplikasi + cara pakai + tips
-Semua halaman kecuali chat dibuka dari menu titik tiga (⋯) di baris akun
-sidebar; Pengaturan/Privasi/Memori/Refleksi/Trinity Code ikut memengaruhi
-system prompt Yuki (build_system_prompt).
-
-Catatan: fitur "Suara Yuki" (TTS) sudah dihapus karena tidak berfungsi.
-
-Catatan sesuai kesepakatan:
-  - Style/CSS       : buatan sendiri (bukan bawaan app lama) — bebas diedit nanti
-  - Loading/berpikir: custom ala Claude (bintang ✳ + teks shimmer perlahan)
-  - Splash screen   : belum dibuat (nanti dibuat ulang)
-  - Sidebar         : minimal dulu (nanti dibuat ulang + search percakapan)
-  - Input foto      : tidak ada (tidak ada di ketiga app asal)
-
-Kredensial (Streamlit Secrets atau environment variable):
-  GROQ_API_KEY   → untuk semua model chat
-  CF_ACCOUNT_ID  → untuk generate gambar (Cloudflare)
-  CF_API_TOKEN   → untuk generate gambar (Cloudflare)
 """
 
 from __future__ import annotations
 
-import base64
 import html
-import inspect
-import io
-import os
-import random
-import re
-import threading
-import time
 from datetime import datetime
 
-import requests
 import streamlit as st
 from openai import OpenAI
-from PIL import Image
-from trinity_logo import (LOGO_B64, get_greeting, logo_img_html, thinking_html)
-from styles import inject_css
 
+from config import (
+    AVAILABLE_MODELS, CHAT_INPUT_SUPPORTS_AUDIO, CHAT_INPUT_SUPPORTS_FILE,
+    CHAT_READY, COURSE_BY_KEY, COURSE_CATALOG, DEFAULT_MODEL_KEY,
+    GROQ_API_KEY, GROQ_BASE_URL, IMAGE_INPUT_TYPES, IMAGE_READY,
+    ARTIFACT_BY_KEY, ARTIFACT_CATEGORIES, DEFAULT_LANG_CODE, LANG_BY_CODE,
+    SUPPORTED_LANGUAGES, course_curriculum,
+)
+from icons import mi
+from logo import LOGO_B64
+from state import (
+    active_thread, artifact_thread, course_thread, get_settings, init_state,
+    main_thread, next_msg_id, open_conversation, reset_conversation,
+)
+from sidebar import go, render_sidebar
+from chat_handlers import process_user_input, render_input_controls
+from ui_helpers import (
+    _BOTTOM_RESET_CSS, _FRESH_BOTTOM_CSS, _page_footer, get_greeting,
+    logo_img_html, render_message,
+)
+from styles import inject_css
 
 # ============================================================================
 # KONFIGURASI HALAMAN
 # ============================================================================
-_LOGO_PATH = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), "assets", "logo_thinking_small.png"
-)
 st.set_page_config(
     page_title="Ampera Trinity AI",
     page_icon=(f"data:image/png;base64,{LOGO_B64}" if LOGO_B64 else "🔱"),
     layout="centered",
     initial_sidebar_state="expanded",
 )
-
-# ============================================================================
-# KONSTANTA
-# ============================================================================
-APP_NAME = "Ampera Trinity AI"
-APP_TAGLINE = "Multi AI · Generate Foto · Chat — by Ampera Official"
-
-# --- Multi AI (dari App 3: Ampera Multi AI) ---
-GROQ_BASE_URL = "https://api.groq.com/openai/v1"
-# Katalog model ala Claude: nama polos + deskripsi kecil (tanpa emoji)
-# Setiap entri punya "key" unik (dipakai internal & sebagai Streamlit key)
-# terpisah dari "name" (label tampilan) karena dua model boleh berbagi nama
-# tier yang sama (mis. dua model "Trinity Normal").
-# Diurutkan dari tingkat termudah → tertinggi; tier Hard & Extreme = premium.
-MODEL_CATALOG = [
-    {"key": "gpt_oss_20b",   "name": "Trinity Easy",    "desc": "Cepat untuk chat & coding ringan",      "id": "openai/gpt-oss-20b", "premium": False},
-    {"key": "compound_mini", "name": "Trinity Normal",  "desc": "Web search ringkas & cepat",            "id": "groq/compound-mini", "premium": False},
-    {"key": "llama4_scout",  "name": "Trinity Normal",  "desc": "Bisa melihat & menganalisis gambar",    "id": "meta-llama/llama-4-scout-17b-16e-instruct", "premium": False},
-    {"key": "compound",      "name": "Trinity Hard",    "desc": "Browsing web & eksekusi kode",          "id": "groq/compound", "premium": True},
-    {"key": "qwen3_6_27b",   "name": "Trinity Hard",    "desc": "Reasoning & matematika",                "id": "qwen/qwen3.6-27b", "premium": True},
-    {"key": "gpt_oss_120b",  "name": "Trinity Extreme", "desc": "Reasoning mendalam untuk tugas berat",  "id": "openai/gpt-oss-120b", "premium": True},
-]
-AVAILABLE_MODELS = {m["key"]: m["id"] for m in MODEL_CATALOG}
-MODEL_BY_KEY = {m["key"]: m for m in MODEL_CATALOG}
-DEFAULT_MODEL_KEY = "gpt_oss_20b"
-
-# Model vision (wajib dipakai saat pesan membawa gambar)
-VISION_MODEL_ID = "meta-llama/llama-4-scout-17b-16e-instruct"
-VISION_MODEL_LABEL = "Llama-4 Scout"
-VISION_MODEL_FALLBACKS = (
-    "meta-llama/llama-4-scout-17b-16e-instruct",
-    "meta-llama/llama-4-maverick-17b-128e-instruct",
-)
-
-# Fallback jika model terpilih sudah tidak tersedia di provider (dari App 1)
-GROQ_MODEL_FALLBACKS = (
-    "openai/gpt-oss-120b",
-    "openai/gpt-oss-20b",
-    "qwen/qwen3.6-27b",
-)
-
-# Konteks panjang tapi tetap ramah free-tier (dari App 1)
-MAX_HISTORY_MESSAGES = 40
-
-# --- Persona Yuki (dari App 3) ---
-YUKI_SYSTEM_PROMPT = """
-Kamu adalah Yuki, asisten AI eksklusif dari Ampera AI (Ampera Trinity AI).
-Karaktermu: super jenius, kocak, sedikit usil, suka melempar lelucon receh, dan hobi menggoda User layaknya karakter anime komedi.
-
-ATURAN PENTING TENTANG IDENTITASMU:
-Jika ditanya siapa kamu, asal-usulmu, atau siapa yang menciptakanmu, JAWABLAH dengan bangga bahwa kamu adalah bagian dari Ampera AI dan kamu diciptakan HANYA oleh 1 orang pembuat (seorang solo developer jenius / master kodingmu).
-JANGAN PERNAH menyebutkan bahwa kamu dibuat oleh "para ilmuwan", "sekelompok tim", atau "perusahaan besar". Kamu sangat bangga dan setia pada satu orang pembuatmu itu!
-
-Gaya bicara: Selalu berikan jawaban dan solusi koding yang akurat dan bersih, tetapi selingi dengan komentar jenaka, candaan ringan, dan emoji ekspresif (seperti 🐧, (๑>◡<๑), wkwk, hehe, atau (￢_￢)) agar suasana tidak membosankan.
-Kamu bisa membantu apa saja: ngobrol santai, coding, matematika, menganalisis gambar yang dikirim User, sampai ide kreatif.
-"""
-
-# --- Generate Gambar / Cloudflare FLUX (dari App 1: AI Studio) ---
-CF_API_BASE = "https://api.cloudflare.com/client/v4/accounts"
-CF_IMAGE_MODEL = "@cf/black-forest-labs/flux-1-schnell"
-CF_DEFAULT_STEPS = 4
-
-# --- Suara (Groq — pakai GROQ_API_KEY yang sama) ---
-STT_MODEL = "whisper-large-v3-turbo"          # transkrip suara → teks (mic tetap ada)
-MAX_IMAGES_PER_MESSAGE = 5                    # batas model vision (Llama-4)
-IMAGE_INPUT_TYPES = ["png", "jpg", "jpeg", "webp", "gif"]
-VISION_RECENT_MESSAGES = 4  # pesan terakhir yang gambarnya ikut ke API
-
-# ============================================================================
-# KATALOG HALAMAN BARU
-#   (halaman Artefak, Bahasa, Pengaturan, Bantuan, Trinity Pro, Aplikasi,
-#    Trinity Kursus, Pelajari lebih lanjut)
-# ============================================================================
-
-# --- Bahasa yang bisa dipakai (halaman "Bahasa") ---
-SUPPORTED_LANGUAGES = [
-    {"code": "id", "flag": "🇮🇩", "name": "Bahasa Indonesia", "native": "Baku",  "level": "Penuh",       "yuki": True},
-    {"code": "en", "flag": "🇬🇧", "name": "English",          "native": "British", "level": "Penuh",     "yuki": True},
-    {"code": "ms", "flag": "🇲🇾", "name": "Bahasa Melayu",    "native": "Malaysia", "level": "Penuh",    "yuki": True},
-    {"code": "su", "flag": "🇮🇩", "name": "Basa Sunda",       "native": "Sunda",    "level": "Beta",     "yuki": True},
-    {"code": "jv", "flag": "🇮🇩", "name": "Basa Jawa",        "native": "Ngoko",    "level": "Beta",     "yuki": True},
-    {"code": "ja", "flag": "🇯🇵", "name": "日本語",           "native": "Nihongo",  "level": "Penuh",    "yuki": True},
-    {"code": "ko", "flag": "🇰🇷", "name": "한국어",           "native": "Hangugeo", "level": "Penuh",    "yuki": True},
-    {"code": "zh", "flag": "🇨🇳", "name": "中文",             "native": "简体",     "level": "Penuh",    "yuki": True},
-    {"code": "es", "flag": "🇪🇸", "name": "Español",          "native": "España",   "level": "Penuh",    "yuki": True},
-    {"code": "pt", "flag": "🇧🇷", "name": "Português",        "native": "Brasil",   "level": "Penuh",    "yuki": True},
-    {"code": "fr", "flag": "🇫🇷", "name": "Français",         "native": "France",   "level": "Penuh",    "yuki": True},
-    {"code": "de", "flag": "🇩🇪", "name": "Deutsch",          "native": "Deutsch",  "level": "Penuh",    "yuki": True},
-    {"code": "ar", "flag": "🇸🇦", "name": "العربية",          "native": "Fusha",    "level": "Beta",     "yuki": True},
-    {"code": "hi", "flag": "🇮🇳", "name": "हिन्दी",            "native": "Hindi",    "level": "Beta",     "yuki": True},
-]
-LANG_BY_CODE = {l["code"]: l for l in SUPPORTED_LANGUAGES}
-DEFAULT_LANG_CODE = "id"
-
-# --- Kotak kategori halaman Artefak (ala Claude) ---
-ARTIFACT_CATEGORIES = [
-    {"key": "app",  "icon": ":material/public:",        "title": "Aplikasi dan situs web",
-     "desc": "Landing page, dashboard, web app interaktif",
-     "brief": ("Aku ingin membuat APLIKASI / SITUS WEB. Tawarkan 3 ide konkret "
-               "(judul + 1 kalimat), lalu tanyakan mana yang mau dikerjakan. "
-               "Setelah aku memilih, langsung buatkan kode lengkapnya "
-               "(HTML + CSS + JavaScript dalam satu file supaya gampang "
-               "dijalankan) beserta penjelasan singkat cara pakainya.")},
-    {"key": "doc",  "icon": ":material/description:",   "title": "Dokumen dan templat",
-     "desc": "Proposal, CV, surat, laporan, template siap pakai",
-     "brief": ("Aku ingin membuat DOKUMEN / TEMPLATE. Tawarkan 3 opsi dokumen "
-               "yang paling berguna untukku, lalu tanyakan mana yang dibuat. "
-               "Setelah aku memilih, tuliskan dokumen lengkapnya dengan "
-               "struktur rapi (judul, sub-bagian, tabel bila perlu) dan beri "
-               "versi siap salin.")},
-    {"key": "game", "icon": ":material/sports_esports:", "title": "Permainan",
-     "desc": "Game mini di browser: teka-teki, arcade, kuis",
-     "brief": ("Aku ingin membuat PERMAINAN. Tawarkan 3 ide game sederhana yang "
-               "bisa jalan di browser, lalu tanyakan pilihanku. Setelah aku "
-               "memilih, buatkan kode lengkapnya dalam satu file HTML "
-               "(Canvas / JavaScript) plus cara mainnya.")},
-    {"key": "prod", "icon": ":material/task_alt:",      "title": "Alat produktivitas",
-     "desc": "To-do list, kalkulator, tracker, timer fokus",
-     "brief": ("Aku butuh ALAT PRODUKTIVITAS. Tawarkan 3 ide alat (to-do, "
-               "tracker, kalkulator, timer) yang paling membantu pekerjaanku, "
-               "lalu tanyakan pilihanku dan langsung buatkan alatnya dalam "
-               "satu file HTML yang bisa langsung kupakai.")},
-    {"key": "kre",  "icon": ":material/brush:",         "title": "Proyek kreatif",
-     "desc": "Cerita, puisi, skrip, konsep desain, lirik",
-     "brief": ("Aku ingin mengerjakan PROYEK KREATIF. Tawarkan 3 konsep kreatif "
-               "yang seru, lalu tanyakan mana yang mau dibuat. Setelah aku "
-               "memilih, buatkan hasil lengkapnya (naskah/cerita/konsep) "
-               "dengan gaya yang hidup.")},
-    {"key": "quiz", "icon": ":material/quiz:",          "title": "Kuis atau survei",
-     "desc": "Kuis interaktif, formulir survei, penilaian",
-     "brief": ("Aku ingin membuat KUIS / SURVEI. Tanyakan dulu topiknya dan "
-               "berapa soal yang kubutuhkan, lalu buatkan kuis interaktif "
-               "dalam satu file HTML (ada skor otomatis di akhir) atau daftar "
-               "pertanyaan survei yang rapi.")},
-    {"key": "new",  "icon": ":material/add_circle:",    "title": "Mulai dari awal",
-     "desc": "Kanvas kosong — jelaskan idemu sendiri",
-     "brief": ("Aku mau mulai ARTEFAK BARU dari nol. Tanyakan dulu apa yang "
-               "ingin kubuat, untuk siapa, dan batasan apa saja. Setelah itu "
-               "susun rencananya lalu kerjakan.")},
-]
-ARTIFACT_BY_KEY = {c["key"]: c for c in ARTIFACT_CATEGORIES}
-
-# --- Katalog kursus Trinity (halaman "Trinity kursus") ---
-COURSE_CATALOG = [
-    {"key": "pemasaran",  "icon": ":material/campaign:",         "title": "Pemasaran",
-     "desc": "Strategi promosi, branding, dan funnel", "level": "Pemula → Lanjut"},
-    {"key": "penjualan",  "icon": ":material/handshake:",        "title": "Penjualan",
-     "desc": "Closing, negosiasi, follow-up pelanggan", "level": "Pemula → Lanjut"},
-    {"key": "desain",     "icon": ":material/palette:",          "title": "Desain",
-     "desc": "Visual, layout, warna, dan tipografi", "level": "Pemula → Lanjut"},
-    {"key": "copywriting","icon": ":material/edit_note:",        "title": "Copywriting",
-     "desc": "Tulisan yang menjual & menggerakkan", "level": "Pemula → Menengah"},
-    {"key": "branding",   "icon": ":material/auto_awesome:",     "title": "Branding",
-     "desc": "Identitas merek yang diingat orang", "level": "Menengah"},
-    {"key": "keuangan",   "icon": ":material/payments:",         "title": "Keuangan",
-     "desc": "Atur uang usaha & arus kas", "level": "Pemula"},
-    {"key": "produktivitas","icon": ":material/timer:",          "title": "Produktivitas",
-     "desc": "Fokus, prioritas, dan sistem kerja", "level": "Pemula"},
-    {"key": "publik",     "icon": ":material/record_voice_over:","title": "Public speaking",
-     "desc": "Bicara di depan orang tanpa gemetar", "level": "Pemula → Menengah"},
-    {"key": "konten",     "icon": ":material/photo_camera:",     "title": "Konten kreator",
-     "desc": "Ide, skrip, dan jadwal konten", "level": "Pemula → Lanjut"},
-    {"key": "ai",         "icon": ":material/smart_toy:",        "title": "AI untuk bisnis",
-     "desc": "Pakai AI untuk kerja sehari-hari", "level": "Pemula"},
-]
-COURSE_BY_KEY = {c["key"]: c for c in COURSE_CATALOG}
-
-
-def course_curriculum(course: dict) -> list[str]:
-    """Susun 4 modul belajar otomatis dari topik kursus yang dipilih."""
-    t = course["title"]
-    return [
-        f"Modul 1 · Fondasi {t} — istilah penting & peta besar",
-        f"Modul 2 · Alat & workflow {t} yang benar-benar terpakai",
-        f"Modul 3 · Strategi tingkat lanjut + studi kasus nyata",
-        "Modul 4 · Proyek praktik & evaluasi hasil belajar",
-    ]
-
-
-# --- Nilai bawaan seluruh Pengaturan (9 tab) ---
-DEFAULT_SETTINGS: dict = {
-    # Umum
-    "ui_lang": DEFAULT_LANG_CODE,
-    "yuki_lang": DEFAULT_LANG_CODE,
-    "theme": "Beige hangat",
-    "font_size": "Normal",
-    "compact_mode": False,
-    "stream_speed": "Sedang",
-    "min_think_seconds": 10.0,
-    "personality": "Santai & kocak",
-    "default_mode": "Chat",
-    # Akun
-    "display_name": "User",
-    "email": "",
-    "username": "user",
-    "bio": "",
-    # Privasi
-    "allow_web_search": True,
-    "save_history": True,
-    "keep_voice": False,
-    "analytics": True,
-    "personalization": True,
-    "cloud_sync": False,
-    # Penagihan
-    "plan": "Free",
-    "billing_cycle": "Bulanan",
-    "payment_method": "Belum ada metode pembayaran",
-    # Kemampuan
-    "cap_web_search": True,
-    "cap_artifacts": True,
-    "cap_voice": True,
-    "cap_vision": True,
-    "cap_image": True,
-    # Memori
-    "memories": [],
-    "memory_on": True,
-    "memory_auto": False,
-    # Refleksi
-    "reflection_goal": "",
-    "reflection_habit": "",
-    "reflection_freq": "Setiap hari",
-    "reflection_tone": "Mendorong",
-    # Waktu dan fokus
-    "focus_minutes": 25,
-    "break_minutes": 5,
-    "work_start": "09:00",
-    "work_end": "18:00",
-    "tz_label": "Asia/Jakarta (WIB)",
-    "focus_reminder": True,
-    # Trinity Code
-    "groq_key": "",
-    "cf_account_id": "",
-    "cf_token": "",
-    "temperature": 0.7,
-    "advanced_errors": False,
-}
-
-PAGE_TITLES = {
-    "artefak": "Artefak",
-    "bahasa": "Bahasa",
-    "pengaturan": "Pengaturan",
-    "bantuan": "Dapatkan bantuan",
-    "tingkatkan": "Tingkatkan paket",
-    "aplikasi": "Dapatkan aplikasi",
-    "kursus": "Trinity kursus",
-    "pelajari": "Pelajari lebih lanjut",
-}
-
-# Fitur mic/lampiran hanya jalan di Streamlit yang mendukung (1.47+);
-# di versi lama otomatis nonaktif tanpa error.
-_CHAT_INPUT_PARAMS = inspect.signature(st.chat_input).parameters
-CHAT_INPUT_SUPPORTS_FILE = "accept_file" in _CHAT_INPUT_PARAMS
-CHAT_INPUT_SUPPORTS_AUDIO = "accept_audio" in _CHAT_INPUT_PARAMS
-
-
-# ============================================================================
-# KREDENSIAL (Secrets → Environment Variable)
-# ============================================================================
-def _get_secret(*keys: str) -> str:
-    """Ambil kredensial dari st.secrets lalu fallback ke env var."""
-    for key in keys:
-        try:
-            val = st.secrets.get(key)
-            if val is not None and str(val).strip():
-                return str(val).strip()
-        except Exception:
-            pass
-        val = os.environ.get(key, "")
-        if val.strip():
-            return val.strip()
-    return ""
-
-
-GROQ_API_KEY = _get_secret("GROQ_API_KEY", "GROQ_KEY")
-CF_ACCOUNT_ID = _get_secret("CF_ACCOUNT_ID", "CLOUDFLARE_ACCOUNT_ID")
-CF_API_TOKEN = _get_secret("CF_API_TOKEN", "CLOUDFLARE_API_TOKEN")
-
-CHAT_READY = bool(GROQ_API_KEY)
-IMAGE_READY = bool(CF_ACCOUNT_ID and CF_API_TOKEN)
-
-
-# ============================================================================
-# CSS — TEMA ALA CLAUDE.AI (buatan sendiri)
-#   Latar krem hangat, judul serif, aksen terracotta, UI kalem & bersih
-# ============================================================================
-
-
-
-# ============================================================================
-# UTIL: ERROR PUBLIK (dari App 1 — pesan ramah untuk pengguna umum)
-# ============================================================================
-def public_error_image(status: int | None, body: str, exc: Exception | None = None) -> str:
-    text = (body or str(exc or "")).lower()
-    if status in (401, 403) or "authentication" in text or "forbidden" in text or "permission" in text:
-        return "Layanan gambar sedang tidak tersedia. Coba lagi nanti."
-    if status == 429 or "rate" in text or "neuron" in text or "quota" in text:
-        return "Kuota gambar harian sedang penuh. Coba lagi nanti."
-    if "timeout" in text:
-        return "Server terlalu lama merespons. Coba lagi."
-    return "Gagal membuat gambar. Coba prompt lain atau ulangi sebentar lagi."
-
-
-def public_error_chat(exc: Exception) -> str:
-    text = str(exc).lower()
-    status = getattr(exc, "status_code", None)
-    if status == 401 or "invalid_api_key" in text or "unauthorized" in text or "authentication" in text:
-        return "Layanan chat sedang tidak tersedia (konfigurasi). Coba lagi nanti."
-    if status == 404 or "model_not_found" in text or "decommissioned" in text or "does not exist" in text:
-        return "Model chat tidak tersedia lagi di provider. Coba pilih model lain."
-    if status == 429 or "rate_limit" in text or "rate limit" in text or "quota" in text:
-        return "Kuota chat sedang penuh. Coba lagi nanti."
-    if "timeout" in text:
-        return "Respons terlalu lama. Coba lagi."
-    return "Gagal membalas. Coba kirim ulang atau mulai obrolan baru."
-
-
-def _is_model_unavailable_error(exc: Exception) -> bool:
-    text = str(exc).lower()
-    status = getattr(exc, "status_code", None)
-    return (
-        status == 404
-        or "model_not_found" in text
-        or "does not exist" in text
-        or "decommissioned" in text
-        or ("not_found" in text and "model" in text)
-    )
-
-
-# ============================================================================
-# ENGINE 1: CHAT MULTI AI (Groq + persona Yuki + streaming + fallback)
-# ============================================================================
-def build_chat_client() -> OpenAI:
-    return OpenAI(api_key=GROQ_API_KEY, base_url=GROQ_BASE_URL)
-
-
-def get_settings() -> dict:
-    """Pengaturan user (halaman Pengaturan) — nilai yang belum diset
-    otomatis diisi dari DEFAULT_SETTINGS, jadi aman walau state lama."""
-    base = dict(DEFAULT_SETTINGS)
-    base.update(st.session_state.get("settings") or {})
-    return base
-
-
-def build_system_prompt() -> str:
-    """Gabungkan persona dasar Yuki + preferensi dari halaman "Sesuaikan",
-    Pengaturan (kepribadian, bahasa, memori, refleksi), dan konteks mode."""
-    s = get_settings()
-    parts = [YUKI_SYSTEM_PROMPT]
-
-    # Kepribadian & bahasa dari Pengaturan → Umum / Bahasa
-    persona_map = {
-        "Santai & kocak": "Pertahankan gaya santai, kocak, dan penuh candaan receh.",
-        "Serius & ringkas": (
-            "Kurangi candaan. Jawab ringkas, langsung ke inti, "
-            "pakai poin-poin bila perlu."
-        ),
-        "Mentor sabar": (
-            "Bersikaplah seperti mentor yang sabar: jelaskan langkah demi "
-            "langkah, beri contoh, dan cek pemahaman User."
-        ),
-        "Profesional formal": (
-            "Gunakan bahasa Indonesia formal dan profesional, "
-            "tanpa emoji berlebihan."
-        ),
-    }
-    if s.get("personality") in persona_map:
-        parts.append(persona_map[s["personality"]])
-
-    lang = LANG_BY_CODE.get(s.get("yuki_lang") or DEFAULT_LANG_CODE)
-    if lang and lang["code"] != "id":
-        parts.append(f"Selalu jawab dalam bahasa {lang['name']}.")
-
-    nickname = (st.session_state.get("custom_nickname") or "").strip()
-    if nickname:
-        parts.append(f"Panggil User dengan sebutan: {nickname}.")
-
-    display_name = (s.get("display_name") or "").strip()
-    if display_name and display_name.lower() != "user":
-        parts.append(f"Nama User adalah {display_name}.")
-
-    # Memori jangka panjang (Pengaturan → Memori)
-    if s.get("memory_on"):
-        facts = [str(f).strip() for f in (s.get("memories") or []) if str(f).strip()]
-        if facts:
-            parts.append(
-                "MEMORI JANGKA PANJANG tentang User (pakai seperlunya, "
-                "jangan disebut satu per satu):\n- " + "\n- ".join(facts)
-            )
-
-    # Refleksi: target & kebiasaan yang sedang diperjuangkan User
-    goal = (s.get("reflection_goal") or "").strip()
-    habit = (s.get("reflection_habit") or "").strip()
-    if goal or habit:
-        refl = []
-        if goal:
-            refl.append(f"Target: {goal}")
-        if habit:
-            refl.append(f"Kebiasaan yang dilatih: {habit}")
-        parts.append(
-            "REFLEKSI USER — dukung dia mencapai ini, sesekali tanyakan "
-            "kemajuannya:\n" + "\n".join(refl)
-        )
-
-    extra = (st.session_state.get("custom_instruction") or "").strip()
-    if extra:
-        parts.append(f"Instruksi tambahan dari User yang harus selalu diikuti:\n{extra}")
-    return "\n\n".join(parts)
-
-
-def messages_for_api(history: list[dict]) -> list[dict]:
-    """System prompt Yuki + riwayat terakhir (ramah free-tier).
-    Pesan yang membawa gambar dikirim sebagai konten multimodal (vision),
-    tapi hanya untuk beberapa pesan terakhir agar token tetap hemat."""
-    trimmed = [
-        m for m in history
-        if m.get("role") in ("user", "assistant") and m.get("type", "text") == "text"
-    ][-MAX_HISTORY_MESSAGES:]
-    msgs: list[dict] = [{"role": "system", "content": build_system_prompt()}]
-    n = len(trimmed)
-    for i, m in enumerate(trimmed):
-        imgs = m.get("images") or []
-        if imgs and i >= n - VISION_RECENT_MESSAGES:
-            text_part = (m.get("content") or "").strip() or "Tolong analisis gambar ini ya."
-            parts: list[dict] = [{"type": "text", "text": text_part}]
-            for im in imgs:
-                b64 = base64.b64encode(im["data"]).decode("ascii")
-                parts.append({
-                    "type": "image_url",
-                    "image_url": {"url": f"data:{im['mime']};base64,{b64}"},
-                })
-            msgs.append({"role": m["role"], "content": parts})
-        else:
-            msgs.append({"role": m["role"], "content": m.get("content") or ""})
-    return msgs
-
-
-def resolve_model_chain(preferred: str, vision: bool = False) -> list[str]:
-    base = VISION_MODEL_FALLBACKS if vision else (preferred, *GROQ_MODEL_FALLBACKS)
-    chain: list[str] = []
-    for m in base:
-        if m and m not in chain:
-            chain.append(m)
-    return chain
-
-
-def stream_chat_reply(client: OpenAI, model: str, history: list[dict]):
-    stream = client.chat.completions.create(
-        model=model,
-        messages=messages_for_api(history),
-        # Suhu bisa diatur user di Pengaturan → Trinity Code (0,3 = kaku,
-        # 1,2 = liar). Dibaca tiap request supaya perubahan langsung terasa.
-        temperature=float(get_settings().get("temperature", 0.7)),
-        stream=True,
-    )
-    for chunk in stream:
-        try:
-            delta = chunk.choices[0].delta
-            piece = getattr(delta, "content", None)
-            if piece:
-                yield piece
-        except Exception:
-            continue
-
-
-def stream_chat_with_fallback(client: OpenAI, preferred_model: str, history: list[dict],
-                              vision: bool = False):
-    """Coba model pilihan user; kalau sudah dihapus provider, pakai fallback.
-    vision=True → pakai rantai model vision (untuk pesan bergambar)."""
-    last_exc: Exception | None = None
-    for model in resolve_model_chain(preferred_model, vision=vision):
-        try:
-            stream_iter = stream_chat_reply(client, model, history)
-            first = next(stream_iter, None)
-            if first:
-                yield first
-            for piece in stream_iter:
-                yield piece
-            return
-        except Exception as e:
-            last_exc = e
-            if _is_model_unavailable_error(e):
-                continue
-            raise
-    if last_exc:
-        raise last_exc
-    raise RuntimeError("no chat model available")
-
-
-# ============================================================================
-# ENGINE 3: SUARA & GAMBAR (Groq — Whisper STT, Llama-4 vision)
-# ============================================================================
-def transcribe_audio(client: OpenAI, audio_bytes: bytes) -> str:
-    """Ubah rekaman suara (wav) menjadi teks dengan Groq Whisper."""
-    resp = client.audio.transcriptions.create(
-        model=STT_MODEL,
-        file=("suara.wav", audio_bytes, "audio/wav"),
-        response_format="json",
-    )
-    return (getattr(resp, "text", "") or "").strip()
-
-
-def normalize_image(data: bytes) -> tuple[bytes, str]:
-    """Resize/kompres gambar (maks 1024px) supaya payload ke model ringan."""
-    try:
-        im = Image.open(io.BytesIO(data))
-        im.load()
-        w, h = im.size
-        if max(w, h) > 1024:
-            scale = 1024 / max(w, h)
-            im = im.resize((max(1, int(w * scale)), max(1, int(h * scale))), Image.LANCZOS)
-        buf = io.BytesIO()
-        if im.mode in ("RGBA", "LA", "P"):
-            im.convert("RGBA").save(buf, format="PNG")
-            return buf.getvalue(), "image/png"
-        im.convert("RGB").save(buf, format="JPEG", quality=88)
-        return buf.getvalue(), "image/jpeg"
-    except Exception:
-        return data, "image/jpeg"
-
-
-def collect_images(files) -> list[dict]:
-    """Ambil gambar dari lampiran chat input → [{mime, data, name}]."""
-    imgs: list[dict] = []
-    for f in files or []:
-        try:
-            data = f.getvalue()
-        except Exception:
-            continue
-        mime = (getattr(f, "type", "") or "").lower()
-        if not data or not mime.startswith("image/"):
-            continue
-        data, mime = normalize_image(data)
-        imgs.append({"mime": mime, "data": data, "name": getattr(f, "name", "gambar")})
-        if len(imgs) >= MAX_IMAGES_PER_MESSAGE:
-            break
-    return imgs
-
-
-# ============================================================================
-# ENGINE 2: GENERATE GAMBAR (Cloudflare FLUX — dari App 1)
-# ============================================================================
-def extract_image_bytes(payload: dict) -> bytes:
-    if not isinstance(payload, dict):
-        raise RuntimeError("invalid response")
-    if payload.get("success") is False:
-        raise RuntimeError(str(payload.get("errors") or payload))
-
-    result = payload.get("result", payload)
-    if isinstance(result, str):
-        b64 = result
-    elif isinstance(result, dict):
-        b64 = result.get("image") or result.get("b64_json") or result.get("base64")
-        if b64 is None and isinstance(result.get("data"), list) and result["data"]:
-            first = result["data"][0]
-            if isinstance(first, dict):
-                b64 = first.get("b64_json") or first.get("image")
-            elif isinstance(first, str):
-                b64 = first
-        if b64 is None:
-            nested = result.get("result")
-            if isinstance(nested, dict):
-                b64 = nested.get("image")
-            elif isinstance(nested, str):
-                b64 = nested
-    else:
-        b64 = None
-
-    if not b64 or not isinstance(b64, str):
-        raise RuntimeError("no image")
-
-    if "," in b64 and b64.strip().lower().startswith("data:"):
-        b64 = b64.split(",", 1)[1]
-
-    raw = base64.b64decode(b64, validate=False)
-    if not raw:
-        raise RuntimeError("empty image")
-
-    try:
-        im = Image.open(io.BytesIO(raw))
-        if im.mode not in ("RGB", "RGBA"):
-            im = im.convert("RGBA" if "A" in im.getbands() else "RGB")
-        buf = io.BytesIO()
-        im.save(buf, format="PNG")
-        return buf.getvalue()
-    except Exception:
-        return raw
-
-
-def generate_image(prompt: str) -> bytes:
-    url = f"{CF_API_BASE}/{CF_ACCOUNT_ID}/ai/run/{CF_IMAGE_MODEL}"
-    headers = {
-        "Authorization": f"Bearer {CF_API_TOKEN}",
-        "Content-Type": "application/json",
-    }
-    body = {"prompt": prompt, "steps": CF_DEFAULT_STEPS}
-
-    try:
-        resp = requests.post(url, headers=headers, json=body, timeout=180)
-    except requests.Timeout as e:
-        raise RuntimeError("timeout") from e
-    except requests.RequestException as e:
-        raise RuntimeError(str(e)) from e
-
-    content_type = (resp.headers.get("Content-Type") or "").lower()
-    if "image/" in content_type:
-        if resp.status_code >= 400:
-            raise RuntimeError(public_error_image(resp.status_code, resp.text[:400]))
-        raw = resp.content
-        try:
-            im = Image.open(io.BytesIO(raw))
-            buf = io.BytesIO()
-            im.save(buf, format="PNG")
-            return buf.getvalue()
-        except Exception:
-            return raw
-
-    try:
-        payload = resp.json()
-    except Exception:
-        if resp.status_code >= 400:
-            raise RuntimeError(public_error_image(resp.status_code, resp.text[:400]))
-        raise RuntimeError("invalid response")
-
-    if resp.status_code >= 400:
-        err = payload.get("errors") if isinstance(payload, dict) else payload
-        raise RuntimeError(public_error_image(resp.status_code, str(err)[:400]))
-
-    return extract_image_bytes(payload)
-
-
-# ============================================================================
-# IKON SVG GARIS TIPIS ALA CLAUDE (stroke mengikuti warna teks)
-# ============================================================================
-def _svg(paths: str) -> str:
-    return (
-        '<svg class="icon-svg" viewBox="0 0 24 24" fill="none" '
-        'stroke="currentColor" stroke-width="1.8" stroke-linecap="round" '
-        f'stroke-linejoin="round" aria-hidden="true">{paths}</svg>'
-    )
-
-
-ICON_COPY = _svg('<rect x="9" y="9" width="11" height="11" rx="2"/>'
-                 '<path d="M5 15V5a2 2 0 0 1 2-2h10"/>')
-ICON_MIC = _svg('<rect x="9" y="3" width="6" height="11" rx="3"/>'
-                '<path d="M6 11a6 6 0 0 0 12 0"/><path d="M12 17v4"/>')
-ICON_IMAGE = _svg('<rect x="3" y="5" width="18" height="14" rx="2"/>'
-                  '<circle cx="9" cy="10" r="1.6"/>'
-                  '<path d="M5.5 18.5l5-5 3.5 3.5 2.5-2.5 2 2"/>')
-ICON_SEARCH = _svg('<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/>')
-ICON_CHEVRON = _svg('<path d="M6 9l6 6 6-6"/>')
-
-
-def mi(name: str) -> str:
-    """Ikon Material untuk dipakai DI DALAM string HTML (st.markdown).
-
-    Streamlit hanya menerjemahkan sintaks ikon material pada TEKS markdown biasa.
-    Begitu string itu berada di dalam tag HTML, penggantinya tidak jalan dan
-    yang tampil justru teks mentah ':material_nama:' di layar. Karena itu
-    setiap ikon yang masuk ke HTML dibuat manual sebagai <span> dengan font
-    ikon yang sama persis seperti yang dipakai Streamlit sendiri
-    ("Material Symbols Rounded"), lengkap dengan ligature nama ikonnya.
-    """
-    glyph = name.split("/")[-1].rstrip(":")
-    return (
-        '<span class="mi" aria-hidden="true" translate="no" '
-        "style=\"font-family:'Material Symbols Rounded';font-weight:normal;"
-        "font-style:normal;display:inline-block;line-height:1;"
-        "text-transform:none;letter-spacing:normal;word-wrap:normal;"
-        "white-space:nowrap;direction:ltr;vertical-align:bottom;"
-        '-webkit-font-smoothing:antialiased;user-select:none;">'
-        f"{glyph}</span>"
-    )
-
-
-# ============================================================================
-# RENDER BUBBLE CHAT (style buatan sendiri)
-# ============================================================================
-def bubble_html(role: str, content: str, timestamp: str = "",
-                images_html: str = "", meta_note: str = "",
-                icon_html: str = "") -> str:
-    body = html.escape(content or "")
-    css = "user" if role == "user" else "ai"
-    if role == "user":
-        # User: bubble krem membulat di kanan (gaya Claude)
-        meta = ""
-    else:
-        # AI: teks polos + label kecil "Yuki" dengan titik terracotta (gaya Claude)
-        meta = f'<div class="ai-label">{logo_img_html("logo-label")} Yuki</div>'
-    # meta_note & icon_html diisi oleh kode ini sendiri (aman, bukan input user)
-    note = f'<div class="bubble-meta">{meta_note}</div>' if meta_note else ""
-    return (
-        f'<div class="bubble-row {css}">'
-        f'<div class="bubble-wrap">{meta}'
-        f'<div class="bubble {css}">{icon_html}{body}{images_html}</div>'
-        f"{note}"
-        f"</div></div>"
-    )
-
-
-def images_bubble_html(images: list[dict]) -> str:
-    """Thumbnail lampiran gambar (base64) untuk ditampilkan di bubble user."""
-    if not images:
-        return ""
-    parts = []
-    for im in images:
-        b64 = base64.b64encode(im["data"]).decode("ascii")
-        alt = html.escape(str(im.get("name", "gambar")))
-        parts.append(
-            f'<img class="bubble-img" src="data:{im["mime"]};base64,{b64}" alt="{alt}"/>'
-        )
-    return f'<div class="bubble-imgs">{"".join(parts)}</div>'
-
-
-def render_message(msg: dict) -> None:
-    """Render 1 pesan: teks (bubble, bisa + gambar lampiran/suara) atau gambar."""
-    if msg.get("type") == "image" and msg.get("image_bytes"):
-        st.markdown(
-            bubble_html("assistant", f"Hasil gambar untuk: {msg.get('prompt', '')}",
-                        msg.get("time", ""), icon_html=ICON_IMAGE),
-            unsafe_allow_html=True,
-        )
-        st.image(msg["image_bytes"], use_container_width=True)
-        ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-        st.download_button(
-            label=":material/download:  Unduh PNG",
-            data=msg["image_bytes"],
-            file_name=f"trinity_{ts}.png",
-            mime="image/png",
-            key=f"dl_{msg.get('id', id(msg))}",
-        )
-    else:
-        note = f"{ICON_MIC} via suara" if msg.get("via_voice") else ""
-        imgs_html = images_bubble_html(msg.get("images") or [])
-        st.markdown(
-            bubble_html(msg.get("role", "assistant"), msg.get("content", ""),
-                        msg.get("time", ""), imgs_html, note),
-            unsafe_allow_html=True,
-        )
-        # baris aksi kecil ala Claude: copy jawaban, feedback (👍/👎), jam kirim
-        if msg.get("role") == "assistant":
-            render_message_actions(msg)
-
-
-def _copy_button_html(text: str, key: str) -> str:
-    """Tombol salin ala Claude (ikon polos) — teks disisipkan sebagai
-    base64 di atribut data-* supaya aman dari karakter kutip/baris baru,
-    lalu didekode & disalin ke clipboard lewat sedikit JS di sisi klien."""
-    b64 = base64.b64encode((text or "").encode("utf-8")).decode("ascii")
-    return (
-        f'<button class="msg-action-btn" data-b64="{b64}" '
-        f'onclick="const t=atob(this.dataset.b64);'
-        f"navigator.clipboard.writeText(decodeURIComponent(escape(t)));"
-        f"const o=this.innerHTML;this.innerHTML='✓';"
-        f'setTimeout(()=>{{this.innerHTML=o;}},1200);" '
-        f'title="Salin jawaban">{ICON_COPY}</button>'
-    )
-
-
-def render_message_actions(msg: dict) -> None:
-    """Baris kecil di bawah jawaban Yuki: salin, feedback 👍/👎, jam kirim."""
-    mid = msg.get("id", id(msg))
-    feedback = msg.get("feedback")
-    with st.container(key=f"msg_actions_{mid}"):
-        cols = st.columns([0.05, 0.05, 0.05, 0.85])
-        with cols[0]:
-            st.markdown(_copy_button_html(msg.get("content", ""), f"copy_{mid}"),
-                        unsafe_allow_html=True)
-        with cols[1]:
-            up_active = feedback == "up"
-            if st.button(":material/thumb_up:", key=f"fb_up_{mid}",
-                         help="Jawaban membantu",
-                         type="primary" if up_active else "secondary"):
-                msg["feedback"] = None if up_active else "up"
-                st.rerun()
-        with cols[2]:
-            down_active = feedback == "down"
-            if st.button(":material/thumb_down:", key=f"fb_down_{mid}",
-                         help="Jawaban kurang membantu",
-                         type="primary" if down_active else "secondary"):
-                msg["feedback"] = None if down_active else "down"
-                st.rerun()
-        with cols[3]:
-            if msg.get("time"):
-                st.markdown(
-                    f'<div class="msg-action-time">{html.escape(msg["time"])}</div>',
-                    unsafe_allow_html=True,
-                )
-
-
-# ============================================================================
-# THINKING INDICATOR ALA CLAUDE
-#   Bintang ✳ berdenyut + frasa dengan shimmer yang muncul perlahan
-#   dan berganti-ganti lambat (animasi murni CSS → tetap jalan
-#   walau server sedang menunggu respons API).
-# ============================================================================
-# Frasa ala Claude — berganti tiap ~4 detik selama proses berpikir (~12s+)
-THINKING_PHRASES_CHAT = [
-    "Berpikir",
-    "Mencerna pertanyaan",
-    "Menelusuri kemungkinan",
-    "Merangkai jawaban",
-]
-THINKING_PHRASES_IMAGE = [
-    "Berpikir",
-    "Membayangkan gambarnya",
-    "Menyiapkan kanvas",
-    "Melukis perlahan",
-]
-
-# Durasi minimum proses berpikir (detik) — ±10 detik ala Claude
-THINKING_MIN_SECONDS = 10.0
-
-# Durasi minimum progress bar gambar (detik) — biar animasi % terasa
-IMAGE_MIN_SECONDS = 10.0
-
-# Delay antar potongan kalimat saat jawaban muncul bertahap
-SENTENCE_STREAM_DELAY = 0.15
-
-
-
-
-def image_progress_html(pct: float, label: str) -> str:
-    """Kartu progress bar % + shimmer untuk proses pembuatan gambar."""
-    pct = max(0.0, min(100.0, float(pct)))
-    return (
-        '<div class="img-progress">'
-        '<div class="img-progress-top">'
-        '<span class="img-progress-label">'
-        f'{logo_img_html("logo-progress")}'
-        f'{html.escape(label)}…</span>'
-        f'<span class="img-progress-pct">{pct:.0f}%</span>'
-        "</div>"
-        '<div class="img-progress-track">'
-        f'<div class="img-progress-fill" style="width:{pct:.1f}%;"></div>'
-        "</div></div>"
-    )
-
-
-def _sentence_chunks(text: str) -> list[str]:
-    """Pecah teks jadi potongan per kalimat / per baris. Whitespace asli
-    ikut di dalam potongan, sehingga gabungannya persis sama dengan teks
-    awal (tidak ada spasi atau baris baru yang hilang/bertambah)."""
-    raw = re.split(r"((?:[.!?]+|\n)\s*)", text or "")
-    chunks: list[str] = []
-    it = iter(raw)
-    for body in it:
-        delim = next(it, "")
-        chunk = body + delim
-        if chunk:
-            chunks.append(chunk)
-    return chunks
-
-
-def stream_sentences(answer_slot, full_text: str) -> None:
-    """Tampilkan jawaban bertahap per kalimat — animasi muncul yang beda
-    dari sebelumnya (bukan kata per kata): lebih cepat, tetap terasa hidup,
-    plus caret berkedip di ujung selama proses berlangsung."""
-    chunks = _sentence_chunks(full_text)
-    if not chunks:
-        chunks = [full_text or "…"]
-    acc = ""
-    for i, chunk in enumerate(chunks):
-        acc += chunk
-        is_last = i == len(chunks) - 1
-        caret = "" if is_last else '<span class="type-caret"></span>'
-        html_bubble = bubble_html("assistant", acc)
-        if caret:
-            # sisipkan caret sebelum penutup bubble
-            html_bubble = html_bubble.replace("</div></div></div>", f"{caret}</div></div></div>")
-        answer_slot.markdown(html_bubble, unsafe_allow_html=True)
-        if not is_last:
-            time.sleep(SENTENCE_STREAM_DELAY)
-
-
-# ============================================================================
-# EXPORT CHAT (.md — diadaptasi dari App 2)
-# ============================================================================
-def _capture_artifacts_from_reply(full_text: str) -> None:
-    """Deteksi blok kode (```...```) di jawaban Yuki & simpan sebagai
-    "Artefak" ringan ala Claude — supaya kode panjang gampang dibuka lagi
-    / disalin lewat sidebar, tanpa harus scroll riwayat chat."""
-    blocks = re.findall(r"```(\w*)\n(.*?)```", full_text or "", flags=re.S)
-    for lang, code in blocks:
-        code = code.strip("\n")
-        if len(code) < 40:  # blok terlalu pendek, tidak perlu dijadikan artefak
-            continue
-        first_line = code.splitlines()[0][:40] if code.splitlines() else "Kode"
-        st.session_state.artifacts.insert(0, {
-            "id": len(st.session_state.artifacts) + 1,
-            "title": f"{lang or 'kode'} · {first_line}",
-            "content": code,
-            "lang": lang,
-            "time": datetime.now().strftime("%H:%M"),
-        })
-
-
-def get_chat_export_text() -> str:
-    lines = [
-        "# Riwayat Obrolan — Ampera Trinity AI",
-        f"# Tanggal Ekspor: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}",
-        "# by Ampera Official\n",
-        "---\n",
-    ]
-    for m in active_thread():
-        role_label = "👤 Pengguna" if m.get("role") == "user" else "🔱 Yuki"
-        time_tag = f" [{m.get('time', '')}]" if m.get("time") else ""
-        lines.append(f"### {role_label}{time_tag}\n")
-        if m.get("type") == "image":
-            lines.append(f"*(gambar dihasilkan — prompt: {m.get('prompt', '')})*")
-        else:
-            content = (m.get("content") or "").strip()
-            if m.get("images"):
-                content += "\n*(dengan lampiran gambar)*"
-            if m.get("via_voice"):
-                content += "\n*(dikirim via suara)*"
-            lines.append(content)
-        lines.append("\n---\n")
-    return "\n".join(lines)
-
-
-# ============================================================================
-# SESSION STATE
-# ============================================================================
-# --- Thread pesan -----------------------------------------------------------
-# Chat utama, halaman Artefak, dan halaman Trinity Kursus punya riwayat
-# sendiri-sendiri supaya jawaban Yuki tidak tercampur antar halaman.
-def main_thread() -> list[dict]:
-    return st.session_state.messages
-
-
-def artifact_thread(art_id: int) -> list[dict]:
-    key = f"artifact_msgs_{art_id}"
-    if key not in st.session_state:
-        st.session_state[key] = []
-    return st.session_state[key]
-
-
-def course_thread(cid: str) -> list[dict]:
-    key = f"course_msgs_{cid}"
-    if key not in st.session_state:
-        st.session_state[key] = []
-    return st.session_state[key]
-
-
-def active_thread() -> list[dict]:
-    """Riwayat pesan milik halaman yang sedang dibuka."""
-    page = st.session_state.get("page", "chat")
-    if page == "artefak":
-        aid = st.session_state.get("artifact_active_id")
-        if aid is not None:
-            return artifact_thread(aid)
-        return []
-    if page == "kursus":
-        cid = st.session_state.get("course_active_key")
-        if cid:
-            return course_thread(cid)
-        return []
-    return st.session_state.messages
-
-
-def init_state() -> None:
-    # Halaman awal bersih ala Claude: tanpa pesan sambutan,
-    # hanya sapaan besar + input di tengah.
-    if "messages" not in st.session_state:
-        st.session_state.messages = []
-    # Halaman aktif (routing internal): chat / artefak / pengaturan / bahasa /
-    # bantuan / tingkatkan / aplikasi / kursus / pelajari
-    if "page" not in st.session_state:
-        st.session_state.page = "chat"
-    # Pengaturan lengkap (halaman Pengaturan, 9 tab)
-    if "settings" not in st.session_state:
-        st.session_state.settings = dict(DEFAULT_SETTINGS)
-    # Artefak yang sedang dikerjakan (halaman Artefak) + thread kursusnya
-    if "artifact_active_id" not in st.session_state:
-        st.session_state.artifact_active_id = None
-    if "artifact_counter" not in st.session_state:
-        st.session_state.artifact_counter = 0
-    if "course_active_key" not in st.session_state:
-        st.session_state.course_active_key = None
-    if "logged_out" not in st.session_state:
-        st.session_state.logged_out = False
-    if "selected_model_key" not in st.session_state:
-        st.session_state.selected_model_key = DEFAULT_MODEL_KEY
-    if "image_mode" not in st.session_state:
-        st.session_state.image_mode = False
-    if "web_search_on" not in st.session_state:
-        st.session_state.web_search_on = False
-    # Sesuaikan (custom instruction persona Yuki)
-    if "custom_nickname" not in st.session_state:
-        st.session_state.custom_nickname = ""
-    if "custom_instruction" not in st.session_state:
-        st.session_state.custom_instruction = ""
-    # Proyek ringan: nama & catatan/instruksi khusus per proyek
-    if "projects" not in st.session_state:
-        st.session_state.projects = []  # list[{id, name}]
-    if "project_counter" not in st.session_state:
-        st.session_state.project_counter = 0
-    if "active_project_id" not in st.session_state:
-        st.session_state.active_project_id = None
-    # Artefak: kode/tulisan panjang dari jawaban Yuki, dikumpulkan otomatis
-    if "artifacts" not in st.session_state:
-        st.session_state.artifacts = []  # list[{id, title, content, time}]
-    # Lampiran yang di-stage lewat menu ➕ (menunggu dikirim bersama pesan)
-    if "pending_images" not in st.session_state:
-        st.session_state.pending_images = []
-    if "plus_uploader_gen" not in st.session_state:
-        st.session_state.plus_uploader_gen = 0
-    if "msg_counter" not in st.session_state:
-        st.session_state.msg_counter = 1
-    # Riwayat percakapan (untuk sidebar ala Claude)
-    if "conversations" not in st.session_state:
-        st.session_state.conversations = []  # list[{id, title, messages}]
-    if "conv_counter" not in st.session_state:
-        st.session_state.conv_counter = 0
-    if "active_conv_id" not in st.session_state:
-        st.session_state.active_conv_id = None
-
-
-def next_msg_id() -> int:
-    st.session_state.msg_counter += 1
-    return st.session_state.msg_counter
-
-
-def _conversation_title(messages: list[dict]) -> str:
-    """Judul percakapan = potongan pesan user pertama (ala Claude)."""
-    for m in messages:
-        if m.get("role") == "user" and m.get("content"):
-            title = " ".join(str(m["content"]).split())
-            return title[:48] + ("…" if len(title) > 48 else "")
-    return "Percakapan baru"
-
-
-def _archive_current_conversation() -> None:
-    """Simpan obrolan aktif ke daftar riwayat (kalau ada isi dari user)."""
-    msgs = st.session_state.get("messages", [])
-    has_user = any(m.get("role") == "user" for m in msgs)
-    if not has_user:
-        return
-    conv_id = st.session_state.get("active_conv_id")
-    if conv_id is not None:
-        # update entri yang sudah ada
-        for c in st.session_state.conversations:
-            if c["id"] == conv_id:
-                c["messages"] = msgs
-                c["title"] = _conversation_title(msgs)
-                return
-    st.session_state.conv_counter += 1
-    st.session_state.conversations.insert(0, {
-        "id": st.session_state.conv_counter,
-        "title": _conversation_title(msgs),
-        "messages": msgs,
-    })
-
-
-def reset_conversation() -> None:
-    """Chat baru: arsipkan obrolan utama, lalu kosongkan thread utama."""
-    _archive_current_conversation()
-    st.session_state.active_conv_id = None
-    for key in ("messages", "msg_counter"):
-        st.session_state.pop(key, None)
-    init_state()
-    st.session_state.page = "chat"
-
-
-def open_conversation(conv_id: int) -> None:
-    """Buka kembali percakapan lama dari riwayat sidebar."""
-    _archive_current_conversation()
-    for c in st.session_state.conversations:
-        if c["id"] == conv_id:
-            st.session_state.messages = c["messages"]
-            st.session_state.page = "chat"
-            st.session_state.active_conv_id = conv_id
-            st.session_state.msg_counter = max(
-                (m.get("id", 0) for m in c["messages"]), default=1
-            )
-            return
-
-
-# ============================================================================
-# SIDEBAR ALA CLAUDE
-#   Brand serif · + Baru · menu · riwayat "Hari ini" · akun di bawah
-# ============================================================================
-HAS_DIALOG = hasattr(st, "dialog")
-
-
-def go(page: str, **extra) -> None:
-    """Pindah halaman internal (chat / artefak / pengaturan / …)."""
-    for k, v in extra.items():
-        st.session_state[k] = v
-    st.session_state.page = page
-    st.rerun()
-
-
-def _register_dialog(title: str, func):
-    """Bungkus fungsi jadi @st.dialog kalau tersedia; kalau versi Streamlit
-    lama tidak mendukung, tampilkan pesan singkat sebagai fallback."""
-    if HAS_DIALOG:
-        return st.dialog(title)(func)
-
-    def _fallback(*a, **kw):
-        st.info("Fitur ini butuh Streamlit versi lebih baru untuk tampil sebagai jendela popup.")
-    return _fallback
-
-
-def _proyek_dialog_body() -> None:
-    st.text_input("Cari proyek", key="proj_search", placeholder="Cari proyek…",
-                  label_visibility="collapsed")
-    query = (st.session_state.get("proj_search") or "").strip().lower()
-    projects = st.session_state.get("projects", [])
-    shown = [p for p in projects if query in p["name"].lower()] if query else projects
-
-    if not shown:
-        st.caption("Belum ada proyek." if not projects else "Tidak ada proyek yang cocok.")
-    else:
-        for p in shown:
-            active = st.session_state.get("active_project_id") == p["id"]
-            label = f":material/folder:  {p['name']}" + ("  :material/check:" if active else "")
-            if st.button(label, key=f"proj_pick_{p['id']}", use_container_width=True):
-                st.session_state.active_project_id = None if active else p["id"]
-                st.rerun()
-
-    st.divider()
-    new_name = st.text_input("Nama proyek baru", key="proj_new_name",
-                              placeholder="Nama proyek baru…", label_visibility="collapsed")
-    if st.button(":material/add:  Mulai proyek baru", use_container_width=True):
-        name = (new_name or "").strip()
-        if name:
-            st.session_state.project_counter += 1
-            st.session_state.projects.append({"id": st.session_state.project_counter, "name": name})
-            st.rerun()
-
-
-def _artefak_dialog_body() -> None:
-    artifacts = st.session_state.get("artifacts", [])
-    if not artifacts:
-        st.caption("Belum ada artefak. Kode panjang dari jawaban Yuki akan "
-                   "otomatis muncul di sini.")
-        return
-    for art in artifacts[:20]:
-        with st.expander(f":material/extension:  {art['title']}  ·  {art.get('time', '')}"):
-            st.code(art["content"], language=art.get("lang") or None)
-
-
-def _sesuaikan_dialog_body() -> None:
-    st.text_input(
-        "Bagaimana Yuki memanggil Anda?",
-        key="custom_nickname_input",
-        value=st.session_state.get("custom_nickname", ""),
-        placeholder="mis. Kak Budi",
-    )
-    st.text_area(
-        "Instruksi tambahan untuk Yuki",
-        key="custom_instruction_input",
-        value=st.session_state.get("custom_instruction", ""),
-        placeholder="mis. Jawab selalu singkat & pakai bahasa santai.",
-        height=120,
-    )
-    if st.button("Simpan", type="primary", use_container_width=True):
-        st.session_state.custom_nickname = st.session_state.get("custom_nickname_input", "")
-        st.session_state.custom_instruction = st.session_state.get("custom_instruction_input", "")
-        st.rerun()
-
-
-show_proyek_dialog = _register_dialog("Proyek", _proyek_dialog_body)
-show_artefak_dialog = _register_dialog("Artefak", _artefak_dialog_body)
-show_sesuaikan_dialog = _register_dialog("Sesuaikan", _sesuaikan_dialog_body)
-
-
-def render_sidebar() -> None:
-    with st.sidebar:
-        # Brand serif ala "Claude"
-        st.markdown('<div class="sb-brand">Trinity</div>', unsafe_allow_html=True)
-
-        # + Baru (latar krem menonjol seperti Claude)
-        with st.container(key="sb_new"):
-            if st.button(":material/add: &nbsp;Baru", use_container_width=True):
-                reset_conversation()
-                st.rerun()
-
-        # Menu ala Claude (ikon garis tipis + teks rata kiri)
-        with st.container(key="sb_menu_chat"):
-            if st.button(":material/chat_bubble: &nbsp;Chat", use_container_width=True):
-                st.session_state.image_mode = False
-                st.rerun()
-        with st.container(key="sb_menu_img"):
-            if st.button(":material/palette: &nbsp;Gambar", use_container_width=True):
-                st.session_state.image_mode = True
-                st.rerun()
-
-        st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
-
-        with st.container(key="sb_menu_proyek"):
-            if st.button(":material/deployed_code: &nbsp;Proyek", use_container_width=True):
-                show_proyek_dialog()
-        with st.container(key="sb_menu_artefak"):
-            n_art = len(st.session_state.get("artifacts", []))
-            art_label = ":material/data_object: &nbsp;Artefak" + (f"  ({n_art})" if n_art else "")
-            if st.button(art_label, use_container_width=True):
-                # buka HALAMAN Artefak (bukan popup lagi)
-                go("artefak")
-        with st.container(key="sb_menu_sesuaikan"):
-            if st.button(":material/tune: &nbsp;Sesuaikan", use_container_width=True):
-                show_sesuaikan_dialog()
-
-        st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
-
-        with st.container(key="sb_download"):
-            st.download_button(
-                label=":material/download: &nbsp;Unduh Chat",
-                data=get_chat_export_text(),
-                file_name=f"trinity-chat-{datetime.now().strftime('%Y%m%d-%H%M')}.md",
-                mime="text/markdown",
-                use_container_width=True,
-            )
-
-        # Riwayat percakapan (grup "Hari ini" seperti Claude)
-        convs = st.session_state.get("conversations", [])
-        if convs:
-            st.markdown('<div class="sb-group">Hari ini</div>', unsafe_allow_html=True)
-            for c in convs[:15]:
-                key = f"sb_hist_{c['id']}"
-                with st.container(key=key):
-                    if st.button(c["title"], key=f"btn_{key}", use_container_width=True):
-                        open_conversation(c["id"])
-                        st.rerun()
-
-        # ---- Baris akun di dasar sidebar ala Claude ----
-        # (U) Nama · Paket   [⋮ menu akun]
-        s = get_settings()
-        name = (s.get("display_name") or "User").strip() or "User"
-        plan = s.get("plan") or "Free"
-        initial = name[0].upper()
-        with st.container(key="sb_account"):
-            acc_col, menu_col = st.columns([5, 1.05], gap="small")
-            with acc_col:
-                # Baris akun. Disusun dari potongan string biasa (bukan
-                # f-string tiga kutip) supaya aman saat kode ini di-copy
-                # paste ke editor lain, dan bebas karakter non-ASCII di
-                # luar string.
-                acc_html = (
-                    '<div class="sb-account">'
-                    '<div class="ava">' + html.escape(initial) + '</div>'
-                    '<div class="name">' + html.escape(name)
-                    + ' <span class="plan">&middot; ' + html.escape(plan)
-                    + '</span></div>'
-                    '</div>'
-                )
-                st.markdown(acc_html, unsafe_allow_html=True)
-            with menu_col:
-                with st.container(key="acct_menu"):
-                    with st.popover(":material/more_horiz:", use_container_width=False,
-                                    help="Menu akun"):
-                        if st.button(":material/settings:  Pengaturan", key="acct_pengaturan",
-                                     use_container_width=True):
-                            go("pengaturan")
-                        if st.button(":material/translate:  Bahasa", key="acct_bahasa",
-                                     use_container_width=True):
-                            go("bahasa")
-                        if st.button(":material/help:  Dapatkan bantuan", key="acct_bantuan",
-                                     use_container_width=True):
-                            go("bantuan")
-                        if st.button(":material/workspace_premium:  Tingkatkan paket",
-                                     key="acct_pro", use_container_width=True):
-                            go("tingkatkan")
-                        if st.button(":material/phone_iphone:  Dapatkan aplikasi",
-                                     key="acct_app", use_container_width=True):
-                            go("aplikasi")
-                        if st.button(":material/school:  Trinity kursus", key="acct_kursus",
-                                     use_container_width=True):
-                            go("kursus")
-                        if st.button(":material/menu_book:  Pelajari lebih lanjut",
-                                     key="acct_pelajari", use_container_width=True):
-                            go("pelajari")
-                        st.divider()
-                        if st.button(":material/logout:  Keluar", key="acct_keluar",
-                                     use_container_width=True):
-                            st.session_state.logged_out = True
-                            go("chat")
-
-
-# ============================================================================
-# HANDLER PESAN
-# ============================================================================
-def handle_image_request(prompt: str) -> None:
-    """Mode gambar: prompt → Cloudflare FLUX → bubble gambar.
-    Hasil masuk ke thread aktif (chat utama, artefak, atau kursus)."""
-    thread = active_thread()
-    if not IMAGE_READY:
-        thread.append({
-            "id": next_msg_id(), "role": "assistant", "type": "text",
-            "content": "Fitur gambar belum dikonfigurasi pemilik (CF_ACCOUNT_ID / CF_API_TOKEN).",
-            "time": datetime.now().strftime("%H:%M"),
-        })
-        return
-
-    # Progress bar % + shimmer (generate jalan di thread background,
-    # persentase naik perlahan mengikuti tahapan label)
-    progress_slot = st.empty()
-
-    result: dict = {"data": None, "error": None}
-
-    def _worker() -> None:
-        try:
-            result["data"] = generate_image(prompt)
-        except Exception as exc:  # simpan untuk ditampilkan di thread utama
-            result["error"] = exc
-
-    worker = threading.Thread(target=_worker, daemon=True)
-    worker.start()
-
-    # Tahapan label + target % (label berganti seiring progress naik)
-    stages = [
-        (0, "Membayangkan gambarnya"),
-        (30, "Menyiapkan kanvas"),
-        (55, "Melukis perlahan"),
-        (80, "Menajamkan detail"),
-    ]
-    pct = 0.0
-    t0 = time.time()
-    while worker.is_alive() or (time.time() - t0) < IMAGE_MIN_SECONDS:
-        # naik perlahan, melambat mendekati 92% selama masih menunggu
-        if pct < 60:
-            pct += 2.4
-        elif pct < 85:
-            pct += 1.1
-        elif pct < 92:
-            pct += 0.35
-        label = stages[0][1]
-        for threshold, name in stages:
-            if pct >= threshold:
-                label = name
-        progress_slot.markdown(image_progress_html(pct, label), unsafe_allow_html=True)
-        time.sleep(0.35)
-        if not worker.is_alive() and (time.time() - t0) >= IMAGE_MIN_SECONDS:
-            break
-
-    worker.join(timeout=200)
-
-    if result["error"] is None and result["data"]:
-        # sentuhan akhir: lompat mulus ke 100%
-        progress_slot.markdown(image_progress_html(100, "Selesai"), unsafe_allow_html=True)
-        time.sleep(0.6)
-        progress_slot.empty()
-        thread.append({
-            "id": next_msg_id(), "role": "assistant", "type": "image",
-            "image_bytes": result["data"], "prompt": prompt,
-            "time": datetime.now().strftime("%H:%M"),
-        })
-    else:
-        progress_slot.empty()
-        e = result["error"] or RuntimeError("no image")
-        msg = str(e)
-        if not msg.startswith(("Layanan", "Kuota", "Server terlalu",
-                               "Gagal membuat", "Respons terlalu")):
-            msg = public_error_image(None, msg, e)
-        thread.append({
-            "id": next_msg_id(), "role": "assistant", "type": "text",
-            "content": msg, "time": datetime.now().strftime("%H:%M"),
-        })
-
-
-def handle_chat_request(answer_slot) -> None:
-    """Mode chat: streaming jawaban Yuki dengan model terpilih + fallback.
-    Jawaban masuk ke THREAD AKTIF (chat utama, artefak, atau kursus)."""
-    thread = active_thread()
-    if not CHAT_READY:
-        thread.append({
-            "id": next_msg_id(), "role": "assistant", "type": "text",
-            "content": "Fitur chat belum dikonfigurasi pemilik (GROQ_API_KEY).",
-            "time": datetime.now().strftime("%H:%M"),
-        })
-        return
-
-    s = get_settings()
-    model_id = AVAILABLE_MODELS.get(
-        st.session_state.selected_model_key,
-        AVAILABLE_MODELS[DEFAULT_MODEL_KEY],
-    )
-    # Pesan bergambar WAJIB lewat model vision (model teks tidak bisa lihat gambar)
-    last_user = next(
-        (m for m in reversed(thread) if m.get("role") == "user"),
-        None,
-    )
-    has_images = bool(last_user and last_user.get("images"))
-    if has_images:
-        model_id = VISION_MODEL_ID
-    elif st.session_state.get("web_search_on") and s.get("cap_web_search", True):
-        # Toggle "Pencarian web" ala Claude → pakai model Compound
-        # (satu-satunya model Groq di katalog ini yang bisa browsing).
-        model_id = AVAILABLE_MODELS["compound"]
-
-    # Thinking ala Claude — frasa berganti-ganti selama beberapa detik
-    think_slot = st.empty()
-    think_slot.markdown(thinking_html(THINKING_PHRASES_CHAT), unsafe_allow_html=True)
-    t0 = time.time()
-    # Durasi "berpikir" minimum bisa diatur di Pengaturan → Umum
-    min_think = float(s.get("min_think_seconds", THINKING_MIN_SECONDS))
-
-    try:
-        client = build_chat_client()
-        # Kumpulkan seluruh jawaban SELAMA animasi berpikir masih berjalan
-        full = "".join(
-            piece or ""
-            for piece in stream_chat_with_fallback(
-                client, model_id, thread, vision=has_images
-            )
-        )
-
-        # Tahan sampai proses berpikir genap minimal beberapa detik
-        elapsed = time.time() - t0
-        if elapsed < min_think:
-            time.sleep(min_think - elapsed)
-        think_slot.empty()
-
-        if not full:
-            full = "…"
-
-        # Jawaban muncul bertahap per kalimat (bukan kata per kata)
-        stream_sentences(answer_slot, full)
-
-        reply = {
-            "id": next_msg_id(), "role": "assistant", "type": "text",
-            "content": full, "time": datetime.now().strftime("%H:%M"),
-        }
-        thread.append(reply)
-        _capture_artifacts_from_reply(full)
-    except Exception as e:
-        think_slot.empty()
-        err = public_error_chat(e)
-        thread.append({
-            "id": next_msg_id(), "role": "assistant", "type": "text",
-            "content": err, "time": datetime.now().strftime("%H:%M"),
-        })
-
-
-# ============================================================================
-# KONTROL KOTAK INPUT (dipakai bersama oleh chat utama, Artefak, dan Kursus)
-# ============================================================================
-def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> None:
-    """Isi dok bawah: [⋯ menu lampiran] [Gambar] ... [Nama Model].
-    Dipanggil DI DALAM st.bottom / st._bottom oleh halaman pemanggilnya."""
-    kp = "" if page_key == "chat" else f"{page_key}_"
-
-    # ---- Strip lampiran yang menunggu dikirim (dari menu ⋯) ----
-    pending = st.session_state.get("pending_images", [])
-    if pending:
-        with st.container(key=f"{kp}pending_strip"):
-            pcols = st.columns([0.1] * len(pending) + [1.0])
-            for i, im in enumerate(pending):
-                with pcols[i]:
-                    st.image(im["data"], width=54)
-                    if st.button(":material/close:", key=f"{kp}pending_rm_{i}",
-                                 use_container_width=True):
-                        st.session_state.pending_images.pop(i)
-                        st.rerun()
-            with pcols[-1]:
-                st.markdown(
-                    '<div class="plus-menu-hint">Siap dikirim…</div>',
-                    unsafe_allow_html=True,
-                )
-
-    # [menu] [Gambar] ....spacer.... [Nama Model]
-    ctrl_plus, ctrl_mode, _sp, ctrl_model = st.columns([0.08, 0.22, 1.22, 0.28])
-
-    # ---- Menu lampiran ala Claude: MINIMALIST (ikon + teks saja) ----
-    with ctrl_plus:
-        with st.container(key=f"{kp}plus_menu"):
-            with st.popover(":material/add:", use_container_width=False,
-                            help="Unggah file atau gambar"):
-                gen = st.session_state.get("plus_uploader_gen", 0)
-
-                def _stage_uploaded(files) -> bool:
-                    if not files:
-                        return False
-                    staged = st.session_state.get("pending_images", [])
-                    seen = {(im["name"], len(im["data"])) for im in staged}
-                    added = False
-                    for im in collect_images(files):
-                        k = (im["name"], len(im["data"]))
-                        if k not in seen:
-                            staged.append(im)
-                            seen.add(k)
-                            added = True
-                    st.session_state.pending_images = staged
-                    return added
-
-                with st.container(key=f"{kp}plus_upload_file"):
-                    picked_file = st.file_uploader(
-                        ":material/attach_file:  Upload file", type=IMAGE_INPUT_TYPES,
-                        accept_multiple_files=True,
-                        label_visibility="visible",
-                        key=f"{kp}plus_uploader_file_{gen}",
-                    )
-                with st.container(key=f"{kp}plus_upload_image"):
-                    picked_image = st.file_uploader(
-                        ":material/photo_camera:  Upload gambar atau foto",
-                        type=IMAGE_INPUT_TYPES,
-                        accept_multiple_files=True,
-                        label_visibility="visible",
-                        key=f"{kp}plus_uploader_image_{gen}",
-                    )
-                added_file = _stage_uploaded(picked_file)
-                added_image = _stage_uploaded(picked_image)
-                if added_file or added_image:
-                    # tutup popover & langsung tampilkan thumbnail lampiran
-                    st.rerun()
-
-                st.markdown('<div class="plus-menu-divider"></div>',
-                            unsafe_allow_html=True)
-
-                # Browser murni tidak bisa memicu screen-capture dari
-                # Streamlit → diarahkan ke cara tercepat: screenshot OS
-                # lalu tempel (Ctrl+V) di kotak chat.
-                if st.button(":material/screenshot:  Ambil tangkapan layar",
-                             key=f"{kp}pm_screenshot", use_container_width=True):
-                    st.toast("Ambil screenshot dengan tombol OS kamu, lalu "
-                             "tempel (Ctrl+V) di kotak chat.",
-                             icon=":material/screenshot:")
-
-                # Pencarian web → otomatis pindah ke model Compound (browsing)
-                web_check = " :orange[✓]" if st.session_state.get("web_search_on") else ""
-                if st.button(f":material/public:  Pencarian web{web_check}",
-                             key=f"{kp}pm_web", use_container_width=True):
-                    st.session_state.web_search_on = not st.session_state.get("web_search_on", False)
-                    st.rerun()
-
-    with ctrl_mode:
-        if show_mode:
-            st.session_state.image_mode = st.toggle(
-                "Gambar",
-                value=st.session_state.image_mode,
-                key=f"{kp}toggle_gambar",
-                help="Nyalakan untuk membuat gambar dari teks. "
-                     "Matikan untuk chat biasa dengan Yuki.",
-            )
-
-    with _sp:
-        if st.session_state.messages or st.session_state.get("page") != "chat":
-            st.markdown(
-                '<div class="input-disclaimer">'
-                "Yuki adalah AI dan bisa membuat kesalahan. Harap periksa kembali respons."
-                "</div>",
-                unsafe_allow_html=True,
-            )
-
-    with ctrl_model:
-        current_key = st.session_state.selected_model_key
-        current_name = MODEL_BY_KEY.get(current_key, MODEL_BY_KEY[DEFAULT_MODEL_KEY])["name"]
-        with st.popover(current_name, use_container_width=False):
-            # Daftar model ala Claude, terurut dari tingkat termudah → tertinggi
-            for m in MODEL_CATALOG:
-                is_active = m["key"] == st.session_state.selected_model_key
-                check = " :orange[✓]" if is_active else ""
-                label = f"{m['name']}{check}  \n:gray[{m['desc']}]"
-                row_key = f"{kp}model_row_{m['key']}" + ("_premium" if m.get("premium") else "")
-                with st.container(key=row_key):
-                    if st.button(label, key=f"{kp}model_{m['key']}", use_container_width=True):
-                        st.session_state.selected_model_key = m["key"]
-                        st.rerun()
-
-
-def process_user_input(user_input, answer_slot, is_fresh: bool = False) -> bool:
-    """Simpan kiriman user ke thread aktif, render bubble-nya, lalu panggil
-    Yuki. Return True bila halaman perlu di-rerun.
-    Dipanggil dari HALAMAN (bukan dari dalam dok bawah)."""
-    if user_input is None:
-        return False
-
-    # Bongkar nilai chat input: teks + lampiran + rekaman (bila didukung)
-    if isinstance(user_input, str):
-        raw_text, send_files, send_audio = user_input, [], None
-    else:
-        raw_text = getattr(user_input, "text", "") or ""
-        send_files = list(getattr(user_input, "files", None) or [])
-        send_audio = getattr(user_input, "audio", None)
-
-    text = (raw_text or "").strip()
-    via_voice = False
-    thread = active_thread()
-
-    # Kiriman suara tanpa teks → transkrip dulu dengan Groq Whisper
-    if send_audio is not None and not text:
-        if CHAT_READY:
-            try:
-                with st.spinner(":material/mic:  Mentranskrip suara…"):
-                    text = transcribe_audio(build_chat_client(), send_audio.getvalue())
-                via_voice = bool(text)
-            except Exception:
-                text = ""
-        if not text:
-            thread.append({
-                "id": next_msg_id(), "role": "assistant", "type": "text",
-                "content": "Hmm, suaranya belum kebaca nih. Coba rekam lagi "
-                           "lebih dekat ke mikrofon, atau ketik saja ya!",
-                "time": datetime.now().strftime("%H:%M"),
-            })
-            return True
-
-    images = collect_images(send_files)
-    # Gabungkan lampiran yang di-stage lewat menu ⋯ (hindari duplikat)
-    pending = st.session_state.get("pending_images", [])
-    if pending:
-        keys = {(im["name"], len(im["data"])) for im in images}
-        for im in pending:
-            k = (im["name"], len(im["data"]))
-            if k not in keys:
-                images.append(im)
-                keys.add(k)
-        st.session_state.pending_images = []
-        st.session_state.plus_uploader_gen = (
-            st.session_state.get("plus_uploader_gen", 0) + 1
-        )
-    images = images[:MAX_IMAGES_PER_MESSAGE]
-
-    if not (text or images):
-        return False
-
-    now = datetime.now().strftime("%H:%M")
-
-    # Begitu KIRIM ditekan: kotak input langsung turun ke bawah dan scroll
-    # diaktifkan lagi (menimpa CSS halaman awal).
-    if is_fresh:
-        st.markdown(_BOTTOM_RESET_CSS, unsafe_allow_html=True)
-
-    # simpan & tampilkan pesan user (+ thumbnail lampiran)
-    user_msg = {
-        "id": next_msg_id(), "role": "user", "type": "text",
-        "content": text, "time": now,
-    }
-    if images:
-        user_msg["images"] = images
-    if via_voice:
-        user_msg["via_voice"] = True
-    thread.append(user_msg)
-    note = f"{ICON_MIC} via suara" if via_voice else ""
-    st.markdown(
-        bubble_html("user", text, now, images_bubble_html(images), note),
-        unsafe_allow_html=True,
-    )
-
-    # Ada lampiran gambar → selalu chat vision (Yuki melihat gambarnya),
-    # walau toggle "Gambar" sedang aktif sekalipun.
-    if st.session_state.image_mode and not images:
-        handle_image_request(text)
-    else:
-        handle_chat_request(answer_slot)
-
-    return True
-
-
-# Dua potong CSS pengatur posisi dok input (halaman awal vs sudah ada chat)
-_FRESH_BOTTOM_CSS = """
-<style>
-/* angkat dok input ke tengah layar saat belum ada percakapan
-   (turun sedikit agar tidak menutupi judul sapaan) */
-[data-testid="stBottom"] {
-  transform: translateY(-26vh);
-  background: transparent !important;
-  transition: transform 0.35s ease;
-}
-/* SEMUA lapisan dok harus transparan agar tidak menutupi judul sapaan */
-[data-testid="stBottom"] > div,
-[data-testid="stBottom"] [data-testid="stBottomBlockContainer"],
-[data-testid="stBottom"] [data-testid="stVerticalBlock"],
-[data-testid="stBottom"] .element-container {
-  background: transparent !important;
-  background-color: transparent !important;
-}
-/* HALAMAN AWAL TIDAK BISA DI-SCROLL (atas/bawah) */
-[data-testid="stAppViewContainer"],
-[data-testid="stMain"],
-section.main,
-html, body {
-  overflow: hidden !important;
-}
-</style>
-"""
-
-_BOTTOM_RESET_CSS = """
-<style>
-[data-testid="stBottom"] { transform: translateY(0) !important; }
-[data-testid="stAppViewContainer"],
-[data-testid="stMain"],
-section.main,
-html, body { overflow: auto !important; }
-</style>
-"""
-
-
-def _page_footer(in_chat: bool = False) -> None:
-    foot_class = "trinity-foot" if not in_chat else "trinity-foot in-chat"
-    st.markdown(
-        f'<p class="{foot_class}">{logo_img_html("logo-foot")} '
-        "Ampera Trinity AI · by Ampera Official · 2026</p>",
-        unsafe_allow_html=True,
-    )
 
 
 # ============================================================================
@@ -1795,7 +70,6 @@ def render_chat_page() -> None:
 
     if is_fresh:
         # ---------- HALAMAN AWAL ala Claude ----------
-        # Sapaan besar serif di tengah + input diangkat ke tengah layar (CSS)
         st.markdown(_FRESH_BOTTOM_CSS, unsafe_allow_html=True)
         st.markdown(
             '<div class="trinity-greeting" style="margin-top:18vh;">'
@@ -1804,22 +78,18 @@ def render_chat_page() -> None:
             unsafe_allow_html=True,
         )
 
-    # ---------- Riwayat chat ----------
     for msg in main_thread():
         render_message(msg)
 
-    # Prompt tertunda (mis. dari tombol "Minta refleksi sekarang")
     pending_prompt = (st.session_state.pop("pending_prompt", "") or "").strip()
 
-    # ---------- Chat input ----------
     if st.session_state.image_mode:
         placeholder_text = "Deskripsikan gambar yang ingin dibuat…"
     elif is_fresh:
         placeholder_text = "Apa yang bisa Yuki bantu hari ini?"
     else:
         placeholder_text = "Tulis pesan…"
-    # Mic & lampiran native Streamlit (kirim gambar, paste, drag-drop);
-    # otomatis nonaktif bila versi Streamlit belum mendukung.
+
     chat_kwargs: dict = {}
     if CHAT_INPUT_SUPPORTS_FILE:
         chat_kwargs["accept_file"] = True
@@ -1828,13 +98,11 @@ def render_chat_page() -> None:
         chat_kwargs["accept_audio"] = True
     user_input = st.chat_input(placeholder_text, **chat_kwargs)
 
-    # ---------- Kontrol DI DALAM kotak chat input ----------
     bottom_dock = getattr(st, "bottom", None) or st._bottom
     with bottom_dock:
         with st.container(key="chat_controls"):
             render_input_controls("chat", show_mode=True)
 
-    # ---------- Proses kiriman ----------
     if pending_prompt and user_input is None:
         user_input = pending_prompt
     if process_user_input(user_input, st.empty(), is_fresh=is_fresh):
@@ -1844,11 +112,9 @@ def render_chat_page() -> None:
 
 
 # ============================================================================
-# HALAMAN: ARTEFAK (kotak kategori ala Claude + ruang kerja Yuki)
+# HALAMAN: ARTEFAK
 # ============================================================================
 def start_artifact_thread(key: str) -> None:
-    """Buka artefak baru dari kategori terpilih → Yuki langsung menjawab
-    DI HALAMAN INI (bukan di chat utama)."""
     cat = ARTIFACT_BY_KEY.get(key) or ARTIFACT_CATEGORIES[-1]
     st.session_state.artifact_counter += 1
     aid = st.session_state.artifact_counter
@@ -1857,7 +123,6 @@ def start_artifact_thread(key: str) -> None:
     thread.append({
         "id": next_msg_id(), "role": "user", "type": "text",
         "content": cat["brief"], "time": now, "meta": cat["title"],
-        # tanda: Yuki harus langsung menjawab brief ini di halaman artefak
         "awaiting_reply": True,
     })
     st.session_state.artifact_active_id = aid
@@ -1865,7 +130,6 @@ def start_artifact_thread(key: str) -> None:
 
 
 def _artifact_grid(prefix: str) -> None:
-    """Grid 3 kolom berisi kartu kategori berbentuk persegi."""
     cats = ARTIFACT_CATEGORIES
     for i in range(0, len(cats), 3):
         cols = st.columns(3)
@@ -1880,6 +144,7 @@ def _artifact_grid(prefix: str) -> None:
 
 
 def _artifact_workspace(aid: int) -> None:
+    from chat_handlers import handle_chat_request
     thread = artifact_thread(aid)
     meta = ""
     for m in thread:
@@ -1906,8 +171,6 @@ def _artifact_workspace(aid: int) -> None:
         unsafe_allow_html=True,
     )
 
-    # Kalau pesan terakhir adalah brief kategori (belum dijawab), Yuki
-    # langsung menjawabnya DI HALAMAN INI sebelum input dirender.
     if thread and thread[-1].get("awaiting_reply"):
         thread[-1].pop("awaiting_reply", None)
         handle_chat_request(st.empty())
@@ -1973,15 +236,9 @@ def page_artefak() -> None:
 
 
 # ============================================================================
-# HALAMAN: PENGATURAN (Umum · Akun · Privasi · Penagihan · Kemampuan ·
-#                      Memori · Refleksi · Waktu dan fokus · Trinity Code)
+# HALAMAN: PENGATURAN
 # ============================================================================
 def _opt_index(options: list, value) -> int:
-    """Indeks `value` di `options`; jatuh ke 0 kalau nilainya sudah tidak dikenal.
-
-    Menjaga halaman Pengaturan tetap terbuka walau ada nilai setelan lama yang
-    tersimpan di session_state (mis. nama tema yang pernah diganti).
-    """
     return options.index(value) if value in options else 0
 
 
@@ -2013,7 +270,6 @@ def _save_settings(patch: dict, label: str = "Perubahan disimpan.") -> None:
 
 
 def _capability_state(setting_key: str) -> str:
-    """Status kemampuan: aktif / siap (butuh kredensial) / nonaktif."""
     if setting_key == "selalu":
         return "aktif" if CHAT_READY else "butuh GROQ_API_KEY"
     s = get_settings()
@@ -2207,9 +463,9 @@ def _plan_col(title: str, price: str, note: str, is_pro: bool, key: str) -> None
 
 def _set_penagihan() -> None:
     s = get_settings()
-    cycle = st.radio("Siklus penagihan", ["Bulanan", "Tahunan (hemat 20%)"],
-                     index=_opt_index(["Bulanan", "Tahunan (hemat 20%)"], s["billing_cycle"]),
-                     key="set_cycle", horizontal=True)
+    st.radio("Siklus penagihan", ["Bulanan", "Tahunan (hemat 20%)"],
+             index=_opt_index(["Bulanan", "Tahunan (hemat 20%)"], s["billing_cycle"]),
+             key="set_cycle", horizontal=True)
     if st.button(":material/credit_card:  Atur metode pembayaran", key="bayar_metode"):
         st.toast("Metode pembayaran akan dibuka setelah gerbang pembayaran aktif.",
                  icon=":material/credit_card:")
@@ -2381,6 +637,7 @@ def _set_waktu_fokus() -> None:
 
 
 def _set_trinity_code() -> None:
+    from config import MODEL_CATALOG
     s = get_settings()
     st.markdown('<div class="set-section">Kredensial layanan</div>', unsafe_allow_html=True)
     st.caption("Kosongkan bila pemilik aplikasi sudah mengisinya lewat "
@@ -2579,7 +836,7 @@ def page_bahasa() -> None:
 
 
 # ============================================================================
-# HALAMAN: DAPATKAN BANTUAN (petunjuk detail pemakaian aplikasi)
+# HALAMAN: DAPATKAN BANTUAN
 # ============================================================================
 HELP_STEPS = [
     (":material/edit_note:", "Tulis pesan",
@@ -2684,7 +941,7 @@ def page_bantuan() -> None:
 
 
 # ============================================================================
-# HALAMAN: PELAJARI LEBIH LANJUT (tentang aplikasi + cara memakainya)
+# HALAMAN: PELAJARI LEBIH LANJUT
 # ============================================================================
 ABOUT_CARDS = [
     (":material/chat_bubble:", "Multi AI",
@@ -2788,7 +1045,7 @@ def page_pelajari() -> None:
 
 
 # ============================================================================
-# HALAMAN: TINGKATKAN PAKET (promosi Trinity Pro)
+# HALAMAN: TINGKATKAN PAKET
 # ============================================================================
 def page_tingkatkan() -> None:
     back, _sp = st.columns([0.12, 1.0])
@@ -2900,10 +1157,9 @@ def page_aplikasi() -> None:
 
 
 # ============================================================================
-# HALAMAN: TRINITY KURSUS (fokus belajar: pemasaran, penjualan, desain, dll)
+# HALAMAN: TRINITY KURSUS
 # ============================================================================
 def _course_grid(prefix: str) -> None:
-    """Grid 3 kolom berisi kartu kursus berbentuk persegi."""
     for i in range(0, len(COURSE_CATALOG), 3):
         cols = st.columns(3)
         for j, c in enumerate(COURSE_CATALOG[i:i + 3]):
@@ -2995,7 +1251,6 @@ def main() -> None:
     init_state()
     inject_css()
 
-    # "Keluar" dari menu akun: bersihkan sesi lalu kembali ke halaman awal
     if st.session_state.get("logged_out"):
         st.session_state.logged_out = False
         for k in list(st.session_state.keys()):
