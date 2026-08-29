@@ -200,12 +200,32 @@ def handle_chat_request(answer_slot) -> None:
 # ============================================================================
 # KONTROL KOTAK INPUT (dipakai bersama oleh chat utama, Artefak, dan Kursus)
 # ============================================================================
+def _make_square_preview(data: bytes, size: int = 160) -> tuple[bytes, str]:
+    """Thumbnail persegi kecil untuk tampilan saja. File asli tidak diubah."""
+    try:
+        im = Image.open(io.BytesIO(data))
+        im.load()
+        w, h = im.size
+        side = min(w, h) or 1
+        left, top = (w - side) // 2, (h - side) // 2
+        im = im.crop((left, top, left + side, top + side))
+        im = im.resize((size, size), Image.LANCZOS)
+        buf = io.BytesIO()
+        if im.mode in ("RGBA", "LA", "P"):
+            im.convert("RGBA").save(buf, format="PNG", optimize=True)
+            return buf.getvalue(), "image/png"
+        im.convert("RGB").save(buf, format="JPEG", quality=82)
+        return buf.getvalue(), "image/jpeg"
+    except Exception:
+        return b"", "image/jpeg"
+
+
 def _pending_cards_html(pending: list) -> str:
-    """Thumbnail persegi untuk lampiran. Hanya tampilan — bytes asli tidak diubah."""
     cards = []
     for im in pending:
         name = (im.get("name") or "gambar").replace("<", "").replace(">", "")[:32]
-        if im.get("status") == "loading" or not im.get("data"):
+        preview = im.get("preview") or b""
+        if im.get("status") == "loading" or not preview:
             cards.append(
                 f'<div class="pending-card">'
                 f'<div class="pending-square pending-loading" title="{name}"></div>'
@@ -213,8 +233,8 @@ def _pending_cards_html(pending: list) -> str:
                 f"</div>"
             )
         else:
-            b64 = base64.b64encode(im["data"]).decode("ascii")
-            mime = im.get("mime") or "image/png"
+            b64 = base64.b64encode(preview).decode("ascii")
+            mime = im.get("preview_mime") or "image/jpeg"
             cards.append(
                 f'<div class="pending-card">'
                 f'<div class="pending-square">'
@@ -253,52 +273,62 @@ def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> Non
                         key=f"{kp}plus_uploader_image_{gen}",
                     )
 
-                picked = list(picked_file or []) + list(picked_image or [])
+                                picked = list(picked_file or []) + list(picked_image or [])
                 sig = tuple(getattr(f, "name", "") for f in picked)
                 last_sig = st.session_state.get(f"{kp}picked_sig")
 
-                # Fase 1: user tekan OK → kotak loading langsung muncul
+                # Fase 1: baca file SEKARANG (sebelum popover nutup), tampilkan loading
                 if picked and sig != last_sig:
                     ready = [
                         im for im in st.session_state.get("pending_images", [])
                         if im.get("status") != "loading"
                     ]
-                    loaders = [{
-                        "name": getattr(f, "name", "gambar"),
-                        "data": b"",
-                        "mime": "image/png",
-                        "status": "loading",
-                    } for f in picked]
-                    st.session_state.pending_images = ready + loaders
-                    st.session_state[f"{kp}picked_sig"] = sig
-                    st.session_state[f"{kp}stage_now"] = True
-                    st.rerun()
-
-                # Fase 2: baca bytes ASLI (tidak di-resize) lalu ganti loading → foto
-                if picked and st.session_state.get(f"{kp}stage_now"):
-                    ready = [
-                        im for im in st.session_state.get("pending_images", [])
-                        if im.get("status") != "loading"
-                    ]
-                    seen = {(im["name"], len(im.get("data") or b"")) for im in ready}
+                    blobs = []
+                    loaders = []
                     for f in picked:
                         try:
-                            data = f.getvalue()
+                            raw = f.getvalue()
                         except Exception:
                             continue
-                        if not data:
+                        if not raw:
                             continue
                         name = getattr(f, "name", "gambar")
                         mime = (getattr(f, "type", "") or "image/png").lower()
                         if not mime.startswith("image/"):
                             mime = "image/png"
-                        key = (name, len(data))
-                        if key not in seen:
-                            ready.append({
-                                "name": name, "data": data, "mime": mime,
-                                "status": "ready",
-                            })
-                            seen.add(key)
+                        blobs.append({"name": name, "data": raw, "mime": mime})
+                        loaders.append({
+                            "name": name, "data": raw, "mime": mime,
+                            "preview": b"", "status": "loading",
+                        })
+                    st.session_state[f"{kp}pending_blobs"] = blobs
+                    st.session_state.pending_images = ready + loaders
+                    st.session_state[f"{kp}picked_sig"] = sig
+                    st.session_state[f"{kp}stage_now"] = True
+                    st.rerun()
+
+                # Fase 2: pakai bytes yang sudah disimpan (tidak butuh file_uploader lagi)
+                if st.session_state.get(f"{kp}stage_now"):
+                    blobs = st.session_state.pop(f"{kp}pending_blobs", [])
+                    ready = [
+                        im for im in st.session_state.get("pending_images", [])
+                        if im.get("status") != "loading"
+                    ]
+                    seen = {(im["name"], len(im.get("data") or b"")) for im in ready}
+                    for b in blobs:
+                        key = (b["name"], len(b["data"]))
+                        if key in seen:
+                            continue
+                        thumb, tmime = _make_square_preview(b["data"])
+                        ready.append({
+                            "name": b["name"],
+                            "data": b["data"],          # asli, resolusi utuh
+                            "mime": b["mime"],
+                            "preview": thumb,           # kecil, cuma untuk layar
+                            "preview_mime": tmime,
+                            "status": "ready",
+                        })
+                        seen.add(key)
                     st.session_state.pending_images = ready
                     st.session_state[f"{kp}stage_now"] = False
                     st.rerun()
