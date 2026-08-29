@@ -1,4 +1,3 @@
-cd /home/claude/trinity_app && cat > sidebar.py << 'PYEOF'
 # -*- coding: utf-8 -*-
 """
 SIDEBAR ALA CLAUDE
@@ -213,5 +212,3 @@ def render_sidebar() -> None:
                                      use_container_width=True):
                             st.session_state.logged_out = True
                             go("chat")
-PYEOF
-python3 -c "import ast; ast.parse(open('sidebar.py').read())" && echo OK
