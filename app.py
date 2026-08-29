@@ -9,8 +9,14 @@ layanan API (Groq, Cloudflare Flux) dan Komponen UI.
 Jalankan dengan:
     streamlit run app.py
 """
-
+import os
+import sys
 import streamlit as st
+
+# Tambahkan direktori utama tempat app.py berada ke sys.path Python
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+# Baru kemudian impor config dan modul lainnya
 from config import (
     APP_NAME,
     APP_TAGLINE,
@@ -21,8 +27,8 @@ from config import (
     DEFAULT_SETTINGS,
     get_secret,
 )
-from services.groq_service import GroqService
-from services.flux_service import FluxService
+
+es.flux_service import FluxService
 from components.chat_ui import render_chat_tab
 from components.gallery_ui import render_gallery_tab
 from components.metrics_ui import render_metrics_tab
