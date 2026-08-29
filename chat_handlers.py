@@ -36,6 +36,13 @@ from ui_helpers import (
     bubble_html, image_progress_html, images_bubble_html, stream_sentences,
     thinking_html,
 )
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
+WIB = ZoneInfo("Asia/Jakarta")
+
+def now_wib() -> str:
+    return datetime.now(WIB).strftime("%H:%M")
 
 
 # ============================================================================
