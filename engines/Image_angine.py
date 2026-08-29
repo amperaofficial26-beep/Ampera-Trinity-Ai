@@ -1,6 +1,3 @@
-cd /home/claude/trinity_app && cat > engines/image_engine.py << 'PYEOF'
-# -*- coding: utf-8 -*-
-"""
 ENGINE 2: GENERATE GAMBAR (Cloudflare FLUX)
 """
 
@@ -12,7 +9,7 @@ import io
 import requests
 from PIL import Image
 
-from config import CF_API_BASE, CF_ACCOUNT_ID, CF_API_TOKEN, CF_IMAGE_MODEL, CF_DEFAULT_STEPS
+from config import CF_ACCOUNT_ID, CF_API_TOKEN, CF_API_BASE, CF_IMAGE_MODEL, CF_DEFAULT_STEPS
 from errors import public_error_image
 
 
@@ -103,5 +100,3 @@ def generate_image(prompt: str) -> bytes:
         raise RuntimeError(public_error_image(resp.status_code, str(err)[:400]))
 
     return extract_image_bytes(payload)
-PYEOF
-python3 -c "import ast; ast.parse(open('engines/image_engine.py').read())" && echo OK
