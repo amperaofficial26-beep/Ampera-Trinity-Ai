@@ -463,7 +463,14 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     color: #4A3559 !important;
 }
 .msg-action-time {
-    font-size: 0.7rem; color: #827788; padding: 6px 4px 0;
+    font-size: 0.7rem;
+    color: #827788;
+    padding: 0 4px;
+    line-height: 26px;
+    margin: 0;
+}
+[class*="st-key-msg_actions_"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:last-child {
+    margin-top: -18px !important;
 }
 
 /* label "Yuki" dengan logo custom di atas jawaban AI */
