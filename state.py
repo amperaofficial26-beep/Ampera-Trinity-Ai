@@ -150,7 +150,9 @@ def _archive_current_conversation() -> None:
         for c in st.session_state.conversations:
             if c["id"] == conv_id:
                 c["messages"] = msgs
-                c["title"] = _conversation_title(msgs)
+                # judul yang sudah diganti manual jangan ditimpa otomatis
+                if not c.get("title_manual"):
+                    c["title"] = _conversation_title(msgs)
                 return
     st.session_state.conv_counter += 1
     st.session_state.conversations.insert(0, {
@@ -182,3 +184,25 @@ def open_conversation(conv_id: int) -> None:
                 (m.get("id", 0) for m in c["messages"]), default=1
             )
             return
+            def rename_conversation(conv_id: int, new_title: str) -> None:
+    """Ganti judul percakapan di riwayat sidebar. Judul manual ditandai
+    supaya tidak ditimpa lagi oleh judul otomatis saat diarsipkan ulang."""
+    title = (new_title or "").strip()
+    if not title:
+        return
+    for c in st.session_state.conversations:
+        if c["id"] == conv_id:
+            c["title"] = title[:60]
+            c["title_manual"] = True
+            return
+
+
+def delete_conversation(conv_id: int) -> None:
+    """Hapus satu percakapan dari riwayat sidebar."""
+    st.session_state.conversations = [
+        c for c in st.session_state.conversations if c["id"] != conv_id
+    ]
+    if st.session_state.get("active_conv_id") == conv_id:
+        st.session_state.active_conv_id = None
+    if st.session_state.get("rename_conv_id") == conv_id:
+        st.session_state.rename_conv_id = None
