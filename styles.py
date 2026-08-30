@@ -144,7 +144,7 @@ section[data-testid="stSidebar"] div.stButton > button {
     padding: 6px 10px !important;
     min-height: 34px !important;
     color: #2C1F33 !important;
-    font-size: 1.03rem !important;
+    font-size: 17px !important;
     font-weight: 500 !important;
 }
 section[data-testid="stSidebar"] div.stButton > button:hover {
@@ -162,7 +162,7 @@ section[data-testid="stSidebar"] div.stButton > button [data-testid="stMarkdownC
 }
 section[data-testid="stSidebar"] div.stButton > button p {
     text-align: left !important;
-    font-size: 0.9rem !important;
+    font-size: 17px !important;
     color: #2C1F33 !important;
     margin: 0 !important;
 }
@@ -199,7 +199,7 @@ section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] button:not([data-tes
     display: inline-block;
 }
 section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] button:not([data-testid="stPopoverButton"]) p {
-    font-size: 1rem !important;
+    font-size: 17px !important;
     font-weight: 400 !important;
     color: #4E4553 !important;
     white-space: nowrap !important;
@@ -265,7 +265,7 @@ section[data-testid="stSidebar"] div.stDownloadButton > button {
     padding: 6px 10px !important;
     min-height: 34px !important;
     color: #2C1F33 !important;
-    font-size: 1rem !important;
+    font-size: 17px !important;
     font-weight: 500 !important;
 }
 section[data-testid="stSidebar"] div.stDownloadButton > button > div,
@@ -281,7 +281,7 @@ section[data-testid="stSidebar"] div.stDownloadButton > button:hover {
 }
 section[data-testid="stSidebar"] div.stDownloadButton > button p {
     text-align: left !important;
-    font-size: 1rem !important;
+    font-size: 17px !important;
     color: #2C1F33 !important;
     margin: 0 !important;
 }
