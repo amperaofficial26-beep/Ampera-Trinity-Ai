@@ -548,6 +548,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 /* KARTU GABUNGAN ala Claude: kotak teks + baris kontrol (+, toggle, model)
    dibungkus jadi SATU kartu membulat, supaya tombol + terlihat menyatu
    di dalam kotak chat input (bukan komponen terpisah di bawahnya). */
+[data-testid="stBottom"] > div,
 [data-testid="stBottomBlockContainer"] {
     background: #F2E8D6 !important;
     border: 1px solid #DBCEB9 !important;
@@ -712,14 +713,30 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 [data-testid="stChatInput"] [data-testid="stChatInputMicButton"]:hover {
     border-color: #2C1F33 !important;
 }
-/* Urutan dok: preview → kotak ketik → tombol + / model */
-[data-testid="stBottomBlockContainer"] {
+/* Rapikan: preview di atas, kotak ketik di tengah, + / model DI BAWAH */
+[data-testid="stBottom"] {
     display: flex !important;
     flex-direction: column !important;
 }
-.st-key-pending_preview { order: 1 !important; }
-[data-testid="stChatInput"] { order: 2 !important; }
-.st-key-chat_controls { order: 3 !important; }
+[data-testid="stBottom"] > div {
+    display: flex !important;
+    flex-direction: column !important;
+}
+[data-testid="stBottomBlockContainer"],
+[data-testid="stBottomBlockContainer"] > [data-testid="stVerticalBlock"] {
+    display: contents !important;
+}
+[data-testid="stBottom"] > *:has(.st-key-pending_preview),
+.st-key-pending_preview {
+    order: 1 !important;
+}
+[data-testid="stBottom"] > *:has([data-testid="stChatInput"]),
+[data-testid="stChatInput"] {
+    order: 2 !important;
+}
+[data-testid="stBottom"] > *:has(.st-key-chat_controls),
+.st-key-chat_controls {
+    order: 3 !important;
 }
 .pending-card {
     position: relative;
@@ -755,8 +772,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     box-shadow: none !important;
     color: #2C1F33 !important;
     font-size: 16px !important;
-    line-height: 1 !important;
-}
+    line-height: 1 !important;}
 }
 /* tombol ➕ di baris kontrol: lingkaran putih bersih ala Claude, menyatu
    di dalam kartu (tanpa bayangan berlebih karena kartu sudah punya shadow) */
