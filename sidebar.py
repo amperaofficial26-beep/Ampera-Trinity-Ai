@@ -14,8 +14,10 @@ import html
 import streamlit as st
 
 from state import (
-    delete_conversation, get_settings, open_conversation, rename_conversation,
-    reset_conversation,
+    assign_conversation_project, delete_conversation, get_settings,
+    open_conversation, rename_conversation, reset_conversation,
+    set_conversation_unread, sync_current_conversation,
+    toggle_pin_conversation,
 )
 from ui_helpers import get_chat_export_text
 
@@ -203,6 +205,7 @@ def render_sidebar() -> None:
             )
 
         # Riwayat percakapan (grup "Hari ini" seperti Claude)
+        sync_current_conversation()
         convs = st.session_state.get("conversations", [])
         if convs:
             st.markdown('<div class="sb-group">Hari ini</div>', unsafe_allow_html=True)
