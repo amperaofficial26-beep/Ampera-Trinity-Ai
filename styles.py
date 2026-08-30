@@ -540,38 +540,42 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 .logo-greeting, .logo-label, .logo-progress, .logo-foot,
 .claude-think .logo-shimmer { color: #2C1F33; }
 
-/* ---------- chat input: kartu putih membulat ala Claude ---------- */
-[data-testid="stBottom"], [data-testid="stBottomBlockContainer"],
+/* ---------- chat input: kartu kecil, ukuran lama ---------- */
+[data-testid="stBottom"],
 [data-testid="stBottom"] > div {
-    background: #E8DCC8 !important; border: none !important; box-shadow: none !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
 }
-/* KARTU GABUNGAN ala Claude: kotak teks + baris kontrol (+, toggle, model)
-   dibungkus jadi SATU kartu membulat, supaya tombol + terlihat menyatu
-   di dalam kotak chat input (bukan komponen terpisah di bawahnya). */
-[data-testid="stBottom"] > div,
-[data-testid="stBottomBlockContainer"] {
+[data-testid="stBottom"] {
+    display: flex !important;
+    flex-direction: column !important;
+}
+[data-testid="stBottom"] > div {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* Kartu krem HANYA di kotak ketik */
+[data-testid="stChatInput"] {
     background: #F2E8D6 !important;
     border: 1px solid #DBCEB9 !important;
     border-radius: 22px !important;
     box-shadow: 0 4px 14px rgba(44,31,51,0.07) !important;
-    padding: 6px 6px 4px !important;
-    transition: border-color .18s ease, box-shadow .18s ease !important;
+    padding: 2px 6px !important;
+    order: 2 !important;
 }
-[data-testid="stBottomBlockContainer"]:focus-within {
+[data-testid="stChatInput"]:focus-within {
     border-color: #2C1F33 !important;
     box-shadow: 0 4px 18px rgba(44,31,51,0.16) !important;
-}
-/* kotak input itu sendiri melebur transparan ke dalam kartu gabungan */
-[data-testid="stChatInput"] {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    padding: 2px 6px !important;
 }
 [data-testid="stChatInput"] div,
 [data-testid="stChatInput"] [data-baseweb="base-input"],
 [data-testid="stChatInput"] [data-baseweb="textarea"] {
-    background: transparent !important; border: none !important; box-shadow: none !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
 }
 [data-testid="stChatInput"] textarea {
     background: transparent !important;
@@ -582,7 +586,6 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 [data-testid="stChatInput"] textarea::placeholder {
     color: #7E7387 !important;
 }
-/* tombol kirim: bulat terracotta khas Claude */
 [data-testid="stChatInput"] button {
     background: #2C1F33 !important;
     border: none !important;
@@ -599,22 +602,38 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 }
 [data-testid="stChatInput"] button:disabled svg { fill: #7E7387 !important; color: #7E7387 !important; }
 
-/* ---------- baris kontrol DI DALAM kartu, tepat di bawah teks (ala Claude) ---------- */
-/* Berada di dok bawah Streamlit (satu wadah dengan st.chat_input)
-   → otomatis ikut bergeser saat sidebar dibuka/ditutup.
-   Layout: [+] [toggle Gambar] [toggle Suara] ......... [Nama Model] */
+/* Buka bungkus Streamlit: preview / ketik / + jadi satu kolom */
+[data-testid="stBottomBlockContainer"] {
+    display: contents !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+}
+[data-testid="stBottomBlockContainer"] > [data-testid="stVerticalBlock"],
+[data-testid="stBottomBlockContainer"] [data-testid="stVerticalBlockBorderWrapper"] {
+    display: contents !important;
+}
+
+/* 1 preview  2 kotak ketik  3 + dan model */
+[data-testid="stBottom"] > div > *:has(.st-key-pending_preview),
+.st-key-pending_preview { order: 1 !important; }
+[data-testid="stBottom"] > div > *:has([data-testid="stChatInput"]) { order: 2 !important; }
+[data-testid="stBottom"] > div > *:has(.st-key-chat_controls),
+.st-key-chat_controls { order: 3 !important; }
+
 .st-key-chat_controls {
     position: relative;
-    margin-top: 0 !important;
+    margin-top: 2px !important;
     padding: 2px 4px 2px;
     background: transparent !important;
+    order: 3 !important;
 }
 .st-key-chat_controls [data-testid="stHorizontalBlock"] {
     align-items: center;
     gap: 2px !important;
     flex-wrap: nowrap !important;
 }
-/* kolom kiri & kanan menyusut mengikuti isi, spacer tengah melar */
 .st-key-chat_controls [data-testid="stHorizontalBlock"]:last-of-type > [data-testid="stColumn"] {
     width: auto !important;
     flex: 0 0 auto !important;
@@ -623,7 +642,6 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 .st-key-chat_controls [data-testid="stHorizontalBlock"]:last-of-type > [data-testid="stColumn"]:nth-child(2) {
     flex: 1 1 auto !important;
 }
-/* disclaimer kecil di tengah (ala Claude) */
 .input-disclaimer {
     text-align: center;
     font-size: 0.76rem;
@@ -633,12 +651,6 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     text-overflow: ellipsis;
     padding: 4px 8px 0;
 }
-/* toggle Gambar: teks kecil abu senada */
-.st-key-chat_controls [data-testid="stCheckbox"] label p {
-    font-size: 0.8rem !important;
-    color: #6B6172 !important;
-}
-/* tombol model = TULISAN BIASA tanpa kotak (ala Claude) */
 .st-key-chat_controls [data-testid="stPopover"] button,
 .st-key-chat_controls [data-testid="stPopover"] > div > button,
 .st-key-chat_controls button[data-testid="stBaseButton-secondary"],
@@ -666,7 +678,6 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     border: none !important;
     box-shadow: none !important;
 }
-/* hilangkan kotak pembungkus milik popover itu sendiri */
 .st-key-chat_controls [data-testid="stPopover"] {
     background: transparent !important;
     border: none !important;
@@ -677,25 +688,12 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     border: none !important;
     box-shadow: none !important;
 }
-.st-key-chat_controls [data-testid="stCheckbox"] {
-    margin: 0 !important;
-}
-.st-key-chat_controls [data-testid="stCheckbox"] label p {
-    font-size: 0.78rem !important;
-    color: #6B6172 !important;
-    white-space: nowrap;
-}
-/* rapikan tinggi elemen di baris kontrol */
 .st-key-chat_controls [data-testid="stVerticalBlock"] { gap: 0 !important; }
 .st-key-chat_controls .element-container { margin: 0 !important; }
 
-/* ---------- MENU ➕ ALA CLAUDE (minimalist: upload saja) ---------- */
-/* sembunyikan tombol lampiran bawaan Streamlit (diganti menu ➕);
-   drag-drop & paste Ctrl+V tetap berfungsi (ditangani elemen lain) */
 [data-testid="stChatInput"] [data-testid="stChatInputFileUploadButton"] {
     display: none !important;
 }
-/* tombol mic / rekam: bulat putih senada (bukan terracotta) */
 [data-testid="stChatInput"] [data-testid="stChatInputMicButton"],
 [data-testid="stChatInput"] [data-testid="stChatInputCancelButton"],
 [data-testid="stChatInput"] [data-testid="stChatInputApproveButton"] {
@@ -713,31 +711,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 [data-testid="stChatInput"] [data-testid="stChatInputMicButton"]:hover {
     border-color: #2C1F33 !important;
 }
-/* Rapikan: preview di atas, kotak ketik di tengah, + / model DI BAWAH */
-[data-testid="stBottom"] {
-    display: flex !important;
-    flex-direction: column !important;
-}
-[data-testid="stBottom"] > div {
-    display: flex !important;
-    flex-direction: column !important;
-}
-[data-testid="stBottomBlockContainer"],
-[data-testid="stBottomBlockContainer"] > [data-testid="stVerticalBlock"] {
-    display: contents !important;
-}
-[data-testid="stBottom"] > *:has(.st-key-pending_preview),
-.st-key-pending_preview {
-    order: 1 !important;
-}
-[data-testid="stBottom"] > *:has([data-testid="stChatInput"]),
-[data-testid="stChatInput"] {
-    order: 2 !important;
-}
-[data-testid="stBottom"] > *:has(.st-key-chat_controls),
-.st-key-chat_controls {
-    order: 3 !important;
-}
+
 .pending-card {
     position: relative;
     width: 72px;
@@ -772,10 +746,8 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     box-shadow: none !important;
     color: #2C1F33 !important;
     font-size: 16px !important;
-    line-height: 1 !important;}
+    line-height: 1 !important;
 }
-/* tombol ➕ di baris kontrol: lingkaran putih bersih ala Claude, menyatu
-   di dalam kartu (tanpa bayangan berlebih karena kartu sudah punya shadow) */
 .st-key-chat_controls [class*="st-key-plus_menu"] [data-testid="stPopover"] button {
     background: transparent !important;
     border: none !important;
