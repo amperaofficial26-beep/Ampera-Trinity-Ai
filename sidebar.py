@@ -13,7 +13,10 @@ import html
 
 import streamlit as st
 
-from state import get_settings, open_conversation, reset_conversation
+from state import (
+    delete_conversation, get_settings, open_conversation, rename_conversation,
+    reset_conversation,
+)
 from ui_helpers import get_chat_export_text
 
 HAS_DIALOG = hasattr(st, "dialog")
@@ -101,7 +104,57 @@ show_proyek_dialog = _register_dialog("Proyek", _proyek_dialog_body)
 show_artefak_dialog = _register_dialog("Artefak", _artefak_dialog_body)
 show_sesuaikan_dialog = _register_dialog("Sesuaikan", _sesuaikan_dialog_body)
 
+def _conv_markdown(c: dict) -> str:
+    """Ubah satu percakapan tersimpan jadi teks Markdown (untuk unduh)."""
+    lines = [
+        f"# {c['title']}",
+        "# by Ampera Official\n",
+        "---\n",
+    ]
+    for m in c.get("messages") or []:
+        role_label = "👤 Pengguna" if m.get("role") == "user" else "🔱 Yuki"
+        time_tag = f" [{m.get('time', '')}]" if m.get("time") else ""
+        lines.append(f"### {role_label}{time_tag}\n")
+        if m.get("type") == "image":
+            lines.append(f"*(gambar dihasilkan — prompt: {m.get('prompt', '')})*")
+        else:
+            content = (m.get("content") or "").strip()
+            if m.get("images"):
+                content += "\n*(dengan lampiran gambar)*"
+            if m.get("via_voice"):
+                content += "\n*(dikirim via suara)*"
+            lines.append(content)
+        lines.append("\n---\n")
+    return "\n".join(lines)
 
+
+def _render_rename_row(c: dict) -> None:
+    """Baris ganti judul inline (di tempat item riwayat, ala Claude)."""
+    with st.form(key=f"rename_form_{c['id']}", clear_on_submit=False):
+        new_title = st.text_input(
+            "Judul", value=st.session_state.get("rename_draft", c["title"]),
+            key=f"rtitle_{c['id']}", label_visibility="collapsed",
+            placeholder="Judul percakapan…",
+        )
+        save_col, cancel_col = st.columns([1, 1], gap="small")
+        with save_col:
+            submitted = st.form_submit_button(
+                ":material/check:  Simpan", use_container_width=True,
+            )
+        with cancel_col:
+            cancelled = st.form_submit_button(
+                ":material/close:  Batal", use_container_width=True,
+            )
+    if submitted:
+        rename_conversation(c["id"], new_title)
+        st.session_state.rename_conv_id = None
+        st.session_state.pop("rename_draft", None)
+        st.rerun()
+    if cancelled:
+        st.session_state.rename_conv_id = None
+        st.session_state.pop("rename_draft", None)
+        st.rerun()
+      
 def render_sidebar() -> None:
     with st.sidebar:
         # Brand serif ala "Claude"
