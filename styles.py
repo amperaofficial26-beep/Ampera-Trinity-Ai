@@ -1321,7 +1321,7 @@ div.stDownloadButton > button:hover {
 .st-key-sb_account [data-testid="stVerticalBlock"] { gap: 0 !important; }
 .st-key-sb_account [data-testid="stColumn"]:first-child { padding-right: 0 !important; }
 .st-key-acct_menu {
-    position: fixed; bottom: 0; left: 0; width: 260px;
+    position: fixed; bottom: 0; left: 0; width: 60px;
     height: 54px; box-sizing: border-box;
     display: flex; align-items: center; justify-content: flex-end;
     padding-right: 12px;
