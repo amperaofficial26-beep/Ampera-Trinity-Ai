@@ -26,11 +26,6 @@ APP_TAGLINE = "Multi AI · Generate Foto · Chat — by Ampera Official"
 # ============================================================================
 GROQ_BASE_URL = "https://api.groq.com/openai/v1"
 
-# Katalog model ala Claude: nama polos + deskripsi kecil (tanpa emoji)
-# Setiap entri punya "key" unik (dipakai internal & sebagai Streamlit key)
-# terpisah dari "name" (label tampilan) karena dua model boleh berbagi nama
-# tier yang sama (mis. dua model "Trinity Normal").
-# Diurutkan dari tingkat termudah → tertinggi; tier Hard & Extreme = premium.
 MODEL_CATALOG = [
     {"key": "gpt_oss_20b",   "name": "Trinity Easy",    "desc": "Cepat untuk chat & coding ringan",      "id": "openai/gpt-oss-20b", "premium": False},
     {"key": "compound_mini", "name": "Trinity Normal",  "desc": "Web search ringkas & cepat",            "id": "groq/compound-mini", "premium": False},
@@ -43,7 +38,6 @@ AVAILABLE_MODELS = {m["key"]: m["id"] for m in MODEL_CATALOG}
 MODEL_BY_KEY = {m["key"]: m for m in MODEL_CATALOG}
 DEFAULT_MODEL_KEY = "gpt_oss_20b"
 
-# Model vision (wajib dipakai saat pesan membawa gambar)
 VISION_MODEL_ID = "qwen/qwen3.6-27b"
 VISION_MODEL_LABEL = "Qwen 3.6"
 VISION_MODEL_FALLBACKS = (
@@ -51,14 +45,12 @@ VISION_MODEL_FALLBACKS = (
     "qwen/qwen3.8-27b",
 )
 
-# Fallback jika model terpilih sudah tidak tersedia di provider
 GROQ_MODEL_FALLBACKS = (
     "openai/gpt-oss-120b",
     "openai/gpt-oss-20b",
     "qwen/qwen3.6-27b",
 )
 
-# Konteks panjang tapi tetap ramah free-tier
 MAX_HISTORY_MESSAGES = 40
 
 # ============================================================================
@@ -84,15 +76,15 @@ CF_IMAGE_MODEL = "@cf/black-forest-labs/flux-1-schnell"
 CF_DEFAULT_STEPS = 4
 
 # ============================================================================
-# SUARA & GAMBAR MASUK (Groq — pakai GROQ_API_KEY yang sama)
+# SUARA & GAMBAR MASUK
 # ============================================================================
-STT_MODEL = "whisper-large-v3-turbo"          # transkrip suara → teks
-MAX_IMAGES_PER_MESSAGE = 5                    # batas model vision (Llama-4)
+STT_MODEL = "whisper-large-v3-turbo"
+MAX_IMAGES_PER_MESSAGE = 5
 IMAGE_INPUT_TYPES = ["png", "jpg", "jpeg", "webp", "gif"]
-VISION_RECENT_MESSAGES = 4  # pesan terakhir yang gambarnya ikut ke API
+VISION_RECENT_MESSAGES = 4
 
 # ============================================================================
-# BAHASA (halaman "Bahasa")
+# BAHASA
 # ============================================================================
 SUPPORTED_LANGUAGES = [
     {"code": "id", "flag": "🇮🇩", "name": "Bahasa Indonesia", "native": "Baku",  "level": "Penuh",       "yuki": True},
@@ -114,7 +106,7 @@ LANG_BY_CODE = {l["code"]: l for l in SUPPORTED_LANGUAGES}
 DEFAULT_LANG_CODE = "id"
 
 # ============================================================================
-# KOTAK KATEGORI HALAMAN ARTEFAK (ala Claude)
+# ARTEFAK
 # ============================================================================
 ARTIFACT_CATEGORIES = [
     {"key": "app",  "icon": ":material/public:",        "title": "Aplikasi dan situs web",
@@ -164,7 +156,7 @@ ARTIFACT_CATEGORIES = [
 ARTIFACT_BY_KEY = {c["key"]: c for c in ARTIFACT_CATEGORIES}
 
 # ============================================================================
-# KATALOG KURSUS TRINITY (halaman "Trinity kursus")
+# KURSUS
 # ============================================================================
 COURSE_CATALOG = [
     {"key": "pemasaran",  "icon": ":material/campaign:",         "title": "Pemasaran",
@@ -192,7 +184,6 @@ COURSE_BY_KEY = {c["key"]: c for c in COURSE_CATALOG}
 
 
 def course_curriculum(course: dict) -> list[str]:
-    """Susun 4 modul belajar otomatis dari topik kursus yang dipilih."""
     t = course["title"]
     return [
         f"Modul 1 · Fondasi {t} — istilah penting & peta besar",
@@ -202,11 +193,7 @@ def course_curriculum(course: dict) -> list[str]:
     ]
 
 
-# ============================================================================
-# NILAI BAWAAN SELURUH PENGATURAN (9 tab)
-# ============================================================================
 DEFAULT_SETTINGS: dict = {
-    # Umum
     "ui_lang": DEFAULT_LANG_CODE,
     "yuki_lang": DEFAULT_LANG_CODE,
     "theme": "Beige hangat",
@@ -216,45 +203,37 @@ DEFAULT_SETTINGS: dict = {
     "min_think_seconds": 10.0,
     "personality": "Santai & kocak",
     "default_mode": "Chat",
-    # Akun
     "display_name": "User",
     "email": "",
     "username": "user",
     "bio": "",
-    # Privasi
     "allow_web_search": True,
     "save_history": True,
     "keep_voice": False,
     "analytics": True,
     "personalization": True,
     "cloud_sync": False,
-    # Penagihan
     "plan": "Free",
     "billing_cycle": "Bulanan",
     "payment_method": "Belum ada metode pembayaran",
-    # Kemampuan
     "cap_web_search": True,
     "cap_artifacts": True,
     "cap_voice": True,
     "cap_vision": True,
     "cap_image": True,
-    # Memori
     "memories": [],
     "memory_on": True,
     "memory_auto": False,
-    # Refleksi
     "reflection_goal": "",
     "reflection_habit": "",
     "reflection_freq": "Setiap hari",
     "reflection_tone": "Mendorong",
-    # Waktu dan fokus
     "focus_minutes": 25,
     "break_minutes": 5,
     "work_start": "09:00",
     "work_end": "18:00",
     "tz_label": "Asia/Jakarta (WIB)",
     "focus_reminder": True,
-    # Trinity Code
     "groq_key": "",
     "cf_account_id": "",
     "cf_token": "",
@@ -273,18 +252,12 @@ PAGE_TITLES = {
     "pelajari": "Pelajari lebih lanjut",
 }
 
-# Fitur mic/lampiran hanya jalan di Streamlit yang mendukung (1.47+);
-# di versi lama otomatis nonaktif tanpa error.
 _CHAT_INPUT_PARAMS = inspect.signature(st.chat_input).parameters
 CHAT_INPUT_SUPPORTS_FILE = "accept_file" in _CHAT_INPUT_PARAMS
 CHAT_INPUT_SUPPORTS_AUDIO = "accept_audio" in _CHAT_INPUT_PARAMS
 
 
-# ============================================================================
-# KREDENSIAL (Secrets → Environment Variable)
-# ============================================================================
 def _get_secret(*keys: str) -> str:
-    """Ambil kredensial dari st.secrets lalu fallback ke env var."""
     for key in keys:
         try:
             val = st.secrets.get(key)
