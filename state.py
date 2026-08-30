@@ -154,7 +154,7 @@ def _archive_current_conversation() -> None:
                 if not c.get("title_manual"):
                     c["title"] = _conversation_title(msgs)
                 return
-       st.session_state.conv_counter += 1
+    st.session_state.conv_counter += 1
     new_id = st.session_state.conv_counter
     st.session_state.active_conv_id = new_id
     st.session_state.conversations.insert(0, {
@@ -173,7 +173,8 @@ def sync_current_conversation() -> None:
     langsung (ala Claude): begitu ada pesan dari user, entri riwayatnya
     langsung dibuat & judulnya ikut ter-update, tanpa harus klik + Baru."""
     _archive_current_conversation()
-    
+
+
 def reset_conversation() -> None:
     """Chat baru: arsipkan obrolan utama, lalu kosongkan thread utama."""
     _archive_current_conversation()
@@ -211,6 +212,7 @@ def rename_conversation(conv_id: int, new_title: str) -> None:
             c["title"] = title[:60]
             c["title_manual"] = True
             return
+
 
 def delete_conversation(conv_id: int) -> None:
     """Hapus satu percakapan dari riwayat sidebar."""
