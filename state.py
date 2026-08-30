@@ -154,9 +154,11 @@ def _archive_current_conversation() -> None:
                 if not c.get("title_manual"):
                     c["title"] = _conversation_title(msgs)
                 return
-    st.session_state.conv_counter += 1
+       st.session_state.conv_counter += 1
+    new_id = st.session_state.conv_counter
+    st.session_state.active_conv_id = new_id
     st.session_state.conversations.insert(0, {
-        "id": st.session_state.conv_counter,
+        "id": new_id,
         "title": _conversation_title(msgs),
         "messages": msgs,
         "pinned": False,
@@ -166,6 +168,12 @@ def _archive_current_conversation() -> None:
     })
 
 
+def sync_current_conversation() -> None:
+    """Tampilkan obrolan yang sedang berjalan di riwayat sidebar secara
+    langsung (ala Claude): begitu ada pesan dari user, entri riwayatnya
+    langsung dibuat & judulnya ikut ter-update, tanpa harus klik + Baru."""
+    _archive_current_conversation()
+    
 def reset_conversation() -> None:
     """Chat baru: arsipkan obrolan utama, lalu kosongkan thread utama."""
     _archive_current_conversation()
@@ -204,7 +212,6 @@ def rename_conversation(conv_id: int, new_title: str) -> None:
             c["title_manual"] = True
             return
 
-
 def delete_conversation(conv_id: int) -> None:
     """Hapus satu percakapan dari riwayat sidebar."""
     st.session_state.conversations = [
@@ -212,6 +219,9 @@ def delete_conversation(conv_id: int) -> None:
     ]
     if st.session_state.get("active_conv_id") == conv_id:
         st.session_state.active_conv_id = None
+        # kalau yang dihapus sedang dibuka, kosongkan juga area chat
+        st.session_state.pop("messages", None)
+        init_state()
     if st.session_state.get("rename_conv_id") == conv_id:
         st.session_state.rename_conv_id = None
 
