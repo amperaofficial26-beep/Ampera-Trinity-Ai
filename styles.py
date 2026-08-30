@@ -180,7 +180,7 @@ section[data-testid="stSidebar"] .st-key-sb_new button:hover {
     font-size: 0.85rem; font-weight: 500; color: #7D7484;
     padding: 16px 12px 6px; letter-spacing: 0.01em;
 }
-/* item riwayat: bulatan kecil ○ di depan + teks abu gelap, elipsis 1 baris */
+//* item riwayat: bulatan kecil ○ di depan + teks abu gelap, elipsis 1 baris */
 section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] button {
     font-weight: 400 !important;
     color: #4E4553 !important;
@@ -188,7 +188,8 @@ section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] button {
     padding: 6px 12px 6px 12px !important;
     position: relative;
 }
-section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] button::before {
+/* bulatan ○ hanya di tombol JUDUL (bukan tombol ⋯ / popover) */
+section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] button:not([data-testid="stPopoverButton"])::before {
     content: "";
     width: 8px; height: 8px;
     border: 1.5px solid #C1B49F;
@@ -197,20 +198,59 @@ section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] button::before {
     flex-shrink: 0;
     display: inline-block;
 }
-section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] button p {
+section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] button:not([data-testid="stPopoverButton"]) p {
     font-size: 0.98rem !important;
     font-weight: 400 !important;
     color: #4E4553 !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
-    max-width: 210px;
+    max-width: 168px;
 }
-/* item riwayat aktif */
-section[data-testid="stSidebar"] [class*="st-key-sb_hist_"].sb-active button {
+/* tombol ⋯ di ujung kanan tiap item riwayat: polos, ikon di tengah */
+section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] [data-testid="stPopoverButton"] {
+    width: 100% !important;
+    min-width: 0 !important;
+    justify-content: center !important;
+    text-align: center !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: #7E7387 !important;
+    padding: 6px 0 !important;
+    height: 36px !important;
+}
+section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] [data-testid="stPopoverButton"]:hover {
+    background: #E2D6C1 !important;
+    color: #2C1F33 !important;
+}
+section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] [data-testid="stPopoverButton"] svg {
+    width: 18px !important; height: 18px !important;
+}
+/* item riwayat aktif: sorot barisnya (bukan tombolnya) ala Claude */
+section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] {
+    border-radius: 10px;
+}
+section[data-testid="stSidebar"] [class*="st-key-sb_hist_"]:has(.sb-active-marker) {
     background: #E2D6C1 !important;
 }
-
+/* item tersemat: bulatan ○ diganti ikon pin (dari label tombol) */
+section[data-testid="stSidebar"] [class*="st-key-sb_hist_"]:has(.sb-pinned-marker) button:not([data-testid="stPopoverButton"])::before {
+    display: none !important;
+}
+/* item belum dibaca: bulatan terisi + teks lebih tegas */
+section[data-testid="stSidebar"] [class*="st-key-sb_hist_"]:has(.sb-unread-marker) button:not([data-testid="stPopoverButton"])::before {
+    background: #4A3559 !important;
+    border-color: #4A3559 !important;
+}
+section[data-testid="stSidebar"] [class*="st-key-sb_hist_"]:has(.sb-unread-marker) button:not([data-testid="stPopoverButton"]) p {
+    font-weight: 600 !important;
+    color: #2C1F33 !important;
+}
+/* form ganti judul: rapat & tidak memakan banyak ruang */
+section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] form {
+    margin: 2px 0 4px !important;
+}
 /* tombol unduh di sidebar: sama polosnya dengan menu lain */
 section[data-testid="stSidebar"] div.stDownloadButton > button {
     background: transparent !important;
