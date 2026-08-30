@@ -132,14 +132,31 @@ button[kind="headerNoPadding"] {
 /* Bagian atas sidebar (brand · + Baru · menu · unduh) dibuat STICKY supaya
    TETAP di atas. Yang ikut discroll hanya daftar riwayat di bawahnya,
    persis perilaku sidebar Claude. Baris akun tetap di dasar (fixed). */
+/* Susun sidebar jadi kolom penuh: bagian atas (menu) tetap, bagian riwayat
+   scroll sendiri, dan baris akun tetap di dasar. Outer sidebar jadi TIDAK
+   ikut scroll — hanya daftar riwayat yang bisa digulir. */
+[data-testid="stSidebarContent"] {
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+}
+[data-testid="stSidebarUserContent"] {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+}
+/* blok atas (brand + menu + unduh): jangan menyusut */
 .st-key-sb_top {
-    position: sticky;
-    top: 0;
-    z-index: 5;
-    background: #EDE2D1;
-    padding-bottom: 4px;
-    border-bottom: 1px solid #DBCEB9;
-    margin-bottom: 2px;
+    flex-shrink: 0 !important;
+}
+/* daftar riwayat: ini satu-satunya area yang discroll */
+.st-key-sb_history {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    padding-bottom: 12px !important;
 }
 /* tombol menu sidebar: baris teks polos RATA KIRI, hover krem (ala Claude) */
 section[data-testid="stSidebar"] div.stButton > button {
