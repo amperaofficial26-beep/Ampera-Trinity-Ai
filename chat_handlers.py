@@ -44,18 +44,13 @@ def now_wib() -> str:
     return datetime.now(WIB).strftime("%H:%M")
 
 
-# ============================================================================
-# MODE GAMBAR
-# ============================================================================
 def maybe_run_yuki(answer_slot) -> bool:
     job = st.session_state.get("_yuki_job")
     if not job:
         return False
-    # Run 1 setelah kirim: preview sudah kosong, jangan jalankan Yuki dulu
     if not st.session_state.get("_yuki_ui_flushed"):
         st.session_state["_yuki_ui_flushed"] = True
         return True
-    # Run 2: preview sudah hilang di layar, baru Yuki bicara
     st.session_state.pop("_yuki_job", None)
     st.session_state.pop("_yuki_ui_flushed", None)
     if job.get("image_mode"):
@@ -63,35 +58,29 @@ def maybe_run_yuki(answer_slot) -> bool:
     else:
         handle_chat_request(answer_slot)
     return True
-    
+
 def handle_image_request(prompt: str) -> None:
-    """Mode gambar: prompt → Cloudflare FLUX → bubble gambar.
-    Hasil masuk ke thread aktif (chat utama, artefak, atau kursus)."""
     thread = active_thread()
     if not IMAGE_READY:
         thread.append({
             "id": next_msg_id(), "role": "assistant", "type": "text",
             "content": "Fitur gambar belum dikonfigurasi pemilik (CF_ACCOUNT_ID / CF_API_TOKEN).",
-            "time": datetime.now().strftime("%H:%M"),
+            "time": now_wib(),
         })
         return
 
-    # Progress bar % + shimmer (generate jalan di thread background,
-    # persentase naik perlahan mengikuti tahapan label)
     progress_slot = st.empty()
-
     result: dict = {"data": None, "error": None}
 
     def _worker() -> None:
         try:
             result["data"] = generate_image(prompt)
-        except Exception as exc:  # simpan untuk ditampilkan di thread utama
+        except Exception as exc:
             result["error"] = exc
 
     worker = threading.Thread(target=_worker, daemon=True)
     worker.start()
 
-    # Tahapan label + target % (label berganti seiring progress naik)
     stages = [
         (0, "Membayangkan gambarnya"),
         (30, "Menyiapkan kanvas"),
@@ -102,7 +91,6 @@ def handle_image_request(prompt: str) -> None:
     t0 = time.time()
     IMAGE_MIN_SECONDS = 10.0
     while worker.is_alive() or (time.time() - t0) < IMAGE_MIN_SECONDS:
-        # naik perlahan, melambat mendekati 92% selama masih menunggu
         if pct < 60:
             pct += 2.4
         elif pct < 85:
@@ -121,14 +109,13 @@ def handle_image_request(prompt: str) -> None:
     worker.join(timeout=200)
 
     if result["error"] is None and result["data"]:
-        # sentuhan akhir: lompat mulus ke 100%
         progress_slot.markdown(image_progress_html(100, "Selesai"), unsafe_allow_html=True)
         time.sleep(0.6)
         progress_slot.empty()
         thread.append({
             "id": next_msg_id(), "role": "assistant", "type": "image",
             "image_bytes": result["data"], "prompt": prompt,
-            "time": datetime.now().strftime("%H:%M"),
+            "time": now_wib(),
         })
     else:
         progress_slot.empty()
@@ -139,22 +126,17 @@ def handle_image_request(prompt: str) -> None:
             msg = public_error_image(None, msg, e)
         thread.append({
             "id": next_msg_id(), "role": "assistant", "type": "text",
-            "content": msg, "time": datetime.now().strftime("%H:%M"),
+            "content": msg, "time": now_wib(),
         })
 
 
-# ============================================================================
-# MODE CHAT
-# ============================================================================
 def handle_chat_request(answer_slot) -> None:
-    """Mode chat: streaming jawaban Yuki dengan model terpilih + fallback.
-    Jawaban masuk ke THREAD AKTIF (chat utama, artefak, atau kursus)."""
     thread = active_thread()
     if not CHAT_READY:
         thread.append({
             "id": next_msg_id(), "role": "assistant", "type": "text",
             "content": "Fitur chat belum dikonfigurasi pemilik (GROQ_API_KEY).",
-            "time": datetime.now().strftime("%H:%M"),
+            "time": now_wib(),
         })
         return
 
@@ -163,7 +145,6 @@ def handle_chat_request(answer_slot) -> None:
         st.session_state.selected_model_key,
         AVAILABLE_MODELS[DEFAULT_MODEL_KEY],
     )
-    # Pesan bergambar WAJIB lewat model vision (model teks tidak bisa lihat gambar)
     last_user = next(
         (m for m in reversed(thread) if m.get("role") == "user"),
         None,
@@ -172,43 +153,32 @@ def handle_chat_request(answer_slot) -> None:
     if has_images:
         model_id = VISION_MODEL_ID
     elif st.session_state.get("web_search_on") and s.get("cap_web_search", True):
-        # Toggle "Pencarian web" ala Claude → pakai model Compound
-        # (satu-satunya model Groq di katalog ini yang bisa browsing).
         model_id = AVAILABLE_MODELS["compound"]
 
-    # Thinking ala Claude — frasa berganti-ganti selama beberapa detik
     from ui_helpers import THINKING_MIN_SECONDS
     think_slot = st.empty()
     think_slot.markdown(thinking_html(THINKING_PHRASES_CHAT), unsafe_allow_html=True)
     t0 = time.time()
-    # Durasi "berpikir" minimum bisa diatur di Pengaturan → Umum
     min_think = float(s.get("min_think_seconds", THINKING_MIN_SECONDS))
 
     try:
         client = build_chat_client()
-        # Kumpulkan seluruh jawaban SELAMA animasi berpikir masih berjalan
         full = "".join(
             piece or ""
             for piece in stream_chat_with_fallback(
                 client, model_id, thread, vision=has_images
             )
         )
-
-        # Tahan sampai proses berpikir genap minimal beberapa detik
         elapsed = time.time() - t0
         if elapsed < min_think:
             time.sleep(min_think - elapsed)
         think_slot.empty()
-
         if not full:
             full = "…"
-
-        # Jawaban muncul bertahap per kalimat (bukan kata per kata)
         stream_sentences(answer_slot, full)
-
         reply = {
             "id": next_msg_id(), "role": "assistant", "type": "text",
-            "content": full, "time": datetime.now().strftime("%H:%M"),
+            "content": full, "time": now_wib(),
         }
         thread.append(reply)
         _capture_artifacts_from_reply(full)
@@ -217,15 +187,11 @@ def handle_chat_request(answer_slot) -> None:
         err = public_error_chat(e)
         thread.append({
             "id": next_msg_id(), "role": "assistant", "type": "text",
-            "content": err, "time": datetime.now().strftime("%H:%M"),
+            "content": err, "time": now_wib(),
         })
 
 
-# ============================================================================
-# KONTROL KOTAK INPUT (dipakai bersama oleh chat utama, Artefak, dan Kursus)
-# ============================================================================
 def _make_square_preview(data: bytes, size: int = 160) -> tuple[bytes, str]:
-    """Thumbnail persegi kecil untuk tampilan saja. File asli tidak diubah."""
     try:
         im = Image.open(io.BytesIO(data))
         im.load()
@@ -268,7 +234,7 @@ def _pending_cards_html(pending: list) -> str:
                 f"</div>"
             )
     return '<div class="pending-row">' + "".join(cards) + "</div>"
-    
+
 def render_pending_preview(page_key: str = "chat") -> None:
     kp = "" if page_key == "chat" else f"{page_key}_"
     pending = st.session_state.get("pending_images", [])
@@ -299,12 +265,10 @@ def render_pending_preview(page_key: str = "chat") -> None:
                 if st.button("×", key=f"{kp}pending_rm_{i}", help="Hapus"):
                     st.session_state.pending_images.pop(i)
                     st.rerun()
-                
-def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> None:
+                    def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> None:
     """Isi dok bawah: [+] [Gambar] ... [Nama Model], preview tepat di atas chat input."""
     kp = "" if page_key == "chat" else f"{page_key}_"
 
-    # [menu] [Gambar] ....spacer.... [Nama Model]
     ctrl_plus, ctrl_mode, _sp, ctrl_model = st.columns([0.08, 0.22, 1.22, 0.28])
 
     with ctrl_plus:
@@ -333,7 +297,6 @@ def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> Non
                 sig = tuple(getattr(f, "name", "") for f in picked)
                 last_sig = st.session_state.get(f"{kp}picked_sig")
 
-                # Fase 1: baca file SEKARANG (sebelum popover nutup), tampilkan loading
                 if picked and sig != last_sig:
                     ready = [
                         im for im in st.session_state.get("pending_images", [])
@@ -363,7 +326,6 @@ def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> Non
                     st.session_state[f"{kp}stage_now"] = True
                     st.rerun()
 
-                # Fase 2: pakai bytes yang sudah disimpan (tidak butuh file_uploader lagi)
                 if st.session_state.get(f"{kp}stage_now"):
                     blobs = st.session_state.pop(f"{kp}pending_blobs", [])
                     ready = [
@@ -378,9 +340,9 @@ def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> Non
                         thumb, tmime = _make_square_preview(b["data"])
                         ready.append({
                             "name": b["name"],
-                            "data": b["data"],          # asli, resolusi utuh
+                            "data": b["data"],
                             "mime": b["mime"],
-                            "preview": thumb,           # kecil, cuma untuk layar
+                            "preview": thumb,
                             "preview_mime": tmime,
                             "status": "ready",
                         })
@@ -437,17 +399,13 @@ def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> Non
                         st.session_state.selected_model_key = m["key"]
                         st.rerun()
 
-# ============================================================================
-# PEMROSESAN KIRIMAN USER
-# ============================================================================
+
 def process_user_input(user_input, answer_slot, is_fresh: bool = False) -> bool:
-    """Simpan kiriman user ke thread aktif, render bubble-nya, lalu panggil
-    Yuki. Return True bila halaman perlu di-rerun.
-    Dipanggil dari HALAMAN (bukan dari dalam dok bawah)."""
+    """Simpan kiriman user ke thread aktif, lalu antri Yuki.
+    Return True bila halaman perlu di-rerun."""
     if user_input is None:
         return False
 
-    # Bongkar nilai chat input: teks + lampiran + rekaman (bila didukung)
     if isinstance(user_input, str):
         raw_text, send_files, send_audio = user_input, [], None
     else:
@@ -459,7 +417,6 @@ def process_user_input(user_input, answer_slot, is_fresh: bool = False) -> bool:
     via_voice = False
     thread = active_thread()
 
-    # Kiriman suara tanpa teks → transkrip dulu dengan Groq Whisper
     if send_audio is not None and not text:
         if CHAT_READY:
             try:
@@ -473,12 +430,11 @@ def process_user_input(user_input, answer_slot, is_fresh: bool = False) -> bool:
                 "id": next_msg_id(), "role": "assistant", "type": "text",
                 "content": "Hmm, suaranya belum kebaca nih. Coba rekam lagi "
                            "lebih dekat ke mikrofon, atau ketik saja ya!",
-                "time": datetime.now().strftime("%H:%M"),
+                "time": now_wib(),
             })
             return True
 
     images = collect_images(send_files)
-    # Gabungkan lampiran yang di-stage lewat menu ⋯ (hindari duplikat)
     pending = st.session_state.get("pending_images", [])
     if pending:
         keys = {(im["name"], len(im["data"])) for im in images}
@@ -496,14 +452,11 @@ def process_user_input(user_input, answer_slot, is_fresh: bool = False) -> bool:
     if not (text or images):
         return False
 
-    now = datetime.now().strftime("%H:%M")
+    now = now_wib()
 
-    # Begitu KIRIM ditekan: kotak input langsung turun ke bawah dan scroll
-    # diaktifkan lagi (menimpa CSS halaman awal).
     if is_fresh:
         st.markdown(_BOTTOM_RESET_CSS, unsafe_allow_html=True)
 
-    # simpan & tampilkan pesan user (+ thumbnail lampiran)
     user_msg = {
         "id": next_msg_id(), "role": "user", "type": "text",
         "content": text, "time": now,
@@ -519,8 +472,6 @@ def process_user_input(user_input, answer_slot, is_fresh: bool = False) -> bool:
         unsafe_allow_html=True,
     )
 
-    # Ada lampiran gambar → selalu chat vision (Yuki melihat gambarnya),
-    # walau toggle "Gambar" sedang aktif sekalipun.
     st.session_state.pending_images = []
     st.session_state.plus_uploader_gen = st.session_state.get("plus_uploader_gen", 0) + 1
     st.session_state["_yuki_job"] = {
