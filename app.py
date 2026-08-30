@@ -35,7 +35,6 @@ def now_wib() -> str:
 
 import streamlit as st
 from openai import OpenAI
-from chat_handlers import process_user_input, render_input_controls, render_pending_preview
 
 from config import (
     AVAILABLE_MODELS, CHAT_INPUT_SUPPORTS_AUDIO, CHAT_INPUT_SUPPORTS_FILE,
@@ -51,7 +50,6 @@ from state import (
     main_thread, next_msg_id, open_conversation, reset_conversation,
 )
 from sidebar import go, render_sidebar
-from chat_handlers import process_user_input, render_input_controls
 from ui_helpers import (
     _BOTTOM_RESET_CSS, _FRESH_BOTTOM_CSS, _page_footer, get_greeting,
     logo_img_html, render_message,
@@ -134,7 +132,7 @@ def start_artifact_thread(key: str) -> None:
     cat = ARTIFACT_BY_KEY.get(key) or ARTIFACT_CATEGORIES[-1]
     st.session_state.artifact_counter += 1
     aid = st.session_state.artifact_counter
-    now = datetime.now().strftime("%H:%M")
+    now = now_wib()
     thread = artifact_thread(aid)
     thread.append({
         "id": next_msg_id(), "role": "user", "type": "text",
@@ -159,8 +157,8 @@ def _artifact_grid(prefix: str) -> None:
                     start_artifact_thread(cat["key"])
 
 
+
 def _artifact_workspace(aid: int) -> None:
-    from chat_handlers import handle_chat_request
     thread = artifact_thread(aid)
     meta = ""
     for m in thread:
@@ -189,10 +187,11 @@ def _artifact_workspace(aid: int) -> None:
 
     if thread and thread[-1].get("awaiting_reply"):
         thread[-1].pop("awaiting_reply", None)
+        from chat_handlers import handle_chat_request
         handle_chat_request(st.empty())
         st.rerun()
-    
-    for msg in main_thread():
+
+    for msg in thread:
         render_message(msg)
 
     if maybe_run_yuki(st.empty()):
@@ -204,14 +203,15 @@ def _artifact_workspace(aid: int) -> None:
         chat_kwargs["file_type"] = IMAGE_INPUT_TYPES
     if CHAT_INPUT_SUPPORTS_AUDIO:
         chat_kwargs["accept_audio"] = True
-        bottom_dock = getattr(st, "bottom", None) or st._bottom
+
+    bottom_dock = getattr(st, "bottom", None) or st._bottom
     with bottom_dock:
         with st.container(key="pending_preview"):
             render_pending_preview("artefak")
-        with st.container(key="artefak"):
-            render_input_controls("artefak", show_mode=True)
+        with st.container(key="chat_controls"):
+            render_input_controls("artefak", show_mode=False)
 
-    user_input = st.chat_input(placeholder_text, **chat_kwargs)
+    user_input = st.chat_input("Jelaskan apa yang mau dibuat…", **chat_kwargs)
     if process_user_input(user_input, st.empty()):
         st.rerun()
 
@@ -253,9 +253,7 @@ def page_artefak() -> None:
                     st.code(art["content"], language=art.get("lang") or None)
 
     _page_footer()
-
-
-# ============================================================================
+  # ============================================================================
 # HALAMAN: PENGATURAN
 # ============================================================================
 def _opt_index(options: list, value) -> int:
@@ -641,7 +639,7 @@ def _set_waktu_fokus() -> None:
     with c5:
         end = st.text_input("Selesai", value=s["work_end"], key="set_end")
     with c6:
-        st.text_input("Waktu lokal sekarang", value=datetime.now().strftime("%H:%M"),
+        st.text_input("Waktu lokal sekarang", value=now_wib(),
                       key="set_now", disabled=True)
 
     remind = st.toggle("Ingatkan aku saat jam fokus selesai", value=s["focus_reminder"],
@@ -776,9 +774,7 @@ def page_pengaturan() -> None:
         _set_trinity_code()
 
     _page_footer()
-
-
-# ============================================================================
+  # ============================================================================
 # HALAMAN: BAHASA
 # ============================================================================
 def page_bahasa() -> None:
@@ -1186,10 +1182,11 @@ def _course_grid(prefix: str) -> None:
             with cols[j]:
                 label = (f"{c['icon']}  \n"
                          f"**{c['title']}**  \n"
-                         f":gray[{c['desc']} \u00b7 {c['level']}]")
+                         f":gray[{c['desc']} · {c['level']}]")
                 if st.button(label, key=f"{prefix}_{c['key']}", use_container_width=True):
                     st.session_state.course_active_key = c["key"]
                     go("kursus")
+
 
 
 def _course_workspace(key: str) -> None:
@@ -1225,8 +1222,7 @@ def _course_workspace(key: str) -> None:
             unsafe_allow_html=True,
         )
 
-
-    for msg in main_thread():
+    for msg in thread:
         render_message(msg)
 
     if maybe_run_yuki(st.empty()):
@@ -1238,14 +1234,15 @@ def _course_workspace(key: str) -> None:
         chat_kwargs["file_type"] = IMAGE_INPUT_TYPES
     if CHAT_INPUT_SUPPORTS_AUDIO:
         chat_kwargs["accept_audio"] = True
-        bottom_dock = getattr(st, "bottom", None) or st._bottom
+
+    bottom_dock = getattr(st, "bottom", None) or st._bottom
     with bottom_dock:
         with st.container(key="pending_preview"):
-            render_pending_preview("kursus")
-        with st.container(key=f"kursus_{key}"):
-            render_input_controls("kursus", show_mode=True)
+            render_pending_preview(f"kursus_{key}")
+        with st.container(key="chat_controls"):
+            render_input_controls(f"kursus_{key}", show_mode=False)
 
-    user_input = st.chat_input(placeholder_text, **chat_kwargs)
+    user_input = st.chat_input(f"Tanya apa saja tentang {course['title']}…", **chat_kwargs)
     if process_user_input(user_input, st.empty()):
         st.rerun()
 
