@@ -241,7 +241,8 @@ def render_sidebar() -> None:
                             ":material/push_pin:  " + c["title"]
                             if pinned else c["title"]
                         )
-                        btn, more = st.columns([0.84, 0.16], gap="small")
+                        btn, more = st.columns([0.82, 0.18], gap="small",
+                        vertical_alignment="center")
                         with btn:
                             if st.button(title_label, key=f"btn_{key}",
                                          use_container_width=True):
