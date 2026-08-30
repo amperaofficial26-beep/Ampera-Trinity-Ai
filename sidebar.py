@@ -172,50 +172,52 @@ def _render_rename_row(c: dict) -> None:
 
 def render_sidebar() -> None:
     with st.sidebar:
-        # Brand serif ala "Claude"
-        st.markdown('<div class="sb-brand">Trinity</div>', unsafe_allow_html=True)
+        # ---- Bagian atas: TETAP di atas (sticky), tidak ikut scroll ----
+        with st.container(key="sb_top"):
+            # Brand serif ala "Claude"
+            st.markdown('<div class="sb-brand">Trinity</div>', unsafe_allow_html=True)
 
-        # + Baru (latar krem menonjol seperti Claude)
-        with st.container(key="sb_new"):
-            if st.button(":material/add: &nbsp;Baru", use_container_width=True):
-                reset_conversation()
-                st.rerun()
+            # + Baru (latar krem menonjol seperti Claude)
+            with st.container(key="sb_new"):
+                if st.button(":material/add: &nbsp;Baru", use_container_width=True):
+                    reset_conversation()
+                    st.rerun()
 
-        # Menu ala Claude (ikon garis tipis + teks rata kiri)
-        with st.container(key="sb_menu_chat"):
-            if st.button(":material/chat_bubble: &nbsp;Chat", use_container_width=True):
-                st.session_state.image_mode = False
-                st.rerun()
-        with st.container(key="sb_menu_img"):
-            if st.button(":material/palette: &nbsp;Gambar", use_container_width=True):
-                st.session_state.image_mode = True
-                st.rerun()
+            # Menu ala Claude (ikon garis tipis + teks rata kiri)
+            with st.container(key="sb_menu_chat"):
+                if st.button(":material/chat_bubble: &nbsp;Chat", use_container_width=True):
+                    st.session_state.image_mode = False
+                    st.rerun()
+            with st.container(key="sb_menu_img"):
+                if st.button(":material/palette: &nbsp;Gambar", use_container_width=True):
+                    st.session_state.image_mode = True
+                    st.rerun()
 
-        st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
+            st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
 
-        with st.container(key="sb_menu_proyek"):
-            if st.button(":material/deployed_code: &nbsp;Proyek", use_container_width=True):
-                show_proyek_dialog()
-        with st.container(key="sb_menu_artefak"):
-            n_art = len(st.session_state.get("artifacts", []))
-            art_label = ":material/data_object: &nbsp;Artefak" + (f"  ({n_art})" if n_art else "")
-            if st.button(art_label, use_container_width=True):
-                # buka HALAMAN Artefak (bukan popup lagi)
-                go("artefak")
-        with st.container(key="sb_menu_sesuaikan"):
-            if st.button(":material/tune: &nbsp;Sesuaikan", use_container_width=True):
-                show_sesuaikan_dialog()
+            with st.container(key="sb_menu_proyek"):
+                if st.button(":material/deployed_code: &nbsp;Proyek", use_container_width=True):
+                    show_proyek_dialog()
+            with st.container(key="sb_menu_artefak"):
+                n_art = len(st.session_state.get("artifacts", []))
+                art_label = ":material/data_object: &nbsp;Artefak" + (f"  ({n_art})" if n_art else "")
+                if st.button(art_label, use_container_width=True):
+                    # buka HALAMAN Artefak (bukan popup lagi)
+                    go("artefak")
+            with st.container(key="sb_menu_sesuaikan"):
+                if st.button(":material/tune: &nbsp;Sesuaikan", use_container_width=True):
+                    show_sesuaikan_dialog()
 
-        st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
+            st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
 
-        with st.container(key="sb_download"):
-            st.download_button(
-                label=":material/download: &nbsp;Unduh Chat",
-                data=get_chat_export_text(),
-                file_name=f"trinity-chat-{__import__('datetime').datetime.now().strftime('%Y%m%d-%H%M')}.md",
-                mime="text/markdown",
-                use_container_width=True,
-            )
+            with st.container(key="sb_download"):
+                st.download_button(
+                    label=":material/download: &nbsp;Unduh Chat",
+                    data=get_chat_export_text(),
+                    file_name=f"trinity-chat-{__import__('datetime').datetime.now().strftime('%Y%m%d-%H%M')}.md",
+                    mime="text/markdown",
+                    use_container_width=True,
+                )
 
         # Riwayat percakapan (grup "Hari ini" seperti Claude). Obrolan yang
         # sedang berjalan langsung ikut tampil (seperti Claude), lalu yang
@@ -242,7 +244,7 @@ def render_sidebar() -> None:
                             if pinned else c["title"]
                         )
                         btn, more = st.columns([0.82, 0.18], gap="small",
-                        vertical_alignment="center")
+                                               vertical_alignment="center")
                         with btn:
                             if st.button(title_label, key=f"btn_{key}",
                                          use_container_width=True):
