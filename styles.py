@@ -52,8 +52,10 @@ section[data-testid="stSidebar"] [data-testid="stSidebarHeader"] {
 }
 /* tombol tutup sidebar — ikon Material, melayang di pojok */
 section[data-testid="stSidebar"] [data-testid="stSidebarHeader"] > * {
-    position: absolute;
-    top: 25px; right: -26px;
+    position: fixed;
+    top: 25px;
+    left: 260px;
+    transform: translateX(-50%);
     z-index: 10;
 }
 [data-testid="stSidebarCollapseButton"] button {
@@ -128,6 +130,9 @@ button[kind="headerNoPadding"] {
     padding: 0 6px 8px;
     margin-top: 0;
     line-height: 1.1;
+}
+[data-testid="stSidebarContent"] {
+    overflow: hidden !important;
 }
 /* ---- Layout sidebar: menu atas & baris akun bawah TETAP, dan HANYA daftar
    riwayat yang punya scrollbar sendiri. Menu atas memakai position:fixed
