@@ -50,16 +50,31 @@ section[data-testid="stSidebar"] [data-testid="stSidebarHeader"] {
     min-height: 0 !important;
     height: 0 !important;
 }
-/* tombol tutup sidebar « melayang di pojok, tidak memakan ruang */
+/* tombol tutup sidebar — ikon Material, melayang di pojok */
 section[data-testid="stSidebar"] [data-testid="stSidebarHeader"] > * {
     position: absolute;
     top: 8px; right: 8px;
     z-index: 10;
 }
-section[data-testid="stSidebar"] [data-testid="stSidebarUserContent"] {
-    padding-top: 6px !important;
+[data-testid="stSidebarCollapseButton"] button {
+    color: #6B6172 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
 }
-/* tombol buka sidebar (saat tertutup) HARUS selalu terlihat */
+[data-testid="stSidebarCollapseButton"] [data-testid="stIconMaterial"],
+[data-testid="stSidebarCollapseButton"] svg {
+    display: none !important;
+}
+[data-testid="stSidebarCollapseButton"] button::before {
+    content: "left_panel_close";
+    font-family: "Material Symbols Rounded", "Material Symbols Outlined", sans-serif;
+    font-size: 22px;
+    line-height: 1;
+    color: #6B6172;
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+/* tombol buka sidebar (saat tertutup) — ikon hamburger Material */
 [data-testid="stSidebarCollapsedControl"],
 [data-testid="collapsedControl"] {
     display: flex !important;
@@ -75,8 +90,24 @@ section[data-testid="stSidebar"] [data-testid="stSidebarUserContent"] {
     border: 1px solid #DBCEB9 !important;
     border-radius: 10px !important;
 }
-[data-testid="stSidebarCollapseButton"] button { color: #6B6172 !important; }
-/* varian testid tombol expand sidebar di Streamlit versi baru */
+[data-testid="stSidebarCollapsedControl"] [data-testid="stIconMaterial"],
+[data-testid="collapsedControl"] [data-testid="stIconMaterial"],
+[data-testid="stExpandSidebarButton"] [data-testid="stIconMaterial"],
+[data-testid="stSidebarCollapsedControl"] svg,
+[data-testid="collapsedControl"] svg,
+[data-testid="stExpandSidebarButton"] svg {
+    display: none !important;
+}
+[data-testid="stSidebarCollapsedControl"] button::before,
+[data-testid="collapsedControl"] button::before,
+[data-testid="stExpandSidebarButton"]::before {
+    content: "menu";
+    font-family: "Material Symbols Rounded", "Material Symbols Outlined", sans-serif;
+    font-size: 22px;
+    line-height: 1;
+    color: #2C1F33;
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+}
 [data-testid="stExpandSidebarButton"],
 button[kind="headerNoPadding"] {
     display: inline-flex !important;
