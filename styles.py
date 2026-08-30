@@ -129,44 +129,35 @@ button[kind="headerNoPadding"] {
     margin-top: 0;
     line-height: 1.1;
 }
-/* Bagian atas sidebar (brand · + Baru · menu · unduh) dibuat STICKY supaya
-   TETAP di atas. Yang ikut discroll hanya daftar riwayat di bawahnya,
-   persis perilaku sidebar Claude. Baris akun tetap di dasar (fixed). */
-/* ---- Susun sidebar: menu atas & baris akun bawah TETAP, dan HANYA daftar
-   riwayat yang bisa discroll (dengan scrollbar sendiri). Memakai flexbox +
-   :has() supaya tinggi otomatis pas, tanpa angka manual. ---- */
-[data-testid="stSidebarContent"] {
-    display: flex !important;
-    flex-direction: column !important;
-    overflow: hidden !important;
+/* ---- Layout sidebar: menu atas & baris akun bawah TETAP, dan HANYA daftar
+   riwayat yang punya scrollbar sendiri. Menu atas memakai position:fixed
+   (cara yang sama dengan baris akun di bawah yang sudah terbukti bekerja),
+   lalu riwayat diberi TINGGI TETAP dengan calc() + overflow-y:auto. ---- */
+
+/* menu atas ditempel di atas layar */
+.st-key-sb_top {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 260px;
+    z-index: 6;
+    background: #EDE2D1;
+    border-bottom: 1px solid #DBCEB9;
+    padding: 2px 16px 6px;
+    box-sizing: border-box;
 }
-[data-testid="stSidebarHeader"] {
-    flex-shrink: 0 !important;
-}
-[data-testid="stSidebarUserContent"] {
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    overflow: hidden !important;
-}
-/* setiap blok (menu / riwayat / akun) jadi satu baris flex; jangan menyusut */
-[data-testid="stSidebarUserContent"] > .element-container {
-    flex-shrink: 0 !important;
-}
-/* blok riwayat: mengisi sisa tinggi dan hanya dia yang punya scroll */
-[data-testid="stSidebarUserContent"] > .element-container:has(.st-key-sb_history) {
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    overflow: hidden !important;
-}
+
+/* riwayat: tinggi tetap = layar - menu - ruang baris akun bawah, lalu scroll
+   sendiri. Dua angka di bawah ini disetel BERSAMA-sama:
+     - 410 = tinggi menu atas
+     -  70 = tinggi baris akun bawah + ruang aman
+   Kalau "Hari ini" ketutup menu -> naikkan 410. Kalau item terbawah ketutup
+   baris akun -> naikkan 70. Kalau ada jarak kosong -> kecilkan angkanya. */
 .st-key-sb_history {
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-    overflow-y: auto !important;
-    padding-bottom: 60px !important;  /* ruang biar item terbawah tak ketutup baris akun */
+    margin-top: 410px;
+    height: calc(100vh - 410px - 70px);
+    overflow-y: auto;
+    padding-bottom: 12px;
 }
 /* tombol menu sidebar: baris teks polos RATA KIRI, hover krem (ala Claude) */
 section[data-testid="stSidebar"] div.stButton > button {
