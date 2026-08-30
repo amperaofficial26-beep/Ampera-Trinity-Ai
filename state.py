@@ -159,6 +159,10 @@ def _archive_current_conversation() -> None:
         "id": st.session_state.conv_counter,
         "title": _conversation_title(msgs),
         "messages": msgs,
+        "pinned": False,
+        "unread": False,
+        "project_id": None,
+        "project_name": "",
     })
 
 
@@ -180,6 +184,8 @@ def open_conversation(conv_id: int) -> None:
             st.session_state.messages = c["messages"]
             st.session_state.page = "chat"
             st.session_state.active_conv_id = conv_id
+            # saat dibuka, otomatis ditandai sudah dibaca
+            c["unread"] = False
             st.session_state.msg_counter = max(
                 (m.get("id", 0) for m in c["messages"]), default=1
             )
@@ -208,3 +214,32 @@ def delete_conversation(conv_id: int) -> None:
         st.session_state.active_conv_id = None
     if st.session_state.get("rename_conv_id") == conv_id:
         st.session_state.rename_conv_id = None
+
+
+def toggle_pin_conversation(conv_id: int) -> None:
+    """Sematkan / lepas sematan satu percakapan (yang tersemat tampil di atas)."""
+    for c in st.session_state.conversations:
+        if c["id"] == conv_id:
+            c["pinned"] = not c.get("pinned", False)
+            return
+
+
+def set_conversation_unread(conv_id: int, unread: bool) -> None:
+    """Tandai percakapan sebagai sudah/belum dibaca (dot di sidebar)."""
+    for c in st.session_state.conversations:
+        if c["id"] == conv_id:
+            c["unread"] = bool(unread)
+            return
+
+
+def assign_conversation_project(conv_id: int, project_id) -> None:
+    """Masukkan percakapan ke salah satu proyek (None = lepas dari proyek)."""
+    projects = st.session_state.get("projects", [])
+    for c in st.session_state.conversations:
+        if c["id"] == conv_id:
+            c["project_id"] = project_id
+            c["project_name"] = (
+                next((p["name"] for p in projects if p["id"] == project_id), "")
+                if project_id is not None else ""
+            )
+            return
