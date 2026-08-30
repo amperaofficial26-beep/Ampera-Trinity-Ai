@@ -541,21 +541,19 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 .claude-think .logo-shimmer { color: #2C1F33; }
 
 /* ---------- chat input: kartu putih membulat ala Claude ---------- */
-/* ====== URUTAN AREA INPUT ala Claude:
-   1) preview lampiran/gambar di atas
-   2) kotak teks di tengah
-   3) baris + dan pilihan model di bawah ====== */
-[data-testid="stBottomBlockContainer"] [data-testid="stVerticalBlock"],
-[data-testid="stBottomBlockContainer"] [data-testid="stVerticalBlockBorderWrapper"],
-[data-testid="stBottomBlockContainer"] [data-testid="stElementContainer"],
-[data-testid="stBottomBlockContainer"] .element-container,
-[data-testid="stBottomBlockContainer"] [data-testid="stHorizontalBlock"] {
+/* ====== URUTAN AREA INPUT ala Claude — HANYA 2 lapisan terluar yang
+   dibongkar (pakai ">"), supaya struktur DI DALAM pending_strip dan
+   chat_controls (posisi tombol ×, baris + & model) tidak ikut rusak ====== */
+[data-testid="stBottomBlockContainer"] > [data-testid="stVerticalBlock"] {
+    display: contents !important;
+}
+[data-testid="stBottomBlockContainer"] > [data-testid="stVerticalBlock"] > [data-testid="stElementContainer"],
+[data-testid="stBottomBlockContainer"] > [data-testid="stVerticalBlock"] > .element-container {
     display: contents !important;
 }
 [data-testid="stBottomBlockContainer"] [class*="st-key-pending_strip"] { order: 1 !important; }
 [data-testid="stBottomBlockContainer"] [data-testid="stChatInput"]      { order: 2 !important; }
-[data-testid="stBottomBlockContainer"] .st-key-chat_controls            { order: 3 !important; }
-[data-testid="stBottom"], [data-testid="stBottomBlockContainer"],
+[data-testid="stBottomBlockContainer"] .st-key-chat_controls            { order: 3 !important; }[data-testid="stBottom"], [data-testid="stBottomBlockContainer"],
 [data-testid="stBottom"] > div {
     background: #E8DCC8 !important; border: none !important; box-shadow: none !important;
 }
