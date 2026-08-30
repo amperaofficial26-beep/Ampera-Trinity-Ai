@@ -1286,7 +1286,7 @@ div.stDownloadButton > button:hover {
 
 /* ---------- footer ---------- */
 .trinity-foot {
-    text-align: center; color: #7E7387; font-size: -10rem;
+    text-align: center; color: #7E7387; font-size: -30rem;
     margin-top: 34px; font-family: 'Inter', sans-serif;
 }
 /* versi saat chat berjalan: lebih kecil lagi dari versi halaman awal */
