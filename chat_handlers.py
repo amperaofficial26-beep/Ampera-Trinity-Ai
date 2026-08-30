@@ -235,6 +235,13 @@ def _pending_cards_html(pending: list) -> str:
             )
     return '<div class="pending-row">' + "".join(cards) + "</div>"
 
+def _drop_pending(idx: int) -> None:
+    imgs = list(st.session_state.get("pending_images") or [])
+    if 0 <= idx < len(imgs):
+        imgs.pop(idx)
+        st.session_state.pending_images = imgs
+
+
 def render_pending_preview(page_key: str = "chat") -> None:
     kp = "" if page_key == "chat" else f"{page_key}_"
     pending = st.session_state.get("pending_images", [])
@@ -258,20 +265,23 @@ def render_pending_preview(page_key: str = "chat") -> None:
                     )
                 st.markdown(
                     f'<div class="pending-card">{inner}'
-                    f'<span class="pending-x">×</span>'
                     f'<div class="pending-name">{name}</div></div>',
                     unsafe_allow_html=True,
                 )
-                if st.button("×", key=f"{kp}pending_rm_{i}", help="Hapus"):
-                    st.session_state.pending_images.pop(i)
-                    st.rerun()
+                st.button(
+                    "×",
+                    key=f"{kp}pending_rm_{i}",
+                    help="Hapus",
+                    on_click=_drop_pending,
+                    args=(i,),
+                )
 
 
 def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> None:
-    """Isi dok bawah: [+] [Gambar] ... [Nama Model], preview tepat di atas chat input."""
+    """Baris di bawah kotak ketik: [+] ........... [Nama Model]."""
     kp = "" if page_key == "chat" else f"{page_key}_"
 
-    ctrl_plus, ctrl_mode, _sp, ctrl_model = st.columns([0.08, 0.22, 1.22, 0.28])
+    ctrl_plus, _sp, ctrl_model = st.columns([0.08, 1.64, 0.28])
 
     with ctrl_plus:
         with st.container(key=f"{kp}plus_menu"):
@@ -368,16 +378,6 @@ def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> Non
                     st.session_state.web_search_on = not st.session_state.get("web_search_on", False)
                     st.rerun()
 
-    with ctrl_mode:
-        if show_mode:
-            st.session_state.image_mode = st.toggle(
-                "Gambar",
-                value=st.session_state.image_mode,
-                key=f"{kp}toggle_gambar",
-                help="Nyalakan untuk membuat gambar dari teks. "
-                     "Matikan untuk chat biasa dengan Yuki.",
-            )
-
     with _sp:
         if st.session_state.messages or st.session_state.get("page") != "chat":
             st.markdown(
@@ -400,8 +400,7 @@ def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> Non
                     if st.button(label, key=f"{kp}model_{m['key']}", use_container_width=True):
                         st.session_state.selected_model_key = m["key"]
                         st.rerun()
-
-
+                        
 def process_user_input(user_input, answer_slot, is_fresh: bool = False) -> bool:
     """Simpan kiriman user ke thread aktif, lalu antri Yuki.
     Return True bila halaman perlu di-rerun."""
