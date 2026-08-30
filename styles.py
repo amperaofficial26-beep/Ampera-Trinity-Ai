@@ -540,64 +540,35 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 .logo-greeting, .logo-label, .logo-progress, .logo-foot,
 .claude-think .logo-shimmer { color: #2C1F33; }
 
-/* ---------- chat input: kolom pendek, kartu satu ---------- */
-[data-testid="stBottom"] {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-}
+/* ---------- chat input: kartu putih membulat ala Claude ---------- */
+[data-testid="stBottom"], [data-testid="stBottomBlockContainer"],
 [data-testid="stBottom"] > div {
-    display: flex !important;
-    flex-direction: column !important;
-    width: 100% !important;
-    max-width: 38rem !important;
-    margin: 0 auto !important;
-    padding: 0 12px 10px !important;
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    box-sizing: border-box !important;
+    background: #E8DCC8 !important; border: none !important; box-shadow: none !important;
 }
-
-/* Buka bungkus supaya preview, ketik, + jadi anak kolom yang sama */
-[data-testid="stBottomBlockContainer"],
-[data-testid="stBottomBlockContainer"] > * {
-    display: contents !important;
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    padding: 0 !important;
-}
-
-/* 1 preview  2 kotak ketik  3 + / model */
-[data-testid="stBottom"] > div > *:has(.st-key-pending_preview),
-.st-key-pending_preview { order: 1 !important; width: 100% !important; }
-[data-testid="stBottom"] > div > *:has([data-testid="stChatInput"]),
-[data-testid="stChatInput"] { order: 2 !important; width: 100% !important; }
-[data-testid="stBottom"] > div > *:has(.st-key-chat_controls),
-.st-key-chat_controls { order: 3 !important; width: 100% !important; }
-
-/* Bagian atas kartu = kotak ketik */
-[data-testid="stChatInput"] {
+/* KARTU GABUNGAN ala Claude: kotak teks + baris kontrol (+, model)
+   dibungkus jadi SATU kartu membulat. */
+[data-testid="stBottomBlockContainer"] {
     background: #F2E8D6 !important;
     border: 1px solid #DBCEB9 !important;
-    border-bottom: none !important;
-    border-radius: 22px 22px 0 0 !important;
-    box-shadow: none !important;
-    padding: 2px 6px 0 !important;
+    border-radius: 22px !important;
+    box-shadow: 0 4px 14px rgba(44,31,51,0.07) !important;
+    padding: 6px 6px 4px !important;
+    transition: border-color .18s ease, box-shadow .18s ease !important;
 }
-[data-testid="stChatInput"]:focus-within {
+[data-testid="stBottomBlockContainer"]:focus-within {
     border-color: #2C1F33 !important;
+    box-shadow: 0 4px 18px rgba(44,31,51,0.16) !important;
+}
+[data-testid="stChatInput"] {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 2px 6px !important;
 }
 [data-testid="stChatInput"] div,
 [data-testid="stChatInput"] [data-baseweb="base-input"],
 [data-testid="stChatInput"] [data-baseweb="textarea"] {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
+    background: transparent !important; border: none !important; box-shadow: none !important;
 }
 [data-testid="stChatInput"] textarea {
     background: transparent !important;
@@ -613,22 +584,22 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     border: none !important;
     border-radius: 10px !important;
     color: #FFFFFF !important;
+    transition: background .18s ease !important;
 }
-[data-testid="stChatInput"] button:hover { background: #4A3559 !important; }
+[data-testid="stChatInput"] button:hover {
+    background: #4A3559 !important;
+}
 [data-testid="stChatInput"] button svg { fill: #FFFFFF !important; color: #FFFFFF !important; }
-[data-testid="stChatInput"] button:disabled { background: #DBCEB9 !important; }
+[data-testid="stChatInput"] button:disabled {
+    background: #DBCEB9 !important;
+}
 [data-testid="stChatInput"] button:disabled svg { fill: #7E7387 !important; color: #7E7387 !important; }
 
-/* Bagian bawah kartu = + kiri, model kanan */
 .st-key-chat_controls {
     position: relative;
     margin-top: 0 !important;
-    padding: 0 8px 6px !important;
-    background: #F2E8D6 !important;
-    border: 1px solid #DBCEB9 !important;
-    border-top: none !important;
-    border-radius: 0 0 22px 22px !important;
-    box-shadow: 0 4px 14px rgba(44,31,51,0.07) !important;
+    padding: 2px 4px 2px;
+    background: transparent !important;
 }
 .st-key-chat_controls [data-testid="stHorizontalBlock"] {
     align-items: center;
@@ -657,6 +628,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 .st-key-chat_controls button[data-testid="stBaseButton-secondary"],
 .st-key-chat_controls button[data-testid="stPopoverButton"] {
     background: transparent !important;
+    background-color: transparent !important;
     border: none !important;
     outline: none !important;
     border-radius: 8px !important;
@@ -675,8 +647,14 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 .st-key-chat_controls button[data-testid="stPopoverButton"]:hover {
     background: rgba(44,31,51,0.06) !important;
     color: #2C1F33 !important;
+    border: none !important;
+    box-shadow: none !important;
 }
-.st-key-chat_controls [data-testid="stPopover"],
+.st-key-chat_controls [data-testid="stPopover"] {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
 .st-key-chat_controls [data-testid="stPopover"] > div {
     background: transparent !important;
     border: none !important;
@@ -706,6 +684,11 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     border-color: #2C1F33 !important;
 }
 
+/* Urutan dok (versi lama, sebelum 3 ubahan) */
+[data-testid="stBottomBlockContainer"] {
+    display: flex !important;
+    flex-direction: column !important;
+}
 .pending-card {
     position: relative;
     width: 72px;
