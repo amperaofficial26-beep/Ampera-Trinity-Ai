@@ -184,7 +184,9 @@ def open_conversation(conv_id: int) -> None:
                 (m.get("id", 0) for m in c["messages"]), default=1
             )
             return
-            def rename_conversation(conv_id: int, new_title: str) -> None:
+
+
+def rename_conversation(conv_id: int, new_title: str) -> None:
     """Ganti judul percakapan di riwayat sidebar. Judul manual ditandai
     supaya tidak ditimpa lagi oleh judul otomatis saat diarsipkan ulang."""
     title = (new_title or "").strip()
