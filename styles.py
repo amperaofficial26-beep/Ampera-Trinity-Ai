@@ -132,30 +132,29 @@ button[kind="headerNoPadding"] {
 /* Bagian atas sidebar (brand · + Baru · menu · unduh) dibuat STICKY supaya
    TETAP di atas. Yang ikut discroll hanya daftar riwayat di bawahnya,
    persis perilaku sidebar Claude. Baris akun tetap di dasar (fixed). */
-/* Susun sidebar jadi kolom penuh: bagian atas (menu) tetap, bagian riwayat
-   scroll sendiri, dan baris akun tetap di dasar. Outer sidebar jadi TIDAK
-   ikut scroll — hanya daftar riwayat yang bisa digulir. */
-[data-testid="stSidebarContent"] {
-    display: flex !important;
-    flex-direction: column !important;
-    overflow: hidden !important;
-}
-[data-testid="stSidebarUserContent"] {
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    overflow: hidden !important;
-}
-/* blok atas (brand + menu + unduh): jangan menyusut */
+/* ---- Susun sidebar: menu atas TETAP, hanya daftar riwayat yang scroll ----
+   Menu dibuat position:fixed (mekanisme yang sama & sudah terbukti bekerja
+   dengan baris akun di dasar). Karena menu keluar dari alur dokumen, beri
+   jarak (margin-top) pada daftar riwayat setinggi menu agar tidak ketutup. */
 .st-key-sb_top {
-    flex-shrink: 0 !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 260px;
+    z-index: 6;
+    background: #EDE2D1;
+    border-bottom: 1px solid #DBCEB9;
+    padding: 2px 16px 6px;
+    box-sizing: border-box;
 }
-/* daftar riwayat: ini satu-satunya area yang discroll */
+/* jarak antar elemen menu dibuat seragam supaya tinggi menu mudah dihitung */
+.st-key-sb_top [data-testid="stVerticalBlock"] { gap: 6px !important; }
+.st-key-sb_top .element-container { margin: 0 !important; }
+/* daftar riwayat: beri ruang atas setinggi menu yang fixed.
+   Angka 380px = perkiraan tinggi menu. Kalau baris riwayat paling atas
+   ketutup menu -> BESARKAN. Kalau ada jarak kosong berlebih -> KECILKAN. */
 .st-key-sb_history {
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-    overflow-y: auto !important;
+    margin-top: 380px !important;
     padding-bottom: 12px !important;
 }
 /* tombol menu sidebar: baris teks polos RATA KIRI, hover krem (ala Claude) */
