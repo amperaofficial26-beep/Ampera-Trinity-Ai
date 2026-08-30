@@ -371,7 +371,6 @@ _BOTTOM_RESET_CSS = """
 def _page_footer(in_chat: bool = False) -> None:
     foot_class = "trinity-foot" if not in_chat else "trinity-foot in-chat"
     st.markdown(
-        f'<p class="{foot_class}">{logo_img_html("logo-foot")} '
-        "Ampera Trinity AI · by Ampera Official · 2026</p>",
+        f'<p class="{foot_class}">© 2026 Ampera Trinity AI · by Ampera Official</p>',
         unsafe_allow_html=True,
     )
