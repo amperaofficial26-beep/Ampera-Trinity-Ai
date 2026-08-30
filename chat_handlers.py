@@ -266,8 +266,8 @@ def render_pending_preview(page_key: str = "chat") -> None:
                     st.session_state.pending_images.pop(i)
                     st.rerun()
                     def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> None:
-    """Isi dok bawah: [+] [Gambar] ... [Nama Model], preview tepat di atas chat input."""
-    kp = "" if page_key == "chat" else f"{page_key}_"
+                        """Isi dok bawah: [+] [Gambar] ... [Nama Model], preview tepat di atas chat input."""
+                        kp = "" if page_key == "chat" else f"{page_key}_"
 
     ctrl_plus, ctrl_mode, _sp, ctrl_model = st.columns([0.08, 0.22, 1.22, 0.28])
 
