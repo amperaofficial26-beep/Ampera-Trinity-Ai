@@ -53,7 +53,7 @@ section[data-testid="stSidebar"] [data-testid="stSidebarHeader"] {
 /* tombol tutup sidebar — ikon Material, melayang di pojok */
 section[data-testid="stSidebar"] [data-testid="stSidebarHeader"] > * {
     position: absolute;
-    top: 8px; right: 1px;
+    top: 8px; right: 20px;
     z-index: 10;
 }
 [data-testid="stSidebarCollapseButton"] button {
