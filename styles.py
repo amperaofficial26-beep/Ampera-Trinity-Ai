@@ -1321,13 +1321,8 @@ div.stDownloadButton > button:hover {
 .st-key-sb_account [data-testid="stVerticalBlock"] { gap: 0 !important; }
 .st-key-sb_account [data-testid="stColumn"]:first-child { padding-right: 0 !important; }
 .st-key-acct_menu {
-    position: fixed; bottom: 0; left: 20px; width: 60px;
-    height: 54px; box-sizing: border-box;
-    display: flex; align-items: center; justify-content: flex-end;
-    padding-right: 12px;
-    z-index: 999996; pointer-events: none;
+    position: fixed; bottom: 9px; left: 208px; z-index: 999996;
 }
-.st-key-acct_menu [data-testid="stPopover"] { pointer-events: auto; }
 .st-key-acct_menu [data-testid="stPopover"] > div { width: auto !important; }
 .st-key-acct_menu button[data-testid="stPopoverButton"],
 .st-key-acct_menu [data-testid="stPopover"] button {
