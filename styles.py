@@ -553,7 +553,9 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 }
 [data-testid="stBottomBlockContainer"] [class*="st-key-pending_strip"] { order: 1 !important; }
 [data-testid="stBottomBlockContainer"] [data-testid="stChatInput"]      { order: 2 !important; }
-[data-testid="stBottomBlockContainer"] .st-key-chat_controls            { order: 3 !important; }[data-testid="stBottom"], [data-testid="stBottomBlockContainer"],
+[data-testid="stBottomBlockContainer"] .st-key-chat_controls            { order: 3 !important; }
+
+[data-testid="stBottom"], [data-testid="stBottomBlockContainer"],
 [data-testid="stBottom"] > div {
     background: #E8DCC8 !important; border: none !important; box-shadow: none !important;
 }
