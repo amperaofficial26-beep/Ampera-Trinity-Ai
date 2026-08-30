@@ -132,30 +132,41 @@ button[kind="headerNoPadding"] {
 /* Bagian atas sidebar (brand · + Baru · menu · unduh) dibuat STICKY supaya
    TETAP di atas. Yang ikut discroll hanya daftar riwayat di bawahnya,
    persis perilaku sidebar Claude. Baris akun tetap di dasar (fixed). */
-/* ---- Susun sidebar: menu atas TETAP, hanya daftar riwayat yang scroll ----
-   Menu dibuat position:fixed (mekanisme yang sama & sudah terbukti bekerja
-   dengan baris akun di dasar). Karena menu keluar dari alur dokumen, beri
-   jarak (margin-top) pada daftar riwayat setinggi menu agar tidak ketutup. */
-.st-key-sb_top {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 260px;
-    z-index: 6;
-    background: #EDE2D1;
-    border-bottom: 1px solid #DBCEB9;
-    padding: 2px 16px 6px;
-    box-sizing: border-box;
+/* ---- Susun sidebar: menu atas & baris akun bawah TETAP, dan HANYA daftar
+   riwayat yang bisa discroll (dengan scrollbar sendiri). Memakai flexbox +
+   :has() supaya tinggi otomatis pas, tanpa angka manual. ---- */
+[data-testid="stSidebarContent"] {
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
 }
-/* jarak antar elemen menu dibuat seragam supaya tinggi menu mudah dihitung */
-.st-key-sb_top [data-testid="stVerticalBlock"] { gap: 6px !important; }
-.st-key-sb_top .element-container { margin: 0 !important; }
-/* daftar riwayat: beri ruang atas setinggi menu yang fixed.
-   Angka 380px = perkiraan tinggi menu. Kalau baris riwayat paling atas
-   ketutup menu -> BESARKAN. Kalau ada jarak kosong berlebih -> KECILKAN. */
+[data-testid="stSidebarHeader"] {
+    flex-shrink: 0 !important;
+}
+[data-testid="stSidebarUserContent"] {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+}
+/* setiap blok (menu / riwayat / akun) jadi satu baris flex; jangan menyusut */
+[data-testid="stSidebarUserContent"] > .element-container {
+    flex-shrink: 0 !important;
+}
+/* blok riwayat: mengisi sisa tinggi dan hanya dia yang punya scroll */
+[data-testid="stSidebarUserContent"] > .element-container:has(.st-key-sb_history) {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+}
 .st-key-sb_history {
-    margin-top: 380px !important;
-    padding-bottom: 12px !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    padding-bottom: 60px !important;  /* ruang biar item terbawah tak ketutup baris akun */
 }
 /* tombol menu sidebar: baris teks polos RATA KIRI, hover krem (ala Claude) */
 section[data-testid="stSidebar"] div.stButton > button {
@@ -358,7 +369,6 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     padding-top: 1.2rem !important;
     padding-bottom: 10rem !important;
 }
-
 /* scrollbar halus ala Claude */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
