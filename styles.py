@@ -129,7 +129,18 @@ button[kind="headerNoPadding"] {
     margin-top: 0;
     line-height: 1.1;
 }
-
+/* Bagian atas sidebar (brand · + Baru · menu · unduh) dibuat STICKY supaya
+   TETAP di atas. Yang ikut discroll hanya daftar riwayat di bawahnya,
+   persis perilaku sidebar Claude. Baris akun tetap di dasar (fixed). */
+.st-key-sb_top {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: #EDE2D1;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #DBCEB9;
+    margin-bottom: 2px;
+}
 /* tombol menu sidebar: baris teks polos RATA KIRI, hover krem (ala Claude) */
 section[data-testid="stSidebar"] div.stButton > button {
     background: transparent !important;
