@@ -81,42 +81,19 @@ def handle_image_request(prompt: str) -> None:
     worker = threading.Thread(target=_worker, daemon=True)
     worker.start()
 
-    stages = [
-        (0, "Membayangkan gambarnya"),
-        (30, "Menyiapkan kanvas"),
-        (55, "Melukis perlahan"),
-        (80, "Menajamkan detail"),
-    ]
-    pct = 0.0
-    t0 = time.time()
-    IMAGE_MIN_SECONDS = 10.0
-    while worker.is_alive() or (time.time() - t0) < IMAGE_MIN_SECONDS:
-        if pct < 60:
-            pct += 2.4
-        elif pct < 85:
-            pct += 1.1
-        elif pct < 92:
-            pct += 0.35
-        label = stages[0][1]
-        for threshold, name in stages:
-            if pct >= threshold:
-                label = name
-        progress_slot.markdown(image_progress_html(pct, label), unsafe_allow_html=True)
-        time.sleep(0.35)
-        if not worker.is_alive() and (time.time() - t0) >= IMAGE_MIN_SECONDS:
-            break
+    # Render kotak loading SEKALI saja. Semua gerakan (shimmer berputar di
+    # tepi kotak, sapuan kanvas, pergantian teks, bar progres) dijalankan
+    # oleh CSS di browser sehingga tetap mulus walau server sedang menunggu
+    # API. Jangan me-render ulang di dalam loop: setiap markdown() baru akan
+    # mengganti node DOM dan me-reset animasi CSS dari nol (itu penyebab
+    # shimmer terlihat diam/berkedip sebelumnya).
+    progress_slot.markdown(image_progress_html(), unsafe_allow_html=True)
 
+    # Tunggu hasil apa adanya — tanpa penundaan minimum buatan.
     worker.join(timeout=200)
 
     if result["error"] is None and result["data"]:
-        progress_slot.markdown(image_progress_html(100, "Selesai"), unsafe_allow_html=True)
-        time.sleep(0.6)
         progress_slot.empty()
-        thread.append({
-            "id": next_msg_id(), "role": "assistant", "type": "image",
-            "image_bytes": result["data"], "prompt": prompt,
-            "time": now_wib(),
-        })
     else:
         progress_slot.empty()
         e = result["error"] or RuntimeError("no image")
