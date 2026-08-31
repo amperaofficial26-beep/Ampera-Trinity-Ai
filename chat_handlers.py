@@ -44,6 +44,16 @@ def now_wib() -> str:
     return datetime.now(WIB).strftime("%H:%M")
 
 
+# --- Durasi tampilan kotak loading pembuatan gambar (detik) ---------------
+# IMAGE_MIN_SECONDS : kotak minimal tampil selama ini walau API sudah selesai,
+#                     supaya animasi shimmer sempat terlihat.
+# IMAGE_DONE_SECONDS: jeda singkat pada keadaan "Selesai" sebelum gambar muncul.
+# IMAGE_MAX_SECONDS : batas aman menunggu API sebelum dianggap timeout.
+IMAGE_MIN_SECONDS = 6.0
+IMAGE_DONE_SECONDS = 0.7
+IMAGE_MAX_SECONDS = 200.0
+
+
 def maybe_run_yuki(answer_slot) -> bool:
     job = st.session_state.get("_yuki_job")
     if not job:
@@ -89,27 +99,52 @@ def handle_image_request(prompt: str) -> None:
     # shimmer terlihat diam/berkedip sebelumnya).
     progress_slot.markdown(image_progress_html(), unsafe_allow_html=True)
 
-    # Tunggu hasil apa adanya — tanpa penundaan minimum buatan.
-    worker.join(timeout=200)
+    # Tunggu hasilnya. Kotak tetap tampil MINIMAL IMAGE_MIN_SECONDS detik
+    # supaya animasinya sempat terlihat utuh (FLUX-schnell sering selesai
+    # dalam 2-3 detik). Polling pakai sleep pendek TANPA render ulang, jadi
+    # animasi CSS di browser tidak ter-reset.
+    t0 = time.time()
+    while worker.is_alive() and (time.time() - t0) < IMAGE_MAX_SECONDS:
+        time.sleep(0.1)
+    while (time.time() - t0) < IMAGE_MIN_SECONDS:
+        time.sleep(0.1)
+    worker.join(timeout=1.0)
 
     if result["error"] is None and result["data"]:
+        # Tampilkan sebentar keadaan "Selesai" (animasi berhenti), lalu
+        # kotak diganti oleh gambar hasilnya.
+        progress_slot.markdown(image_progress_html(done=True), unsafe_allow_html=True)
+        time.sleep(IMAGE_DONE_SECONDS)
         progress_slot.empty()
+        st.session_state.pop("_last_image_error", None)
         thread.append({
             "id": next_msg_id(), "role": "assistant", "type": "image",
             "image_bytes": result["data"], "prompt": prompt,
             "time": now_wib(),
         })
+        return
+
+    progress_slot.empty()
+
+    if result["error"] is None and worker.is_alive():
+        e: Exception = RuntimeError("timeout")
     else:
-        progress_slot.empty()
         e = result["error"] or RuntimeError("no image")
-        msg = str(e)
-        if not msg.startswith(("Layanan", "Kuota", "Server terlalu",
-                               "Gagal membuat", "Respons terlalu")):
-            msg = public_error_image(None, msg, e)
-        thread.append({
-            "id": next_msg_id(), "role": "assistant", "type": "text",
-            "content": msg, "time": now_wib(),
-        })
+
+    # Simpan detail teknisnya supaya bisa dilihat di UI (expander "Detail
+    # teknis" di bawah pesan error) — sebelumnya kegagalan bisa terasa
+    # seperti "tidak terjadi apa-apa".
+    detail = f"{type(e).__name__}: {e}"
+    st.session_state["_last_image_error"] = detail
+
+    msg = str(e)
+    if not msg.startswith(("Layanan", "Kuota", "Server terlalu",
+                           "Gagal membuat", "Respons terlalu")):
+        msg = public_error_image(None, msg, e)
+    thread.append({
+        "id": next_msg_id(), "role": "assistant", "type": "text",
+        "content": msg, "time": now_wib(), "error_detail": detail,
+    })
 
 
 def handle_chat_request(answer_slot) -> None:

@@ -233,6 +233,12 @@ def render_message(msg: dict) -> None:
                         msg.get("time", ""), imgs_html, note),
             unsafe_allow_html=True,
         )
+        # Kalau pesan ini berasal dari kegagalan pembuatan gambar, detail
+        # teknisnya ditampilkan terlipat supaya penyebabnya bisa dicek
+        # (bukan sekadar "tidak ada hasil" tanpa keterangan).
+        if msg.get("error_detail"):
+            with st.expander("Detail teknis"):
+                st.code(str(msg["error_detail"]), language="text")
         # baris aksi kecil ala Claude: copy jawaban, feedback (👍/👎), jam kirim
         if msg.get("role") == "assistant":
             render_message_actions(msg)
