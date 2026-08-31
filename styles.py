@@ -37,7 +37,7 @@ html, body, [data-testid="stAppViewContainer"], .stApp {
 section[data-testid="stSidebar"] {
     background: #EDE2D1 !important;
     border-right: 1px solid #DBCEB9 !important;
-    width: 210px !important;
+    width: 240px !important;
     display: flex !important;
     visibility: visible !important;
 }
