@@ -10,8 +10,20 @@ import base64
 import io
 
 import streamlit as st
-from openai import OpenAI
 from PIL import Image
+
+# Impor pustaka openai dibuat "tahan banting": kalau paketnya gagal dimuat
+# (mis. versi Python di server terlalu baru sehingga wheel pydantic-core
+# belum tersedia), aplikasi TETAP jalan dan fitur gambar tetap bisa dipakai.
+# Sebelumnya kegagalan di sini membuat seluruh app.py crash saat import
+# dengan pesan menyesatkan: KeyError: 'engines.groq_engine'.
+try:
+    from openai import OpenAI
+except Exception as _exc:  # pragma: no cover
+    OpenAI = None
+    OPENAI_IMPORT_ERROR: Exception | None = _exc
+else:
+    OPENAI_IMPORT_ERROR = None
 
 from config import (
     GROQ_API_KEY, GROQ_BASE_URL, GROQ_MODEL_FALLBACKS, MAX_HISTORY_MESSAGES,
@@ -22,7 +34,13 @@ from errors import _is_model_unavailable_error
 from state import get_settings
 
 
-def build_chat_client() -> OpenAI:
+def build_chat_client():
+    if OpenAI is None:
+        raise RuntimeError(
+            "Pustaka 'openai' gagal dimuat di server "
+            f"({type(OPENAI_IMPORT_ERROR).__name__}: {OPENAI_IMPORT_ERROR}). "
+            "Fitur chat sementara tidak tersedia."
+        )
     return OpenAI(api_key=GROQ_API_KEY, base_url=GROQ_BASE_URL)
 
 

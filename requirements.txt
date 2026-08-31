@@ -1,4 +1,9 @@
-streamlit
-openai
-requests
-Pillow
+# Versi dipatok supaya build di Streamlit Cloud tidak "berpindah" sendiri.
+# Catatan: pilih Python 3.12 di Streamlit Cloud (Manage app > Settings >
+# Advanced > Python version). Python 3.14 masih terlalu baru — wheel untuk
+# pydantic-core (dependensi openai) belum tersedia, dan kegagalan impornya
+# muncul sebagai "KeyError: 'engines.groq_engine'".
+streamlit>=1.40,<2
+openai>=1.60,<2
+requests>=2.32,<3
+Pillow>=10.4,<12

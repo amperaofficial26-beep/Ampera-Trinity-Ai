@@ -205,6 +205,7 @@ def handle_chat_request(answer_slot) -> None:
         thread.append({
             "id": next_msg_id(), "role": "assistant", "type": "text",
             "content": err, "time": now_wib(),
+            "error_detail": f"{type(e).__name__}: {e}",
         })
 
 
