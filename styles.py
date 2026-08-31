@@ -52,10 +52,8 @@ section[data-testid="stSidebar"] [data-testid="stSidebarHeader"] {
 }
 /* tombol tutup sidebar — ikon Material, melayang di pojok */
 section[data-testid="stSidebar"] [data-testid="stSidebarHeader"] > * {
-    position: fixed;
-    top: 25px;
-    left: 260px;
-    transform: translateX(-50%);
+    position: absolute;
+    top: 25px; right: -26px;
     z-index: 10;
 }
 [data-testid="stSidebarCollapseButton"] button {
@@ -131,39 +129,7 @@ button[kind="headerNoPadding"] {
     margin-top: 0;
     line-height: 1.1;
 }
-[data-testid="stSidebarContent"] {
-    overflow: hidden !important;
-}
-/* ---- Layout sidebar: menu atas & baris akun bawah TETAP, dan HANYA daftar
-   riwayat yang punya scrollbar sendiri. Menu atas memakai position:fixed
-   (cara yang sama dengan baris akun di bawah yang sudah terbukti bekerja),
-   lalu riwayat diberi TINGGI TETAP dengan calc() + overflow-y:auto. ---- */
 
-/* menu atas ditempel di atas layar */
-.st-key-sb_top {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 260px;
-    z-index: 6;
-    background: #EDE2D1;
-    border-bottom: 1px solid #DBCEB9;
-    padding: 2px 16px 6px;
-    box-sizing: border-box;
-}
-
-/* riwayat: tinggi tetap = layar - menu - ruang baris akun bawah, lalu scroll
-   sendiri. Dua angka di bawah ini disetel BERSAMA-sama:
-     - 410 = tinggi menu atas
-     -  70 = tinggi baris akun bawah + ruang aman
-   Kalau "Hari ini" ketutup menu -> naikkan 410. Kalau item terbawah ketutup
-   baris akun -> naikkan 70. Kalau ada jarak kosong -> kecilkan angkanya. */
-.st-key-sb_history {
-    margin-top: 410px;
-    height: calc(100vh - 410px - 70px);
-    overflow-y: auto;
-    padding-bottom: 12px;
-}
 /* tombol menu sidebar: baris teks polos RATA KIRI, hover krem (ala Claude) */
 section[data-testid="stSidebar"] div.stButton > button {
     background: transparent !important;
@@ -178,7 +144,7 @@ section[data-testid="stSidebar"] div.stButton > button {
     padding: 6px 10px !important;
     min-height: 34px !important;
     color: #2C1F33 !important;
-    font-size: 17px !important;
+    font-size: 0.9rem !important;
     font-weight: 500 !important;
 }
 section[data-testid="stSidebar"] div.stButton > button:hover {
@@ -196,7 +162,7 @@ section[data-testid="stSidebar"] div.stButton > button [data-testid="stMarkdownC
 }
 section[data-testid="stSidebar"] div.stButton > button p {
     text-align: left !important;
-    font-size: 17px !important;
+    font-size: 0.9rem !important;
     color: #2C1F33 !important;
     margin: 0 !important;
 }
@@ -214,7 +180,7 @@ section[data-testid="stSidebar"] .st-key-sb_new button:hover {
     font-size: 0.85rem; font-weight: 500; color: #7D7484;
     padding: 16px 12px 6px; letter-spacing: 0.01em;
 }
-//* item riwayat: bulatan kecil ○ di depan + teks abu gelap, elipsis 1 baris */
+/* item riwayat: bulatan kecil ○ di depan + teks abu gelap, elipsis 1 baris */
 section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] button {
     font-weight: 400 !important;
     color: #4E4553 !important;
@@ -222,8 +188,7 @@ section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] button {
     padding: 6px 12px 6px 12px !important;
     position: relative;
 }
-/* bulatan ○ hanya di tombol JUDUL (bukan tombol ⋯ / popover) */
-section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] button:not([data-testid="stPopoverButton"])::before {
+section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] button::before {
     content: "";
     width: 8px; height: 8px;
     border: 1.5px solid #C1B49F;
@@ -232,59 +197,20 @@ section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] button:not([data-tes
     flex-shrink: 0;
     display: inline-block;
 }
-section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] button:not([data-testid="stPopoverButton"]) p {
-    font-size: 17px !important;
+section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] button p {
+    font-size: 0.98rem !important;
     font-weight: 400 !important;
     color: #4E4553 !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
-    max-width: 168px;
+    max-width: 210px;
 }
-/* tombol ⋯ di ujung kanan tiap item riwayat: polos, ikon di tengah */
-section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] [data-testid="stPopoverButton"] {
-    width: 100% !important;
-    min-width: 0 !important;
-    justify-content: center !important;
-    text-align: center !important;
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    color: #7E7387 !important;
-    padding: 6px 0 !important;
-    height: 36px !important;
-}
-section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] [data-testid="stPopoverButton"]:hover {
-    background: #E2D6C1 !important;
-    color: #2C1F33 !important;
-}
-section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] [data-testid="stPopoverButton"] svg {
-    width: 18px !important; height: 18px !important;
-}
-/* item riwayat aktif: sorot barisnya (bukan tombolnya) ala Claude */
-section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] {
-    border-radius: 10px;
-}
-section[data-testid="stSidebar"] [class*="st-key-sb_hist_"]:has(.sb-active-marker) {
+/* item riwayat aktif */
+section[data-testid="stSidebar"] [class*="st-key-sb_hist_"].sb-active button {
     background: #E2D6C1 !important;
 }
-/* item tersemat: bulatan ○ diganti ikon pin (dari label tombol) */
-section[data-testid="stSidebar"] [class*="st-key-sb_hist_"]:has(.sb-pinned-marker) button:not([data-testid="stPopoverButton"])::before {
-    display: none !important;
-}
-/* item belum dibaca: bulatan terisi + teks lebih tegas */
-section[data-testid="stSidebar"] [class*="st-key-sb_hist_"]:has(.sb-unread-marker) button:not([data-testid="stPopoverButton"])::before {
-    background: #4A3559 !important;
-    border-color: #4A3559 !important;
-}
-section[data-testid="stSidebar"] [class*="st-key-sb_hist_"]:has(.sb-unread-marker) button:not([data-testid="stPopoverButton"]) p {
-    font-weight: 600 !important;
-    color: #2C1F33 !important;
-}
-/* form ganti judul: rapat & tidak memakan banyak ruang */
-section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] form {
-    margin: 2px 0 4px !important;
-}
+
 /* tombol unduh di sidebar: sama polosnya dengan menu lain */
 section[data-testid="stSidebar"] div.stDownloadButton > button {
     background: transparent !important;
@@ -299,7 +225,7 @@ section[data-testid="stSidebar"] div.stDownloadButton > button {
     padding: 6px 10px !important;
     min-height: 34px !important;
     color: #2C1F33 !important;
-    font-size: 17px !important;
+    font-size: 0.9rem !important;
     font-weight: 500 !important;
 }
 section[data-testid="stSidebar"] div.stDownloadButton > button > div,
@@ -315,7 +241,7 @@ section[data-testid="stSidebar"] div.stDownloadButton > button:hover {
 }
 section[data-testid="stSidebar"] div.stDownloadButton > button p {
     text-align: left !important;
-    font-size: 17px !important;
+    font-size: 0.9rem !important;
     color: #2C1F33 !important;
     margin: 0 !important;
 }
@@ -365,6 +291,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     padding-top: 1.2rem !important;
     padding-bottom: 10rem !important;
 }
+
 /* scrollbar halus ala Claude */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -1332,8 +1259,7 @@ div.stDownloadButton > button:hover {
 
 /* ---------- footer ---------- */
 .trinity-foot {
-    text-align: center; color: #7E7387;
-    font-size: 13px !important;   /* ← pakai px + !important biar pasti menang */
+    text-align: center; color: #7E7387; font-size: 0.2rem;
     margin-top: 34px; font-family: 'Inter', sans-serif;
 }
 /* versi saat chat berjalan: lebih kecil lagi dari versi halaman awal */
@@ -1354,7 +1280,7 @@ div.stDownloadButton > button:hover {
 .st-key-sb_account [data-testid="stVerticalBlock"] { gap: 0 !important; }
 .st-key-sb_account [data-testid="stColumn"]:first-child { padding-right: 0 !important; }
 .st-key-acct_menu {
-    position: fixed; bottom: 9px; left: 208px; z-index: 999996;
+    position: fixed; bottom: 12px; left: 208px; z-index: 999996;
 }
 .st-key-acct_menu [data-testid="stPopover"] > div { width: auto !important; }
 .st-key-acct_menu button[data-testid="stPopoverButton"],
