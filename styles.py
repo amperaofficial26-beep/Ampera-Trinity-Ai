@@ -130,7 +130,8 @@ button[kind="headerNoPadding"] {
     line-height: 1.1;
 }
 
-/* tombol menu sidebar: baris teks polos RATA KIRI, hover krem (ala Claude) */
+/* tombol menu sidebar: baris teks polos RATA KIRI, hover krem (ala Claude)
+   → teks & ikon DIPERBESAR, tinggi baris DIRAPATKAN */
 section[data-testid="stSidebar"] div.stButton > button {
     background: transparent !important;
     border: none !important;
@@ -141,10 +142,12 @@ section[data-testid="stSidebar"] div.stButton > button {
     text-align: left !important;
     justify-content: flex-start !important;
     align-items: center !important;
-    padding: 6px 10px !important;
-    min-height: 34px !important;
+    gap: 6px !important;
+    padding: 3px 10px !important;
+    min-height: 30px !important;
+    line-height: 1.2 !important;
     color: #2C1F33 !important;
-    font-size: 0.9rem !important;
+    font-size: 1.06rem !important;
     font-weight: 500 !important;
 }
 section[data-testid="stSidebar"] div.stButton > button:hover {
@@ -162,9 +165,22 @@ section[data-testid="stSidebar"] div.stButton > button [data-testid="stMarkdownC
 }
 section[data-testid="stSidebar"] div.stButton > button p {
     text-align: left !important;
-    font-size: 0.9rem !important;
+    font-size: 1.06rem !important;
+    line-height: 1.25 !important;
     color: #2C1F33 !important;
     margin: 0 !important;
+}
+/* ikon Material di tombol sidebar: sengaja LEBIH BESAR dari teksnya.
+   Streamlit memberi span ikon ini fontSize + width + height dari token
+   iconSizes (default `base` = 1rem), jadi ketiganya harus dinaikkan
+   bersama-sama agar glyph tidak meluber keluar kotaknya. */
+section[data-testid="stSidebar"] div.stButton > button [data-testid="stIconMaterial"],
+section[data-testid="stSidebar"] div.stDownloadButton > button [data-testid="stIconMaterial"] {
+    font-size: 1.35rem !important;
+    width: 1.35rem !important;
+    height: 1.35rem !important;
+    line-height: 1 !important;
+    flex-shrink: 0 !important;
 }
 /* tombol "+ Baru" menonjol sedikit (latar krem seperti Claude) */
 section[data-testid="stSidebar"] .st-key-sb_new button {
@@ -178,33 +194,35 @@ section[data-testid="stSidebar"] .st-key-sb_new button:hover {
 /* label grup riwayat: "Hari ini" abu kecil */
 .sb-group {
     font-size: 0.85rem; font-weight: 500; color: #7D7484;
-    padding: 16px 12px 6px; letter-spacing: 0.01em;
+    padding: 11px 12px 3px; letter-spacing: 0.01em;
 }
 /* item riwayat: bulatan kecil ○ di depan + teks abu gelap, elipsis 1 baris */
 section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] button {
     font-weight: 400 !important;
     color: #4E4553 !important;
-    min-height: 36px !important;
-    padding: 6px 12px 6px 12px !important;
+    min-height: 30px !important;
+    padding: 3px 10px !important;
+    line-height: 1.2 !important;
     position: relative;
 }
 section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] button::before {
     content: "";
-    width: 8px; height: 8px;
+    width: 9px; height: 9px;
     border: 1.5px solid #C1B49F;
     border-radius: 50%;
-    margin-right: 12px;
+    margin-right: 11px;
     flex-shrink: 0;
     display: inline-block;
 }
 section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] button p {
-    font-size: 0.98rem !important;
+    font-size: 1.06rem !important;
+    line-height: 1.25 !important;
     font-weight: 400 !important;
     color: #4E4553 !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
-    max-width: 210px;
+    max-width: 168px;
 }
 /* item riwayat aktif */
 section[data-testid="stSidebar"] [class*="st-key-sb_hist_"].sb-active button {
@@ -222,10 +240,11 @@ section[data-testid="stSidebar"] div.stDownloadButton > button {
     text-align: left !important;
     justify-content: flex-start !important;
     align-items: center !important;
-    padding: 6px 10px !important;
-    min-height: 34px !important;
+    padding: 3px 10px !important;
+    min-height: 30px !important;
+    line-height: 1.2 !important;
     color: #2C1F33 !important;
-    font-size: 0.9rem !important;
+    font-size: 1.06rem !important;
     font-weight: 500 !important;
 }
 section[data-testid="stSidebar"] div.stDownloadButton > button > div,
@@ -241,14 +260,15 @@ section[data-testid="stSidebar"] div.stDownloadButton > button:hover {
 }
 section[data-testid="stSidebar"] div.stDownloadButton > button p {
     text-align: left !important;
-    font-size: 0.9rem !important;
+    font-size: 1.06rem !important;
+    line-height: 1.25 !important;
     color: #2C1F33 !important;
     margin: 0 !important;
 }
 
 /* garis pemisah tipis */
 .sb-divider {
-    height: 1px; background: #DBCEB9; margin: 6px 2px;
+    height: 1px; background: #DBCEB9; margin: 4px 2px;
 }
 
 /* baris akun ala Claude — DIPAKU di dasar layar, selebar sidebar */
@@ -283,8 +303,9 @@ section[data-testid="stSidebar"] > div:first-child {
     display: flex; align-items: center; gap: 12px;
     color: #6B6172; font-size: 0.95rem;
 }
-/* rapatkan jarak antar elemen sidebar */
-section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] { gap: 2px !important; }
+/* rapatkan jarak antar elemen sidebar (0 = benar-benar rapat;
+   ruang antar baris menu cukup datang dari padding tombolnya sendiri) */
+section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] { gap: 0 !important; }
 section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 [data-testid="stMainBlockContainer"] {
     max-width: 768px;
