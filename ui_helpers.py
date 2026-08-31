@@ -119,23 +119,34 @@ def thinking_html(phrases: list[str]) -> str:
 
 
 def image_progress_html(pct: float, label: str) -> str:
-    """Kartu progress bar % + shimmer untuk proses pembuatan gambar."""
+    """Kotak loading pembuatan gambar ala ChatGPT dengan perimeter shimmer & canvas wave."""
     pct = max(0.0, min(100.0, float(pct)))
+    meta = f'<div class="ai-label">{logo_img_html("logo-label")} Yuki</div>'
     return (
-        '<div class="img-progress">'
-        '<div class="img-progress-top">'
-        '<span class="img-progress-label">'
-        f'{logo_img_html("logo-progress")}'
-        f'{html.escape(label)}…</span>'
-        f'<span class="img-progress-pct">{pct:.0f}%</span>'
-        "</div>"
-        '<div class="img-progress-track">'
-        f'<div class="img-progress-fill" style="width:{pct:.1f}%;"></div>'
-        "</div></div>"
+        f'<div class="bubble-row ai">'
+        f'<div class="bubble-wrap">{meta}'
+        '<div class="img-gen-box-wrapper">'
+        '<div class="img-gen-box-inner">'
+        '<div class="img-gen-canvas-shimmer"></div>'
+        '<div class="img-gen-center-icon">'
+        '<svg class="img-gen-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
+        '<rect width="18" height="18" x="3" y="3" rx="4"/>'
+        '<circle cx="8.5" cy="8.5" r="1.5"/>'
+        '<path d="m21 15-5-5L5 21"/>'
+        '</svg>'
+        '</div>'
+        '<div class="img-gen-status-wrap">'
+        f'<div class="img-gen-status-text">{html.escape(label)}…</div>'
+        f'<div class="img-gen-progress-pill"><span>{pct:.0f}%</span></div>'
+        '<div class="img-gen-mini-bar">'
+        f'<div class="img-gen-mini-fill" style="width:{pct:.1f}%;"></div>'
+        '</div>'
+        '</div>'
+        '</div>'
+        '</div>'
+        '</div></div>'
     )
-
-
-# ============================================================================
+    # ============================================================================
 # BUBBLE CHAT
 # ============================================================================
 def bubble_html(role: str, content: str, timestamp: str = "",
