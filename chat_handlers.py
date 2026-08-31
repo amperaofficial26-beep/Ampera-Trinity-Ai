@@ -86,12 +86,14 @@ def handle_image_request(prompt: str) -> None:
     def _worker() -> None:
         try:
             result["data"] = generate_image(prompt)
-        except Exception as exc:
-            result["error"] = exc
-
-    worker = threading.Thread(target=_worker, daemon=True)
-    worker.start()
-
+    except Exception as e:
+        think_slot.empty()
+        err = public_error_chat(e)
+        thread.append({
+            "id": next_msg_id(), "role": "assistant", "type": "text",
+            "content": err, "time": now_wib(),
+            "error_detail": f"{type(e).__name__}: {e}",
+        })
     # Render kotak loading SEKALI saja. Semua gerakan (shimmer berputar di
     # tepi kotak, sapuan kanvas, pergantian teks, bar progres) dijalankan
     # oleh CSS di browser sehingga tetap mulus walau server sedang menunggu
