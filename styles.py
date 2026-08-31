@@ -1219,68 +1219,195 @@ div.stDownloadButton > button:hover {
 }
 @keyframes caretBlink { 50% { opacity: 0; } }
 
-/* ---------- progress bar gambar: % + shimmer (ala Claude) ---------- */
+/* ====================================================================
+   KOTAK LOADING PEMBUATAN GAMBAR ALA CHATGPT (Perimeter Shimmer Box)
+   --------------------------------------------------------------------
+   - Kotak kanvas persegi (aspect-ratio 1:1) ala ChatGPT / DALL-E.
+   - Efek berkas cahaya / shimmer berputar 360° mengitari tepi samping kotak.
+   - Gelombang shimmer halus menyapu di atas permukaan kanvas kotak.
+   - Ikon kanvas berdenyut di tengah + status bertahap & mini progress bar.
+==================================================================== */
+
+.img-gen-box-wrapper,
 .img-progress {
-    padding: 14px 16px 16px;
-    background: #F2E8D6;
-    border: 1px solid #DBCEB9;
-    border-radius: 16px;
-    box-shadow: 0 2px 10px rgba(44,31,51,0.06);
-    animation: thinkFadeIn 1s ease both;
-    margin: 6px 0 14px;
+    position: relative !important;
+    width: 100% !important;
+    max-width: 340px !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 22px !important;
+    padding: 3px !important;
+    overflow: hidden !important;
+    margin: 8px 0 16px !important;
+    box-shadow: 0 8px 30px rgba(44, 31, 51, 0.12) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: #E0D2BB !important;
+    animation: thinkFadeIn 0.5s ease both !important;
+    box-sizing: border-box !important;
 }
-.img-progress-top {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 10px;
+
+/* Berkas shimmer cahaya yang berputar 360° mengitari samping / tepi kotak */
+.img-gen-box-wrapper::before,
+.img-progress::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        transparent 65deg,
+        rgba(110, 84, 130, 0.35) 120deg,
+        rgba(255, 255, 255, 0.95) 180deg,
+        #4A3559 215deg,
+        rgba(110, 84, 130, 0.35) 250deg,
+        transparent 305deg,
+        transparent 360deg
+    );
+    animation: borderShimmerSpin 3.2s linear infinite !important;
+    z-index: 0;
 }
-.img-progress-label {
-    display: inline-flex; align-items: center; gap: 8px;
-    font-size: 0.9rem; font-weight: 500;
-    /* teks shimmer sama seperti thinking */
+
+@keyframes borderShimmerSpin {
+    0%   { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Lapisan dalam kotak kanvas */
+.img-gen-box-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(150deg, #FAF3E8 0%, #EFE4D2 52%, #E5D7C2 100%);
+    border-radius: 19px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    z-index: 1;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+/* Gelombang shimmer menyapu diagonal di permukaan kanvas kotak */
+.img-gen-canvas-shimmer {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        115deg,
+        transparent 15%,
+        rgba(255, 255, 255, 0.35) 45%,
+        rgba(255, 255, 255, 0.8) 50%,
+        rgba(255, 255, 255, 0.35) 55%,
+        transparent 85%
+    );
+    background-size: 260% 260%;
+    animation: canvasShimmerWave 2.8s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 2;
+}
+
+@keyframes canvasShimmerWave {
+    0%   { background-position: 180% 180%; }
+    50%  { background-position: 50% 50%; }
+    100% { background-position: -80% -80%; }
+}
+
+/* Ikon tengah dengan breathing pulse & shadow */
+.img-gen-center-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 18px;
+    background: #2C1F33;
+    color: #F8F0E3;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 6px 20px rgba(44, 31, 51, 0.22);
+    animation: iconPulseBreath 2.2s ease-in-out infinite;
+    margin-bottom: 14px;
+    position: relative;
+    z-index: 3;
+}
+
+@keyframes iconPulseBreath {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 6px 20px rgba(44, 31, 51, 0.22);
+    }
+    50% {
+        transform: scale(1.06);
+        box-shadow: 0 10px 28px rgba(74, 53, 89, 0.38);
+    }
+}
+
+.img-gen-icon-svg {
+    width: 28px;
+    height: 28px;
+    stroke: #F8F0E3;
+}
+
+/* Pembungkus status teks & progress */
+.img-gen-status-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    z-index: 3;
+    text-align: center;
+    padding: 0 24px;
+}
+
+.img-gen-status-text {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #2C1F33;
+    letter-spacing: -0.01em;
     background: linear-gradient(
         90deg,
-        #7E7387 0%, #7E7387 35%,
-        #2C1F33 50%,
-        #7E7387 65%, #7E7387 100%
+        #2C1F33 0%,
+        #6E5482 45%,
+        #2C1F33 70%,
+        #2C1F33 100%
     );
-    background-size: 220% 100%;
+    background-size: 200% 100%;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: shimmerSweep 4s linear infinite;
-}
-.img-progress-label .star {
-    -webkit-text-fill-color: #2C1F33;
-    animation: starPulse 2.2s ease-in-out infinite;
-    display: inline-block; font-size: 1rem;
-}
-.img-progress-pct {
-    font-size: 0.92rem; font-weight: 600; color: #4A3559;
-    font-variant-numeric: tabular-nums;
-}
-.img-progress-track {
-    height: 8px; border-radius: 99px;
-    background: #E0D2BB; overflow: hidden;
-    position: relative;
-}
-.img-progress-fill {
-    height: 100%; border-radius: 99px;
-    background: linear-gradient(90deg, #2C1F33, #6E5482, #2C1F33);
-    background-size: 200% 100%;
-    animation: shimmerSweep 2.2s linear infinite;
-    transition: width 0.5s ease;
-    position: relative;
-}
-/* kilau putih menyapu di atas bar */
-.img-progress-fill::after {
-    content: ""; position: absolute; inset: 0;
-    background: linear-gradient(90deg,
-        transparent 0%, rgba(255,255,255,0.55) 50%, transparent 100%);
-    background-size: 180% 100%;
-    animation: shimmerSweep 1.8s linear infinite;
-    border-radius: 99px;
+    animation: shimmerSweep 3.2s linear infinite;
 }
 
+.img-gen-progress-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(44, 31, 51, 0.08);
+    padding: 3px 12px;
+    border-radius: 99px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #4A3559;
+    font-variant-numeric: tabular-nums;
+}
+
+.img-gen-mini-bar {
+    width: 130px;
+    height: 4px;
+    border-radius: 99px;
+    background: rgba(44, 31, 51, 0.12);
+    overflow: hidden;
+    margin-top: 3px;
+}
+
+.img-gen-mini-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #2C1F33, #6E5482);
+    border-radius: 99px;
+    transition: width 0.35s ease;
+}
 /* ---------- alert / error ---------- */
 [data-testid="stAlert"] {
     background: #F2E8D6 !important;
