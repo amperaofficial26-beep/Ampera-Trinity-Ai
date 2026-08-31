@@ -150,29 +150,14 @@ def _archive_current_conversation() -> None:
         for c in st.session_state.conversations:
             if c["id"] == conv_id:
                 c["messages"] = msgs
-                # judul yang sudah diganti manual jangan ditimpa otomatis
-                if not c.get("title_manual"):
-                    c["title"] = _conversation_title(msgs)
+                c["title"] = _conversation_title(msgs)
                 return
     st.session_state.conv_counter += 1
-    new_id = st.session_state.conv_counter
-    st.session_state.active_conv_id = new_id
     st.session_state.conversations.insert(0, {
-        "id": new_id,
+        "id": st.session_state.conv_counter,
         "title": _conversation_title(msgs),
         "messages": msgs,
-        "pinned": False,
-        "unread": False,
-        "project_id": None,
-        "project_name": "",
     })
-
-
-def sync_current_conversation() -> None:
-    """Tampilkan obrolan yang sedang berjalan di riwayat sidebar secara
-    langsung (ala Claude): begitu ada pesan dari user, entri riwayatnya
-    langsung dibuat & judulnya ikut ter-update, tanpa harus klik + Baru."""
-    _archive_current_conversation()
 
 
 def reset_conversation() -> None:
@@ -193,65 +178,7 @@ def open_conversation(conv_id: int) -> None:
             st.session_state.messages = c["messages"]
             st.session_state.page = "chat"
             st.session_state.active_conv_id = conv_id
-            # saat dibuka, otomatis ditandai sudah dibaca
-            c["unread"] = False
             st.session_state.msg_counter = max(
                 (m.get("id", 0) for m in c["messages"]), default=1
-            )
-            return
-
-
-def rename_conversation(conv_id: int, new_title: str) -> None:
-    """Ganti judul percakapan di riwayat sidebar. Judul manual ditandai
-    supaya tidak ditimpa lagi oleh judul otomatis saat diarsipkan ulang."""
-    title = (new_title or "").strip()
-    if not title:
-        return
-    for c in st.session_state.conversations:
-        if c["id"] == conv_id:
-            c["title"] = title[:60]
-            c["title_manual"] = True
-            return
-
-
-def delete_conversation(conv_id: int) -> None:
-    """Hapus satu percakapan dari riwayat sidebar."""
-    st.session_state.conversations = [
-        c for c in st.session_state.conversations if c["id"] != conv_id
-    ]
-    if st.session_state.get("active_conv_id") == conv_id:
-        st.session_state.active_conv_id = None
-        # kalau yang dihapus sedang dibuka, kosongkan juga area chat
-        st.session_state.pop("messages", None)
-        init_state()
-    if st.session_state.get("rename_conv_id") == conv_id:
-        st.session_state.rename_conv_id = None
-
-
-def toggle_pin_conversation(conv_id: int) -> None:
-    """Sematkan / lepas sematan satu percakapan (yang tersemat tampil di atas)."""
-    for c in st.session_state.conversations:
-        if c["id"] == conv_id:
-            c["pinned"] = not c.get("pinned", False)
-            return
-
-
-def set_conversation_unread(conv_id: int, unread: bool) -> None:
-    """Tandai percakapan sebagai sudah/belum dibaca (dot di sidebar)."""
-    for c in st.session_state.conversations:
-        if c["id"] == conv_id:
-            c["unread"] = bool(unread)
-            return
-
-
-def assign_conversation_project(conv_id: int, project_id) -> None:
-    """Masukkan percakapan ke salah satu proyek (None = lepas dari proyek)."""
-    projects = st.session_state.get("projects", [])
-    for c in st.session_state.conversations:
-        if c["id"] == conv_id:
-            c["project_id"] = project_id
-            c["project_name"] = (
-                next((p["name"] for p in projects if p["id"] == project_id), "")
-                if project_id is not None else ""
             )
             return
