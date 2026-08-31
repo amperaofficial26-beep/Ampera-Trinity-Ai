@@ -305,7 +305,7 @@ section[data-testid="stSidebar"] > div:first-child {
 }
 /* rapatkan jarak antar elemen sidebar (0 = benar-benar rapat;
    ruang antar baris menu cukup datang dari padding tombolnya sendiri) */
-section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] { gap: 4px !important; }
+section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] { gap: 6px !important; }
 section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 [data-testid="stMainBlockContainer"] {
     max-width: 768px;
