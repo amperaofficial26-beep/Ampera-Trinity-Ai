@@ -37,7 +37,7 @@ html, body, [data-testid="stAppViewContainer"], .stApp {
 section[data-testid="stSidebar"] {
     background: #EDE2D1 !important;
     border-right: 1px solid #DBCEB9 !important;
-    width: 260px !important;
+    width: 210px !important;
     display: flex !important;
     visibility: visible !important;
 }
@@ -53,7 +53,7 @@ section[data-testid="stSidebar"] [data-testid="stSidebarHeader"] {
 /* tombol tutup sidebar — ikon Material, melayang di pojok */
 section[data-testid="stSidebar"] [data-testid="stSidebarHeader"] > * {
     position: absolute;
-    top: 25px; right: 9px;
+    top: 25px; right: 10px;
     z-index: 10;
 }
 [data-testid="stSidebarCollapseButton"] button {
