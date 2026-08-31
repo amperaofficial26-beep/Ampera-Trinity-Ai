@@ -1,3 +1,25 @@
+# Virtual environment
 .venv/
+venv/
+env/
+
+# Python
 __pycache__/
 *.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Rahasia — JANGAN PERNAH DI-COMMIT
+.streamlit/secrets.toml
+.env
+.env.*
+!.env.example
+
+# Streamlit
+.streamlit/cache/
+
+# Editor & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
