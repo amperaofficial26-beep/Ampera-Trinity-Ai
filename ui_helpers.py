@@ -118,14 +118,36 @@ def thinking_html(phrases: list[str]) -> str:
     )
 
 
-def image_progress_html(pct: float, label: str) -> str:
-    """Kotak loading pembuatan gambar ala ChatGPT dengan perimeter shimmer & canvas wave."""
-    pct = max(0.0, min(100.0, float(pct)))
+IMAGE_STAGE_PHRASES = [
+    "Membayangkan gambarnya",
+    "Menyiapkan kanvas",
+    "Melukis perlahan",
+    "Menajamkan detail",
+]
+def image_progress_html(labels: list[str] | None = None,
+                        done: bool = False) -> str:
+    """Kotak loading pembuatan gambar ala ChatGPT.
+
+    PENTING: HTML ini dirender SEKALI saja, lalu seluruh gerakannya
+    (shimmer tepi yang berputar, sapuan kanvas, pergantian teks, bar
+    progres) dijalankan murni oleh CSS di browser. Kalau blok ini
+    di-`markdown()` berulang kali, Streamlit mengganti node DOM-nya
+    setiap kali sehingga semua animasi CSS ter-reset dari awal dan
+    terlihat diam / berkedip.
+    """
+    phrases = list(labels or IMAGE_STAGE_PHRASES)[:4]
+    if done:
+        phrases = ["Selesai"]
+
+    spans = "".join(
+        f'<span class="img-gen-phrase">{html.escape(p)}…</span>' for p in phrases
+    )
     meta = f'<div class="ai-label">{logo_img_html("logo-label")} Yuki</div>'
+    state_cls = " is-done" if done else ""
     return (
         f'<div class="bubble-row ai">'
         f'<div class="bubble-wrap">{meta}'
-        '<div class="img-gen-box-wrapper">'
+        f'<div class="img-gen-box-wrapper{state_cls}">'
         '<div class="img-gen-box-inner">'
         '<div class="img-gen-canvas-shimmer"></div>'
         '<div class="img-gen-center-icon">'
@@ -136,17 +158,16 @@ def image_progress_html(pct: float, label: str) -> str:
         '</svg>'
         '</div>'
         '<div class="img-gen-status-wrap">'
-        f'<div class="img-gen-status-text">{html.escape(label)}…</div>'
-        f'<div class="img-gen-progress-pill"><span>{pct:.0f}%</span></div>'
+        f'<div class="img-gen-phrases">{spans}</div>'
         '<div class="img-gen-mini-bar">'
-        f'<div class="img-gen-mini-fill" style="width:{pct:.1f}%;"></div>'
+        '<div class="img-gen-mini-fill"></div>'
         '</div>'
         '</div>'
         '</div>'
         '</div>'
         '</div></div>'
     )
-    # ============================================================================
+# ============================================================================
 # BUBBLE CHAT
 # ============================================================================
 def bubble_html(role: str, content: str, timestamp: str = "",
