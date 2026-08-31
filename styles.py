@@ -1235,98 +1235,101 @@ div.stDownloadButton > button:hover {
     max-width: 340px !important;
     aspect-ratio: 1 / 1 !important;
     border-radius: 22px !important;
-    padding: 3px !important;
+    padding: 2px !important;            /* tebal pita cahaya di tepi */
     overflow: hidden !important;
+    isolation: isolate;                 /* pita cahaya tak bocor ke luar */
     margin: 8px 0 16px !important;
-    box-shadow: 0 8px 30px rgba(44, 31, 51, 0.12) !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    background: #E0D2BB !important;
-    animation: thinkFadeIn 0.5s ease both !important;
+    box-shadow: 0 10px 34px rgba(44, 31, 51, 0.13) !important;
+    display: block !important;
+    background: #FFFFFF !important;     /* kotak putih ala ChatGPT */
+    animation: thinkFadeIn 0.45s ease both !important;
     box-sizing: border-box !important;
 }
 
-/* Berkas shimmer cahaya yang berputar 360° mengitari samping / tepi kotak */
+/* Berkas shimmer cahaya yang berputar 360° mengitari tepi kotak.
+   Memakai kotak pembungkus 1:1 yang diputar (bukan @property --angle),
+   supaya jalan di semua browser termasuk Safari & Firefox. */
 .img-gen-box-wrapper::before,
 .img-progress::before {
     content: "";
     position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
+    z-index: 0;
+    top: 50%;
+    left: 50%;
+    width: 150%;
+    aspect-ratio: 1 / 1;
+    height: auto;
     background: conic-gradient(
         from 0deg,
-        transparent 0deg,
-        transparent 65deg,
-        rgba(110, 84, 130, 0.35) 120deg,
-        rgba(255, 255, 255, 0.95) 180deg,
-        #4A3559 215deg,
-        rgba(110, 84, 130, 0.35) 250deg,
-        transparent 305deg,
-        transparent 360deg
+        rgba(255, 255, 255, 0) 0deg,
+        rgba(255, 255, 255, 0) 40deg,
+        rgba(110, 84, 130, 0.25) 95deg,
+        rgba(74, 53, 89, 0.95) 135deg,
+        rgba(200, 178, 220, 0.95) 160deg,
+        rgba(110, 84, 130, 0.25) 200deg,
+        rgba(255, 255, 255, 0) 260deg,
+        rgba(255, 255, 255, 0) 360deg
     );
-    animation: borderShimmerSpin 3.2s linear infinite !important;
-    z-index: 0;
+    transform-origin: center center;
+    animation: borderShimmerSpin 2.6s linear infinite;
+    will-change: transform;
 }
 
 @keyframes borderShimmerSpin {
-    0%   { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to   { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
-/* Lapisan dalam kotak kanvas */
+/* Saat selesai: pita cahaya berhenti & memudar */
+.img-gen-box-wrapper.is-done::before { animation: none; opacity: 0; }
+.img-gen-box-wrapper.is-done .img-gen-canvas-shimmer { animation: none; opacity: 0; }
+
+/* Lapisan dalam kotak kanvas (putih) */
 .img-gen-box-inner {
     position: relative;
+    z-index: 1;
     width: 100%;
     height: 100%;
-    background: linear-gradient(150deg, #FAF3E8 0%, #EFE4D2 52%, #E5D7C2 100%);
-    border-radius: 19px;
+    background: #FFFFFF;
+    border-radius: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    z-index: 1;
-    border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
-/* Gelombang shimmer menyapu diagonal di permukaan kanvas kotak */
+/* Gelombang shimmer menyapu diagonal di permukaan kanvas putih */
 .img-gen-canvas-shimmer {
     position: absolute;
     inset: 0;
     background: linear-gradient(
         115deg,
-        transparent 15%,
-        rgba(255, 255, 255, 0.35) 45%,
-        rgba(255, 255, 255, 0.8) 50%,
-        rgba(255, 255, 255, 0.35) 55%,
-        transparent 85%
+        rgba(240, 234, 246, 0) 30%,
+        rgba(226, 216, 238, 0.75) 48%,
+        rgba(240, 234, 246, 0) 66%
     );
     background-size: 260% 260%;
-    animation: canvasShimmerWave 2.8s ease-in-out infinite;
+    animation: canvasShimmerWave 2.4s ease-in-out infinite;
     pointer-events: none;
     z-index: 2;
 }
 
 @keyframes canvasShimmerWave {
-    0%   { background-position: 180% 180%; }
-    50%  { background-position: 50% 50%; }
-    100% { background-position: -80% -80%; }
+    0%   { background-position: 170% 170%; }
+    100% { background-position: -70% -70%; }
 }
 
-/* Ikon tengah dengan breathing pulse & shadow */
+/* Ikon tengah dengan breathing pulse */
 .img-gen-center-icon {
-    width: 60px;
-    height: 60px;
+    width: 58px;
+    height: 58px;
     border-radius: 18px;
     background: #2C1F33;
-    color: #F8F0E3;
+    color: #FFFFFF;
     display: grid;
     place-items: center;
-    box-shadow: 0 6px 20px rgba(44, 31, 51, 0.22);
+    box-shadow: 0 6px 20px rgba(44, 31, 51, 0.20);
     animation: iconPulseBreath 2.2s ease-in-out infinite;
     margin-bottom: 14px;
     position: relative;
@@ -1336,18 +1339,18 @@ div.stDownloadButton > button:hover {
 @keyframes iconPulseBreath {
     0%, 100% {
         transform: scale(1);
-        box-shadow: 0 6px 20px rgba(44, 31, 51, 0.22);
+        box-shadow: 0 6px 20px rgba(44, 31, 51, 0.20);
     }
     50% {
         transform: scale(1.06);
-        box-shadow: 0 10px 28px rgba(74, 53, 89, 0.38);
+        box-shadow: 0 10px 28px rgba(74, 53, 89, 0.34);
     }
 }
 
 .img-gen-icon-svg {
-    width: 28px;
-    height: 28px;
-    stroke: #F8F0E3;
+    width: 27px;
+    height: 27px;
+    stroke: #FFFFFF;
 }
 
 /* Pembungkus status teks & progress */
@@ -1355,59 +1358,89 @@ div.stDownloadButton > button:hover {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 7px;
+    gap: 10px;
     z-index: 3;
     text-align: center;
     padding: 0 24px;
 }
 
-.img-gen-status-text {
+/* Teks status berganti sendiri lewat CSS (tanpa rerun server) */
+.img-gen-phrases {
+    position: relative;
+    height: 1.4em;
+    min-width: 210px;
+}
+.img-gen-phrase {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    white-space: nowrap;
     font-size: 0.95rem;
     font-weight: 600;
-    color: #2C1F33;
     letter-spacing: -0.01em;
     background: linear-gradient(
         90deg,
-        #2C1F33 0%,
-        #6E5482 45%,
-        #2C1F33 70%,
-        #2C1F33 100%
+        #8C82A0 0%, #8C82A0 30%,
+        #2C1F33 50%,
+        #8C82A0 70%, #8C82A0 100%
     );
-    background-size: 200% 100%;
+    background-size: 220% 100%;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: shimmerSweep 3.2s linear infinite;
+    opacity: 0;
+    animation: shimmerSweep 2.6s linear infinite,
+               imgPhraseCycle 20s ease-in-out infinite;
 }
-
-.img-gen-progress-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(44, 31, 51, 0.08);
-    padding: 3px 12px;
-    border-radius: 99px;
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: #4A3559;
-    font-variant-numeric: tabular-nums;
+.img-gen-phrase:nth-child(1) { animation-delay: 0s, 0s; }
+.img-gen-phrase:nth-child(2) { animation-delay: 0s, 5s; }
+.img-gen-phrase:nth-child(3) { animation-delay: 0s, 10s; }
+.img-gen-phrase:nth-child(4) { animation-delay: 0s, 15s; }
+/* kalau cuma satu frasa (mis. "Selesai"), tampilkan terus */
+.img-gen-phrase:only-child {
+    opacity: 1;
+    animation: shimmerSweep 2.6s linear infinite;
+}
+@keyframes imgPhraseCycle {
+    0%   { opacity: 0; filter: blur(4px); }
+    3%   { opacity: 1; filter: blur(0); }
+    22%  { opacity: 1; filter: blur(0); }
+    25%  { opacity: 0; filter: blur(4px); }
+    100% { opacity: 0; }
 }
 
 .img-gen-mini-bar {
-    width: 130px;
+    position: relative;
+    width: 140px;
     height: 4px;
     border-radius: 99px;
-    background: rgba(44, 31, 51, 0.12);
+    background: rgba(44, 31, 51, 0.10);
     overflow: hidden;
-    margin-top: 3px;
 }
 
+/* Bar indeterminate: meluncur terus selama gambar dibuat */
 .img-gen-mini-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
     height: 100%;
-    background: linear-gradient(90deg, #2C1F33, #6E5482);
+    width: 42%;
+    background: linear-gradient(90deg, rgba(44,31,51,0), #2C1F33, #6E5482, rgba(110,84,130,0));
     border-radius: 99px;
-    transition: width 0.35s ease;
+    animation: imgBarSlide 1.5s ease-in-out infinite;
 }
+@keyframes imgBarSlide {
+    0%   { transform: translateX(-110%); }
+    100% { transform: translateX(340%); }
+}
+.img-gen-box-wrapper.is-done .img-gen-mini-fill {
+    animation: none;
+    width: 100%;
+    transform: none;
+    background: #2C1F33;
+}
+
 /* ---------- alert / error ---------- */
 [data-testid="stAlert"] {
     background: #F2E8D6 !important;
