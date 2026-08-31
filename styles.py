@@ -271,17 +271,20 @@ section[data-testid="stSidebar"] div.stDownloadButton > button p {
     height: 1px; background: #DBCEB9; margin: 4px 2px;
 }
 
-/* baris akun ala Claude — DIPAKU di dasar layar, selebar sidebar */
+/* baris kartu nama user ala Claude — DIPAKU di dasar layar, selebar sidebar (230px) */
 .sb-account {
     position: fixed;
     bottom: 0; left: 0;
-    width: 260px;              /* = lebar sidebar */
-    display: flex; align-items: center; gap: 10px;
-    padding: 12px 16px 14px;
-    border-top: 1px solid #DBCEB9;
-    background: #EDE2D1;
+    width: 230px !important;              /* = persis selebar sidebar */
+    max-width: 230px !important;
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 12px 12px;
+    padding-right: 42px;                  /* ruang untuk tombol menu ⋯ */
+    border-top: 1px solid #DBCEB9 !important;
+    background: #EDE2D1 !important;
     z-index: 999995;
     box-sizing: border-box;
+    pointer-events: none;                 /* teksnya saja; tombol di sebelahnya */
 }
 /* beri ruang bawah agar konten sidebar tidak tertutup baris akun */
 section[data-testid="stSidebar"] > div:first-child {
@@ -295,8 +298,16 @@ section[data-testid="stSidebar"] > div:first-child {
     flex-shrink: 0;
     border: 1px solid #CDBFA8;
 }
-.sb-account .name { font-size: 1rem; font-weight: 600; color: #2C1F33; }
-.sb-account .plan { font-size: 0.88rem; color: #7E7387; font-weight: 400; }
+.sb-account .name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #2C1F33;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 135px;
+}
+.sb-account .plan { font-size: 0.85rem; color: #7E7387; font-weight: 400; }
 .sb-account .caret { color: #7E7387; font-size: 0.7rem; margin-left: 2px; }
 .sb-account .right-icons {
     margin-left: auto;
@@ -1294,14 +1305,22 @@ div.stDownloadButton > button:hover {
    Bantuan · Trinity Pro · Aplikasi · Trinity Kursus · Pelajari) ============ */
 /* --- baris akun + menu titik tiga --- */
 .sb-account {
-    padding-right: 48px;            /* ruang untuk tombol menu ⋯ */
-    border-top: none;
+    width: 230px !important;
+    max-width: 230px !important;
+    padding-right: 42px;            /* ruang untuk tombol menu ⋯ */
     pointer-events: none;           /* teksnya saja; tombol di sebelahnya */
 }
 .st-key-sb_account [data-testid="stVerticalBlock"] { gap: 0 !important; }
 .st-key-sb_account [data-testid="stColumn"]:first-child { padding-right: 0 !important; }
 .st-key-acct_menu {
-    position: fixed; bottom: 12px; left: 208px; z-index: 999996;
+    position: fixed; bottom: 10px; left: 190px; z-index: 999996;
+}
+/* Sembunyikan baris kartu nama user saat sidebar tertutup */
+section[data-testid="stSidebar"][aria-expanded="false"] .sb-account,
+section[data-testid="stSidebar"][aria-expanded="false"] .st-key-acct_menu,
+section[data-testid="stSidebar"][aria-expanded="false"] .st-key-sb_account {
+    display: none !important;
+    visibility: hidden !important;
 }
 .st-key-acct_menu [data-testid="stPopover"] > div { width: auto !important; }
 .st-key-acct_menu button[data-testid="stPopoverButton"],
