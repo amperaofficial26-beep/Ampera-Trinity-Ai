@@ -1,0 +1,53 @@
+/* Pygments — skema warna hangat untuk blok kode (latar gelap) */
+.highlight               { background: transparent; }
+.highlight .hll          { background-color: #4a3f31; }
+.highlight .c,
+.highlight .c1,
+.highlight .cm,
+.highlight .cs           { color: #97897a; font-style: italic; }   /* komentar */
+.highlight .cp           { color: #d1a26a; }                        /* preprocessor */
+.highlight .k,
+.highlight .kc,
+.highlight .kd,
+.highlight .kn,
+.highlight .kp,
+.highlight .kr           { color: #e2a3c7; font-weight: 600; }      /* keyword */
+.highlight .kt           { color: #8fc9d8; }                        /* tipe */
+.highlight .o,
+.highlight .ow           { color: #e5d4bb; }                        /* operator */
+.highlight .p            { color: #cdbfa9; }                        /* tanda baca */
+.highlight .n            { color: #f2e9db; }                        /* nama */
+.highlight .na           { color: #d8c07a; }                        /* atribut */
+.highlight .nb           { color: #8fc9d8; }                        /* builtin */
+.highlight .nc           { color: #f0c674; font-weight: 600; }      /* kelas */
+.highlight .nd           { color: #d1a26a; }                        /* dekorator */
+.highlight .nf,
+.highlight .fm           { color: #a3c9a8; }                        /* fungsi */
+.highlight .nn           { color: #f0c674; }                        /* namespace */
+.highlight .nt           { color: #e2a3c7; }                        /* tag HTML */
+.highlight .nv           { color: #f2e9db; }                        /* variabel */
+.highlight .s,
+.highlight .s1,
+.highlight .s2,
+.highlight .sb,
+.highlight .sc,
+.highlight .sd,
+.highlight .se,
+.highlight .sh,
+.highlight .si,
+.highlight .sx,
+.highlight .sr,
+.highlight .ss           { color: #c3d99b; }                        /* string */
+.highlight .m,
+.highlight .mf,
+.highlight .mh,
+.highlight .mi,
+.highlight .mo,
+.highlight .il           { color: #e8b98a; }                        /* angka */
+.highlight .gd           { color: #e08b8b; }                        /* diff hapus */
+.highlight .gi           { color: #a3c9a8; }                        /* diff tambah */
+.highlight .gh           { color: #f0c674; font-weight: 600; }
+.highlight .gu           { color: #b9a68d; }
+.highlight .ge           { font-style: italic; }
+.highlight .gs           { font-weight: 600; }
+.highlight .err          { color: #f2e9db; }

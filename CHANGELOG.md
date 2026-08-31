@@ -10,6 +10,14 @@ dan proyek ini memakai [Semantic Versioning](https://semver.org/lang/id/).
 ## [Belum dirilis]
 
 ### Ditambahkan
+- **Situs dokumentasi GitHub Pages** — landing page + seluruh dokumentasi yang bisa dibrowse,
+  bertema "Beige hangat" mengikuti aplikasi
+- `tools/build_site.py` — pembangun situs statis dari Markdown (Python murni, tanpa Jekyll)
+- `tools/check_links.py` — pemeriksa tautan menggantung, dijalankan otomatis sebelum penerbitan
+- `tools/theme/` — CSS tema, sorotan sintaks, dan skrip interaksi situs
+- `tools/pages-workflow.yml` — templat GitHub Actions untuk membangun & menerbitkan
+  otomatis setiap push ke `main` (dipasang sekali ke `.github/workflows/pages.yml`)
+- `docs/situs-dokumentasi.md` — penjelasan cara kerja dan pemeliharaan situs
 - Dokumentasi lengkap di folder `docs/`: instalasi, konfigurasi, fitur, panduan pengguna, arsitektur, deploy, dan FAQ
 - `CONTRIBUTING.md` — panduan kontribusi, gaya kode, dan aturan arsitektur
 - `LICENSE` — MIT License

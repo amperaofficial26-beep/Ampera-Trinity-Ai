@@ -1,0 +1,85 @@
+# ============================================================================
+# Bangun & terbitkan situs dokumentasi ke GitHub Pages
+# ----------------------------------------------------------------------------
+# Berjalan otomatis setiap kali ada push ke branch `main` yang menyentuh
+# dokumentasi, tema, atau skrip pembangunnya. Situs dibangun oleh
+# tools/build_site.py (Python murni, tanpa Jekyll) lalu diterbitkan.
+#
+# CARA MEMASANG (satu kali saja):
+#   1. Salin isi berkas ini.
+#   2. Di GitHub: Add file -> Create new file
+#      Nama berkas:  .github/workflows/pages.yml
+#      Tempel isinya, lalu Commit ke branch `main`.
+#   3. Settings -> Pages -> Build and deployment -> Source: "GitHub Actions"
+#
+# Setelah itu situs otomatis dibangun ulang setiap kali `main` diperbarui.
+# Berkas ini sengaja disimpan di tools/ karena token otomatis tidak diizinkan
+# membuat berkas di .github/workflows/ (butuh izin khusus "workflows").
+# ============================================================================
+name: Terbitkan Dokumentasi
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - "tools/**"
+      - "README.md"
+      - "CONTRIBUTING.md"
+      - "CHANGELOG.md"
+      - "assets/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch: # bisa juga dijalankan manual dari tab Actions
+
+# Izin minimum yang dibutuhkan untuk menerbitkan ke Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Kalau ada beberapa push beruntun, cukup selesaikan yang terakhir
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Bangun situs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ambil kode
+        uses: actions/checkout@v4
+
+      - name: Siapkan Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Pasang dependensi
+        run: pip install --disable-pip-version-check markdown pygments
+
+      - name: Bangun situs statis
+        run: python tools/build_site.py
+
+      - name: Periksa tautan internal
+        run: python tools/check_links.py
+
+      - name: Siapkan konfigurasi Pages
+        uses: actions/configure-pages@v5
+
+      - name: Unggah artefak situs
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    name: Terbitkan
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Terbitkan ke GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

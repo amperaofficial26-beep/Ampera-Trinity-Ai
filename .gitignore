@@ -23,3 +23,6 @@ __pycache__/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Hasil build situs dokumentasi (dibangun ulang oleh CI)
+_site/

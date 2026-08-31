@@ -14,8 +14,11 @@ Satu aplikasi untuk chat multi-model, analisis & generate gambar, artefak, kursu
 [![Groq](https://img.shields.io/badge/LLM-Groq-F55036)](https://groq.com)
 [![Cloudflare FLUX](https://img.shields.io/badge/Image-Cloudflare%20FLUX-F38020?logo=cloudflare&logoColor=white)](https://developers.cloudflare.com/workers-ai/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Dokumentasi](https://img.shields.io/badge/Dokumentasi-online-b0763a)](https://amperaofficial26-beep.github.io/Ampera-Trinity-Ai/)
 
-[Dokumentasi](docs/) · [Instalasi](docs/instalasi.md) · [Konfigurasi](docs/konfigurasi.md) · [Deploy](docs/deploy.md) · [FAQ](docs/faq.md)
+### 📖 [**Baca dokumentasi lengkap →**](https://amperaofficial26-beep.github.io/Ampera-Trinity-Ai/)
+
+[Instalasi](docs/instalasi.md) · [Konfigurasi](docs/konfigurasi.md) · [Fitur](docs/fitur.md) · [Deploy](docs/deploy.md) · [FAQ](docs/faq.md)
 
 </div>
 
@@ -117,7 +120,8 @@ Ampera-Trinity-Ai/
 │   ├── groq_engine.py     # Chat streaming, fallback model, vision, STT
 │   └── image_engine.py    # Generate gambar Cloudflare FLUX
 ├── assets/                # Gambar statis
-├── docs/                  # 📚 Dokumentasi lengkap
+├── docs/                  # 📚 Dokumentasi lengkap (sumber situs Pages)
+├── tools/                 # Pembangun situs dokumentasi + pemeriksa tautan
 └── .streamlit/config.toml # Konfigurasi server Streamlit
 ```
 
@@ -126,6 +130,10 @@ Penjelasan alur data & tanggung jawab tiap modul: **[docs/arsitektur.md](docs/ar
 ---
 
 ## 📚 Dokumentasi
+
+Seluruh dokumentasi tersedia sebagai situs web di
+**<https://amperaofficial26-beep.github.io/Ampera-Trinity-Ai/>** — lengkap dengan
+pencarian, daftar isi, dan navigasi antar halaman.
 
 | Dokumen | Isi |
 |---|---|
@@ -136,6 +144,7 @@ Penjelasan alur data & tanggung jawab tiap modul: **[docs/arsitektur.md](docs/ar
 | [docs/arsitektur.md](docs/arsitektur.md) | Struktur kode, alur data, cara menambah fitur |
 | [docs/deploy.md](docs/deploy.md) | Streamlit Cloud, Hugging Face, Docker, VPS |
 | [docs/faq.md](docs/faq.md) | Pertanyaan yang sering muncul |
+| [docs/situs-dokumentasi.md](docs/situs-dokumentasi.md) | Cara kerja situs GitHub Pages ini |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Panduan kontribusi & gaya kode |
 | [CHANGELOG.md](CHANGELOG.md) | Riwayat perubahan |
 

@@ -2,6 +2,9 @@
 
 Selamat datang di dokumentasi lengkap **Ampera Trinity AI** — aplikasi web AI dengan asisten Yuki.
 
+> 💡 Dokumentasi ini juga tersedia sebagai situs web yang lebih nyaman dibaca:
+> **<https://amperaofficial26-beep.github.io/Ampera-Trinity-Ai/>**
+
 ## Peta Dokumen
 
 ### 🚀 Mulai
@@ -22,6 +25,7 @@ Selamat datang di dokumentasi lengkap **Ampera Trinity AI** — aplikasi web AI 
 | Dokumen | Untuk siapa | Isi |
 |---|---|---|
 | **[Arsitektur](arsitektur.md)** | Developer | Struktur modul, alur data, cara menambah fitur |
+| **[Situs Dokumentasi](situs-dokumentasi.md)** | Developer | Cara kerja situs Pages & menambah halaman |
 | **[Kontribusi](../CONTRIBUTING.md)** | Kontributor | Gaya kode, alur PR, checklist |
 | **[Changelog](../CHANGELOG.md)** | Semua orang | Riwayat perubahan versi |
 
