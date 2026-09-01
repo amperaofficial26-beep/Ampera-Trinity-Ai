@@ -1448,16 +1448,42 @@ div.stDownloadButton > button:hover {
     color: #2C1F33 !important;
 }
 
-/* ---------- footer ---------- */
-.trinity-foot {
-    text-align: center; color: #7E7387; font-size: 10px;
-    margin-top: 34px; font-family: 'Inter', sans-serif;
+/* PENTING soal ukuran font footer:
+   Streamlit punya aturan bawaan [data-testid="stMarkdownContainer"] p {...}
+   yang spesifisitasnya (0,1,1) LEBIH TINGGI daripada .trinity-foot (0,1,0),
+   jadi kalau ditulis pakai kelas saja, font-size-nya selalu kalah dan
+   terlihat "tidak mau mengecil". Karena itu selektornya dinaikkan
+   (elemen p + wadah markdown) dan diberi !important.
+   >>> UBAH ANGKA DI SINI untuk mengatur ukuran footer <<< */
+.trinity-foot,
+p.trinity-foot,
+[data-testid="stMarkdownContainer"] p.trinity-foot,
+[data-testid="stMainBlockContainer"] [data-testid="stMarkdownContainer"] p.trinity-foot {
+    text-align: center !important;
+    color: #7E7387 !important;
+    font-size: 10px !important;      /* halaman awal (sebelum mulai chat) */
+    line-height: 1.5 !important;
+    margin-top: 34px !important;
+    margin-bottom: 0 !important;
+    font-family: 'Inter', sans-serif !important;
+    -webkit-text-size-adjust: 100%;  /* cegah browser HP membesarkan teks kecil */
+    text-size-adjust: 100%;
 }
+
 /* versi saat chat berjalan: lebih kecil lagi dari versi halaman awal */
-.trinity-foot.in-chat {
-    font-size: 9px;
-    color: #827788;
-    margin-top: 22px;
+.trinity-foot.in-chat,
+p.trinity-foot.in-chat,
+[data-testid="stMarkdownContainer"] p.trinity-foot.in-chat,
+[data-testid="stMainBlockContainer"] [data-testid="stMarkdownContainer"] p.trinity-foot.in-chat {
+    font-size: 9px !important;       /* saat chat sudah berjalan */
+    color: #827788 !important;
+    margin-top: 22px !important;
+}
+
+/* logo kecil di dalam footer ikut menyesuaikan */
+.trinity-foot .logo-foot {
+    width: 1.2em !important;
+    height: 1.2em !important;
 }
 
 /* ============ HALAMAN BARU (Artefak · Pengaturan · Bahasa ·
