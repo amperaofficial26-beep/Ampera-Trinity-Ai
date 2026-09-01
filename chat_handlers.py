@@ -42,8 +42,6 @@ WIB = ZoneInfo("Asia/Jakarta")
 
 def now_wib() -> str:
     return datetime.now(WIB).strftime("%H:%M")
-def now_wib() -> str:
-    return datetime.now(WIB).strftime("%H:%M")
 
 
 # --- Durasi tampilan kotak loading pembuatan gambar (detik) ---------------
