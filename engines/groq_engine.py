@@ -43,7 +43,6 @@ def build_chat_client():
         )
     return OpenAI(api_key=GROQ_API_KEY, base_url=GROQ_BASE_URL)
 
-
 def build_system_prompt() -> str:
     """Gabungkan persona dasar Yuki + preferensi dari halaman "Sesuaikan",
     Pengaturan (kepribadian, bahasa, memori, refleksi), dan konteks mode."""
@@ -65,7 +64,7 @@ def build_system_prompt() -> str:
             "tanpa emoji berlebihan."
         ),
     }
-          if s.get("personality") in persona_map:
+    if s.get("personality") in persona_map:
         parts.append(persona_map[s["personality"]])
 
     # Aturan bertanya balik: hanya untuk permintaan yang benar-benar kabur.
@@ -78,7 +77,7 @@ def build_system_prompt() -> str:
         extra = CLARIFY_MODE_RULES.get(clarify_mode, "")
         if extra:
             parts.append(extra)
-                  
+
     lang = LANG_BY_CODE.get(s.get("yuki_lang") or DEFAULT_LANG_CODE)
     if lang and lang["code"] != "id":
         parts.append(f"Selalu jawab dalam bahasa {lang['name']}.")
@@ -116,7 +115,6 @@ def build_system_prompt() -> str:
     if extra:
         parts.append(f"Instruksi tambahan dari User yang harus selalu diikuti:\n{extra}")
     return "\n\n".join(parts)
-
 
 def messages_for_api(history: list[dict]) -> list[dict]:
     """System prompt Yuki + riwayat terakhir (ramah free-tier).
