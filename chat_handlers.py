@@ -183,7 +183,7 @@ def handle_chat_request(answer_slot) -> None:
         elapsed = time.time() - t0
         if elapsed < min_think:
             time.sleep(min_think - elapsed)
-                think_slot.empty()
+        think_slot.empty()
         if not full:
             full = "…"
         # Pisahkan blok [[PILIHAN]] -> jadi kartu tombol, bukan teks mentah.
