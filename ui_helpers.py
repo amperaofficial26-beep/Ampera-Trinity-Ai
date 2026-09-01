@@ -15,7 +15,9 @@ import time
 from datetime import datetime
 
 import streamlit as st
+from zoneinfo import ZoneInfo
 
+_WIB = ZoneInfo("Asia/Jakarta")
 from icons import ICON_COPY, ICON_MIC, ICON_IMAGE
 from logo import LOGO_B64
 from state import active_thread
@@ -206,6 +208,118 @@ def images_bubble_html(images: list[dict]) -> str:
     return f'<div class="bubble-imgs">{"".join(parts)}</div>'
 
 
+_QUICK_RE = re.compile(
+    r"\[\[\s*PILIHAN\s*\]\](.*?)\[\[\s*/\s*PILIHAN\s*\]\]",
+    re.S | re.I,
+)
+
+
+def parse_quick_replies(text: str) -> tuple[str, dict]:
+    """Pisahkan blok [[PILIHAN]] dari jawaban Yuki.
+
+    Mengembalikan (teks_bersih, kartu). `kartu` berisi
+    {"question": str, "options": [str, ...]} atau {} bila tidak ada.
+    Blok yang berada di dalam contoh kode (```) sengaja diabaikan supaya
+    contoh kode tidak berubah jadi tombol.
+    """
+    raw = text or ""
+    if "[[" not in raw.upper().replace(" ", "") and "PILIHAN" not in raw.upper():
+        return raw, {}
+
+    # Lindungi isi blok kode agar tidak ikut terbaca.
+    kode_blok: list[str] = []
+
+    def _simpan(m):
+        kode_blok.append(m.group(0))
+        return f"\x00KODE{len(kode_blok) - 1}\x00"
+
+    aman = re.sub(r"```.*?```", _simpan, raw, flags=re.S)
+
+    cocok = _QUICK_RE.search(aman)
+    if not cocok:
+        return raw, {}
+
+    isi = cocok.group(1)
+    aman = aman.replace(cocok.group(0), "")
+
+    pertanyaan = ""
+    pilihan: list[str] = []
+    for baris in isi.splitlines():
+        b = baris.strip()
+        if not b:
+            continue
+        low = b.lower()
+        if low.startswith(("tanya:", "pertanyaan:", "question:")):
+            pertanyaan = b.split(":", 1)[1].strip()
+        elif b.startswith(("-", "*", "•")):
+            opsi = b.lstrip("-*• ").strip()
+            if opsi and opsi not in pilihan:
+                pilihan.append(opsi)
+        elif not pertanyaan:
+            pertanyaan = b
+
+    # Kembalikan blok kode yang tadi disimpan.
+    for i, blok in enumerate(kode_blok):
+        aman = aman.replace(f"\x00KODE{i}\x00", blok)
+
+    bersih = aman.strip()
+    if not pilihan:
+        # Tidak ada pilihan yang sah -> kembalikan pertanyaannya sebagai teks
+        # biasa supaya tidak ada informasi yang hilang.
+        if pertanyaan:
+            bersih = (bersih + "\n\n" + pertanyaan).strip()
+        return bersih, {}
+    return bersih, {"question": pertanyaan, "options": pilihan[:4]}
+
+
+def send_quick_reply(text: str) -> None:
+    """Kirim jawaban dari tombol kartu pilihan seolah User mengetiknya."""
+    from state import active_thread, next_msg_id
+
+    jawab = (text or "").strip()
+    if not jawab:
+        return
+    active_thread().append({
+        "id": next_msg_id(), "role": "user", "type": "text",
+        "content": jawab, "time": datetime.now(_WIB).strftime("%H:%M"),
+        "from_quick_reply": True,
+    })
+    st.session_state["_yuki_job"] = {"image_mode": False, "text": jawab}
+    st.session_state.pop("_yuki_ui_flushed", None)
+
+
+def render_quick_replies(msg: dict, aktif: bool = True) -> None:
+    """Kartu pilihan ala Claude di bawah jawaban Yuki."""
+    kartu = msg.get("quick_replies") or {}
+    opsi = kartu.get("options") or []
+    if not opsi:
+        return
+
+    mid = msg.get("id", id(msg))
+    with st.container(key=f"qr_card_{mid}"):
+        tanya = kartu.get("question") or "Pilih salah satu:"
+        st.markdown(
+            f'<div class="qr-question">{html.escape(tanya)}</div>',
+            unsafe_allow_html=True,
+        )
+        if not aktif:
+            # Kartu lama: tampilkan sebagai jejak, tidak bisa diklik lagi.
+            chips = "".join(
+                f'<span class="qr-chip-done">{html.escape(o)}</span>' for o in opsi
+            )
+            st.markdown(f'<div class="qr-row-done">{chips}</div>',
+                        unsafe_allow_html=True)
+            return
+        cols = st.columns(len(opsi))
+        for i, opt in enumerate(opsi):
+            with cols[i]:
+                st.button(
+                    opt,
+                    key=f"qr_{mid}_{i}",
+                    use_container_width=True,
+                    on_click=send_quick_reply,
+                    args=(opt,),
+                )
 def render_message(msg: dict) -> None:
     """Render 1 pesan: teks (bubble, bisa + gambar lampiran/suara) atau gambar."""
     if msg.get("type") == "image" and msg.get("image_bytes"):
@@ -240,10 +354,16 @@ def render_message(msg: dict) -> None:
         if msg.get("error_detail"):
             with st.expander("Detail teknis"):
                 st.code(str(msg["error_detail"]), language="text")
-        # baris aksi kecil ala Claude: copy jawaban, feedback (👍/👎), jam kirim
+               # baris aksi kecil ala Claude: copy jawaban, feedback (👍/👎), jam kirim
         if msg.get("role") == "assistant":
             render_message_actions(msg)
-
+            # Kartu pilihan interaktif: hanya jawaban TERAKHIR yang bisa diklik.
+            if msg.get("quick_replies"):
+                from state import active_thread
+                thread = active_thread()
+                terakhir = bool(thread) and thread[-1] is msg
+                render_quick_replies(msg, aktif=terakhir)
+                
 def _copy_button_html(text: str, key: str) -> str:
     """Tombol salin ala Claude (ikon polos) — teks disisipkan sebagai
     base64 di atribut data-* supaya aman dari karakter kutip/baris baru,
