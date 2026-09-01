@@ -217,68 +217,70 @@ _QUICK_RE = re.compile(
 def parse_quick_replies(text: str) -> tuple[str, dict]:
     """Pisahkan blok [[PILIHAN]] dari jawaban Yuki.
 
-    Mengembalikan (teks_bersih, kartu). `kartu` berisi
-    {"question": str, "options": [str, ...]} atau {} bila tidak ada.
-    Blok yang berada di dalam contoh kode (```) sengaja diabaikan supaya
-    contoh kode tidak berubah jadi tombol.
+    SELALU mengembalikan pasangan (teks_bersih, kartu) — tidak pernah None.
+    `kartu` berisi {"question": str, "options": [...], "multi": bool}
+    atau {} bila tidak ada blok pilihan.
     """
     raw = text or ""
-    if "[[" not in raw.upper().replace(" ", "") and "PILIHAN" not in raw.upper():
-        return raw, {}
+    try:
+        if "PILIHAN" not in raw.upper():
+            return raw, {}
 
-    # Lindungi isi blok kode agar tidak ikut terbaca.
-    kode_blok: list[str] = []
+        # Lindungi isi blok kode agar tidak ikut terbaca.
+        kode_blok: list[str] = []
 
-    def _simpan(m):
-        kode_blok.append(m.group(0))
-        return f"\x00KODE{len(kode_blok) - 1}\x00"
+        def _simpan(m):
+            kode_blok.append(m.group(0))
+            return f"\x00KODE{len(kode_blok) - 1}\x00"
 
-    aman = re.sub(r"```.*?```", _simpan, raw, flags=re.S)
+        aman = re.sub(r"```.*?```", _simpan, raw, flags=re.S)
 
-    cocok = _QUICK_RE.search(aman)
-    if not cocok:
-        return raw, {}
+        cocok = _QUICK_RE.search(aman)
+        if not cocok:
+            return raw, {}
 
-    isi = cocok.group(1)
-    aman = aman.replace(cocok.group(0), "")
+        isi = cocok.group(1)
+        aman = aman.replace(cocok.group(0), "")
 
-    pertanyaan = ""
-    pilihan: list[str] = []
-    multi = False
-    for baris in isi.splitlines():
-        b = baris.strip()
-        if not b:
-            continue
-        low = b.lower()
-        if low.startswith(("mode:", "tipe:", "jenis:")):
-            multi = any(k in low for k in ("banyak", "ganda", "multi"))
-        elif low.startswith(("tanya:", "pertanyaan:", "question:")):
-            pertanyaan = b.split(":", 1)[1].strip()
-        elif b.startswith(("-", "*", "•")):
-            opsi = b.lstrip("-*• ").strip()
-            if opsi and opsi not in pilihan:
-                pilihan.append(opsi)
-        elif not pertanyaan:
-            pertanyaan = b
+        pertanyaan = ""
+        pilihan: list[str] = []
+        multi = False
+        for baris in isi.splitlines():
+            b = baris.strip()
+            if not b:
+                continue
+            low = b.lower()
+            if low.startswith(("mode:", "tipe:", "jenis:")):
+                multi = any(k in low for k in ("banyak", "ganda", "multi"))
+            elif low.startswith(("tanya:", "pertanyaan:", "question:")):
+                pertanyaan = b.split(":", 1)[1].strip()
+            elif b.startswith(("-", "*", "•")):
+                opsi = b.lstrip("-*• ").strip()
+                if opsi and opsi not in pilihan:
+                    pilihan.append(opsi)
+            elif not pertanyaan:
+                pertanyaan = b
 
-    # Kembalikan blok kode yang tadi disimpan.
-    for i, blok in enumerate(kode_blok):
-        aman = aman.replace(f"\x00KODE{i}\x00", blok)
+        # Kembalikan blok kode yang tadi disimpan.
+        for i, blok in enumerate(kode_blok):
+            aman = aman.replace(f"\x00KODE{i}\x00", blok)
 
-    bersih = aman.strip()
-    if not pilihan:
-        # Tidak ada pilihan yang sah -> kembalikan pertanyaannya sebagai teks
-        # biasa supaya tidak ada informasi yang hilang.
-        if pertanyaan:
-            bersih = (bersih + "\n\n" + pertanyaan).strip()
-        return bersih, {}
+        bersih = aman.strip()
+        if not pilihan:
+            # Tidak ada pilihan yang sah -> kembalikan pertanyaannya sebagai
+            # teks biasa supaya tidak ada informasi yang hilang.
+            if pertanyaan:
+                bersih = (bersih + "\n\n" + pertanyaan).strip()
+            return bersih, {}
         return bersih, {
-        "question": pertanyaan,
-        "options": pilihan[:4],
-        "multi": multi,
-    }
-
-
+            "question": pertanyaan,
+            "options": pilihan[:4],
+            "multi": multi,
+        }
+    except Exception:
+        # Apa pun yang terjadi, jawaban Yuki harus tetap tampil apa adanya.
+        return raw, {}
+        
 def send_quick_reply(text: str) -> None:
     """Kirim jawaban dari tombol kartu pilihan seolah User mengetiknya."""
     from state import active_thread, next_msg_id
