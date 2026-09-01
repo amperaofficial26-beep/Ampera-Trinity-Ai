@@ -749,9 +749,9 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
                   untuk mengangkat kotak ke tengah, di bawah sapaan.
 ==================================================================== */
 :root {
-    --chat-lift: 0px;
+    --chat-lift: 20px;
     --chat-shift: 0px;
-    --chat-width: 46rem;
+    --chat-width: 40rem;
     --chat-lift-fresh: 26vh;
 }
 
