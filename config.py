@@ -97,8 +97,22 @@ IMAGE_SIZE_PRESETS = [
     {"key": "small",      "name": "Kecil",     "ratio": "1:1",  "w": 512,  "h": 512,
      "desc": "Ringan & cepat dimuat"},
 ]
-IMAGE_SIZE_BY_KEY = {p["key"]: p for p in IMAGE_SIZE_PRESETS}
+
+# Dibangun dengan perulangan biasa + pemeriksaan tipe, bukan dict-comprehension.
+# Kalau ada satu entri yang salah bentuk saat diedit (mis. kurung "[" tertukar
+# jadi "{"), aplikasi tidak ikut mati — entri rusaknya dilewati saja.
+IMAGE_SIZE_BY_KEY = {}
+for _preset in (IMAGE_SIZE_PRESETS if isinstance(IMAGE_SIZE_PRESETS, (list, tuple)) else []):
+    if isinstance(_preset, dict) and _preset.get("key"):
+        IMAGE_SIZE_BY_KEY[_preset["key"]] = _preset
+
 DEFAULT_IMAGE_SIZE_KEY = "square"
+if DEFAULT_IMAGE_SIZE_KEY not in IMAGE_SIZE_BY_KEY:
+    _fallback = {"key": "square", "name": "Persegi", "ratio": "1:1",
+                 "w": 1024, "h": 1024, "desc": "Serbaguna"}
+    IMAGE_SIZE_PRESETS = list(IMAGE_SIZE_BY_KEY.values()) or [_fallback]
+    IMAGE_SIZE_BY_KEY.setdefault("square", _fallback)
+    DEFAULT_IMAGE_SIZE_KEY = IMAGE_SIZE_PRESETS[0]["key"]
 
 # ============================================================================
 # SUARA & GAMBAR MASUK
