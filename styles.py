@@ -1461,7 +1461,7 @@ p.trinity-foot,
 [data-testid="stMainBlockContainer"] [data-testid="stMarkdownContainer"] p.trinity-foot {
     text-align: center !important;
     color: #7E7387 !important;
-    font-size: 13px !important;      /* halaman awal (sebelum mulai chat) */
+    font-size: 12px !important;      /* halaman awal (sebelum mulai chat) */
     line-height: 1.5 !important;
     margin-top: -7px !important;
     margin-bottom: 0 !important;
