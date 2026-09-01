@@ -83,12 +83,13 @@ def handle_image_request(prompt: str) -> None:
         })
         return
 
+    size = current_image_size()
     progress_slot = st.empty()
     result: dict = {"data": None, "error": None}
 
     def _worker() -> None:
         try:
-            result["data"] = generate_image(prompt)
+            result["data"] = generate_image(prompt, size_key=size["key"])
         except Exception as exc:
             result["error"] = exc
 
@@ -203,10 +204,12 @@ def handle_chat_request(answer_slot) -> None:
         think_slot.empty()
         err = public_error_chat(e)
         thread.append({
-            "id": next_msg_id(), "role": "assistant", "type": "text",
-            "content": err, "time": now_wib(),
+            "id": next_msg_id(), "role": "assistant", "type": "image",
+            "image_bytes": result["data"], "prompt": prompt,
+            "time": now_wib(),
+            "size_label": f'{size["name"]} · {size["ratio"]} · {size["w"]}×{size["h"]}',
         })
-
+        return
 
 def _make_square_preview(data: bytes, size: int = 160) -> tuple[bytes, str]:
     try:
