@@ -189,6 +189,15 @@ def handle_chat_request(answer_slot) -> None:
             full = "…"
         # Pisahkan blok [[PILIHAN]] -> jadi kartu tombol, bukan teks mentah.
         full, kartu = parse_quick_replies(full)
+                # Pisahkan blok [[PILIHAN]] -> jadi kartu tombol, bukan teks mentah.
+        # Dibungkus pemeriksaan supaya jawaban Yuki tetap tampil walau
+        # parser bermasalah (mis. mengembalikan None karena salah edit).
+        hasil = parse_quick_replies(full)
+        if isinstance(hasil, (tuple, list)) and len(hasil) == 2:
+            full, kartu = hasil
+            kartu = kartu if isinstance(kartu, dict) else {}
+        else:
+            kartu = {}
         if not full:
             full = kartu.get("question") or "…"
         stream_sentences(answer_slot, full)
