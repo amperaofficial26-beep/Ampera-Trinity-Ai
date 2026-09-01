@@ -1484,6 +1484,73 @@ div.stDownloadButton > button:hover {
     transform: none;
     background: #2C1F33;
 }
+/* ====================================================================
+   KARTU PILIHAN INTERAKTIF (quick reply ala Claude)
+   Muncul di bawah jawaban Yuki saat dia perlu memastikan sesuatu.
+==================================================================== */
+[class*="st-key-qr_card_"] {
+    background: #F2E8D6 !important;
+    border: 1px solid #DBCEB9 !important;
+    border-radius: 16px !important;
+    padding: 12px 14px 10px !important;
+    margin: 6px 0 18px !important;
+    max-width: 560px;
+    animation: qrCardIn 0.35s ease both;
+}
+@keyframes qrCardIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.qr-question {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #2C1F33;
+    margin-bottom: 10px;
+    line-height: 1.45;
+}
+
+/* Tombol pilihan */
+[class*="st-key-qr_card_"] div.stButton > button,
+[class*="st-key-qr_card_"] [data-testid="stBaseButton-secondary"] {
+    background: #FFFFFF !important;
+    border: 1px solid #DBCEB9 !important;
+    border-radius: 11px !important;
+    color: #2C1F33 !important;
+    font-size: 0.86rem !important;
+    font-weight: 500 !important;
+    padding: 7px 12px !important;
+    min-height: 38px !important;
+    box-shadow: 0 1px 2px rgba(44,31,51,0.05) !important;
+    transition: background .15s ease, border-color .15s ease,
+                transform .12s ease, box-shadow .15s ease !important;
+    white-space: normal !important;
+    line-height: 1.3 !important;
+}
+[class*="st-key-qr_card_"] div.stButton > button:hover {
+    background: #FAF3E8 !important;
+    border-color: #2C1F33 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 10px rgba(44,31,51,0.10) !important;
+}
+[class*="st-key-qr_card_"] div.stButton > button:active {
+    transform: translateY(0) !important;
+    background: #EFE4D2 !important;
+}
+[class*="st-key-qr_card_"] [data-testid="stHorizontalBlock"] {
+    gap: 8px !important;
+}
+
+/* Kartu lama (sudah dijawab): jadi jejak abu, tidak bisa diklik */
+.qr-row-done { display: flex; flex-wrap: wrap; gap: 6px; }
+.qr-chip-done {
+    font-size: 0.78rem;
+    color: #948AA0;
+    background: rgba(44, 31, 51, 0.05);
+    border: 1px solid #E2D6C2;
+    border-radius: 9px;
+    padding: 4px 10px;
+}
 /* ---------- alert / error ---------- */
 [data-testid="stAlert"] {
     background: #F2E8D6 !important;
