@@ -1461,7 +1461,7 @@ p.trinity-foot,
 [data-testid="stMainBlockContainer"] [data-testid="stMarkdownContainer"] p.trinity-foot {
     text-align: center !important;
     color: #7E7387 !important;
-    font-size: 10px !important;      /* halaman awal (sebelum mulai chat) */
+    font-size: 13px !important;      /* halaman awal (sebelum mulai chat) */
     line-height: 1.5 !important;
     margin-top: -7px !important;
     margin-bottom: 0 !important;
@@ -1475,7 +1475,7 @@ p.trinity-foot,
 p.trinity-foot.in-chat,
 [data-testid="stMarkdownContainer"] p.trinity-foot.in-chat,
 [data-testid="stMainBlockContainer"] [data-testid="stMarkdownContainer"] p.trinity-foot.in-chat {
-    font-size: 9px !important;       /* saat chat sudah berjalan */
+    font-size: 11px !important;       /* saat chat sudah berjalan */
     color: #827788 !important;
     margin-top: 22px !important;
 }
