@@ -11,10 +11,7 @@ import io
 import requests
 from PIL import Image
 
-from config import (
-    CF_ACCOUNT_ID, CF_API_TOKEN, CF_API_BASE, CF_IMAGE_MODEL, CF_DEFAULT_STEPS,
-    DEFAULT_IMAGE_SIZE_KEY, IMAGE_SIZE_BY_KEY,
-)
+from config import CF_ACCOUNT_ID, CF_API_TOKEN, CF_API_BASE, CF_IMAGE_MODEL, CF_DEFAULT_STEPS
 from errors import public_error_image
 
 
