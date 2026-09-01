@@ -735,6 +735,47 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     display: flex !important;
     flex-direction: column !important;
 }
+/* ====================================================================
+   POSISI KOLOM CHAT (dok input di bawah layar)
+   --------------------------------------------------------------------
+   Semua pengaturan posisi kotak chat dikumpulkan di sini supaya tidak
+   tersebar. Cukup ubah 4 angka di bawah ini.
+
+   --chat-lift  : seberapa tinggi kolom chat diangkat dari dasar layar
+                  saat percakapan SUDAH berjalan. 0px = menempel bawah.
+   --chat-shift : geser mendatar. Minus = ke kiri, plus = ke kanan.
+   --chat-width : lebar maksimum kartu input.
+   --chat-lift-fresh : posisi saat halaman awal (belum ada chat); dipakai
+                  untuk mengangkat kotak ke tengah, di bawah sapaan.
+==================================================================== */
+:root {
+    --chat-lift: 0px;
+    --chat-shift: 0px;
+    --chat-width: 46rem;
+    --chat-lift-fresh: 26vh;
+}
+
+/* Posisi saat chat sudah berjalan */
+[data-testid="stBottom"] {
+    transform: translate(var(--chat-shift), calc(-1 * var(--chat-lift)));
+    transition: transform 0.35s ease;
+}
+
+/* Lebar & perataan kartu input */
+[data-testid="stBottomBlockContainer"] {
+    max-width: var(--chat-width) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+/* Di layar sempit (HP), abaikan geseran & pakai lebar penuh supaya
+   kotak chat tidak keluar layar. */
+@media (max-width: 640px) {
+    :root {
+        --chat-shift: 0px;
+        --chat-width: 100%;
+    }
+}
 .pending-card {
     position: relative;
     width: 72px;
