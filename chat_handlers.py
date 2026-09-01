@@ -78,7 +78,7 @@ def handle_image_request(prompt: str) -> None:
         })
         return
 
-        progress_slot = st.empty()
+    progress_slot = st.empty()
     result: dict = {"data": None, "error": None}
 
     def _worker() -> None:
@@ -86,6 +86,7 @@ def handle_image_request(prompt: str) -> None:
             result["data"] = generate_image(prompt)
         except Exception as exc:
             result["error"] = exc
+
     worker = threading.Thread(target=_worker, daemon=True)
     worker.start()
 
@@ -149,7 +150,6 @@ def handle_chat_request(answer_slot) -> None:
             "image_bytes": result["data"], "prompt": prompt,
             "time": now_wib(),
         })
-        return
 
     s = get_settings()
     model_id = AVAILABLE_MODELS.get(
@@ -390,9 +390,6 @@ def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> Non
                              key=f"{kp}pm_web", use_container_width=True):
                     st.session_state.web_search_on = not st.session_state.get("web_search_on", False)
                     st.rerun()
-                  
-                    st.markdown('<div class="plus-menu-divider"></div>',
-                            unsafe_allow_html=True)                            
 
     with _sp:
         if st.session_state.messages or st.session_state.get("page") != "chat":
