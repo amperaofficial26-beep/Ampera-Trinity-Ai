@@ -74,6 +74,9 @@ Kamu bisa membantu apa saja: ngobrol santai, coding, matematika, menganalisis ga
 CF_API_BASE = "https://api.cloudflare.com/client/v4/accounts"
 CF_IMAGE_MODEL = "@cf/black-forest-labs/flux-1-schnell"
 CF_DEFAULT_STEPS = 4
+IMAGE_SIZE_PRESETS = [ ... ]
+IMAGE_SIZE_BY_KEY = {p["key"]: p for p in IMAGE_SIZE_PRESETS}
+DEFAULT_IMAGE_SIZE_KEY = "square"
 
 # --- UKURAN HASIL GAMBAR ---------------------------------------------------
 # Catatan penting: model @cf/black-forest-labs/flux-1-schnell di Cloudflare
