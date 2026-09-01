@@ -68,6 +68,11 @@ def maybe_run_yuki(answer_slot) -> bool:
         handle_chat_request(answer_slot)
     return True
 
+def current_image_size() -> dict:
+    """Preset ukuran gambar yang sedang dipilih user."""
+    key = st.session_state.get("image_size_key", DEFAULT_IMAGE_SIZE_KEY)
+    return IMAGE_SIZE_BY_KEY.get(key, IMAGE_SIZE_BY_KEY[DEFAULT_IMAGE_SIZE_KEY])
+
 def handle_image_request(prompt: str) -> None:
     thread = active_thread()
     if not IMAGE_READY:
