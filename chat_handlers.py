@@ -53,6 +53,7 @@ IMAGE_MIN_SECONDS = 6.0
 IMAGE_DONE_SECONDS = 0.7
 IMAGE_MAX_SECONDS = 200.0
 
+
 def maybe_run_yuki(answer_slot) -> bool:
     job = st.session_state.get("_yuki_job")
     if not job:
@@ -94,12 +95,14 @@ def handle_image_request(prompt: str) -> None:
     # tepi kotak, sapuan kanvas, pergantian teks, bar progres) dijalankan
     # oleh CSS di browser sehingga tetap mulus walau server sedang menunggu
     # API. Jangan me-render ulang di dalam loop: setiap markdown() baru akan
-    # mengganti node DOM dan me-reset animasi CSS dari nol.
+    # mengganti node DOM dan me-reset animasi CSS dari nol (itu penyebab
+    # shimmer terlihat diam/berkedip sebelumnya).
     progress_slot.markdown(image_progress_html(), unsafe_allow_html=True)
 
     # Tunggu hasilnya. Kotak tetap tampil MINIMAL IMAGE_MIN_SECONDS detik
-    # supaya animasinya sempat terlihat utuh. Polling pakai sleep pendek
-    # TANPA render ulang, jadi animasi CSS di browser tidak ter-reset.
+    # supaya animasinya sempat terlihat utuh (FLUX-schnell sering selesai
+    # dalam 2-3 detik). Polling pakai sleep pendek TANPA render ulang, jadi
+    # animasi CSS di browser tidak ter-reset.
     t0 = time.time()
     while worker.is_alive() and (time.time() - t0) < IMAGE_MAX_SECONDS:
         time.sleep(0.1)
@@ -129,7 +132,8 @@ def handle_image_request(prompt: str) -> None:
         e = result["error"] or RuntimeError("no image")
 
     # Simpan detail teknisnya supaya bisa dilihat di UI (expander "Detail
-    # teknis" di bawah pesan error).
+    # teknis" di bawah pesan error) — sebelumnya kegagalan bisa terasa
+    # seperti "tidak terjadi apa-apa".
     detail = f"{type(e).__name__}: {e}"
     st.session_state["_last_image_error"] = detail
 
@@ -141,7 +145,7 @@ def handle_image_request(prompt: str) -> None:
         "id": next_msg_id(), "role": "assistant", "type": "text",
         "content": msg, "time": now_wib(), "error_detail": detail,
     })
-    
+
 def handle_chat_request(answer_slot) -> None:
     thread = active_thread()
     if not CHAT_READY:
@@ -188,8 +192,6 @@ def handle_chat_request(answer_slot) -> None:
         if not full:
             full = "…"
         # Pisahkan blok [[PILIHAN]] -> jadi kartu tombol, bukan teks mentah.
-        full, kartu = parse_quick_replies(full)
-                # Pisahkan blok [[PILIHAN]] -> jadi kartu tombol, bukan teks mentah.
         # Dibungkus pemeriksaan supaya jawaban Yuki tetap tampil walau
         # parser bermasalah (mis. mengembalikan None karena salah edit).
         hasil = parse_quick_replies(full)
@@ -217,6 +219,8 @@ def handle_chat_request(answer_slot) -> None:
             "content": err, "time": now_wib(),
             "error_detail": f"{type(e).__name__}: {e}",
         })
+
+
 def _make_square_preview(data: bytes, size: int = 160) -> tuple[bytes, str]:
     try:
         im = Image.open(io.BytesIO(data))
@@ -426,7 +430,7 @@ def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> Non
                     if st.button(label, key=f"{kp}model_{m['key']}", use_container_width=True):
                         st.session_state.selected_model_key = m["key"]
                         st.rerun()
-                        
+
 def process_user_input(user_input, answer_slot, is_fresh: bool = False) -> bool:
     """Simpan kiriman user ke thread aktif, lalu antri Yuki.
     Return True bila halaman perlu di-rerun."""
