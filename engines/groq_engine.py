@@ -28,6 +28,7 @@ from config import (
     GROQ_API_KEY, GROQ_BASE_URL, GROQ_MODEL_FALLBACKS, MAX_HISTORY_MESSAGES,
     MAX_IMAGES_PER_MESSAGE, STT_MODEL, VISION_MODEL_FALLBACKS,
     VISION_RECENT_MESSAGES, YUKI_SYSTEM_PROMPT, LANG_BY_CODE, DEFAULT_LANG_CODE,
+    CLARIFY_RULES, CLARIFY_MODE_RULES,
 )
 from errors import _is_model_unavailable_error
 from state import get_settings
@@ -64,9 +65,20 @@ def build_system_prompt() -> str:
             "tanpa emoji berlebihan."
         ),
     }
-    if s.get("personality") in persona_map:
+        if s.get("personality") in persona_map:
         parts.append(persona_map[s["personality"]])
 
+    # Aturan bertanya balik: hanya untuk permintaan yang benar-benar kabur.
+    # Mode "Mati" mengganti aturan itu dengan larangan bertanya.
+    clarify_mode = s.get("clarify_mode", "Seperlunya")
+    if clarify_mode == "Mati":
+        parts.append(CLARIFY_MODE_RULES["Mati"])
+    else:
+        parts.append(CLARIFY_RULES)
+        extra = CLARIFY_MODE_RULES.get(clarify_mode, "")
+        if extra:
+            parts.append(extra)
+                  
     lang = LANG_BY_CODE.get(s.get("yuki_lang") or DEFAULT_LANG_CODE)
     if lang and lang["code"] != "id":
         parts.append(f"Selalu jawab dalam bahasa {lang['name']}.")
