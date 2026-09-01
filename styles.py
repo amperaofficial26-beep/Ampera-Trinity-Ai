@@ -734,42 +734,45 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 [data-testid="stBottomBlockContainer"] {
     display: flex !important;
     flex-direction: column !important;
-}
-/* ====================================================================
+}/* ====================================================================
    POSISI KOLOM CHAT (dok input di bawah layar)
    --------------------------------------------------------------------
-   Semua pengaturan posisi kotak chat dikumpulkan di sini supaya tidak
-   tersebar. Cukup ubah 4 angka di bawah ini.
+   Kenapa pakai margin, bukan transform:
+   Elemen [data-testid="stBottom"] di Streamlit adalah position: sticky
+   dengan bottom: 0. Menggesernya pakai transform sering tidak terlihat
+   karena posisi lengketnya dihitung ulang oleh browser. Yang PASTI
+   bekerja adalah menambah margin pada kartu input di dalamnya: tinggi
+   batang dok ikut bertambah, sehingga kartunya benar-benar terangkat.
 
-   --chat-lift  : seberapa tinggi kolom chat diangkat dari dasar layar
-                  saat percakapan SUDAH berjalan. 0px = menempel bawah.
+   --chat-lift  : tinggi angkat kolom chat dari dasar layar saat chat
+                  SUDAH berjalan. 0px = menempel bawah.
    --chat-shift : geser mendatar. Minus = ke kiri, plus = ke kanan.
    --chat-width : lebar maksimum kartu input.
-   --chat-lift-fresh : posisi saat halaman awal (belum ada chat); dipakai
-                  untuk mengangkat kotak ke tengah, di bawah sapaan.
+   --chat-lift-fresh : posisi saat halaman awal (belum ada chat).
 ==================================================================== */
 :root {
-    --chat-lift: 10px;
+    --chat-lift: 90px;
     --chat-shift: 0px;
-    --chat-width: 40rem;
+    --chat-width: 46rem;
     --chat-lift-fresh: 26vh;
 }
 
-/* Posisi saat chat sudah berjalan */
-[data-testid="stBottom"] {
-    transform: translate(var(--chat-shift), calc(-1 * var(--chat-lift)));
-    transition: transform 0.35s ease;
-}
-
-/* Lebar & perataan kartu input */
+/* Angkat & geser kartu input (berlaku saat chat sudah berjalan) */
 [data-testid="stBottomBlockContainer"] {
+    margin-bottom: var(--chat-lift) !important;
+    transform: translateX(var(--chat-shift)) !important;
     max-width: var(--chat-width) !important;
     margin-left: auto !important;
     margin-right: auto !important;
 }
 
-/* Di layar sempit (HP), abaikan geseran & pakai lebar penuh supaya
-   kotak chat tidak keluar layar. */
+/* Batang dok dibuat transparan di area tambahan hasil pengangkatan,
+   supaya yang terlihat naik hanya kartunya, bukan blok warna. */
+[data-testid="stBottom"] > div {
+    background: transparent !important;
+}
+
+/* Di layar sempit (HP): tanpa geseran, lebar penuh. */
 @media (max-width: 640px) {
     :root {
         --chat-shift: 0px;
