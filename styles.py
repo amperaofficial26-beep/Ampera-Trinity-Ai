@@ -1463,7 +1463,7 @@ p.trinity-foot,
     color: #7E7387 !important;
     font-size: 10px !important;      /* halaman awal (sebelum mulai chat) */
     line-height: 1.5 !important;
-    margin-top: 34px !important;
+    margin-top: 14px !important;
     margin-bottom: 0 !important;
     font-family: 'Inter', sans-serif !important;
     -webkit-text-size-adjust: 100%;  /* cegah browser HP membesarkan teks kecil */
