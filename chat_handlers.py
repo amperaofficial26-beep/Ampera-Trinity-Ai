@@ -20,8 +20,7 @@ import streamlit as st
 from config import (
     AVAILABLE_MODELS, DEFAULT_MODEL_KEY, IMAGE_INPUT_TYPES, IMAGE_READY,
     CHAT_READY, MAX_IMAGES_PER_MESSAGE, MODEL_BY_KEY, MODEL_CATALOG,
-    VISION_MODEL_ID, DEFAULT_IMAGE_SIZE_KEY, IMAGE_SIZE_BY_KEY,
-    IMAGE_SIZE_PRESETS,
+    VISION_MODEL_ID,
 )
 from engines.groq_engine import (
     build_chat_client, collect_images, stream_chat_with_fallback,
@@ -69,24 +68,6 @@ def maybe_run_yuki(answer_slot) -> bool:
         handle_chat_request(answer_slot)
     return True
 
-def current_image_size() -> dict:
-    """Preset ukuran gambar yang sedang dipilih user.
-
-    Sengaja dibuat tahan-banting: preset diambil ulang dari config saat
-    dipanggil, jadi walau blok import di atas belum diperbarui, menu
-    ukuran tetap jalan (tidak melempar NameError) dan otomatis jatuh ke
-    ukuran bawaan 1024x1024.
-    """
-    from config import DEFAULT_IMAGE_SIZE_KEY, IMAGE_SIZE_BY_KEY
-
-    fallback = {"key": "square", "name": "Persegi", "ratio": "1:1",
-                "w": 1024, "h": 1024, "desc": "Serbaguna"}
-    if not IMAGE_SIZE_BY_KEY:
-        return fallback
-    key = st.session_state.get("image_size_key", DEFAULT_IMAGE_SIZE_KEY)
-    return IMAGE_SIZE_BY_KEY.get(
-        key, IMAGE_SIZE_BY_KEY.get(DEFAULT_IMAGE_SIZE_KEY, fallback)
-    )
 def handle_image_request(prompt: str) -> None:
     thread = active_thread()
     if not IMAGE_READY:
@@ -97,16 +78,14 @@ def handle_image_request(prompt: str) -> None:
         })
         return
 
-    size = current_image_size()
-    progress_slot = st.empty()
+        progress_slot = st.empty()
     result: dict = {"data": None, "error": None}
 
     def _worker() -> None:
         try:
-            result["data"] = generate_image(prompt, size_key=size["key"])
+            result["data"] = generate_image(prompt)
         except Exception as exc:
             result["error"] = exc
-
     worker = threading.Thread(target=_worker, daemon=True)
     worker.start()
 
@@ -165,9 +144,9 @@ def handle_image_request(prompt: str) -> None:
 def handle_chat_request(answer_slot) -> None:
     thread = active_thread()
     if not CHAT_READY:
-        thread.append({
-            "id": next_msg_id(), "role": "assistant", "type": "text",
-            "content": "Fitur chat belum dikonfigurasi pemilik (GROQ_API_KEY).",
+       thread.append({
+            "id": next_msg_id(), "role": "assistant", "type": "image",
+            "image_bytes": result["data"], "prompt": prompt,
             "time": now_wib(),
         })
         return
@@ -413,26 +392,7 @@ def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> Non
                     st.rerun()
                   
                     st.markdown('<div class="plus-menu-divider"></div>',
-                            unsafe_allow_html=True)
-
-                # Ukuran hasil gambar Yuki. Cloudflare flux-1-schnell tidak
-                # menerima width/height, jadi pilihan ini diterapkan setelah
-                # gambar jadi (center-crop + resize) di engines/image_engine.py.
-                cur_size = current_image_size()
-                st.markdown(
-                    f':material/aspect_ratio:  **Ukuran gambar**  \n'
-                    f':gray[{cur_size["name"]} · {cur_size["ratio"]} · '
-                    f'{cur_size["w"]}×{cur_size["h"]}]'
-                )
-                for sp in IMAGE_SIZE_PRESETS:
-                    active = sp["key"] == cur_size["key"]
-                    check = " :orange[✓]" if active else ""
-                    label = (f'{sp["name"]} · {sp["ratio"]}{check}  \n'
-                             f':gray[{sp["w"]}×{sp["h"]} — {sp["desc"]}]')
-                    if st.button(label, key=f"{kp}pm_size_{sp['key']}",
-                                 use_container_width=True):
-                        st.session_state.image_size_key = sp["key"]
-                        st.rerun()                              
+                            unsafe_allow_html=True)                            
 
     with _sp:
         if st.session_state.messages or st.session_state.get("page") != "chat":
