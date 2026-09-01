@@ -1485,70 +1485,129 @@ div.stDownloadButton > button:hover {
     background: #2C1F33;
 }
 /* ====================================================================
-   KARTU PILIHAN INTERAKTIF (quick reply ala Claude)
+   KARTU PILIHAN INTERAKTIF (quick reply)
    Muncul di bawah jawaban Yuki saat dia perlu memastikan sesuatu.
+   Tata letak: grid 2 kolom bila label pendek, vertikal di layar sempit.
 ==================================================================== */
 [class*="st-key-qr_card_"] {
-    background: #F2E8D6 !important;
-    border: 1px solid #DBCEB9 !important;
-    border-radius: 16px !important;
-    padding: 12px 14px 10px !important;
-    margin: 6px 0 18px !important;
+    background: #FBF6EC !important;              /* sedikit lebih terang dari kanvas */
+    border: 1px solid #E0D2BB !important;
+    border-radius: 14px !important;
+    padding: 14px 14px 12px !important;
+    margin: 8px 0 20px !important;
     max-width: 560px;
-    animation: qrCardIn 0.35s ease both;
+    box-shadow: 0 2px 10px rgba(44, 31, 51, 0.05) !important;
+    animation: qrCardIn 0.32s cubic-bezier(.2,.8,.2,1) both;
 }
 @keyframes qrCardIn {
-    from { opacity: 0; transform: translateY(6px); }
+    from { opacity: 0; transform: translateY(8px); }
     to   { opacity: 1; transform: translateY(0); }
 }
 
+/* --- pertanyaan --- */
 .qr-question {
     font-size: 0.9rem;
-    font-weight: 600;
+    font-weight: 600;                 /* semibold: terbaca sekilas */
     color: #2C1F33;
-    margin-bottom: 10px;
+    letter-spacing: -0.01em;
+    margin: 0 0 12px;
     line-height: 1.45;
 }
 
-/* Tombol pilihan */
-[class*="st-key-qr_card_"] div.stButton > button,
-[class*="st-key-qr_card_"] [data-testid="stBaseButton-secondary"] {
-    background: #FFFFFF !important;
+/* --- tombol pilihan --- */
+[class*="st-key-qr_card_"] div.stButton > button {
+    background: #FFFFFF !important;   /* "mengambang" di atas kartu */
     border: 1px solid #DBCEB9 !important;
-    border-radius: 11px !important;
+    border-radius: 10px !important;
     color: #2C1F33 !important;
-    font-size: 0.86rem !important;
-    font-weight: 500 !important;
-    padding: 7px 12px !important;
-    min-height: 38px !important;
-    box-shadow: 0 1px 2px rgba(44,31,51,0.05) !important;
-    transition: background .15s ease, border-color .15s ease,
-                transform .12s ease, box-shadow .15s ease !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;      /* medium */
+    text-align: left !important;
+    justify-content: flex-start !important;
+    padding: 10px 14px !important;
+    min-height: 44px !important;      /* nyaman di-tap pada layar sentuh */
+    box-shadow: 0 1px 2px rgba(44, 31, 51, 0.05) !important;
     white-space: normal !important;
-    line-height: 1.3 !important;
+    line-height: 1.35 !important;
+    transition: background .16s ease, border-color .16s ease,
+                transform .1s ease, box-shadow .16s ease !important;
 }
 [class*="st-key-qr_card_"] div.stButton > button:hover {
-    background: #FAF3E8 !important;
+    background: #FFFDF9 !important;
     border-color: #2C1F33 !important;
     transform: translateY(-1px) !important;
-    box-shadow: 0 4px 10px rgba(44,31,51,0.10) !important;
+    box-shadow: 0 5px 14px rgba(44, 31, 51, 0.11) !important;
 }
 [class*="st-key-qr_card_"] div.stButton > button:active {
-    transform: translateY(0) !important;
-    background: #EFE4D2 !important;
+    transform: scale(0.985) translateY(0) !important;  /* umpan balik instan */
+    background: #F4EADA !important;
+    box-shadow: 0 1px 2px rgba(44, 31, 51, 0.08) !important;
 }
-[class*="st-key-qr_card_"] [data-testid="stHorizontalBlock"] {
-    gap: 8px !important;
+[class*="st-key-qr_card_"] div.stButton > button:focus-visible {
+    outline: 2px solid #2C1F33 !important;
+    outline-offset: 2px !important;
 }
 
-/* Kartu lama (sudah dijawab): jadi jejak abu, tidak bisa diklik */
+/* --- keadaan TERPILIH (multi-pilih, tombol primary) --- */
+[class*="st-key-qr_card_"] div.stButton > button[kind="primary"],
+[class*="st-key-qr_card_"] [data-testid="stBaseButton-primary"] {
+    background: #2C1F33 !important;
+    border-color: #2C1F33 !important;
+    color: #FBF6EC !important;
+    font-weight: 600 !important;
+    box-shadow: 0 3px 10px rgba(44, 31, 51, 0.20) !important;
+}
+[class*="st-key-qr_card_"] div.stButton > button[kind="primary"]:hover {
+    background: #40304A !important;
+    border-color: #40304A !important;
+}
+
+/* --- tombol "Kirim pilihan" pada kartu multi-pilih --- */
+[class*="st-key-qr_send_"] div.stButton > button {
+    margin-top: 4px !important;
+    background: #EFE4D2 !important;
+    border-style: dashed !important;
+    text-align: center !important;
+    justify-content: center !important;
+    font-weight: 600 !important;
+}
+[class*="st-key-qr_send_"] div.stButton > button:disabled {
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+}
+
+/* --- jarak antar tombol --- */
+[class*="st-key-qr_card_"] [data-testid="stHorizontalBlock"] {
+    gap: 10px !important;
+    margin-bottom: 10px !important;
+}
+[class*="st-key-qr_card_"] [data-testid="stVerticalBlock"] {
+    gap: 10px !important;
+}
+[class*="st-key-qr_card_"] div.stButton { margin: 0 !important; }
+
+/* --- layar sempit: paksa satu tombol per baris --- */
+@media (max-width: 640px) {
+    [class*="st-key-qr_card_"] [data-testid="stHorizontalBlock"] {
+        flex-direction: column !important;
+    }
+    [class*="st-key-qr_card_"] [data-testid="stColumn"] {
+        width: 100% !important;
+        flex: 1 1 100% !important;
+        min-width: 100% !important;
+    }
+    [class*="st-key-qr_card_"] { max-width: 100%; }
+}
+
+/* --- kartu lama (sudah dijawab): jejak abu, tidak bisa diklik --- */
 .qr-row-done { display: flex; flex-wrap: wrap; gap: 6px; }
 .qr-chip-done {
     font-size: 0.78rem;
     color: #948AA0;
     background: rgba(44, 31, 51, 0.05);
     border: 1px solid #E2D6C2;
-    border-radius: 9px;
+    border-radius: 8px;
     padding: 4px 10px;
 }
 /* ---------- alert / error ---------- */
