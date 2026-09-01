@@ -145,11 +145,12 @@ def handle_image_request(prompt: str) -> None:
 def handle_chat_request(answer_slot) -> None:
     thread = active_thread()
     if not CHAT_READY:
-       thread.append({
-            "id": next_msg_id(), "role": "assistant", "type": "image",
-            "image_bytes": result["data"], "prompt": prompt,
+        thread.append({
+            "id": next_msg_id(), "role": "assistant", "type": "text",
+            "content": "Fitur chat belum dikonfigurasi pemilik (GROQ_API_KEY).",
             "time": now_wib(),
         })
+        return
 
     s = get_settings()
     model_id = AVAILABLE_MODELS.get(
@@ -203,13 +204,10 @@ def handle_chat_request(answer_slot) -> None:
         think_slot.empty()
         err = public_error_chat(e)
         thread.append({
-            "id": next_msg_id(), "role": "assistant", "type": "image",
-            "image_bytes": result["data"], "prompt": prompt,
-            "time": now_wib(),
-            "size_label": f'{size["name"]} · {size["ratio"]} · {size["w"]}×{size["h"]}',
+            "id": next_msg_id(), "role": "assistant", "type": "text",
+            "content": err, "time": now_wib(),
+            "error_detail": f"{type(e).__name__}: {e}",
         })
-        return
-
 def _make_square_preview(data: bytes, size: int = 160) -> tuple[bytes, str]:
     try:
         im = Image.open(io.BytesIO(data))
