@@ -386,7 +386,8 @@ _FRESH_BOTTOM_CSS = """
 /* angkat dok input ke tengah layar saat belum ada percakapan
    (turun sedikit agar tidak menutupi judul sapaan) */
 [data-testid="stBottom"] {
-  transform: translateY(-26vh);
+  /* angka posisinya diatur lewat --chat-lift-fresh & --chat-shift di styles.py */
+  transform: translate(var(--chat-shift, 0px), calc(-1 * var(--chat-lift-fresh, 26vh)));
   background: transparent !important;
   transition: transform 0.35s ease;
 }
@@ -403,10 +404,14 @@ _FRESH_BOTTOM_CSS = """
 
 _BOTTOM_RESET_CSS = """
 <style>
-[data-testid="stBottom"] { transform: translateY(0) !important; }
+/* Turunkan dok kembali ke posisi "chat berjalan". Nilainya mengikuti
+   --chat-lift & --chat-shift di styles.py, bukan angka mati, supaya
+   pengaturan posisi cukup diubah di satu tempat. */
+[data-testid="stBottom"] {
+  transform: translate(var(--chat-shift, 0px), calc(-1 * var(--chat-lift, 0px))) !important;
+}
 </style>
 """
-
 
 def _page_footer(in_chat: bool = False) -> None:
     foot_class = "trinity-foot" if not in_chat else "trinity-foot in-chat"
