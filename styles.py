@@ -751,7 +751,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
    --chat-lift-fresh : posisi saat halaman awal (belum ada chat).
 ==================================================================== */
 :root {
-    --chat-lift: 90px;
+    --chat-lift: 200px;
     --chat-shift: 0px;
     --chat-width: 46rem;
     --chat-lift-fresh: 26vh;
