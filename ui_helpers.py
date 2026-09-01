@@ -215,6 +215,11 @@ def render_message(msg: dict) -> None:
             unsafe_allow_html=True,
         )
         st.image(msg["image_bytes"], use_container_width=True)
+
+        st.image(msg["image_bytes"], use_container_width=True)
+    if msg.get("size_label"):
+        st.caption(f":material/aspect_ratio: {msg['size_label']}")
+        ts = datetime.now().strftime("%Y%m%d_%H%M%S")
         ts = datetime.now().strftime("%Y%m%d_%H%M%S")
         st.download_button(
             label=":material/download:  Unduh PNG",
