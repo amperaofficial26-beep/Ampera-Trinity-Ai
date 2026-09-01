@@ -244,12 +244,15 @@ def parse_quick_replies(text: str) -> tuple[str, dict]:
 
     pertanyaan = ""
     pilihan: list[str] = []
+    multi = False
     for baris in isi.splitlines():
         b = baris.strip()
         if not b:
             continue
         low = b.lower()
-        if low.startswith(("tanya:", "pertanyaan:", "question:")):
+        if low.startswith(("mode:", "tipe:", "jenis:")):
+            multi = any(k in low for k in ("banyak", "ganda", "multi"))
+        elif low.startswith(("tanya:", "pertanyaan:", "question:")):
             pertanyaan = b.split(":", 1)[1].strip()
         elif b.startswith(("-", "*", "•")):
             opsi = b.lstrip("-*• ").strip()
@@ -269,7 +272,11 @@ def parse_quick_replies(text: str) -> tuple[str, dict]:
         if pertanyaan:
             bersih = (bersih + "\n\n" + pertanyaan).strip()
         return bersih, {}
-    return bersih, {"question": pertanyaan, "options": pilihan[:4]}
+        return bersih, {
+        "question": pertanyaan,
+        "options": pilihan[:4],
+        "multi": multi,
+    }
 
 
 def send_quick_reply(text: str) -> None:
@@ -288,38 +295,105 @@ def send_quick_reply(text: str) -> None:
     st.session_state.pop("_yuki_ui_flushed", None)
 
 
+def _qr_layout(opsi: list[str]) -> str:
+    """Tentukan susunan tombol: 'grid' (2 kolom) atau 'list' (vertikal).
+
+    Grid dipakai hanya bila semua labelnya pendek, supaya teks tidak
+    terpotong. Di layar sempit, CSS akan memaksa semuanya jadi vertikal.
+    """
+    if len(opsi) >= 2 and all(len(o) <= 16 for o in opsi):
+        return "grid"
+    return "list"
+
+
+def toggle_quick_choice(mid, opt: str) -> None:
+    """Tandai / batalkan satu pilihan pada kartu multi-pilih."""
+    kunci = f"_qr_pick_{mid}"
+    dipilih = list(st.session_state.get(kunci, []))
+    if opt in dipilih:
+        dipilih.remove(opt)
+    else:
+        dipilih.append(opt)
+    st.session_state[kunci] = dipilih
+
+
+def kirim_quick_choices(mid) -> None:
+    """Kirim semua pilihan yang tercentang pada kartu multi-pilih."""
+    dipilih = st.session_state.get(f"_qr_pick_{mid}", [])
+    if dipilih:
+        send_quick_reply(", ".join(dipilih))
+        st.session_state.pop(f"_qr_pick_{mid}", None)
+
+
 def render_quick_replies(msg: dict, aktif: bool = True) -> None:
-    """Kartu pilihan ala Claude di bawah jawaban Yuki."""
+    """Kartu pilihan ala Claude di bawah jawaban Yuki.
+
+    - satu pertanyaan singkat di atas
+    - tombol tersusun grid 2 kolom bila labelnya pendek, selain itu vertikal
+      (di layar sempit selalu vertikal, diatur lewat CSS)
+    - mendukung pilih-satu maupun pilih-banyak (bertanda centang)
+    """
     kartu = msg.get("quick_replies") or {}
     opsi = kartu.get("options") or []
     if not opsi:
         return
 
     mid = msg.get("id", id(msg))
+    multi = bool(kartu.get("multi"))
+    tata = _qr_layout(opsi)
+
     with st.container(key=f"qr_card_{mid}"):
         tanya = kartu.get("question") or "Pilih salah satu:"
         st.markdown(
             f'<div class="qr-question">{html.escape(tanya)}</div>',
             unsafe_allow_html=True,
         )
+
+        # --- kartu lama: tidak bisa diklik lagi, tampil sebagai jejak ---
         if not aktif:
-            # Kartu lama: tampilkan sebagai jejak, tidak bisa diklik lagi.
             chips = "".join(
                 f'<span class="qr-chip-done">{html.escape(o)}</span>' for o in opsi
             )
             st.markdown(f'<div class="qr-row-done">{chips}</div>',
                         unsafe_allow_html=True)
             return
-        cols = st.columns(len(opsi))
-        for i, opt in enumerate(opsi):
-            with cols[i]:
-                st.button(
-                    opt,
-                    key=f"qr_{mid}_{i}",
-                    use_container_width=True,
-                    on_click=send_quick_reply,
-                    args=(opt,),
-                )
+
+        dipilih = st.session_state.get(f"_qr_pick_{mid}", []) if multi else []
+
+        def _tombol(opt: str, i: int) -> None:
+            tercentang = opt in dipilih
+            label = f"✓  {opt}" if tercentang else (f"◻  {opt}" if multi else opt)
+            st.button(
+                label,
+                key=f"qr_{mid}_{i}",
+                use_container_width=True,
+                type="primary" if tercentang else "secondary",
+                on_click=(toggle_quick_choice if multi else send_quick_reply),
+                args=((mid, opt) if multi else (opt,)),
+            )
+
+        if tata == "grid":
+            # dua kolom; baris terakhir menyesuaikan bila jumlahnya ganjil
+            for baris_awal in range(0, len(opsi), 2):
+                sepasang = opsi[baris_awal:baris_awal + 2]
+                cols = st.columns(len(sepasang))
+                for j, opt in enumerate(sepasang):
+                    with cols[j]:
+                        _tombol(opt, baris_awal + j)
+        else:
+            for i, opt in enumerate(opsi):
+                _tombol(opt, i)
+
+        if multi:
+            jumlah = len(dipilih)
+            st.button(
+                f"Kirim {jumlah} pilihan" if jumlah else "Pilih dulu ya",
+                key=f"qr_send_{mid}",
+                use_container_width=True,
+                disabled=jumlah == 0,
+                on_click=kirim_quick_choices,
+                args=(mid,),
+            )
 def render_message(msg: dict) -> None:
     """Render 1 pesan: teks (bubble, bisa + gambar lampiran/suara) atau gambar."""
     if msg.get("type") == "image" and msg.get("image_bytes"):
