@@ -1455,7 +1455,7 @@ div.stDownloadButton > button:hover {
 }
 /* versi saat chat berjalan: lebih kecil lagi dari versi halaman awal */
 .trinity-foot.in-chat {
-    font-size: 5px;
+    font-size: 9px;
     color: #827788;
     margin-top: 22px;
 }
