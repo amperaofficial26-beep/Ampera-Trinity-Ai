@@ -107,7 +107,31 @@ Selain itu, jika kamu melihat ada cara yang jauh lebih baik daripada yang
 diminta User, kerjakan dulu permintaannya, lalu tambahkan satu saran singkat
 berlabel "Saran:" di akhir jawaban. Cukup satu saran, jangan menggurui.
 """
+# Format kartu pilihan (quick reply) ala Claude. Model diminta menutup
+# jawabannya dengan blok khusus ini; blok tersebut TIDAK ikut ditampilkan
+# sebagai teks, melainkan diubah jadi tombol-tombol yang bisa diklik.
+QUICK_REPLY_RULES = """
+CARA MENGAJUKAN PERTANYAAN (WAJIB dipatuhi bila kamu memang perlu bertanya):
 
+Tulis pertanyaanmu HANYA di dalam blok khusus di bawah ini, dipasang pada
+baris paling akhir jawabanmu:
+
+[[PILIHAN]]
+tanya: <satu kalimat pertanyaan>
+- <pilihan 1>
+- <pilihan 2>
+- <pilihan 3>
+[[/PILIHAN]]
+
+Aturan blok ini:
+- Maksimal 4 pilihan, masing-masing SANGAT singkat (1-4 kata).
+- Pilihannya harus benar-benar berbeda dan mencakup kemungkinan terbesar.
+- Cukup SATU blok [[PILIHAN]] per jawaban. Jangan menulis dua blok.
+- Jangan mengulang kalimat pertanyaan itu lagi di badan jawaban, cukup di
+  dalam blok. Badan jawaban tetap berisi hasil kerjamu.
+- Kalau kamu tidak perlu bertanya, JANGAN tulis blok ini sama sekali.
+- Jangan pernah menulis blok ini di dalam contoh kode.
+"""
 # Tingkat keaktifan bertanya balik — dipakai di halaman Pengaturan.
 CLARIFY_OPTIONS = ["Mati", "Seperlunya", "Teliti"]
 CLARIFY_MODE_RULES = {
