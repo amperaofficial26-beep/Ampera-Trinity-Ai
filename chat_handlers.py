@@ -33,7 +33,7 @@ from state import active_thread, get_settings, next_msg_id
 from ui_helpers import (
     THINKING_PHRASES_CHAT, _BOTTOM_RESET_CSS, _capture_artifacts_from_reply,
     bubble_html, image_progress_html, images_bubble_html, stream_sentences,
-    thinking_html,
+    thinking_html, parse_quick_replies,
 )
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -183,14 +183,20 @@ def handle_chat_request(answer_slot) -> None:
         elapsed = time.time() - t0
         if elapsed < min_think:
             time.sleep(min_think - elapsed)
-        think_slot.empty()
+                think_slot.empty()
         if not full:
             full = "…"
+        # Pisahkan blok [[PILIHAN]] -> jadi kartu tombol, bukan teks mentah.
+        full, kartu = parse_quick_replies(full)
+        if not full:
+            full = kartu.get("question") or "…"
         stream_sentences(answer_slot, full)
         reply = {
             "id": next_msg_id(), "role": "assistant", "type": "text",
             "content": full, "time": now_wib(),
         }
+        if kartu:
+            reply["quick_replies"] = kartu
         thread.append(reply)
         _capture_artifacts_from_reply(full)
     except Exception as e:
