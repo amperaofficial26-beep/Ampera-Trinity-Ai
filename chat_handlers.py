@@ -397,6 +397,28 @@ def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> Non
                              key=f"{kp}pm_web", use_container_width=True):
                     st.session_state.web_search_on = not st.session_state.get("web_search_on", False)
                     st.rerun()
+                  
+                    st.markdown('<div class="plus-menu-divider"></div>',
+                            unsafe_allow_html=True)
+
+                # Ukuran hasil gambar Yuki. Cloudflare flux-1-schnell tidak
+                # menerima width/height, jadi pilihan ini diterapkan setelah
+                # gambar jadi (center-crop + resize) di engines/image_engine.py.
+                cur_size = current_image_size()
+                st.markdown(
+                    f':material/aspect_ratio:  **Ukuran gambar**  \n'
+                    f':gray[{cur_size["name"]} · {cur_size["ratio"]} · '
+                    f'{cur_size["w"]}×{cur_size["h"]}]'
+                )
+                for sp in IMAGE_SIZE_PRESETS:
+                    active = sp["key"] == cur_size["key"]
+                    check = " :orange[✓]" if active else ""
+                    label = (f'{sp["name"]} · {sp["ratio"]}{check}  \n'
+                             f':gray[{sp["w"]}×{sp["h"]} — {sp["desc"]}]')
+                    if st.button(label, key=f"{kp}pm_size_{sp['key']}",
+                                 use_container_width=True):
+                        st.session_state.image_size_key = sp["key"]
+                        st.rerun()                              
 
     with _sp:
         if st.session_state.messages or st.session_state.get("page") != "chat":
