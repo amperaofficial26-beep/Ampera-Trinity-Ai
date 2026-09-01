@@ -41,7 +41,7 @@ from config import (
     CHAT_READY, COURSE_BY_KEY, COURSE_CATALOG, DEFAULT_MODEL_KEY,
     GROQ_API_KEY, GROQ_BASE_URL, IMAGE_INPUT_TYPES, IMAGE_READY,
     ARTIFACT_BY_KEY, ARTIFACT_CATEGORIES, DEFAULT_LANG_CODE, LANG_BY_CODE,
-    SUPPORTED_LANGUAGES, course_curriculum,
+    SUPPORTED_LANGUAGES, course_curriculum, CLARIFY_OPTIONS,
 )
 from icons import mi
 from logo import LOGO_B64
@@ -344,10 +344,18 @@ def _set_umum() -> None:
                              help="Seberapa cepat kalimat Yuki muncul satu per satu.")
 
     st.markdown('<div class="set-section">Perilaku Yuki</div>', unsafe_allow_html=True)
-    c5, c6 = st.columns(2)
+        c5, c6 = st.columns(2)
     with c5:
         persona = st.selectbox("Kepribadian", PERSONA_OPTIONS,
                                index=_opt_index(PERSONA_OPTIONS, s["personality"]), key="set_persona")
+        clarify = st.selectbox(
+            "Bertanya balik saat permintaan kurang jelas", CLARIFY_OPTIONS,
+            index=_opt_index(CLARIFY_OPTIONS, s.get("clarify_mode", "Seperlunya")),
+            key="set_clarify",
+            help="Mati: Yuki langsung mengerjakan dengan asumsi sendiri. "
+                 "Seperlunya: bertanya hanya kalau permintaan benar-benar kabur. "
+                 "Teliti: lebih sering memastikan detail penting dulu.",
+        )
     with c6:
         min_think = st.slider("Durasi \"berpikir\" minimum (detik)", 0.0, 20.0,
                               float(s["min_think_seconds"]), 0.5, key="set_think",
@@ -361,6 +369,7 @@ def _set_umum() -> None:
         _save_settings({
             "theme": theme, "font_size": font, "compact_mode": compact,
             "stream_speed": speed, "personality": persona,
+            "clarify_mode": clarify,
             "min_think_seconds": float(min_think), "default_mode": mode,
         }, "Pengaturan umum disimpan.")
         st.rerun()
