@@ -61,54 +61,7 @@ def extract_image_bytes(payload: dict) -> bytes:
     except Exception:
         return raw
 
-
-def _apply_size(raw: bytes, size_key: str | None) -> bytes:
-    preset = IMAGE_SIZE_BY_KEY.get(size_key or DEFAULT_IMAGE_SIZE_KEY)
-    if not preset:
-        return raw
-    return fit_to_size(raw, int(preset["w"]), int(preset["h"]))
-
-
-def fit_to_size(raw: bytes, width: int, height: int) -> bytes:
-    """Potong tengah (center-crop) ke rasio target lalu skalakan ke ukuran itu.
-
-    Model flux-1-schnell di Cloudflare tidak punya parameter width/height,
-    jadi pengaturan ukuran dikerjakan di sini. Center-crop dipakai supaya
-    gambar tidak gepeng/melar seperti kalau langsung di-resize paksa.
-    """
-    if not raw or width <= 0 or height <= 0:
-        return raw
-    try:
-        im = Image.open(io.BytesIO(raw))
-        im.load()
-        src_w, src_h = im.size
-        if not src_w or not src_h:
-            return raw
-
-        target_ratio = width / height
-        src_ratio = src_w / src_h
-        if src_ratio > target_ratio:          # sumber terlalu lebar -> pangkas kiri-kanan
-            new_w = int(round(src_h * target_ratio))
-            left = (src_w - new_w) // 2
-            box = (left, 0, left + new_w, src_h)
-        else:                                  # sumber terlalu tinggi -> pangkas atas-bawah
-            new_h = int(round(src_w / target_ratio))
-            top = (src_h - new_h) // 2
-            box = (0, top, src_w, top + new_h)
-        im = im.crop(box).resize((width, height), Image.LANCZOS)
-
-        if im.mode not in ("RGB", "RGBA"):
-            im = im.convert("RGBA" if "A" in im.getbands() else "RGB")
-        buf = io.BytesIO()
-        im.save(buf, format="PNG", optimize=True)
-        return buf.getvalue()
-    except Exception:
-        # Kalau apa pun gagal, kembalikan gambar aslinya — jangan sampai
-        # pengaturan ukuran malah membatalkan hasil yang sudah jadi.
-        return raw
-
-
-def generate_image(prompt: str, size_key: str | None = None) -> bytes:
+def generate_image(prompt: str) -> bytes:
     url = f"{CF_API_BASE}/{CF_ACCOUNT_ID}/ai/run/{CF_IMAGE_MODEL}"
     headers = {
         "Authorization": f"Bearer {CF_API_TOKEN}",
@@ -132,10 +85,9 @@ def generate_image(prompt: str, size_key: str | None = None) -> bytes:
             im = Image.open(io.BytesIO(raw))
             buf = io.BytesIO()
             im.save(buf, format="PNG")
-            raw = buf.getvalue()
+            return buf.getvalue()
         except Exception:
-            pass
-        return _apply_size(raw, size_key)
+            return raw
 
     try:
         payload = resp.json()
@@ -148,4 +100,4 @@ def generate_image(prompt: str, size_key: str | None = None) -> bytes:
         err = payload.get("errors") if isinstance(payload, dict) else payload
         raise RuntimeError(public_error_image(resp.status_code, str(err)[:400]))
 
-    return _apply_size(extract_image_bytes(payload), size_key)
+    return extract_image_bytes(payload)
