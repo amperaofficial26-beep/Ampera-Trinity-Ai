@@ -208,67 +208,134 @@ def images_bubble_html(images: list[dict]) -> str:
     return f'<div class="bubble-imgs">{"".join(parts)}</div>'
 
 
-_QUICK_RE = re.compile(
-    r"\[\[\s*PILIHAN\s*\]\](.*?)\[\[\s*/\s*PILIHAN\s*\]\]",
-    re.S | re.I,
-)
+# Penanda blok pilihan. Sengaja dibuat longgar: model kadang menulis
+# [PILIHAN], **[[PILIHAN]]**, `[[ PILIHAN ]]`, atau membungkusnya dalam
+# pagar kode. Semua bentuk itu tetap harus dikenali.
+_QR_OPEN = r"[`*_]*\[{1,2}\s*PILIHAN\s*\]{1,2}[`*_]*"
+_QR_CLOSE = r"[`*_]*\[{1,2}\s*/\s*PILIHAN\s*\]{1,2}[`*_]*"
+_QUICK_RE = re.compile(_QR_OPEN + r"(.*?)" + _QR_CLOSE, re.S | re.I)
+
+# Cadangan: jawaban ditutup satu kalimat tanya + daftar pilihan pendek,
+# padahal model lupa memakai blok [[PILIHAN]].
+_TANYA_RE = re.compile(r"^(.*\?)\s*$")
+
+
+def _parse_isi_blok(isi: str) -> tuple[str, list[str], bool]:
+    """Baca isi blok pilihan -> (pertanyaan, daftar_opsi, multi)."""
+    pertanyaan = ""
+    pilihan: list[str] = []
+    multi = False
+    for baris in isi.splitlines():
+        b = baris.strip().strip("`")
+        if not b:
+            continue
+        low = b.lower()
+        if low.startswith(("mode:", "tipe:", "jenis:")):
+            multi = any(k in low for k in ("banyak", "ganda", "multi"))
+        elif low.startswith(("tanya:", "pertanyaan:", "question:")):
+            pertanyaan = b.split(":", 1)[1].strip()
+        elif b.startswith(("-", "*", "•", "+")) or re.match(r"^\d+[.)]\s", b):
+            opsi = re.sub(r"^(\d+[.)]|[-*•+])\s*", "", b).strip()
+            opsi = opsi.strip("*_`[]").strip()
+            if opsi and opsi.lower() not in [o.lower() for o in pilihan]:
+                pilihan.append(opsi)
+        elif not pertanyaan:
+            pertanyaan = b.strip("*_ ")
+    return pertanyaan, pilihan, multi
+
+
+def _kartu_cadangan(teks: str) -> tuple[str, dict]:
+    """Kalau model lupa blok [[PILIHAN]], coba kenali pola alami:
+    kalimat tanya di akhir jawaban + 2-4 butir pilihan pendek.
+
+    Sengaja ketat supaya daftar biasa (langkah-langkah, fitur, dsb.)
+    tidak salah dikira pilihan.
+    """
+    baris = [b.rstrip() for b in (teks or "").rstrip().splitlines()]
+    butir: list[str] = []
+    i = len(baris) - 1
+    while i >= 0 and len(butir) < 5:
+        b = baris[i].strip()
+        if not b:
+            i -= 1
+            continue
+        if b.startswith(("-", "*", "•")) or re.match(r"^\d+[.)]\s", b):
+            isi = re.sub(r"^(\d+[.)]|[-*•])\s*", "", b).strip().strip("*_`")
+            # pilihan harus pendek dan bukan kalimat panjang
+            if not isi or len(isi) > 24 or isi.endswith((".", ":", ";")):
+                return teks, {}
+            butir.insert(0, isi)
+            i -= 1
+            continue
+        break
+
+    if not (2 <= len(butir) <= 4):
+        return teks, {}
+
+    # cari kalimat tanya tepat di atas daftar
+    while i >= 0 and not baris[i].strip():
+        i -= 1
+    if i < 0:
+        return teks, {}
+    tanya = baris[i].strip().strip("*_ ")
+    if not tanya.endswith("?") or len(tanya) > 120:
+        return teks, {}
+
+    bersih = "\n".join(baris[:i]).strip()
+    return bersih, {"question": tanya, "options": butir, "multi": False}
 
 
 def parse_quick_replies(text: str) -> tuple[str, dict]:
     """Pisahkan blok [[PILIHAN]] dari jawaban Yuki.
 
-    SELALU mengembalikan pasangan (teks_bersih, kartu) — tidak pernah None.
+    SELALU mengembalikan pasangan (teks_bersih, kartu) - tidak pernah None.
     `kartu` berisi {"question": str, "options": [...], "multi": bool}
-    atau {} bila tidak ada blok pilihan.
+    atau {} bila memang tidak ada pilihan.
     """
     raw = text or ""
     try:
         if "PILIHAN" not in raw.upper():
-            return raw, {}
+            # tidak ada penanda sama sekali -> coba pola alami
+            return _kartu_cadangan(raw)
 
-        # Lindungi isi blok kode agar tidak ikut terbaca.
+        # Model sering membungkus blok itu dalam pagar kode. Buka dulu
+        # pagarnya kalau isinya memang blok pilihan.
+        def _buka_pagar(m):
+            dalam = m.group(0)
+            return m.group(1) if re.search(_QR_OPEN, dalam, re.I) else dalam
+
+        kerja = re.sub(r"```[a-zA-Z]*\n(.*?)```", _buka_pagar, raw, flags=re.S)
+
+        # Sisa pagar kode yang bukan blok pilihan: lindungi agar tak terbaca.
         kode_blok: list[str] = []
 
         def _simpan(m):
             kode_blok.append(m.group(0))
             return f"\x00KODE{len(kode_blok) - 1}\x00"
 
-        aman = re.sub(r"```.*?```", _simpan, raw, flags=re.S)
+        aman = re.sub(r"```.*?```", _simpan, kerja, flags=re.S)
 
         cocok = _QUICK_RE.search(aman)
-        if not cocok:
-            return raw, {}
+        if cocok:
+            isi = cocok.group(1)
+            aman = aman.replace(cocok.group(0), "")
+        else:
+            # Penutup [[/PILIHAN]] hilang -> ambil semua sesudah pembuka.
+            buka = re.search(_QR_OPEN, aman, re.I)
+            if not buka:
+                for i, blok in enumerate(kode_blok):
+                    aman = aman.replace(f"\x00KODE{i}\x00", blok)
+                return _kartu_cadangan(aman.strip() or raw)
+            isi = aman[buka.end():]
+            aman = aman[:buka.start()]
 
-        isi = cocok.group(1)
-        aman = aman.replace(cocok.group(0), "")
+        pertanyaan, pilihan, multi = _parse_isi_blok(isi)
 
-        pertanyaan = ""
-        pilihan: list[str] = []
-        multi = False
-        for baris in isi.splitlines():
-            b = baris.strip()
-            if not b:
-                continue
-            low = b.lower()
-            if low.startswith(("mode:", "tipe:", "jenis:")):
-                multi = any(k in low for k in ("banyak", "ganda", "multi"))
-            elif low.startswith(("tanya:", "pertanyaan:", "question:")):
-                pertanyaan = b.split(":", 1)[1].strip()
-            elif b.startswith(("-", "*", "•")):
-                opsi = b.lstrip("-*• ").strip()
-                if opsi and opsi not in pilihan:
-                    pilihan.append(opsi)
-            elif not pertanyaan:
-                pertanyaan = b
-
-        # Kembalikan blok kode yang tadi disimpan.
         for i, blok in enumerate(kode_blok):
             aman = aman.replace(f"\x00KODE{i}\x00", blok)
 
         bersih = aman.strip()
         if not pilihan:
-            # Tidak ada pilihan yang sah -> kembalikan pertanyaannya sebagai
-            # teks biasa supaya tidak ada informasi yang hilang.
             if pertanyaan:
                 bersih = (bersih + "\n\n" + pertanyaan).strip()
             return bersih, {}
@@ -280,7 +347,6 @@ def parse_quick_replies(text: str) -> tuple[str, dict]:
     except Exception:
         # Apa pun yang terjadi, jawaban Yuki harus tetap tampil apa adanya.
         return raw, {}
-        
 def send_quick_reply(text: str) -> None:
     """Kirim jawaban dari tombol kartu pilihan seolah User mengetiknya."""
     from state import active_thread, next_msg_id
