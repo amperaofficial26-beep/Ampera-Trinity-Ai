@@ -343,8 +343,8 @@ def _set_umum() -> None:
                              index=_opt_index(SPEED_OPTIONS, s["stream_speed"]), key="set_speed",
                              help="Seberapa cepat kalimat Yuki muncul satu per satu.")
 
-    st.markdown('<div class="set-section">Perilaku Yuki</div>', unsafe_allow_html=True)
-        c5, c6 = st.columns(2)
+        st.markdown('<div class="set-section">Perilaku Yuki</div>', unsafe_allow_html=True)
+    c5, c6 = st.columns(2)
     with c5:
         persona = st.selectbox("Kepribadian", PERSONA_OPTIONS,
                                index=_opt_index(PERSONA_OPTIONS, s["personality"]), key="set_persona")
