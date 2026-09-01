@@ -169,7 +169,7 @@ def image_progress_html(labels: list[str] | None = None,
         '</div>'
         '</div></div>'
     )
-    # ============================================================================
+# ============================================================================
 # BUBBLE CHAT
 # ============================================================================
 def bubble_html(role: str, content: str, timestamp: str = "",
@@ -242,7 +242,6 @@ def render_message(msg: dict) -> None:
         # baris aksi kecil ala Claude: copy jawaban, feedback (👍/👎), jam kirim
         if msg.get("role") == "assistant":
             render_message_actions(msg)
-
 
 def _copy_button_html(text: str, key: str) -> str:
     """Tombol salin ala Claude (ikon polos) — teks disisipkan sebagai

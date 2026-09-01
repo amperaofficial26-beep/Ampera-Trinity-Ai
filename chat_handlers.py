@@ -42,6 +42,8 @@ WIB = ZoneInfo("Asia/Jakarta")
 
 def now_wib() -> str:
     return datetime.now(WIB).strftime("%H:%M")
+def now_wib() -> str:
+    return datetime.now(WIB).strftime("%H:%M")
 
 
 # --- Durasi tampilan kotak loading pembuatan gambar (detik) ---------------
@@ -146,7 +148,20 @@ def handle_image_request(prompt: str) -> None:
         "content": msg, "time": now_wib(), "error_detail": detail,
     })
 
+    # Simpan detail teknisnya supaya bisa dilihat di UI (expander "Detail
+    # teknis" di bawah pesan error).
+    detail = f"{type(e).__name__}: {e}"
+    st.session_state["_last_image_error"] = detail
 
+    msg = str(e)
+    if not msg.startswith(("Layanan", "Kuota", "Server terlalu",
+                           "Gagal membuat", "Respons terlalu")):
+        msg = public_error_image(None, msg, e)
+    thread.append({
+        "id": next_msg_id(), "role": "assistant", "type": "text",
+        "content": msg, "time": now_wib(), "error_detail": detail,
+    })
+    
 def handle_chat_request(answer_slot) -> None:
     thread = active_thread()
     if not CHAT_READY:
