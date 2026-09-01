@@ -28,7 +28,7 @@ from config import (
     GROQ_API_KEY, GROQ_BASE_URL, GROQ_MODEL_FALLBACKS, MAX_HISTORY_MESSAGES,
     MAX_IMAGES_PER_MESSAGE, STT_MODEL, VISION_MODEL_FALLBACKS,
     VISION_RECENT_MESSAGES, YUKI_SYSTEM_PROMPT, LANG_BY_CODE, DEFAULT_LANG_CODE,
-    CLARIFY_RULES, CLARIFY_MODE_RULES,
+    CLARIFY_RULES, CLARIFY_MODE_RULES, QUICK_REPLY_RULES,
 )
 from errors import _is_model_unavailable_error
 from state import get_settings
@@ -74,6 +74,7 @@ def build_system_prompt() -> str:
         parts.append(CLARIFY_MODE_RULES["Mati"])
     else:
         parts.append(CLARIFY_RULES)
+        parts.append(QUICK_REPLY_RULES)
         extra = CLARIFY_MODE_RULES.get(clarify_mode, "")
         if extra:
             parts.append(extra)
