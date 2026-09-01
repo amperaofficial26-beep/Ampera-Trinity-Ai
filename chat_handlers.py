@@ -80,32 +80,28 @@ def handle_image_request(prompt: str) -> None:
         })
         return
 
-        progress_slot = st.empty()
+    progress_slot = st.empty()
     result: dict = {"data": None, "error": None}
 
     def _worker() -> None:
         try:
             result["data"] = generate_image(prompt)
-    except Exception as e:
-        think_slot.empty()
-        err = public_error_chat(e)
-        thread.append({
-            "id": next_msg_id(), "role": "assistant", "type": "text",
-            "content": err, "time": now_wib(),
-            "error_detail": f"{type(e).__name__}: {e}",
-        })
+        except Exception as exc:
+            result["error"] = exc
+
+    worker = threading.Thread(target=_worker, daemon=True)
+    worker.start()
+
     # Render kotak loading SEKALI saja. Semua gerakan (shimmer berputar di
     # tepi kotak, sapuan kanvas, pergantian teks, bar progres) dijalankan
     # oleh CSS di browser sehingga tetap mulus walau server sedang menunggu
     # API. Jangan me-render ulang di dalam loop: setiap markdown() baru akan
-    # mengganti node DOM dan me-reset animasi CSS dari nol (itu penyebab
-    # shimmer terlihat diam/berkedip sebelumnya).
+    # mengganti node DOM dan me-reset animasi CSS dari nol.
     progress_slot.markdown(image_progress_html(), unsafe_allow_html=True)
 
     # Tunggu hasilnya. Kotak tetap tampil MINIMAL IMAGE_MIN_SECONDS detik
-    # supaya animasinya sempat terlihat utuh (FLUX-schnell sering selesai
-    # dalam 2-3 detik). Polling pakai sleep pendek TANPA render ulang, jadi
-    # animasi CSS di browser tidak ter-reset.
+    # supaya animasinya sempat terlihat utuh. Polling pakai sleep pendek
+    # TANPA render ulang, jadi animasi CSS di browser tidak ter-reset.
     t0 = time.time()
     while worker.is_alive() and (time.time() - t0) < IMAGE_MAX_SECONDS:
         time.sleep(0.1)
@@ -135,8 +131,7 @@ def handle_image_request(prompt: str) -> None:
         e = result["error"] or RuntimeError("no image")
 
     # Simpan detail teknisnya supaya bisa dilihat di UI (expander "Detail
-    # teknis" di bawah pesan error) — sebelumnya kegagalan bisa terasa
-    # seperti "tidak terjadi apa-apa".
+    # teknis" di bawah pesan error).
     detail = f"{type(e).__name__}: {e}"
     st.session_state["_last_image_error"] = detail
 
@@ -148,6 +143,7 @@ def handle_image_request(prompt: str) -> None:
         "id": next_msg_id(), "role": "assistant", "type": "text",
         "content": msg, "time": now_wib(), "error_detail": detail,
     })
+    
 def handle_chat_request(answer_slot) -> None:
     thread = active_thread()
     if not CHAT_READY:
