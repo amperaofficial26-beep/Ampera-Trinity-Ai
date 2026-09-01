@@ -121,8 +121,16 @@ tanya: <satu kalimat pertanyaan>
 - <pilihan 1>
 - <pilihan 2>
 - <pilihan 3>
+[[PILIHAN]]
+Bila User boleh memilih LEBIH DARI SATU, tambahkan baris "mode: banyak"
+tepat di bawah baris tanya:
+[[PILIHAN]]
+tanya: Fitur mana yang mau dipakai?
+mode: banyak
+- Login
+- Laporan
+- Cetak struk
 [[/PILIHAN]]
-
 Aturan blok ini:
 - Maksimal 4 pilihan, masing-masing SANGAT singkat (1-4 kata).
 - Pilihannya harus benar-benar berbeda dan mencakup kemungkinan terbesar.
