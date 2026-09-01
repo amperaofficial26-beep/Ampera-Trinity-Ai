@@ -65,7 +65,7 @@ def build_system_prompt() -> str:
             "tanpa emoji berlebihan."
         ),
     }
-        if s.get("personality") in persona_map:
+          if s.get("personality") in persona_map:
         parts.append(persona_map[s["personality"]])
 
     # Aturan bertanya balik: hanya untuk permintaan yang benar-benar kabur.
