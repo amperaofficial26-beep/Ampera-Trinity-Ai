@@ -75,42 +75,6 @@ CF_API_BASE = "https://api.cloudflare.com/client/v4/accounts"
 CF_IMAGE_MODEL = "@cf/black-forest-labs/flux-1-schnell"
 CF_DEFAULT_STEPS = 4
 
-# --- UKURAN HASIL GAMBAR ---------------------------------------------------
-# Catatan penting: model @cf/black-forest-labs/flux-1-schnell di Cloudflare
-# HANYA menerima parameter "prompt" dan "steps" — tidak ada width/height.
-# Jadi ukuran diatur di sisi kita: hasil mentah dari Cloudflare dipotong
-# (center-crop) ke rasio yang dipilih, lalu diskalakan ke ukuran targetnya.
-IMAGE_SIZE_PRESETS = [
-    {"key": "square",     "name": "Persegi",   "ratio": "1:1",  "w": 1024, "h": 1024,
-     "desc": "Serbaguna, cocok untuk unggahan feed"},
-    {"key": "portrait",   "name": "Potret",    "ratio": "3:4",  "w": 896,  "h": 1152,
-     "desc": "Poster, ilustrasi tokoh"},
-    {"key": "story",      "name": "Story",     "ratio": "9:16", "w": 768,  "h": 1344,
-     "desc": "Status WhatsApp, Reels, TikTok"},
-    {"key": "landscape",  "name": "Lanskap",   "ratio": "4:3",  "w": 1152, "h": 896,
-     "desc": "Pemandangan, ilustrasi lebar"},
-    {"key": "wide",       "name": "Layar Lebar", "ratio": "16:9", "w": 1344, "h": 768,
-     "desc": "Thumbnail YouTube, banner"},
-    {"key": "small",      "name": "Kecil",     "ratio": "1:1",  "w": 512,  "h": 512,
-     "desc": "Ringan & cepat dimuat"},
-]
-
-# Dibangun dengan perulangan biasa + pemeriksaan tipe, bukan dict-comprehension.
-# Kalau ada satu entri yang salah bentuk saat diedit (mis. kurung "[" tertukar
-# jadi "{"), aplikasi tidak ikut mati — entri rusaknya dilewati saja.
-IMAGE_SIZE_BY_KEY = {}
-for _preset in (IMAGE_SIZE_PRESETS if isinstance(IMAGE_SIZE_PRESETS, (list, tuple)) else []):
-    if isinstance(_preset, dict) and _preset.get("key"):
-        IMAGE_SIZE_BY_KEY[_preset["key"]] = _preset
-
-DEFAULT_IMAGE_SIZE_KEY = "square"
-if DEFAULT_IMAGE_SIZE_KEY not in IMAGE_SIZE_BY_KEY:
-    _fallback = {"key": "square", "name": "Persegi", "ratio": "1:1",
-                 "w": 1024, "h": 1024, "desc": "Serbaguna"}
-    IMAGE_SIZE_PRESETS = list(IMAGE_SIZE_BY_KEY.values()) or [_fallback]
-    IMAGE_SIZE_BY_KEY.setdefault("square", _fallback)
-    DEFAULT_IMAGE_SIZE_KEY = IMAGE_SIZE_PRESETS[0]["key"]
-
 # ============================================================================
 # SUARA & GAMBAR MASUK
 # ============================================================================
