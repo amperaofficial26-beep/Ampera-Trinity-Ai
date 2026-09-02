@@ -1972,13 +1972,34 @@ div.stDownloadButton > button:hover {
 }
 .af-title-ext { font-size: 0.95rem; color: #A095AC; }
 
+/* Baris aksi: Salin | perlebar | tutup.
+   Ketiganya dipaksa TINGGI SAMA (36px) dan sejajar tengah. Tanpa ini,
+   tombol Salin (HTML biasa) dan tombol Streamlit punya margin bawaan
+   berbeda sehingga terlihat tidak rata. */
 [class*="st-key-af_actbar"] [data-testid="stHorizontalBlock"] {
-    gap: 6px !important; align-items: center !important;
+    gap: 6px !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+}
+[class*="st-key-af_actbar"] [data-testid="stColumn"] {
+    display: flex !important;
+    align-items: center !important;
+    min-width: 0 !important;
+}
+/* nol-kan margin bawaan pembungkus Streamlit */
+[class*="st-key-af_actbar"] .element-container,
+[class*="st-key-af_actbar"] [data-testid="stMarkdownContainer"],
+[class*="st-key-af_actbar"] [data-testid="stMarkdown"],
+[class*="st-key-af_actbar"] div.stButton {
+    margin: 0 !important; padding: 0 !important; line-height: 0 !important;
+    width: 100% !important;
 }
 .af-copy {
     background: #FFFFFF; border: 1px solid #DBCEB9; border-radius: 9px;
     cursor: pointer; font-size: 0.82rem; font-weight: 600; color: #2C1F33;
-    padding: 7px 14px; width: 100%;
+    height: 36px; width: 100%; padding: 0 14px; margin: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    line-height: 1;
     transition: background .15s ease, transform .1s ease;
 }
 .af-copy:hover { background: #F2E8D6; }
@@ -1986,8 +2007,20 @@ div.stDownloadButton > button:hover {
 [class*="st-key-af_actbar"] div.stButton > button {
     background: #FFFFFF !important; border: 1px solid #DBCEB9 !important;
     color: #4A3559 !important; border-radius: 9px !important;
-    width: 34px !important; min-width: 34px !important; height: 34px !important;
-    padding: 0 !important;
+    width: 36px !important; min-width: 36px !important;
+    height: 36px !important; min-height: 36px !important;
+    padding: 0 !important; margin: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important; justify-content: center !important;
+    line-height: 1 !important;
+}
+[class*="st-key-af_actbar"] div.stButton > button:hover {
+    background: #F2E8D6 !important; border-color: #2C1F33 !important;
+}
+[class*="st-key-af_actbar"] [data-testid="stIconMaterial"] {
+    font-size: 1.05rem !important;
+    width: 1.05rem !important; height: 1.05rem !important;
+    line-height: 1 !important;
 }
 [class*="st-key-af_actbar"] div.stButton > button:hover {
     background: #F2E8D6 !important; border-color: #2C1F33 !important;
