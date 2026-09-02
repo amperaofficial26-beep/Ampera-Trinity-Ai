@@ -1485,6 +1485,156 @@ div.stDownloadButton > button:hover {
     background: #2C1F33;
 }
 /* ====================================================================
+   KARTU KAYA (rich cards): perbandingan, langkah, link
+   Meniru gaya kartu Claude: putih, sudut lembut, garis pemisah tipis,
+   bayangan sangat halus, tipografi bertingkat.
+==================================================================== */
+.rc-card {
+    background: #FFFFFF;
+    border: 1px solid #E4D9C6;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(44, 31, 51, 0.05);
+    margin: 10px 0 14px;
+    max-width: 640px;
+    overflow: hidden;
+    animation: rcIn 0.3s cubic-bezier(.2,.8,.2,1) both;
+}
+@keyframes rcIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- 1. KARTU PERBANDINGAN ---------- */
+.rc-cmp-row {
+    display: grid;
+    grid-template-columns: repeat(var(--rc-cols, 2), 1fr);
+    border-top: 1px solid #EFE6D6;
+}
+.rc-cmp-row.rc-cmp-toprow { border-top: none; }
+.rc-cmp-head {
+    padding: 16px 18px 6px;
+    font-size: 1.02rem;
+    font-weight: 650;
+    color: #2C1F33;
+    letter-spacing: -0.01em;
+}
+.rc-cmp-cell { padding: 12px 18px 14px; }
+.rc-cmp-label {
+    font-size: 0.76rem;
+    color: #8E8398;
+    margin-bottom: 3px;
+    letter-spacing: 0.01em;
+}
+.rc-cmp-value {
+    font-size: 0.92rem;
+    color: #2C1F33;
+    font-weight: 500;
+    line-height: 1.4;
+}
+/* garis pemisah vertikal antar kolom */
+.rc-cmp-row > *:not(:first-child) { border-left: 1px solid #F3ECE0; }
+
+/* ---------- 2. KARTU LANGKAH ---------- */
+.rc-step { padding: 18px 20px 16px; }
+.rc-step-title {
+    font-size: 1.18rem;
+    font-weight: 600;
+    color: #2C1F33;
+    letter-spacing: -0.015em;
+    margin-bottom: 6px;
+}
+.rc-step-desc {
+    font-size: 0.9rem;
+    color: #6B6172;
+    line-height: 1.55;
+    margin-bottom: 14px;
+}
+.rc-step-dots { display: flex; align-items: center; gap: 7px; }
+.rc-dot {
+    width: 26px; height: 26px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    background: #F1EADD;
+    color: #8E8398;
+    font-size: 0.76rem;
+    font-weight: 600;
+    transition: background .2s ease, color .2s ease, transform .2s ease;
+}
+.rc-dot.on {
+    background: #2C1F33;
+    color: #FBF6EC;
+    transform: scale(1.06);
+}
+.rc-step-count {
+    margin-left: 6px;
+    font-size: 0.78rem;
+    color: #8E8398;
+}
+/* tombol navigasi langkah */
+[class*="st-key-rc_nav_"] { max-width: 640px; margin: -6px 0 16px !important; }
+[class*="st-key-rc_nav_"] div.stButton > button {
+    border-radius: 10px !important;
+    border: 1px solid #DBCEB9 !important;
+    background: #FFFFFF !important;
+    color: #2C1F33 !important;
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+    min-height: 40px !important;
+    transition: background .15s ease, transform .1s ease !important;
+}
+[class*="st-key-rc_nav_"] div.stButton > button:hover:not(:disabled) {
+    background: #FAF3E8 !important;
+    border-color: #2C1F33 !important;
+}
+[class*="st-key-rc_nav_"] div.stButton > button:active:not(:disabled) {
+    transform: scale(0.985) !important;
+}
+[class*="st-key-rc_nav_"] div.stButton > button[kind="primary"] {
+    background: #2C1F33 !important;
+    border-color: #2C1F33 !important;
+    color: #FBF6EC !important;
+}
+[class*="st-key-rc_nav_"] div.stButton > button:disabled {
+    opacity: 0.45 !important;
+    cursor: not-allowed !important;
+}
+
+/* ---------- 3. KARTU LINK ---------- */
+.rc-link { padding: 14px 18px 13px; }
+.rc-link-title {
+    display: inline-block;
+    font-size: 0.98rem;
+    font-weight: 600;
+    color: #2C1F33 !important;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+    margin-bottom: 5px;
+}
+.rc-link-title:hover { color: #4A3559 !important; }
+.rc-link-desc {
+    font-size: 0.87rem;
+    color: #6B6172;
+    line-height: 1.5;
+    margin-bottom: 7px;
+}
+.rc-link-src {
+    font-size: 0.78rem;
+    color: #A095AC;
+    letter-spacing: 0.01em;
+}
+
+/* ---------- layar sempit ---------- */
+@media (max-width: 640px) {
+    .rc-card { max-width: 100%; }
+    .rc-cmp-row { grid-template-columns: 1fr; }
+    .rc-cmp-row > *:not(:first-child) {
+        border-left: none;
+        border-top: 1px solid #F3ECE0;
+    }
+    [class*="st-key-rc_nav_"] { max-width: 100%; }
+}
+/* ====================================================================
    KARTU PILIHAN INTERAKTIF (quick reply)
    Muncul di bawah jawaban Yuki saat dia perlu memastikan sesuatu.
    Tata letak: grid 2 kolom bila label pendek, vertikal di layar sempit.
