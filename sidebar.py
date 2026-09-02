@@ -34,7 +34,38 @@ ACCT_MENU_BG_HOVER = "#E0D2BB"      # latar saat disentuh kursor
 ACCT_MENU_FG = "#6B6172"            # warna ikon titik tiga
 ACCT_MENU_BORDER = "transparent"    # garis tepi; "transparent" = tanpa garis
 # ============================================================================
-
+# Gaya agar tombol pemicu popover di sidebar tampak identik dengan tombol
+# menu biasa (rata kiri, tanpa kotak), dan panel popovernya cukup lebar.
+_GAYA_MENU_POPOVER = (
+    "<style>"
+    ".st-key-sb_menu_proyek [data-testid='stPopover'] button,"
+    ".st-key-sb_menu_proyek button[data-testid='stPopoverButton']{"
+    "background:transparent !important;"
+    "border:none !important;"
+    "box-shadow:none !important;"
+    "color:#2C1F33 !important;"
+    "text-align:left !important;"
+    "justify-content:flex-start !important;"
+    "padding:0.45rem 0.6rem !important;"
+    "width:100% !important;"
+    "}"
+    ".st-key-sb_menu_proyek button:hover{"
+    "background:#E0D2BB !important;"
+    "border-radius:9px !important;"
+    "}"
+    ".st-key-sb_menu_proyek [data-testid='stPopover'] button p{"
+    "text-align:left !important;font-size:1.06rem !important;"
+    "line-height:1.25 !important;color:#2C1F33 !important;margin:0 !important;"
+    "}"
+    ".st-key-sb_menu_proyek [data-testid='stIconMaterial']{"
+    "font-size:1.35rem !important;width:1.35rem !important;height:1.35rem !important;"
+    "}"
+    # panel popovernya
+    "[data-testid='stPopoverBody']:has([class*='st-key-proj_']){"
+    "min-width:290px !important;max-width:330px !important;"
+    "}"
+    "</style>"
+)
 def go(page: str, **extra) -> None:
     """Pindah halaman internal (chat / artefak / pengaturan / …)."""
     for k, v in extra.items():
@@ -142,8 +173,13 @@ def render_sidebar() -> None:
         st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
 
         with st.container(key="sb_menu_proyek"):
-            if st.button(":material/deployed_code: &nbsp;Proyek", use_container_width=True):
-                show_proyek_dialog()
+            # Proyek tampil sebagai POPOVER (muncul di samping tombolnya),
+            # bukan dialog yang melayang di tengah halaman. Gaya tombolnya
+            # disamakan dengan menu sidebar lain lewat <style> di bawah.
+            st.markdown(_GAYA_MENU_POPOVER, unsafe_allow_html=True)
+            with st.popover(":material/deployed_code: &nbsp;Proyek",
+                            use_container_width=True):
+                _proyek_dialog_body()
         with st.container(key="sb_menu_artefak"):
             n_art = len(st.session_state.get("artifacts", []))
             art_label = ":material/data_object: &nbsp;Artefak" + (f"  ({n_art})" if n_art else "")
