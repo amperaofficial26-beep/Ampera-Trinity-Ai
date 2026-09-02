@@ -49,7 +49,7 @@ from state import (
     active_thread, artifact_thread, course_thread, get_settings, init_state,
     main_thread, next_msg_id, open_conversation, reset_conversation,
 )
-from sidebar import go, render_sidebar
+from sidebar import go, go_cb, render_sidebar
 from ui_helpers import (
     _BOTTOM_RESET_CSS, _FRESH_BOTTOM_CSS, _page_footer, get_greeting,
     logo_img_html, render_message,
@@ -177,9 +177,10 @@ def _artifact_workspace(aid: int) -> None:
 
     back, _sp, new_btn = st.columns([0.18, 1.0, 0.22])
     with back:
-        if st.button(":material/arrow_back:", key="art_back",
-                     use_container_width=True, help="Kembali ke pilihan artefak"):
-            go("artefak", artifact_active_id=None)
+        st.button(":material/arrow_back:", key="art_back",
+                  use_container_width=True, help="Kembali ke pilihan artefak",
+                  on_click=go_cb, args=("artefak",),
+                  kwargs={"artifact_active_id": None})
     with new_btn:
         if st.button(":material/add: &nbsp;Baru", key="art_new",
                      use_container_width=True):
@@ -751,9 +752,8 @@ def _set_trinity_code() -> None:
 def page_pengaturan() -> None:
     back, _sp = st.columns([0.12, 1.0])
     with back:
-        if st.button(":material/arrow_back:", key="set_back", use_container_width=True,
-                     help="Kembali ke chat"):
-            go("chat")
+        st.button(":material/arrow_back:", key="set_back", use_container_width=True,
+                  help="Kembali ke chat", on_click=go_cb, args=("chat",))
     st.markdown(
         f'<div class="page-head"><div class="page-head-icon">{mi(":material/settings:")}</div>'
         '<div><h2 class="page-title">Pengaturan</h2>'
@@ -1214,9 +1214,10 @@ def _course_workspace(key: str) -> None:
 
     back, _sp = st.columns([0.12, 1.0])
     with back:
-        if st.button(":material/arrow_back:", key="course_back", use_container_width=True,
-                     help="Kembali ke daftar kursus"):
-            go("kursus", course_active_key=None)
+        st.button(":material/arrow_back:", key="course_back", use_container_width=True,
+                  help="Kembali ke daftar kursus",
+                  on_click=go_cb, args=("kursus",),
+                  kwargs={"course_active_key": None})
 
     st.markdown(
         f'<div class="page-head"><div class="page-head-icon">{mi(course["icon"])}</div>'
