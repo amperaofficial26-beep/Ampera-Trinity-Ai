@@ -1748,12 +1748,31 @@ div.stDownloadButton > button:hover {
     display: flex; align-items: center; justify-content: space-between; gap: 8px;
 }
 
-/* ---------- 8. HALAMAN AI PENJADWAL ---------- */
-.jd-panel-title {
-    font-size: 0.78rem; font-weight: 700; color: #A095AC;
-    letter-spacing: 0.06em; text-transform: uppercase; margin: 2px 0 10px;
+/* ---------- 8. HALAMAN AI DESAIN & AI PENJADWAL ---------- */
+/* label bagian, dipakai di kedua halaman */
+.sec-label {
+    font-size: 0.74rem; font-weight: 700; color: #A095AC;
+    letter-spacing: 0.07em; text-transform: uppercase;
+    margin: 4px 0 8px;
 }
-.jd-progress-wrap { margin-bottom: 14px; }
+.sec-divider {
+    height: 1px; background: #E0D2BB;
+    margin: 22px 0 18px; border: none;
+}
+/* ruang kosong agar isi terakhir tidak tertutup kotak input */
+.dock-spacer { height: 96px; }
+
+/* panel daftar tugas */
+[class*="st-key-jd_panel"] {
+    background: #F7F1E6;
+    border: 1px solid #E4D9C6;
+    border-radius: 14px;
+    padding: 6px 14px 10px !important;
+    margin-bottom: 10px;
+}
+[class*="st-key-jd_panel"] [data-testid="stVerticalBlock"] { gap: 0 !important; }
+
+.jd-progress-wrap { margin: 2px 0 12px; }
 .jd-progress-text { font-size: 0.8rem; color: #6B6172; margin-bottom: 6px; }
 .jd-progress-bar {
     height: 6px; background: #E4D9C6; border-radius: 99px; overflow: hidden;
@@ -1763,55 +1782,84 @@ div.stDownloadButton > button:hover {
     transition: width .4s cubic-bezier(.32,.72,0,1);
 }
 .jd-group {
-    font-size: 0.74rem; font-weight: 700; color: #A095AC;
+    font-size: 0.72rem; font-weight: 700; color: #A095AC;
     letter-spacing: 0.05em; text-transform: uppercase;
-    margin: 14px 0 4px;
+    margin: 12px 0 2px; padding-top: 2px;
 }
 .jd-item {
-    display: flex; align-items: baseline; gap: 7px; flex-wrap: wrap;
-    padding: 6px 0;
+    display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+    padding: 2px 0;
 }
 .jd-dot {
     width: 7px; height: 7px; border-radius: 50%;
-    display: inline-block; flex: 0 0 auto;
+    display: inline-block; flex: 0 0 auto; transform: translateY(-1px);
 }
 .jd-title { font-size: 0.93rem; color: #2C1F33; font-weight: 500; }
-.jd-meta { font-size: 0.76rem; color: #A095AC; }
-.jd-item.jd-done .jd-title {
-    text-decoration: line-through; color: #B0A6BC;
-}
+.jd-meta { font-size: 0.75rem; color: #A095AC; }
+.jd-item.jd-done .jd-title { text-decoration: line-through; color: #B0A6BC; }
 .jd-item.jd-done .jd-dot { opacity: 0.4; }
-/* tombol centang & hapus di baris tugas */
+
+/* baris tugas: rapatkan jarak antar baris & rapikan tombolnya */
+[class*="st-key-jd_row_"] { margin: 0 !important; }
+[class*="st-key-jd_row_"] [data-testid="stHorizontalBlock"] {
+    gap: 8px !important; align-items: center !important;
+    min-height: 34px;
+}
+[class*="st-key-jd_row_"] div.stButton { margin: 0 !important; }
 [class*="st-key-jd_row_"] div.stButton > button {
     background: transparent !important;
     border: 1px solid #DBCEB9 !important;
     color: #6B6172 !important;
-    width: 26px !important; min-width: 26px !important; height: 26px !important;
+    width: 24px !important; min-width: 24px !important; height: 24px !important;
     padding: 0 !important; border-radius: 7px !important;
-    font-size: 0.8rem !important;
+    font-size: 0.75rem !important; line-height: 1 !important;
 }
 [class*="st-key-jd_row_"] div.stButton > button:hover {
     background: #E0D2BB !important; color: #2C1F33 !important;
 }
-[class*="st-key-jd_row_"] [data-testid="stHorizontalBlock"] {
-    gap: 6px !important; align-items: center !important;
+[class*="st-key-jd_clear_wrap"] div.stButton > button {
+    background: transparent !important;
+    border: 1px dashed #CDBFA8 !important;
+    color: #8E8398 !important;
+    font-size: 0.8rem !important;
+    min-height: 34px !important;
+    margin-top: 8px !important;
 }
-/* tombol cepat di kedua halaman AI khusus */
+
+/* tombol mulai cepat di kedua halaman AI khusus */
 [class*="st-key-desain_quick"] div.stButton > button,
 [class*="st-key-jadwal_quick"] div.stButton > button {
     background: #F2E8D6 !important;
     border: 1px solid #E0D2BB !important;
-    border-radius: 10px !important;
+    border-radius: 11px !important;
     color: #2C1F33 !important;
-    font-size: 0.84rem !important;
+    font-size: 0.86rem !important;
     font-weight: 500 !important;
-    min-height: 40px !important;
-    margin-bottom: 6px !important;
+    min-height: 46px !important;
+    white-space: normal !important;
+    line-height: 1.3 !important;
+    transition: background .15s ease, border-color .15s ease,
+                transform .1s ease !important;
 }
 [class*="st-key-desain_quick"] div.stButton > button:hover,
 [class*="st-key-jadwal_quick"] div.stButton > button:hover {
     background: #FFFFFF !important;
     border-color: #2C1F33 !important;
+    transform: translateY(-1px) !important;
+}
+[class*="st-key-desain_quick"] [data-testid="stHorizontalBlock"],
+[class*="st-key-jadwal_quick"] [data-testid="stHorizontalBlock"] {
+    gap: 10px !important;
+}
+[class*="st-key-desain_quick"] [data-testid="stVerticalBlock"] {
+    gap: 10px !important;
+}
+
+/* form "Tambah tugas sendiri" */
+[data-testid="stMainBlockContainer"] [data-testid="stExpander"] {
+    border-radius: 12px !important;
+    border: 1px solid #E4D9C6 !important;
+    margin-bottom: 8px !important;
 }
 /* ---------- layar sempit ---------- */
 @media (max-width: 640px) {
