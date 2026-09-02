@@ -168,6 +168,29 @@ Penyimpanan: 512GB SSD | 1TB SSD
 - Dokumentasi Python | https://docs.python.org | Rujukan resmi bahasa Python.
 [[/KARTU]]
 
+4) Menunjukkan sebuah lokasi/tempat:
+[[KARTU:peta]]
+lokasi: Monumen Nasional, Jakarta Pusat
+judul: Monumen Nasional
+ket: Ikon Jakarta, cocok untuk melihat kota dari ketinggian.
+[[/KARTU]]
+
+5) Rencana perjalanan / jadwal per hari (baris tanpa tanda | dianggap
+   nama hari, baris dengan | adalah: waktu | kegiatan | catatan):
+[[KARTU:itinerary]]
+Hari 1
+Pagi | Kawah Putih | Udara sejuk dan spot foto ikonik.
+Sore | Jalan Braga | Wisata kuliner khas Bandung.
+Hari 2
+Pagi | Tangkuban Perahu | Berangkat lebih awal agar tidak berkabut.
+[[/KARTU]]
+
+6) Terjemahan antar dua bahasa:
+[[KARTU:terjemahan]]
+Indonesia: Selamat pagi, apa kabar?
+Inggris: Good morning, how are you?
+[[/KARTU]]
+
 Aturan:
 - Pakai kartu HANYA bila isinya memang berbentuk itu. Jawaban biasa tetap
   ditulis sebagai teks/paragraf.
@@ -175,6 +198,9 @@ Aturan:
 - Perbandingan: maksimal 3 kolom dan 6 baris spesifikasi.
 - Langkah: 2-6 langkah, judulnya singkat, penjelasannya satu kalimat.
 - Link: maksimal 4 tautan, URL harus lengkap diawali https://
+- Peta: satu lokasi saja, tulis selengkap mungkin (nama tempat + kota).
+- Itinerary: maksimal 3 hari, tiap hari maksimal 5 kegiatan.
+- Terjemahan: tepat 2 baris, formatnya "NamaBahasa: teksnya".
 - Beri satu kalimat pengantar sebelum kartu, lalu langsung bloknya.
 - Jangan pernah menulis blok kartu di dalam contoh kode.
 """
