@@ -269,7 +269,7 @@ def _gambar_sesi() -> list[dict]:
 # ============================================================================
 def _css_panel(terbuka: bool, lebar: bool) -> str:
     w = PANEL_LEBAR_LEBAR_PX if lebar else PANEL_LEBAR_PX
-    geser = str(w + 15) if terbuka else "18"
+    geser = str(w + 5) if terbuka else "15"
     return (
         "<style>"
         ".st-key-art_panel{"
