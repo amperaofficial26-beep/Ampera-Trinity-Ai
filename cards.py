@@ -12,7 +12,7 @@ kartu visual — bukan ditampilkan sebagai teks mentah:
     [[/KARTU]]
 
 Jenis yang sudah didukung: perbandingan, langkah, link, peta, itinerary,
-terjemahan.
+terjemahan, palet.
 Menambah jenis baru cukup: tulis satu fungsi _render_<jenis>(kartu, kunci)
 lalu daftarkan di RENDERER.
 """
@@ -44,6 +44,7 @@ _ALIAS = {
     "itenerary": "itinerary", "trip": "itinerary",
     "translate": "terjemahan", "translation": "terjemahan",
     "terjemah": "terjemahan", "bahasa": "terjemahan",
+    "warna": "palet", "palette": "palet", "colors": "palet", "color": "palet",
 }
 
 
@@ -362,7 +363,57 @@ def _render_terjemahan(kartu: dict, kunci: str) -> None:
         )
     st.markdown(f'<div class="rc-card rc-tr">{sel}</div>', unsafe_allow_html=True)
 
+def _render_palet(kartu: dict, kunci: str) -> None:
+    """Kartu palet warna: petak warna + kode hex yang bisa disalin."""
+    judul = ""
+    warna: list[tuple[str, str]] = []
+    for b in kartu["lines"]:
+        polos = re.sub(r"^(\d+[.)]|[-*•])\s*", "", b).strip()
+        low = polos.lower()
+        if low.startswith(("judul:", "nama:", "title:")):
+            judul = polos.split(":", 1)[1].strip()
+            continue
+        m = re.search(r"#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})", polos)
+        if not m:
+            continue
+        hex_kode = "#" + m.group(1).upper()
+        sisa = polos.replace(m.group(0), "", 1)
+        label = sisa.strip(" |-–:\t").strip()
+        warna.append((hex_kode, label))
 
+    if not warna:
+        return
+    warna = warna[:6]
+
+    petak = ""
+    for hex_kode, label in warna:
+        # teks di atas petak: gelap atau terang mengikuti kecerahan warnanya
+        h = hex_kode.lstrip("#")
+        if len(h) == 3:
+            h = "".join(ch * 2 for ch in h)
+        try:
+            r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+            terang = (r * 299 + g * 587 + b * 114) / 1000 > 150
+        except Exception:
+            terang = True
+        tulisan = "#2C1F33" if terang else "#FFFFFF"
+        petak += (
+            '<div class="rc-pal-item">'
+            f'<div class="rc-pal-chip" style="background:{_esc(hex_kode)};'
+            f'color:{tulisan};">{_esc(hex_kode)}</div>'
+            + (f'<div class="rc-pal-label">{_esc(label)}</div>' if label else "")
+            + "</div>"
+        )
+
+    kepala = f'<div class="rc-pal-title">{_esc(judul)}</div>' if judul else ""
+    semua = " ".join(h for h, _ in warna)
+    st.markdown(
+        f'<div class="rc-card rc-pal">{kepala}'
+        f'<div class="rc-pal-row">{petak}</div>'
+        f'<div class="rc-pal-foot">{_esc(semua)} '
+        f"{_tombol_salin(semua, 'Salin semua kode warna')}</div></div>",
+        unsafe_allow_html=True,
+    )
 RENDERER = {
     "perbandingan": _render_perbandingan,
     "langkah": _render_langkah,
@@ -370,8 +421,8 @@ RENDERER = {
     "peta": _render_peta,
     "itinerary": _render_itinerary,
     "terjemahan": _render_terjemahan,
+    "palet": _render_palet,
 }
-
 
 def render_cards(msg: dict) -> None:
     """Tampilkan semua kartu milik satu pesan Yuki."""
