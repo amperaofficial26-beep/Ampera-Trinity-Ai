@@ -243,6 +243,20 @@ def render_sidebar() -> None:
             if st.button(":material/tune: &nbsp;Sesuaikan", use_container_width=True):
                 show_sesuaikan_dialog()
 
+                st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
+
+        # ---- Kelompok AI khusus ----
+        with st.container(key="sb_menu_desain"):
+            if st.button(":material/palette: &nbsp;AI Desain", use_container_width=True):
+                go("desain")
+        with st.container(key="sb_menu_jadwal"):
+            n_tugas = len([t for t in st.session_state.get("tasks", [])
+                           if not t.get("selesai")])
+            label_jd = (":material/calendar_month: &nbsp;AI Penjadwal"
+                        + (f"  ({n_tugas})" if n_tugas else ""))
+            if st.button(label_jd, use_container_width=True):
+                go("jadwal")
+
         st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
 
         with st.container(key="sb_download"):
