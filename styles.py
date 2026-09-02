@@ -1018,7 +1018,7 @@ div.stDownloadButton > button:hover {
 }
 /* ---------- pop-up model ala Claude: SATU panel, item = teks polos ---------- */
 [data-testid="stPopoverBody"] {
-    background: #FFFFFF !important;
+    background: #FBF6EC !important;
     border: 1px solid #DBCEB9 !important;
     border-radius: 16px !important;
     box-shadow: 0 16px 48px rgba(44,31,51,0.18) !important;
