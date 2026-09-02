@@ -27,6 +27,7 @@ from engines.groq_engine import (
     transcribe_audio,
 )
 from artifacts import ambil_artefak
+from loading_code import code_loading_html, inject_code_loading_css
 from cards import parse_cards
 from engines.image_engine import generate_image
 from errors import public_error_chat, public_error_image
@@ -148,6 +149,18 @@ def handle_image_request(prompt: str) -> None:
         "content": msg, "time": now_wib(), "error_detail": detail,
     })
 
+def _tebak_nama_file(teks: str) -> str:
+    """Ambil nama file yang disebut Yuki tepat sebelum blok kode, kalau ada.
+    Dipakai sebagai judul pada loader pembuatan kode."""
+    import re
+    m = re.findall(r"([\w./-]+\.[A-Za-z0-9]{1,5})\s*:?\s*\n*```", teks or "")
+    if m:
+        return m[-1]
+    m2 = re.findall(r"```([a-zA-Z0-9_+-]+)", teks or "")
+    if m2:
+        return "Menulis kode " + m2[-1]
+    return "Menyiapkan berkas…"
+    
 def handle_chat_request(answer_slot) -> None:
     thread = active_thread()
     if not CHAT_READY:
@@ -179,16 +192,29 @@ def handle_chat_request(answer_slot) -> None:
     t0 = time.time()
     min_think = float(s.get("min_think_seconds", THINKING_MIN_SECONDS))
 
-    try:
+       try:
         client = build_chat_client()
-        full = "".join(
-            piece or ""
-            for piece in stream_chat_with_fallback(
-                client, model_id, thread, vision=has_images
-            )
-        )
+
+        # Kumpulkan jawaban. Begitu terdeteksi Yuki mulai menulis kode
+        # (muncul pagar ```), animasi "berpikir" diganti loader khusus
+        # pembuatan file. Diganti SEKALI saja supaya animasi CSS-nya tidak
+        # ter-reset (pelajaran dari kotak loading gambar).
+        potongan: list[str] = []
+        mode_kode = False
+        for piece in stream_chat_with_fallback(
+            client, model_id, thread, vision=has_images
+        ):
+            potongan.append(piece or "")
+            if not mode_kode and "```" in "".join(potongan):
+                mode_kode = True
+                inject_code_loading_css()
+                think_slot.markdown(
+                    code_loading_html(_tebak_nama_file("".join(potongan))),
+                    unsafe_allow_html=True,
+                )
+        full = "".join(potongan)
         elapsed = time.time() - t0
-        if elapsed < min_think:
+           if elapsed < min_think:
             time.sleep(min_think - elapsed)
         think_slot.empty()
         if not full:
@@ -226,6 +252,12 @@ def handle_chat_request(answer_slot) -> None:
                 # Blok kode -> disimpan sebagai FILE dan tampil di panel kanan,
         # bukan memenuhi ruang chat. Chat hanya menampilkan kartu ringkas.
         full, file_ids = ambil_artefak(full)
+        if file_ids and mode_kode:
+            think_slot.markdown(
+                code_loading_html("Selesai", done=True), unsafe_allow_html=True
+            )
+            time.sleep(0.6)
+            think_slot.empty()
         if not full:
             full = ("Selesai! Filenya sudah kubuat, lihat panel di sebelah kanan ya."
                     if file_ids else "…")
