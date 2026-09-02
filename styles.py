@@ -1717,6 +1717,102 @@ div.stDownloadButton > button:hover {
 .rc-icon-btn:hover { background: rgba(44,31,51,0.06); }
 .rc-icon-btn:active { transform: scale(0.9); 
 }
+/* ---------- 7. KARTU PALET WARNA ---------- */
+.rc-pal { padding: 14px 16px 12px; }
+.rc-pal-title {
+    font-size: 0.9rem; font-weight: 600; color: #2C1F33; margin-bottom: 10px;
+}
+.rc-pal-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.rc-pal-item { flex: 1 1 84px; min-width: 84px; }
+.rc-pal-chip {
+    height: 62px;
+    border-radius: 10px;
+    border: 1px solid rgba(44, 31, 51, 0.10);
+    display: flex; align-items: flex-end; justify-content: center;
+    padding-bottom: 6px;
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.02em;
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+.rc-pal-chip:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 14px rgba(44, 31, 51, 0.14);
+}
+.rc-pal-label {
+    font-size: 0.74rem; color: #8E8398; margin-top: 5px;
+    text-align: center; line-height: 1.3;
+}
+.rc-pal-foot {
+    margin-top: 11px; padding-top: 9px;
+    border-top: 1px solid #F3ECE0;
+    font-size: 0.74rem; color: #A095AC;
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+
+/* ---------- 8. HALAMAN AI PENJADWAL ---------- */
+.jd-panel-title {
+    font-size: 0.78rem; font-weight: 700; color: #A095AC;
+    letter-spacing: 0.06em; text-transform: uppercase; margin: 2px 0 10px;
+}
+.jd-progress-wrap { margin-bottom: 14px; }
+.jd-progress-text { font-size: 0.8rem; color: #6B6172; margin-bottom: 6px; }
+.jd-progress-bar {
+    height: 6px; background: #E4D9C6; border-radius: 99px; overflow: hidden;
+}
+.jd-progress-fill {
+    height: 100%; background: #2C1F33; border-radius: 99px;
+    transition: width .4s cubic-bezier(.32,.72,0,1);
+}
+.jd-group {
+    font-size: 0.74rem; font-weight: 700; color: #A095AC;
+    letter-spacing: 0.05em; text-transform: uppercase;
+    margin: 14px 0 4px;
+}
+.jd-item {
+    display: flex; align-items: baseline; gap: 7px; flex-wrap: wrap;
+    padding: 6px 0;
+}
+.jd-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    display: inline-block; flex: 0 0 auto;
+}
+.jd-title { font-size: 0.93rem; color: #2C1F33; font-weight: 500; }
+.jd-meta { font-size: 0.76rem; color: #A095AC; }
+.jd-item.jd-done .jd-title {
+    text-decoration: line-through; color: #B0A6BC;
+}
+.jd-item.jd-done .jd-dot { opacity: 0.4; }
+/* tombol centang & hapus di baris tugas */
+[class*="st-key-jd_row_"] div.stButton > button {
+    background: transparent !important;
+    border: 1px solid #DBCEB9 !important;
+    color: #6B6172 !important;
+    width: 26px !important; min-width: 26px !important; height: 26px !important;
+    padding: 0 !important; border-radius: 7px !important;
+    font-size: 0.8rem !important;
+}
+[class*="st-key-jd_row_"] div.stButton > button:hover {
+    background: #E0D2BB !important; color: #2C1F33 !important;
+}
+[class*="st-key-jd_row_"] [data-testid="stHorizontalBlock"] {
+    gap: 6px !important; align-items: center !important;
+}
+/* tombol cepat di kedua halaman AI khusus */
+[class*="st-key-desain_quick"] div.stButton > button,
+[class*="st-key-jadwal_quick"] div.stButton > button {
+    background: #F2E8D6 !important;
+    border: 1px solid #E0D2BB !important;
+    border-radius: 10px !important;
+    color: #2C1F33 !important;
+    font-size: 0.84rem !important;
+    font-weight: 500 !important;
+    min-height: 40px !important;
+    margin-bottom: 6px !important;
+}
+[class*="st-key-desain_quick"] div.stButton > button:hover,
+[class*="st-key-jadwal_quick"] div.stButton > button:hover {
+    background: #FFFFFF !important;
+    border-color: #2C1F33 !important;
+}
 /* ---------- layar sempit ---------- */
 @media (max-width: 640px) {
     .rc-card { max-width: 100%; }
