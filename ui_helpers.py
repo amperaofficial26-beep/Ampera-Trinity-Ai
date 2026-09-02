@@ -471,9 +471,6 @@ def render_message(msg: dict) -> None:
             unsafe_allow_html=True,
         )
         st.image(msg["image_bytes"], use_container_width=True)
-
-        st.image(msg["image_bytes"], use_container_width=True)
-        ts = datetime.now().strftime("%Y%m%d_%H%M%S")
         ts = datetime.now().strftime("%Y%m%d_%H%M%S")
         st.download_button(
             label=":material/download:  Unduh PNG",
@@ -490,14 +487,14 @@ def render_message(msg: dict) -> None:
                         msg.get("time", ""), imgs_html, note),
             unsafe_allow_html=True,
         )
-               # Kalau pesan ini berasal dari kegagalan pembuatan gambar, detail
+        # Kalau pesan ini berasal dari kegagalan pembuatan gambar, detail
         # teknisnya ditampilkan terlipat supaya penyebabnya bisa dicek
         # (bukan sekadar "tidak ada hasil" tanpa keterangan).
         if msg.get("error_detail"):
             with st.expander("Detail teknis"):
                 st.code(str(msg["error_detail"]), language="text")
-               # baris aksi kecil ala Claude: copy jawaban, feedback (👍/👎), jam kirim
-               if msg.get("role") == "assistant":
+        # baris aksi kecil ala Claude: copy jawaban, feedback (👍/👎), jam kirim
+        if msg.get("role") == "assistant":
             # Kartu kaya (perbandingan / langkah / link) di bawah jawaban.
             if msg.get("cards"):
                 from cards import render_cards
