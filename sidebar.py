@@ -118,7 +118,6 @@ _GAYA_MENU_POPOVER = (
     "</style>"
 )
 
-
 def go(page: str, **extra) -> None:
     """Pindah halaman internal (chat / artefak / pengaturan / …)."""
     for k, v in extra.items():
@@ -126,7 +125,19 @@ def go(page: str, **extra) -> None:
     st.session_state.page = page
     st.rerun()
 
+def go_cb(page: str, **extra) -> None:
+    """Versi go() untuk dipakai sebagai on_click=... pada st.button.
 
+    Bedanya: TIDAK memanggil st.rerun(). Streamlit sudah otomatis
+    menjalankan ulang halaman setelah callback selesai. Cara ini lebih
+    andal daripada pola "if st.button(): go(...)" — pada halaman yang
+    juga memanggil st.rerun() di tempat lain (mis. maybe_run_yuki atau
+    process_user_input), klik tombol bisa "hilang" sebelum sempat
+    diproses."""
+    for k, v in extra.items():
+        st.session_state[k] = v
+    st.session_state.page = page
+  
 def _register_dialog(title: str, func):
     """Bungkus fungsi jadi @st.dialog kalau tersedia; kalau versi Streamlit
     lama tidak mendukung, tampilkan pesan singkat sebagai fallback."""
