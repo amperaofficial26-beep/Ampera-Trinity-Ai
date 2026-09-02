@@ -55,6 +55,9 @@ from ui_helpers import (
     logo_img_html, render_message,
 )
 from anim import inject_anim_css, inject_page_anim
+from artifacts import render_panel
+from page_desain import page_desain
+from page_jadwal import page_jadwal
 from page_desain import page_desain
 from page_jadwal import page_jadwal
 from styles import inject_css
