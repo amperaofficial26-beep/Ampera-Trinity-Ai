@@ -143,7 +143,8 @@ def kartu_file_html(ids: list[int]) -> str:
             "</div>"
         )
     return kartu
-  
+
+
 def buka_panel(aid: int) -> None:
     st.session_state["artifact_panel_open"] = True
     st.session_state["artifact_panel_id"] = aid
@@ -239,6 +240,12 @@ def _css_panel(terbuka: bool) -> str:
     )
 
 
+def render_panel() -> None:
+    """Panel kanan berisi file/kode buatan Yuki + tombol buka/tutup.
+
+    Streamlit tidak punya sidebar kanan bawaan, jadi panel ini container
+    biasa yang DIPOSISIKAN ke kanan lewat CSS.
+    """
     daftar = daftar_artefak()
     terbuka = bool(st.session_state.get("artifact_panel_open"))
     st.markdown(_css_panel(terbuka), unsafe_allow_html=True)
@@ -279,7 +286,7 @@ def _css_panel(terbuka: bool) -> str:
                 unsafe_allow_html=True,
             )
         return
-      
+
     aktif_id = st.session_state.get("artifact_panel_id") or daftar[0]["id"]
     aktif = next((a for a in daftar if a["id"] == aktif_id), daftar[0])
     baris = len(aktif["content"].splitlines())
