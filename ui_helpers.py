@@ -497,7 +497,11 @@ def render_message(msg: dict) -> None:
             with st.expander("Detail teknis"):
                 st.code(str(msg["error_detail"]), language="text")
                # baris aksi kecil ala Claude: copy jawaban, feedback (👍/👎), jam kirim
-        if msg.get("role") == "assistant":
+               if msg.get("role") == "assistant":
+            # Kartu kaya (perbandingan / langkah / link) di bawah jawaban.
+            if msg.get("cards"):
+                from cards import render_cards
+                render_cards(msg)
             render_message_actions(msg)
             # Kartu pilihan interaktif: hanya jawaban TERAKHIR yang bisa diklik.
             if msg.get("quick_replies"):
