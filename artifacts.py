@@ -34,8 +34,23 @@ BUKA_OTOMATIS = True        # panel langsung terbuka saat file baru dibuat
 MIN_BARIS_JADI_FILE = 3     # blok kode lebih pendek dari ini tetap di chat
 MIN_KARAKTER_JADI_FILE = 40
 BARIS_LANGSUNG_FILE = 5     # sebanyak ini baris ke atas: selalu jadi file
-# ============================================================================
 
+# --- TOMBOL BUKA/TUTUP PANEL: warna, ukuran, posisi ------------------------
+# Catatan: styles.py punya aturan global "div.stButton > button" yang juga
+# memakai !important. Karena itu CSS di bawah ditulis dengan awalan "body"
+# agar spesifisitasnya lebih tinggi dan pasti menang.
+TOMBOL_BG = "#2C1F33"          # latar tombol saat diam
+TOMBOL_BG_HOVER = "#40304A"    # latar saat disentuh kursor
+TOMBOL_IKON = "#FBF6EC"        # warna ikon
+TOMBOL_GARIS = "#2C1F33"       # garis tepi ("transparent" = tanpa garis)
+TOMBOL_UKURAN_PX = 46          # lebar = tinggi
+TOMBOL_RADIUS_PX = 14          # kelengkungan sudut
+TOMBOL_POSISI = "atas"       # "tengah" | "atas" | "bawah"
+TOMBOL_OFFSET_PX = 110         # jarak dari atas/bawah bila posisi bukan tengah
+TOMBOL_JARAK_TEPI_PX = 15      # jarak dari tepi layar saat panel TERTUTUP
+TOMBOL_JARAK_PANEL_PX = 5     # jarak dari tepi panel saat panel TERBUKA
+TOMBOL_BAYANGAN = "0 4px 14px rgba(44,31,51,0.18)"   # "none" = tanpa bayangan
+# ============================================================================
 _EKSTENSI = {
     "python": "py", "py": "py", "javascript": "js", "js": "js",
     "typescript": "ts", "ts": "ts", "html": "html", "css": "css",
