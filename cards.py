@@ -11,15 +11,18 @@ kartu visual — bukan ditampilkan sebagai teks mentah:
     RAM: 8GB | 16GB
     [[/KARTU]]
 
-Jenis yang sudah didukung: perbandingan, langkah, link.
+Jenis yang sudah didukung: perbandingan, langkah, link, peta, itinerary,
+terjemahan.
 Menambah jenis baru cukup: tulis satu fungsi _render_<jenis>(kartu, kunci)
 lalu daftarkan di RENDERER.
 """
 
 from __future__ import annotations
 
+import base64
 import html
 import re
+import urllib.parse
 
 import streamlit as st
 
@@ -36,6 +39,11 @@ _ALIAS = {
     "langkah_langkah": "langkah", "steps": "langkah", "step": "langkah",
     "panduan": "langkah", "tutorial": "langkah",
     "tautan": "link", "referensi": "link", "sumber": "link", "links": "link",
+    "map": "peta", "lokasi": "peta", "maps": "peta",
+    "jadwal": "itinerary", "rencana": "itinerary", "perjalanan": "itinerary",
+    "itenerary": "itinerary", "trip": "itinerary",
+    "translate": "terjemahan", "translation": "terjemahan",
+    "terjemah": "terjemahan", "bahasa": "terjemahan",
 }
 
 
@@ -207,10 +215,161 @@ def _render_link(kartu: dict, kunci: str) -> None:
         st.markdown(kartu_html, unsafe_allow_html=True)
 
 
+def _tombol_salin(teks: str, judul: str = "Salin") -> str:
+    """Tombol salin mandiri (JS inline, tanpa dependensi lain)."""
+    b64 = base64.b64encode((teks or "").encode("utf-8")).decode("ascii")
+    return (
+        f'<button class="rc-icon-btn" data-b64="{b64}" '
+        f'onclick="const t=atob(this.dataset.b64);'
+        f"navigator.clipboard.writeText(decodeURIComponent(escape(t)));"
+        f"const o=this.innerHTML;this.innerHTML='&#10003;';"
+        f'setTimeout(()=>{{this.innerHTML=o;}},1200);" '
+        f'title="{_esc(judul)}">&#128203;</button>'
+    )
+
+
+def _render_peta(kartu: dict, kunci: str) -> None:
+    """Peta lokasi (Google Maps embed, tanpa API key) + panel keterangan."""
+    lokasi = judul = ket = ""
+    for b in kartu["lines"]:
+        if ":" not in b:
+            if not lokasi:
+                lokasi = b.strip()
+            continue
+        label, nilai = b.split(":", 1)
+        label, nilai = label.strip().lower(), nilai.strip()
+        if label in ("lokasi", "alamat", "tempat", "query"):
+            lokasi = nilai
+        elif label in ("judul", "nama", "title"):
+            judul = nilai
+        elif label in ("ket", "keterangan", "desc", "deskripsi", "catatan"):
+            ket = nilai
+
+    if not lokasi:
+        return
+    judul = judul or lokasi
+
+    src = ("https://www.google.com/maps?q="
+           + urllib.parse.quote_plus(lokasi) + "&output=embed")
+    tautan = ("https://www.google.com/maps/search/?api=1&query="
+              + urllib.parse.quote_plus(lokasi))
+
+    with st.container(key=f"rc_map_{kunci}"):
+        kiri, kanan = st.columns([2, 1])
+        with kiri:
+            try:
+                import streamlit.components.v1 as components
+                components.iframe(src, height=260)
+            except Exception:
+                st.markdown(
+                    f'<div class="rc-card rc-map-fallback">'
+                    f'<a href="{_esc(tautan)}" target="_blank" rel="noopener">'
+                    f"Buka {_esc(judul)} di Google Maps</a></div>",
+                    unsafe_allow_html=True,
+                )
+        with kanan:
+            st.markdown(
+                f'<div class="rc-card rc-map-side">'
+                f'<div class="rc-map-title">{_esc(judul)}</div>'
+                + (f'<div class="rc-map-desc">{_esc(ket)}</div>' if ket else "")
+                + f'<a class="rc-map-link" href="{_esc(tautan)}" target="_blank" '
+                  f'rel="noopener">Buka di Maps</a></div>',
+                unsafe_allow_html=True,
+            )
+
+
+def _render_itinerary(kartu: dict, kunci: str) -> None:
+    """Rencana perjalanan: tab per hari + linimasa waktu -> kegiatan."""
+    hari: list[tuple[str, list[tuple[str, str, str]]]] = []
+    for b in kartu["lines"]:
+        polos = re.sub(r"^(\d+[.)]|[-*•])\s*", "", b).strip()
+        bagian = [x.strip() for x in polos.split("|")]
+        # baris judul hari: tidak memakai pemisah "|"
+        if len(bagian) == 1:
+            nama = bagian[0].rstrip(":").strip()
+            if nama:
+                hari.append((nama, []))
+            continue
+        if not hari:
+            hari.append(("Hari 1", []))
+        waktu = bagian[0]
+        kegiatan = bagian[1] if len(bagian) > 1 else ""
+        catatan = bagian[2] if len(bagian) > 2 else ""
+        hari[-1][1].append((waktu, kegiatan, catatan))
+
+    hari = [h for h in hari if h[1]]
+    if not hari:
+        return
+
+    sk = f"_rc_day_{kunci}"
+    aktif = int(st.session_state.get(sk, 0))
+    aktif = max(0, min(aktif, len(hari) - 1))
+
+    def _pilih_hari(i: int) -> None:
+        st.session_state[sk] = i
+
+    with st.container(key=f"rc_itin_{kunci}"):
+        if len(hari) > 1:
+            cols = st.columns(len(hari))
+            for i, (nama, _) in enumerate(hari):
+                with cols[i]:
+                    st.button(nama, key=f"rc_day_{kunci}_{i}",
+                              use_container_width=True,
+                              type="primary" if i == aktif else "secondary",
+                              on_click=_pilih_hari, args=(i,))
+
+        baris_html = ""
+        for waktu, kegiatan, catatan in hari[aktif][1]:
+            baris_html += (
+                f'<div class="rc-itin-row">'
+                f'<div class="rc-itin-time">{_esc(waktu)}</div>'
+                f'<div class="rc-itin-mark"><span class="rc-itin-dot"></span></div>'
+                f'<div class="rc-itin-body">'
+                f'<div class="rc-itin-act">{_esc(kegiatan)}</div>'
+                + (f'<div class="rc-itin-note">{_esc(catatan)}</div>' if catatan else "")
+                + "</div></div>"
+            )
+        st.markdown(
+            f'<div class="rc-card rc-itin">'
+            f'<div class="rc-itin-day">{_esc(hari[aktif][0])}</div>'
+            f"{baris_html}</div>",
+            unsafe_allow_html=True,
+        )
+
+
+def _render_terjemahan(kartu: dict, kunci: str) -> None:
+    """Dua panel bersebelahan: bahasa asal dan bahasa tujuan."""
+    panel: list[tuple[str, str]] = []
+    for b in kartu["lines"]:
+        if ":" not in b:
+            continue
+        label, teks = b.split(":", 1)
+        label, teks = label.strip(), teks.strip()
+        if label and teks:
+            panel.append((label, teks))
+    if len(panel) < 2:
+        return
+    panel = panel[:2]
+
+    sel = ""
+    for i, (label, teks) in enumerate(panel):
+        aksi = _tombol_salin(teks, f"Salin teks {label}")
+        sel += (
+            f'<div class="rc-tr-pane">'
+            f'<div class="rc-tr-head"><span class="rc-tr-lang">{_esc(label)}</span>'
+            f'<span class="rc-tr-act">{aksi}</span></div>'
+            f'<div class="rc-tr-text">{_esc(teks)}</div></div>'
+        )
+    st.markdown(f'<div class="rc-card rc-tr">{sel}</div>', unsafe_allow_html=True)
+
+
 RENDERER = {
     "perbandingan": _render_perbandingan,
     "langkah": _render_langkah,
     "link": _render_link,
+    "peta": _render_peta,
+    "itinerary": _render_itinerary,
+    "terjemahan": _render_terjemahan,
 }
 
 
