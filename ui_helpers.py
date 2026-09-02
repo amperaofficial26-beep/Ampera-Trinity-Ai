@@ -716,10 +716,18 @@ def _page_footer(in_chat: bool = False) -> None:
     Lewat <style> yang disuntik di sini — setelah CSS utama — aturan ini
     pasti menang.
     """
-    foot_class = "trinity-foot" if not in_chat else "trinity-foot in-chat"
-    ukuran = FOOTER_SIZE_CHAT_PX if in_chat else FOOTER_SIZE_PX
-    jarak = FOOTER_TOP_GAP_CHAT_PX if in_chat else FOOTER_TOP_GAP_PX
-    sel = "p.trinity-foot.in-chat" if in_chat else "p.trinity-foot"
+       # --- penjaga: footer hanya untuk halaman awal ---
+    if in_chat:
+        return
+    if st.session_state.get("page", "chat") != "chat":
+        return
+    if st.session_state.get("messages"):
+        return
+
+    foot_class = "trinity-foot"
+    ukuran = FOOTER_SIZE_PX
+    jarak = FOOTER_TOP_GAP_PX
+    sel = "p.trinity-foot"
 
     st.markdown(
         "<style>"
