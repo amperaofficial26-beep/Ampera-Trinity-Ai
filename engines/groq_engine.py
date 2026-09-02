@@ -29,6 +29,7 @@ from config import (
     MAX_IMAGES_PER_MESSAGE, STT_MODEL, VISION_MODEL_FALLBACKS,
     VISION_RECENT_MESSAGES, YUKI_SYSTEM_PROMPT, LANG_BY_CODE, DEFAULT_LANG_CODE,
     CLARIFY_RULES, CLARIFY_MODE_RULES, QUICK_REPLY_RULES, CARD_RULES,
+    DESAIN_PROMPT, JADWAL_PROMPT,
 )
 from errors import _is_model_unavailable_error
 from state import get_settings
@@ -49,6 +50,12 @@ def build_system_prompt() -> str:
     s = get_settings()
     parts = [YUKI_SYSTEM_PROMPT, CARD_RULES]
 
+    # Persona tambahan sesuai halaman yang sedang dibuka.
+    halaman = st.session_state.get("page", "chat")
+    if halaman == "desain":
+        parts.append(DESAIN_PROMPT)
+    elif halaman == "jadwal":
+        parts.append(JADWAL_PROMPT)
     persona_map = {
         "Santai & kocak": "Pertahankan gaya santai, kocak, dan penuh candaan receh.",
         "Serius & ringkas": (
