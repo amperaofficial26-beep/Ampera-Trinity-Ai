@@ -389,7 +389,7 @@ def _render_isi(aktif: dict, lebar: bool) -> None:
            else aktif["lang"]).upper()
     nama = aktif["title"].rsplit(".", 1)[0]
 
-   judul, aksi = st.columns([1.0, 0.72])
+    judul, aksi = st.columns([1.0, 0.72])
     with judul:
         st.markdown(
             '<div class="af-title-row"><span class="af-title">'
@@ -426,8 +426,6 @@ def _render_isi(aktif: dict, lebar: bool) -> None:
             key=f"af_dl_{aktif['id']}",
             use_container_width=True,
         )
-
-
 # ============================================================================
 # PINTU MASUK
 # ============================================================================
