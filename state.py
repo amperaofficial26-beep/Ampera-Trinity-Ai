@@ -48,10 +48,58 @@ def course_thread(cid: str) -> list[dict]:
         st.session_state[key] = []
     return st.session_state[key]
 
+def mode_thread(nama: str) -> list[dict]:
+    """Riwayat pesan untuk halaman ber-mode khusus (desain, jadwal)."""
+    key = f"mode_msgs_{nama}"
+    if key not in st.session_state:
+        st.session_state[key] = []
+    return st.session_state[key]
 
+
+# ============================================================================
+# DAFTAR TUGAS (AI Penjadwal)
+# ============================================================================
+def tasks() -> list[dict]:
+    if "tasks" not in st.session_state:
+        st.session_state.tasks = []
+    return st.session_state.tasks
+
+
+def add_task(judul: str, kapan: str = "", prioritas: str = "sedang",
+             catatan: str = "") -> dict:
+    """Tambah satu tugas. `kapan` bebas teks (mis. 'Senin', '12 Sep', 'Hari ini')."""
+    st.session_state["task_counter"] = st.session_state.get("task_counter", 0) + 1
+    t = {
+        "id": st.session_state["task_counter"],
+        "judul": (judul or "").strip(),
+        "kapan": (kapan or "").strip(),
+        "prioritas": (prioritas or "sedang").strip().lower(),
+        "catatan": (catatan or "").strip(),
+        "selesai": False,
+    }
+    tasks().append(t)
+    return t
+
+
+def toggle_task(tid: int) -> None:
+    for t in tasks():
+        if t["id"] == tid:
+            t["selesai"] = not t["selesai"]
+            return
+
+
+def drop_task(tid: int) -> None:
+    st.session_state.tasks = [t for t in tasks() if t["id"] != tid]
+
+
+def clear_done_tasks() -> None:
+    st.session_state.tasks = [t for t in tasks() if not t["selesai"]]
+    
 def active_thread() -> list[dict]:
     """Riwayat pesan milik halaman yang sedang dibuka."""
-    page = st.session_state.get("page", "chat")
+       page = st.session_state.get("page", "chat")
+    if page in ("desain", "jadwal"):
+        return mode_thread(page)
     if page == "artefak":
         aid = st.session_state.get("artifact_active_id")
         if aid is not None:
@@ -70,6 +118,11 @@ def init_state() -> None:
     # hanya sapaan besar + input di tengah.
     if "messages" not in st.session_state:
         st.session_state.messages = []
+    # Daftar tugas untuk AI Penjadwal
+    if "tasks" not in st.session_state:
+        st.session_state.tasks = []
+    if "task_counter" not in st.session_state:
+        st.session_state.task_counter = 0
     # Halaman aktif (routing internal): chat / artefak / pengaturan / bahasa /
     # bantuan / tingkatkan / aplikasi / kursus / pelajari
     if "page" not in st.session_state:
