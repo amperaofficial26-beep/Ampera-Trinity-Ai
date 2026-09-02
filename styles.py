@@ -1931,6 +1931,19 @@ div.stDownloadButton > button:hover {
 .af-copy:hover { background: #E0D2BB; color: #2C1F33; }
 .af-copy:active { transform: scale(0.94); }
 
+/* -- panel saat belum ada file -- */
+.af-empty {
+    background: #FFFFFF;
+    border: 1px dashed #DBCEB9;
+    border-radius: 12px;
+    padding: 16px;
+    font-size: 0.86rem;
+    color: #6B6172;
+    line-height: 1.6;
+    margin-top: 10px;
+}
+.af-empty b { color: #2C1F33; 
+}
 /* -- daftar file (chip) -- */
 .af-files-label {
     font-size: 0.7rem; font-weight: 700; color: #A095AC;
