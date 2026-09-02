@@ -203,6 +203,16 @@ def handle_chat_request(answer_slot) -> None:
             kartu = {}
         if not full:
             full = kartu.get("question") or "…"
+                # Blok [[TUGAS]] di halaman AI Penjadwal -> langsung masuk daftar tugas.
+        if st.session_state.get("page") == "jadwal":
+            try:
+                from page_jadwal import serap_blok_tugas
+                full, jml = serap_blok_tugas(full)
+                if jml:
+                    st.toast(f"{jml} tugas ditambahkan ke daftar.",
+                             icon=":material/task_alt:")
+            except Exception:
+                pass
         # Blok [[KARTU:...]] -> kartu visual (perbandingan, langkah, link).
         hasil_kartu = parse_cards(full)
         if isinstance(hasil_kartu, (tuple, list)) and len(hasil_kartu) == 2:
