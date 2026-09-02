@@ -1623,7 +1623,100 @@ div.stDownloadButton > button:hover {
     color: #A095AC;
     letter-spacing: 0.01em;
 }
+/* ---------- 4. KARTU PETA ---------- */
+[class*="st-key-rc_map_"] { max-width: 660px; margin-bottom: 14px; }
+[class*="st-key-rc_map_"] iframe {
+    border: 1px solid #E4D9C6 !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    background: #F6F1E7;
+}
+[class*="st-key-rc_map_"] [data-testid="stHorizontalBlock"] { gap: 10px !important; }
+.rc-map-side { padding: 14px 16px; height: 100%; }
+.rc-map-title {
+    font-size: 0.96rem; font-weight: 600; color: #2C1F33;
+    line-height: 1.35; margin-bottom: 5px;
+}
+.rc-map-desc {
+    font-size: 0.83rem; color: #6B6172; line-height: 1.5; margin-bottom: 9px;
+}
+.rc-map-link {
+    font-size: 0.82rem; font-weight: 600; color: #2C1F33 !important;
+    text-decoration: underline; text-underline-offset: 3px;
+}
+.rc-map-fallback { padding: 18px; text-align: center; }
 
+/* ---------- 5. KARTU ITINERARY ---------- */
+[class*="st-key-rc_itin_"] { max-width: 640px; margin-bottom: 14px; }
+[class*="st-key-rc_itin_"] [data-testid="stHorizontalBlock"] {
+    gap: 6px !important; margin-bottom: 4px !important;
+}
+[class*="st-key-rc_itin_"] div.stButton > button {
+    border-radius: 9px !important;
+    border: 1px solid #E4D9C6 !important;
+    background: #F6F1E7 !important;
+    color: #8E8398 !important;
+    font-size: 0.84rem !important;
+    font-weight: 600 !important;
+    min-height: 36px !important;
+    transition: background .15s ease, color .15s ease !important;
+}
+[class*="st-key-rc_itin_"] div.stButton > button[kind="primary"] {
+    background: #FFFFFF !important;
+    border-color: #DBCEB9 !important;
+    color: #2C1F33 !important;
+    box-shadow: 0 1px 3px rgba(44,31,51,0.08) !important;
+}
+.rc-itin { padding: 16px 18px 8px; }
+.rc-itin-day {
+    font-size: 0.78rem; font-weight: 700; color: #A095AC;
+    letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 12px;
+}
+.rc-itin-row { display: grid; grid-template-columns: 58px 18px 1fr; }
+.rc-itin-time {
+    font-size: 0.82rem; color: #8E8398; text-align: right;
+    padding-top: 2px; padding-right: 4px;
+}
+.rc-itin-mark { position: relative; display: flex; justify-content: center; }
+.rc-itin-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #C9BCA6; margin-top: 7px; z-index: 1;
+}
+/* garis penghubung antar titik linimasa */
+.rc-itin-row:not(:last-child) .rc-itin-mark::after {
+    content: ""; position: absolute; top: 15px; bottom: -6px;
+    width: 1px; background: #EAE0D0;
+}
+.rc-itin-body { padding: 0 0 16px 6px; }
+.rc-itin-act {
+    font-size: 0.98rem; font-weight: 600; color: #2C1F33;
+    letter-spacing: -0.01em; line-height: 1.35;
+}
+.rc-itin-note {
+    font-size: 0.85rem; color: #6B6172; line-height: 1.5; margin-top: 2px;
+}
+
+/* ---------- 6. KARTU TERJEMAHAN ---------- */
+.rc-tr { display: grid; grid-template-columns: 1fr 1fr; }
+.rc-tr-pane { padding: 13px 16px 15px; }
+.rc-tr-pane:last-child { border-left: 1px solid #F3ECE0; }
+.rc-tr-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 8px;
+}
+.rc-tr-lang { font-size: 0.78rem; color: #8E8398; letter-spacing: 0.01em; }
+.rc-tr-text {
+    font-size: 0.96rem; color: #2C1F33; line-height: 1.5; font-weight: 500;
+}
+.rc-icon-btn {
+    background: transparent; border: none; cursor: pointer;
+    font-size: 0.86rem; line-height: 1; padding: 2px 4px;
+    border-radius: 6px; color: #8E8398;
+    transition: background .15s ease, transform .1s ease;
+}
+.rc-icon-btn:hover { background: rgba(44,31,51,0.06); }
+.rc-icon-btn:active { transform: scale(0.9); 
+}
 /* ---------- layar sempit ---------- */
 @media (max-width: 640px) {
     .rc-card { max-width: 100%; }
@@ -1633,7 +1726,14 @@ div.stDownloadButton > button:hover {
         border-top: 1px solid #F3ECE0;
     }
     [class*="st-key-rc_nav_"] { max-width: 100%; }
-}
+    [class*="st-key-rc_map_"], [class*="st-key-rc_itin_"] { max-width: 100%; }
+    .rc-tr { grid-template-columns: 1fr; }
+    .rc-tr-pane:last-child {
+        border-left: none;
+        border-top: 1px solid #F3ECE0;
+    }
+    .rc-itin-row { grid-template-columns: 48px 16px 1fr; 
+    }
 /* ====================================================================
    KARTU PILIHAN INTERAKTIF (quick reply)
    Muncul di bawah jawaban Yuki saat dia perlu memastikan sesuatu.
