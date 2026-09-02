@@ -1862,145 +1862,168 @@ div.stDownloadButton > button:hover {
     margin-bottom: 8px !important;
 }
 /* ---------- 9. PANEL FILE / ARTEFAK (sidebar kanan) ---------- */
-/* -- kartu ringkas pengganti blok kode di dalam chat -- */
+/* -- kartu ringkas di dalam chat -- */
 .af-chip {
     display: flex; align-items: center; gap: 9px; flex-wrap: wrap;
-    background: #F7F1E6;
-    border: 1px solid #E0D2BB;
-    border-radius: 11px;
-    padding: 10px 13px;
-    margin: 6px 0 4px;
-    max-width: 460px;
+    background: #F7F1E6; border: 1px solid #E0D2BB; border-radius: 11px;
+    padding: 10px 13px; margin: 6px 0 4px; max-width: 460px;
     animation: iosPopIn .34s cubic-bezier(.32,.72,0,1) both;
 }
 .af-chip-ic {
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.78rem; font-weight: 700; color: #FBF6EC;
-    background: #2C1F33; border-radius: 7px;
-    padding: 3px 7px; line-height: 1.2;
+    background: #2C1F33; border-radius: 7px; padding: 3px 7px; line-height: 1.2;
 }
 .af-chip-name {
     font-size: 0.92rem; font-weight: 600; color: #2C1F33;
     font-family: 'JetBrains Mono', monospace;
 }
 .af-chip-meta { font-size: 0.76rem; color: #A095AC; }
-
 [class*="st-key-af_open_"] div.stButton > button {
-    background: transparent !important;
-    border: 1px solid #DBCEB9 !important;
-    border-radius: 9px !important;
-    color: #4A3559 !important;
-    font-size: 0.82rem !important;
-    font-weight: 600 !important;
-    min-height: 34px !important;
-    margin-bottom: 12px !important;
+    background: transparent !important; border: 1px solid #DBCEB9 !important;
+    border-radius: 9px !important; color: #4A3559 !important;
+    font-size: 0.8rem !important; font-weight: 600 !important;
+    min-height: 30px !important; margin-top: 4px !important;
 }
 [class*="st-key-af_open_"] div.stButton > button:hover {
     background: #E0D2BB !important; border-color: #2C1F33 !important;
 }
 
-/* -- header panel -- */
-.af-head {
-    padding-bottom: 12px;
-    border-bottom: 1px solid #E4D9C6;
-    margin-bottom: 4px;
+/* ================= TAMPILAN DAFTAR ================= */
+.af-sec {
+    font-size: 1.28rem; font-weight: 650; color: #2C1F33;
+    letter-spacing: -0.02em; margin: 2px 0 12px;
+    font-family: 'Source Serif 4', serif;
 }
-.af-head-row { display: flex; align-items: center; gap: 9px; }
-.af-head-ic {
+.af-sec-2 { margin-top: 22px; }
+
+/* tombol "Unduh semua" */
+[class*="st-key-af_dlall"] div.stDownloadButton > button {
+    background: transparent !important; border: none !important;
+    color: #2C1F33 !important; font-size: 0.9rem !important;
+    font-weight: 600 !important; justify-content: flex-end !important;
+    min-height: 30px !important; margin: -46px 0 10px !important;
+}
+[class*="st-key-af_dlall"] div.stDownloadButton > button:hover {
+    color: #4A3559 !important; text-decoration: underline !important;
+}
+
+/* kartu file */
+[class*="st-key-af_card_"] {
+    background: #FFFFFF !important; border: 1px solid #EAE0D0 !important;
+    border-radius: 14px !important; padding: 12px 14px !important;
+    margin-bottom: 10px !important;
+    box-shadow: 0 1px 3px rgba(44,31,51,0.04) !important;
+    transition: border-color .15s ease, box-shadow .15s ease !important;
+}
+[class*="st-key-af_card_"]:hover {
+    border-color: #DBCEB9 !important;
+    box-shadow: 0 4px 14px rgba(44,31,51,0.08) !important;
+}
+[class*="st-key-af_card_"] [data-testid="stHorizontalBlock"] {
+    gap: 10px !important; align-items: center !important;
+}
+.af-file-ic {
+    width: 46px; height: 54px; border-radius: 8px;
+    background: linear-gradient(150deg, #F6E7CE 0%, #EFD9B4 100%);
+    border: 1px solid #E3C89B;
+    display: grid; place-items: center;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.74rem; font-weight: 700; color: #FBF6EC;
-    background: #2C1F33; border-radius: 7px;
-    padding: 3px 7px; line-height: 1.2; flex: 0 0 auto;
+    font-size: 0.95rem; font-weight: 700; color: #B5762F;
 }
-.af-head-title {
-    font-size: 0.98rem; font-weight: 650; color: #2C1F33;
-    font-family: 'JetBrains Mono', monospace;
-    word-break: break-all; line-height: 1.3;
+.af-file-name {
+    font-size: 1.05rem; font-weight: 600; color: #2C1F33; line-height: 1.25;
+    word-break: break-all;
 }
-.af-head-meta {
-    font-size: 0.75rem; color: #A095AC; margin-top: 7px;
-    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+.af-file-ext {
+    font-size: 0.82rem; color: #A095AC; margin-top: 1px;
+    text-transform: uppercase; letter-spacing: 0.03em;
+}
+[class*="st-key-af_card_"] div.stDownloadButton > button {
+    background: transparent !important; border: none !important;
+    color: #6B6172 !important; min-height: 32px !important;
+    padding: 0 !important;
+}
+[class*="st-key-af_card_"] div.stDownloadButton > button:hover {
+    color: #2C1F33 !important;
+}
+
+/* petak Konten (gambar) */
+[class*="st-key-af_konten"] [data-testid="stHorizontalBlock"] {
+    gap: 10px !important; margin-bottom: 10px !important;
+}
+[class*="st-key-af_konten"] [data-testid="stImage"] img {
+    border-radius: 12px !important; border: 1px solid #EAE0D0 !important;
+    background: #FFFFFF;
+}
+
+/* panel kosong */
+.af-empty {
+    background: #FFFFFF; border: 1px dashed #DBCEB9; border-radius: 12px;
+    padding: 16px; font-size: 0.86rem; color: #6B6172; line-height: 1.6;
+}
+.af-empty b { color: #2C1F33; }
+
+/* ================= TAMPILAN ISI FILE ================= */
+.af-title-row { display: flex; align-items: baseline; gap: 2px; padding-top: 4px; }
+.af-title {
+    font-size: 1.18rem; font-weight: 650; color: #2C1F33;
+    letter-spacing: -0.02em; font-family: 'Source Serif 4', serif;
+}
+.af-title-ext { font-size: 0.95rem; color: #A095AC; }
+
+[class*="st-key-af_actbar"] [data-testid="stHorizontalBlock"] {
+    gap: 6px !important; align-items: center !important;
 }
 .af-copy {
-    background: transparent; border: 1px solid #DBCEB9;
-    border-radius: 7px; cursor: pointer;
-    font-size: 0.72rem; font-weight: 600; color: #6B6172;
-    padding: 3px 9px; margin-left: auto;
-    transition: background .15s ease, color .15s ease, transform .1s ease;
+    background: #FFFFFF; border: 1px solid #DBCEB9; border-radius: 9px;
+    cursor: pointer; font-size: 0.82rem; font-weight: 600; color: #2C1F33;
+    padding: 7px 14px; width: 100%;
+    transition: background .15s ease, transform .1s ease;
 }
-.af-copy:hover { background: #E0D2BB; color: #2C1F33; }
-.af-copy:active { transform: scale(0.94); }
+.af-copy:hover { background: #F2E8D6; }
+.af-copy:active { transform: scale(0.96); }
+[class*="st-key-af_actbar"] div.stButton > button {
+    background: #FFFFFF !important; border: 1px solid #DBCEB9 !important;
+    color: #4A3559 !important; border-radius: 9px !important;
+    width: 34px !important; min-width: 34px !important; height: 34px !important;
+    padding: 0 !important;
+}
+[class*="st-key-af_actbar"] div.stButton > button:hover {
+    background: #F2E8D6 !important; border-color: #2C1F33 !important;
+}
+[class*="st-key-af_back"] div.stButton > button {
+    background: transparent !important; border: none !important;
+    color: #8E8398 !important; font-size: 0.8rem !important;
+    min-height: 26px !important; padding: 0 !important;
+    margin: -2px 0 8px !important;
+}
+[class*="st-key-af_back"] div.stButton > button:hover { color: #2C1F33 !important; }
 
-/* -- panel saat belum ada file -- */
-.af-empty {
-    background: #FFFFFF;
-    border: 1px dashed #DBCEB9;
-    border-radius: 12px;
-    padding: 16px;
-    font-size: 0.86rem;
-    color: #6B6172;
-    line-height: 1.6;
-    margin-top: 10px;
+/* kotak kode: nomor baris + pewarnaan */
+.af-codebox {
+    background: #FFFFFF; border: 1px solid #EAE0D0; border-radius: 12px;
+    padding: 12px 4px 12px 0; overflow: auto; max-height: 64vh;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.79rem;
+    line-height: 1.75;
 }
-.af-empty b { color: #2C1F33; 
+.af-ln { display: flex; white-space: pre; }
+.af-ln:hover { background: #FBF7F0; }
+.af-num {
+    flex: 0 0 46px; text-align: right; padding-right: 14px;
+    color: #C4BACF; user-select: none;
 }
-/* -- daftar file (chip) -- */
-.af-files-label {
-    font-size: 0.7rem; font-weight: 700; color: #A095AC;
-    letter-spacing: 0.06em; text-transform: uppercase;
-    margin: 10px 0 2px;
-}
-[class*="st-key-af_files"] [data-testid="stHorizontalBlock"] {
-    gap: 6px !important; margin-bottom: 6px !important;
-}
-[class*="st-key-af_files"] div.stButton > button {
-    background: #FFFFFF !important;
-    border: 1px solid #E0D2BB !important;
-    border-radius: 8px !important;
-    color: #6B6172 !important;
-    font-family: 'JetBrains Mono', monospace !important;
-    font-size: 0.74rem !important;
-    min-height: 30px !important;
-    padding: 0 8px !important;
-    overflow: hidden !important;
-}
-[class*="st-key-af_files"] div.stButton > button[kind="primary"] {
-    background: #2C1F33 !important;
-    border-color: #2C1F33 !important;
-    color: #FBF6EC !important;
-    font-weight: 700 !important;
-}
+.af-code { white-space: pre; color: #2C1F33; padding-right: 14px; }
+.af-code .k-key { color: #7A3E9D; font-weight: 600; }   /* kata kunci */
+.af-code .k-str { color: #1F7A4D; }                      /* teks */
+.af-code .k-com { color: #A095AC; font-style: italic; }  /* komentar */
+.af-code .k-num { color: #B5762F; }                      /* angka */
 
-/* -- kotak kode di panel -- */
-.st-key-art_panel [data-testid="stCode"],
-.st-key-art_panel pre {
-    border-radius: 12px !important;
-    border: 1px solid #E4D9C6 !important;
-    max-height: 58vh !important;
-    font-size: 0.8rem !important;
-}
-
-/* -- aksi bawah panel -- */
 [class*="st-key-af_actions"] div.stDownloadButton > button {
-    background: #2C1F33 !important;
-    border: none !important;
-    color: #FBF6EC !important;
-    border-radius: 10px !important;
-    font-size: 0.84rem !important;
-    font-weight: 600 !important;
-    min-height: 40px !important;
-}
-[class*="st-key-af_actions"] div.stButton > button {
-    background: transparent !important;
-    border: 1px solid #DBCEB9 !important;
-    color: #6B6172 !important;
-    border-radius: 10px !important;
-    font-size: 0.82rem !important;
-    min-height: 36px !important;
-    margin-top: 6px !important;
-}
-[class*="st-key-af_actions"] div.stButton > button:hover {
-    background: #E0D2BB !important; color: #2C1F33 !important;
+    background: #2C1F33 !important; border: none !important;
+    color: #FBF6EC !important; border-radius: 10px !important;
+    font-size: 0.84rem !important; font-weight: 600 !important;
+    min-height: 40px !important; margin-top: 10px !important;
 }
 /* ---------- layar sempit ---------- */
 @media (max-width: 640px) {
