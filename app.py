@@ -55,6 +55,8 @@ from ui_helpers import (
     logo_img_html, render_message,
 )
 from anim import inject_anim_css, inject_page_anim
+from page_desain import page_desain
+from page_jadwal import page_jadwal
 from styles import inject_css
 from chat_handlers import (
     process_user_input, render_input_controls, render_pending_preview,
@@ -1324,6 +1326,10 @@ def main() -> None:
         page_kursus()
     elif page == "pelajari":
         page_pelajari()
+    elif page == "desain":
+        page_desain()
+    elif page == "jadwal":
+        page_jadwal()
     else:
         render_chat_page()
 
