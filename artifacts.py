@@ -2,13 +2,14 @@
 """
 PANEL ARTEFAK (sidebar kanan) — ala Claude Artifacts.
 
-Alur kerjanya:
-  1. Yuki menulis jawaban berisi blok kode ```...```
-  2. ambil_artefak() memotong blok itu dari teks chat, menyimpannya sebagai
-     "file", lalu menyisipkan kartu ringkas (nama file + bahasa + jumlah baris)
-  3. Panel kanan otomatis terbuka menampilkan isi file lengkapnya
+Dua tampilan:
+  DAFTAR : bagian "Artefak" (kartu file + unduh semua) dan "Konten"
+           (petak gambar hasil buatan Yuki)
+  ISI    : kode dengan nomor baris + pewarnaan sintaks, tombol Salin,
+           perlebar, dan tutup
 
-Jadi chat tetap ringkas, kode dibaca di panel khusus.
+Alur: Yuki menulis blok kode ```...``` -> ambil_artefak() memotongnya dari
+teks chat, menyimpannya sebagai file, lalu panel ini terbuka otomatis.
 
 >>> ATUR LEBAR & PERILAKU PANEL DI BAGIAN "PENGATURAN" DI BAWAH <<<
 """
@@ -17,7 +18,9 @@ from __future__ import annotations
 
 import base64
 import html
+import io
 import re
+import zipfile
 from datetime import datetime
 
 import streamlit as st
@@ -25,14 +28,14 @@ import streamlit as st
 # ============================================================================
 # PENGATURAN
 # ============================================================================
-PANEL_LEBAR_PX = 460        # lebar panel kanan
+PANEL_LEBAR_PX = 470        # lebar panel kanan
+PANEL_LEBAR_LEBAR_PX = 860  # lebar saat tombol "perlebar" ditekan
 BUKA_OTOMATIS = True        # panel langsung terbuka saat file baru dibuat
 MIN_BARIS_JADI_FILE = 3     # blok kode lebih pendek dari ini tetap di chat
-MIN_KARAKTER_JADI_FILE = 40 # ...begitu juga yang terlalu sedikit karakternya
+MIN_KARAKTER_JADI_FILE = 40
 BARIS_LANGSUNG_FILE = 5     # sebanyak ini baris ke atas: selalu jadi file
 # ============================================================================
 
-# ekstensi berkas menurut bahasa yang ditulis Yuki di pagar kode
 _EKSTENSI = {
     "python": "py", "py": "py", "javascript": "js", "js": "js",
     "typescript": "ts", "ts": "ts", "html": "html", "css": "css",
@@ -44,10 +47,21 @@ _EKSTENSI = {
 }
 
 _KODE_RE = re.compile(r"```([a-zA-Z0-9_+-]*)\n(.*?)```", re.S)
-# "nama file" kalau Yuki menyebutnya di baris sebelum blok kode
 _NAMA_RE = re.compile(r"([\w./-]+\.[A-Za-z0-9]{1,5})\s*:?\s*$")
 
+_KATA_KUNCI = {
+    "def", "class", "return", "import", "from", "as", "if", "elif", "else",
+    "for", "while", "in", "not", "and", "or", "is", "None", "True", "False",
+    "try", "except", "finally", "raise", "with", "lambda", "yield", "pass",
+    "break", "continue", "global", "nonlocal", "assert", "del", "async", "await",
+    "function", "const", "let", "var", "new", "this", "export", "default",
+    "public", "private", "static", "void", "int", "str", "bool", "float",
+}
 
+
+# ============================================================================
+# PENYIMPANAN
+# ============================================================================
 def daftar_artefak() -> list[dict]:
     if "artifacts" not in st.session_state:
         st.session_state.artifacts = []
@@ -55,30 +69,20 @@ def daftar_artefak() -> list[dict]:
 
 
 def _tebak_nama(lang: str, kode: str, sebelum: str) -> str:
-    """Tebak nama file: dari teks sebelum blok, komentar di baris pertama,
-    atau nama umum sesuai bahasanya."""
     m = _NAMA_RE.search((sebelum or "").strip().splitlines()[-1]
                         if (sebelum or "").strip() else "")
     if m:
         return m.group(1)
-
     baris1 = (kode.splitlines() or [""])[0].strip()
     m2 = re.search(r"([\w./-]+\.[A-Za-z0-9]{1,5})", baris1)
     if m2 and baris1.startswith(("#", "//", "/*", "<!--")):
         return m2.group(1)
-
     ext = _EKSTENSI.get((lang or "").lower(), "txt")
-    n = len([a for a in daftar_artefak()]) + 1
-    return f"file_{n}.{ext}"
+    return f"file_{len(daftar_artefak()) + 1}.{ext}"
 
 
 def ambil_artefak(teks: str) -> tuple[str, list[int]]:
-    """Potong blok kode dari jawaban Yuki -> simpan sebagai file.
-
-    Mengembalikan (teks_tanpa_kode, daftar_id_file_baru).
-    Blok pendek dibiarkan tetap di chat supaya cuplikan singkat tidak
-    ikut jadi "file".
-    """
+    """Potong blok kode dari jawaban Yuki -> simpan sebagai file."""
     raw = teks or ""
     if "```" not in raw:
         return raw, []
@@ -90,27 +94,25 @@ def ambil_artefak(teks: str) -> tuple[str, list[int]]:
     for m in _KODE_RE.finditer(raw):
         lang = (m.group(1) or "").lower()
         kode = m.group(2).strip("\n")
+        potongan.append(raw[posisi:m.start()])
         sebelum = raw[posisi:m.start()]
-        potongan.append(sebelum)
         posisi = m.end()
 
         n_baris = len(kode.splitlines())
-        cukup_panjang = (
-            n_baris >= BARIS_LANGSUNG_FILE
-            or (n_baris >= MIN_BARIS_JADI_FILE and len(kode) >= MIN_KARAKTER_JADI_FILE)
-        )
-        if not cukup_panjang:
-            potongan.append(m.group(0))     # biarkan tetap di chat
+        layak = (n_baris >= BARIS_LANGSUNG_FILE
+                 or (n_baris >= MIN_BARIS_JADI_FILE
+                     and len(kode) >= MIN_KARAKTER_JADI_FILE))
+        if not layak:
+            potongan.append(m.group(0))
             continue
 
         st.session_state["artifact_counter"] = (
             st.session_state.get("artifact_counter", 0) + 1
         )
         aid = st.session_state["artifact_counter"]
-        nama = _tebak_nama(lang, kode, sebelum)
         daftar_artefak().insert(0, {
             "id": aid,
-            "title": nama,
+            "title": _tebak_nama(lang, kode, sebelum),
             "content": kode,
             "lang": lang or "text",
             "time": datetime.now().strftime("%H:%M"),
@@ -134,17 +136,18 @@ def kartu_file_html(ids: list[int]) -> str:
         art = next((a for a in daftar_artefak() if a["id"] == aid), None)
         if not art:
             continue
-        baris = len(art["content"].splitlines())
         kartu += (
-            '<div class="af-chip">'
-            '<span class="af-chip-ic">&lt;/&gt;</span>'
+            '<div class="af-chip"><span class="af-chip-ic">&lt;/&gt;</span>'
             f'<span class="af-chip-name">{html.escape(art["title"])}</span>'
-            f'<span class="af-chip-meta">{html.escape(art["lang"])} · {baris} baris</span>'
-            "</div>"
+            f'<span class="af-chip-meta">{html.escape(art["lang"])} · '
+            f'{len(art["content"].splitlines())} baris</span></div>'
         )
     return kartu
 
 
+# ============================================================================
+# AKSI PANEL
+# ============================================================================
 def buka_panel(aid: int) -> None:
     st.session_state["artifact_panel_open"] = True
     st.session_state["artifact_panel_id"] = aid
@@ -164,8 +167,61 @@ def pilih_file(aid: int) -> None:
     st.session_state["artifact_panel_id"] = aid
 
 
-def _tombol_salin_html(teks: str) -> str:
-    """Tombol salin isi file (JS inline, tanpa dependensi lain)."""
+def kembali_ke_daftar() -> None:
+    st.session_state["artifact_panel_id"] = None
+
+
+def toggle_lebar() -> None:
+    st.session_state["artifact_panel_wide"] = not st.session_state.get(
+        "artifact_panel_wide", False
+    )
+
+
+# ============================================================================
+# TAMPILAN KODE: nomor baris + pewarnaan sintaks sederhana
+# ============================================================================
+def _warnai(baris: str) -> str:
+    """Pewarnaan sintaks ringan tanpa pustaka luar (Pygments tidak ada di
+    lingkungan Streamlit Cloud kita). Urutannya penting: komentar dan teks
+    dikunci lebih dulu agar isinya tidak ikut diwarnai sebagai kata kunci."""
+    hasil: list[str] = []
+    pola = re.compile(
+        r'(?P<komentar>#[^\n]*|//[^\n]*)'
+        r'|(?P<teks>"""[\s\S]*?"""|\'\'\'[\s\S]*?\'\'\'|"[^"\n]*"|\'[^\'\n]*\')'
+        r'|(?P<angka>\b\d+(?:\.\d+)?\b)'
+        r'|(?P<kata>\b[A-Za-z_][A-Za-z_0-9]*\b)'
+    )
+    posisi = 0
+    for m in pola.finditer(baris):
+        hasil.append(html.escape(baris[posisi:m.start()]))
+        posisi = m.end()
+        isi = html.escape(m.group(0))
+        if m.lastgroup == "komentar":
+            hasil.append(f'<span class="k-com">{isi}</span>')
+        elif m.lastgroup == "teks":
+            hasil.append(f'<span class="k-str">{isi}</span>')
+        elif m.lastgroup == "angka":
+            hasil.append(f'<span class="k-num">{isi}</span>')
+        elif m.group(0) in _KATA_KUNCI:
+            hasil.append(f'<span class="k-key">{isi}</span>')
+        else:
+            hasil.append(isi)
+    hasil.append(html.escape(baris[posisi:]))
+    return "".join(hasil) or "&nbsp;"
+
+
+def _kode_html(kode: str) -> str:
+    """Kode dengan nomor baris, siap ditempel sebagai HTML."""
+    baris_html = ""
+    for i, b in enumerate(kode.splitlines() or [""], start=1):
+        baris_html += (
+            '<div class="af-ln"><span class="af-num">' + str(i) + "</span>"
+            '<span class="af-code">' + _warnai(b) + "</span></div>"
+        )
+    return '<div class="af-codebox">' + baris_html + "</div>"
+
+
+def _tombol_salin_html(teks: str, label: str = "Salin") -> str:
     b64 = base64.b64encode((teks or "").encode("utf-8")).decode("ascii")
     return (
         '<button class="af-copy" data-b64="' + b64 + '" '
@@ -173,87 +229,224 @@ def _tombol_salin_html(teks: str) -> str:
         "navigator.clipboard.writeText(decodeURIComponent(escape(t)));"
         "const o=this.innerHTML;this.innerHTML='Tersalin';"
         'setTimeout(()=>{this.innerHTML=o;},1300);" '
-        'title="Salin seluruh isi file">Salin</button>'
+        'title="Salin seluruh isi">' + html.escape(label) + "</button>"
     )
 
 
-def _css_panel(terbuka: bool) -> str:
-    """CSS panel + tombol mengambang. Lebarnya mengikuti PANEL_LEBAR_PX."""
-    w = str(PANEL_LEBAR_PX)
-    geser = str(PANEL_LEBAR_PX + 26) if terbuka else "18"
+def _zip_semua(daftar: list[dict]) -> bytes:
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
+        dipakai: set[str] = set()
+        for a in daftar:
+            nama = a["title"]
+            n = 1
+            while nama in dipakai:
+                n += 1
+                nama = f"{n}_{a['title']}"
+            dipakai.add(nama)
+            z.writestr(nama, a["content"])
+    return buf.getvalue()
+
+
+def _gambar_sesi() -> list[dict]:
+    """Kumpulkan gambar hasil buatan Yuki dari semua thread (bagian Konten)."""
+    keluar: list[dict] = []
+    for kunci, nilai in st.session_state.items():
+        if not isinstance(nilai, list):
+            continue
+        if not (kunci == "messages" or str(kunci).endswith("_msgs")
+                or str(kunci).startswith(("mode_msgs", "course_msgs",
+                                          "artifact_msgs"))):
+            continue
+        for m in nilai:
+            if isinstance(m, dict) and m.get("type") == "image" and m.get("image_bytes"):
+                keluar.append(m)
+    return keluar[-8:]
+
+
+# ============================================================================
+# CSS PANEL
+# ============================================================================
+def _css_panel(terbuka: bool, lebar: bool) -> str:
+    w = PANEL_LEBAR_LEBAR_PX if lebar else PANEL_LEBAR_PX
+    geser = str(w + 26) if terbuka else "18"
     return (
         "<style>"
-        # ---------- panel ----------
         ".st-key-art_panel{"
-        "position:fixed !important;"
-        "top:3.2rem !important;right:0 !important;bottom:0 !important;"
-        "width:" + w + "px !important;"
-        "background:#F7F1E6 !important;"
-        "border-left:1px solid #DBCEB9 !important;"
-        "padding:16px 18px 90px !important;"
-        "overflow-y:auto !important;"
+        "position:fixed !important;top:3.2rem !important;right:0 !important;"
+        "bottom:0 !important;width:" + str(w) + "px !important;"
+        "background:#FBF7F0 !important;border-left:1px solid #E4D9C6 !important;"
+        "padding:18px 18px 90px !important;overflow-y:auto !important;"
         "z-index:999990 !important;"
         "box-shadow:-10px 0 30px rgba(44,31,51,0.07) !important;"
-        "animation:afSlideIn .34s cubic-bezier(.32,.72,0,1) both;"
-        "}"
+        "transition:width .3s cubic-bezier(.32,.72,0,1) !important;"
+        "animation:afSlideIn .34s cubic-bezier(.32,.72,0,1) both;}"
         "@keyframes afSlideIn{from{opacity:0;transform:translateX(30px);}"
         "to{opacity:1;transform:translateX(0);}}"
-        ".st-key-art_panel [data-testid='stVerticalBlock']{gap:.55rem !important;}"
+        ".st-key-art_panel [data-testid='stVerticalBlock']{gap:.5rem !important;}"
 
-        # ---------- tombol mengambang buka/tutup ----------
-        ".st-key-af_toggle{"
-        "position:fixed !important;"
-        "top:50% !important;right:" + geser + "px !important;"
-        "transform:translateY(-50%) !important;"
-        "width:44px !important;margin:0 !important;"
-        "z-index:999995 !important;"
-        "transition:right .34s cubic-bezier(.32,.72,0,1) !important;"
-        "}"
+        # tombol mengambang buka/tutup - senada tema (krem), ikon Material
+        ".st-key-af_toggle{position:fixed !important;top:50% !important;"
+        "right:" + geser + "px !important;transform:translateY(-50%) !important;"
+        "width:46px !important;margin:0 !important;z-index:999995 !important;"
+        "transition:right .3s cubic-bezier(.32,.72,0,1) !important;}"
         ".st-key-af_toggle div.stButton > button{"
-        "background:#2C1F33 !important;border:none !important;"
-        "color:#FBF6EC !important;"
-        "width:44px !important;min-width:44px !important;height:44px !important;"
-        "padding:0 !important;border-radius:13px !important;"
-        "font-size:.95rem !important;font-weight:700 !important;"
-        "box-shadow:0 6px 18px rgba(44,31,51,0.22) !important;"
-        "transition:transform .15s ease, background .15s ease !important;"
-        "}"
+        "background:#F2E8D6 !important;border:1px solid #DBCEB9 !important;"
+        "color:#4A3559 !important;width:46px !important;min-width:46px !important;"
+        "height:46px !important;padding:0 !important;border-radius:14px !important;"
+        "box-shadow:0 4px 14px rgba(44,31,51,0.12) !important;"
+        "transition:transform .15s ease, background .15s ease !important;}"
         ".st-key-af_toggle div.stButton > button:hover{"
-        "background:#40304A !important;transform:scale(1.06) !important;}"
-        ".st-key-af_toggle div.stButton > button:active{"
-        "transform:scale(.94) !important;}"
+        "background:#FFFFFF !important;border-color:#2C1F33 !important;"
+        "transform:scale(1.06) !important;}"
+        ".st-key-af_toggle div.stButton > button:active{transform:scale(.94) !important;}"
+        ".st-key-af_toggle [data-testid='stIconMaterial']{"
+        "font-size:1.35rem !important;width:1.35rem !important;height:1.35rem !important;}"
 
-        # ---------- geser isi halaman ----------
-        "[data-testid='stMainBlockContainer']{"
-        "padding-right:" + (str(PANEL_LEBAR_PX + 40) if terbuka else "1rem")
-        + " !important;transition:padding-right .34s cubic-bezier(.32,.72,0,1);"
-        "}"
+        "[data-testid='stMainBlockContainer']{padding-right:"
+        + (str(w + 40) + "px" if terbuka else "1rem")
+        + " !important;transition:padding-right .3s cubic-bezier(.32,.72,0,1);}"
 
-        # ---------- layar sempit: panel jadi layar penuh ----------
         "@media (max-width:1100px){"
         ".st-key-art_panel{width:100% !important;top:0 !important;}"
         "[data-testid='stMainBlockContainer']{padding-right:1rem !important;}"
         ".st-key-af_toggle{right:14px !important;top:auto !important;"
-        "bottom:96px !important;transform:none !important;}"
-        "}"
+        "bottom:96px !important;transform:none !important;}}"
         "</style>"
     )
 
 
+# ============================================================================
+# TAMPILAN 1: DAFTAR (Artefak + Konten)
+# ============================================================================
+def _render_daftar(daftar: list[dict]) -> None:
+    st.markdown('<div class="af-sec">Artefak</div>', unsafe_allow_html=True)
+
+    if not daftar:
+        st.markdown(
+            '<div class="af-empty">Minta Yuki membuat kode atau file, '
+            "misalnya <b>\"buatkan kalkulator python\"</b>. Hasilnya otomatis "
+            "muncul di panel ini, bukan memenuhi ruang chat.</div>",
+            unsafe_allow_html=True,
+        )
+    else:
+        with st.container(key="af_dlall"):
+            st.download_button(
+                ":material/download:  Unduh semua",
+                data=_zip_semua(daftar),
+                file_name="artefak-trinity.zip",
+                mime="application/zip",
+                key="af_zip",
+                use_container_width=True,
+            )
+
+        for a in daftar[:20]:
+            nama = a["title"].rsplit(".", 1)[0]
+            ext = (a["title"].rsplit(".", 1)[-1] if "." in a["title"]
+                   else a["lang"]).upper()
+            with st.container(key=f"af_card_{a['id']}"):
+                ikon, isi, unduh = st.columns([0.22, 1.0, 0.2])
+                with ikon:
+                    st.markdown('<div class="af-file-ic">&lt;/&gt;</div>',
+                                unsafe_allow_html=True)
+                with isi:
+                    st.markdown(
+                        '<div class="af-file-name">' + html.escape(nama) + "</div>"
+                        '<div class="af-file-ext">' + html.escape(ext) + "</div>",
+                        unsafe_allow_html=True,
+                    )
+                    st.button("Buka", key=f"af_open_{a['id']}",
+                              use_container_width=True,
+                              on_click=pilih_file, args=(a["id"],))
+                with unduh:
+                    st.download_button(
+                        ":material/download:",
+                        data=a["content"],
+                        file_name=a["title"],
+                        mime="text/plain",
+                        key=f"af_dl1_{a['id']}",
+                    )
+
+    # ---- bagian Konten: gambar hasil buatan Yuki ----
+    gambar = _gambar_sesi()
+    if gambar:
+        st.markdown('<div class="af-sec af-sec-2">Konten</div>',
+                    unsafe_allow_html=True)
+        with st.container(key="af_konten"):
+            for i in range(0, len(gambar), 2):
+                pasangan = gambar[i:i + 2]
+                cols = st.columns(len(pasangan))
+                for j, m in enumerate(pasangan):
+                    with cols[j]:
+                        st.image(m["image_bytes"], use_container_width=True)
+
+
+# ============================================================================
+# TAMPILAN 2: ISI FILE
+# ============================================================================
+def _render_isi(aktif: dict, lebar: bool) -> None:
+    ext = (aktif["title"].rsplit(".", 1)[-1] if "." in aktif["title"]
+           else aktif["lang"]).upper()
+    nama = aktif["title"].rsplit(".", 1)[0]
+
+    judul, aksi = st.columns([1.0, 0.62])
+    with judul:
+        st.markdown(
+            '<div class="af-title-row"><span class="af-title">'
+            + html.escape(nama) + '</span><span class="af-title-ext"> · '
+            + html.escape(ext) + "</span></div>",
+            unsafe_allow_html=True,
+        )
+    with aksi:
+        with st.container(key="af_actbar"):
+            c1, c2, c3 = st.columns([1.0, 0.42, 0.42])
+            with c1:
+                st.markdown(_tombol_salin_html(aktif["content"]),
+                            unsafe_allow_html=True)
+            with c2:
+                st.button(":material/close_fullscreen:" if lebar
+                          else ":material/open_in_full:",
+                          key="af_wide", help="Perlebar / kecilkan panel",
+                          on_click=toggle_lebar)
+            with c3:
+                st.button(":material/close:", key="af_close",
+                          help="Tutup panel", on_click=tutup_panel)
+
+    st.button(":material/arrow_back:  Semua file", key="af_back",
+              on_click=kembali_ke_daftar)
+
+    st.markdown(_kode_html(aktif["content"]), unsafe_allow_html=True)
+
+    with st.container(key="af_actions"):
+        st.download_button(
+            ":material/download:  Unduh " + aktif["title"],
+            data=aktif["content"],
+            file_name=aktif["title"],
+            mime="text/plain",
+            key=f"af_dl_{aktif['id']}",
+            use_container_width=True,
+        )
+
+
+# ============================================================================
+# PINTU MASUK
+# ============================================================================
 def render_panel() -> None:
-    """Panel kanan berisi file/kode buatan Yuki + tombol buka/tutup.
+    """Panel kanan + tombol mengambang buka/tutup.
 
     Streamlit tidak punya sidebar kanan bawaan, jadi panel ini container
     biasa yang DIPOSISIKAN ke kanan lewat CSS.
     """
     daftar = daftar_artefak()
     terbuka = bool(st.session_state.get("artifact_panel_open"))
-    st.markdown(_css_panel(terbuka), unsafe_allow_html=True)
+    lebar = bool(st.session_state.get("artifact_panel_wide"))
+    st.markdown(_css_panel(terbuka, lebar), unsafe_allow_html=True)
 
-    # ---- tombol mengambang: SELALU tampil, walau belum ada file ----
+    # tombol mengambang: SELALU tampil
     with st.container(key="af_toggle"):
         st.button(
-            "›" if terbuka else "‹",
+            ":material/right_panel_close:" if terbuka
+            else ":material/right_panel_open:",
             key="af_toggle_btn",
             help=("Tutup panel file" if terbuka
                   else (f"Buka panel file ({len(daftar)})" if daftar
@@ -264,77 +457,11 @@ def render_panel() -> None:
     if not terbuka:
         return
 
-    # ---- panel kosong: belum ada file yang dibuat Yuki ----
-    if not daftar:
-        with st.container(key="art_panel"):
-            atas, tutup = st.columns([1.0, 0.2])
-            with atas:
-                st.markdown(
-                    '<div class="af-head"><div class="af-head-row">'
-                    '<span class="af-head-ic">&lt;/&gt;</span>'
-                    '<span class="af-head-title">Panel File</span></div>'
-                    '<div class="af-head-meta">Belum ada file</div></div>',
-                    unsafe_allow_html=True,
-                )
-            with tutup:
-                st.button("✕", key="af_close_empty", help="Tutup panel",
-                          on_click=tutup_panel)
-            st.markdown(
-                '<div class="af-empty">Minta Yuki membuat kode atau file, '
-                "misalnya <b>\"buatkan kalkulator python\"</b>. Hasilnya otomatis "
-                "muncul di panel ini, bukan memenuhi ruang chat.</div>",
-                unsafe_allow_html=True,
-            )
-        return
-
-    aktif_id = st.session_state.get("artifact_panel_id") or daftar[0]["id"]
-    aktif = next((a for a in daftar if a["id"] == aktif_id), daftar[0])
-    baris = len(aktif["content"].splitlines())
+    aktif_id = st.session_state.get("artifact_panel_id")
+    aktif = next((a for a in daftar if a["id"] == aktif_id), None)
 
     with st.container(key="art_panel"):
-        # ---- header: judul + aksi ----
-        st.markdown(
-            '<div class="af-head">'
-            '<div class="af-head-row">'
-            '<span class="af-head-ic">&lt;/&gt;</span>'
-            '<span class="af-head-title">' + html.escape(aktif["title"]) + "</span>"
-            "</div>"
-            '<div class="af-head-meta">' + html.escape(aktif["lang"])
-            + " · " + str(baris) + " baris · " + html.escape(aktif.get("time", ""))
-            + "  " + _tombol_salin_html(aktif["content"]) + "</div></div>",
-            unsafe_allow_html=True,
-        )
-
-        # ---- daftar file (chip) bila lebih dari satu ----
-        if len(daftar) > 1:
-            st.markdown('<div class="af-files-label">File dalam sesi ini</div>',
-                        unsafe_allow_html=True)
-            with st.container(key="af_files"):
-                for i in range(0, min(len(daftar), 8), 2):
-                    pasangan = daftar[i:i + 2]
-                    cols = st.columns(len(pasangan))
-                    for j, a in enumerate(pasangan):
-                        with cols[j]:
-                            st.button(
-                                a["title"][:22],
-                                key=f"af_pick_{a['id']}",
-                                use_container_width=True,
-                                type="primary" if a["id"] == aktif["id"] else "secondary",
-                                on_click=pilih_file, args=(a["id"],),
-                            )
-
-        # ---- isi file ----
-        st.code(aktif["content"], language=aktif["lang"] or None)
-
-        # ---- aksi bawah ----
-        with st.container(key="af_actions"):
-            st.download_button(
-                ":material/download:  Unduh " + aktif["title"],
-                data=aktif["content"],
-                file_name=aktif["title"],
-                mime="text/plain",
-                key=f"af_dl_{aktif['id']}",
-                use_container_width=True,
-            )
-            st.button(":material/close:  Tutup panel", key="af_close",
-                      use_container_width=True, on_click=tutup_panel)
+        if aktif is None:
+            _render_daftar(daftar)
+        else:
+            _render_isi(aktif, lebar)
