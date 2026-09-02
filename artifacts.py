@@ -269,7 +269,7 @@ def _gambar_sesi() -> list[dict]:
 # ============================================================================
 def _css_panel(terbuka: bool, lebar: bool) -> str:
     w = PANEL_LEBAR_LEBAR_PX if lebar else PANEL_LEBAR_PX
-    geser = str(w + 26) if terbuka else "18"
+    geser = str(w + 15) if terbuka else "18"
     return (
         "<style>"
         ".st-key-art_panel{"
@@ -286,12 +286,12 @@ def _css_panel(terbuka: bool, lebar: bool) -> str:
         ".st-key-art_panel [data-testid='stVerticalBlock']{gap:.5rem !important;}"
 
         # tombol mengambang buka/tutup - senada tema (krem), ikon Material
-        ".st-key-af_toggle{position:fixed !important;top:50% !important;"
+        ".st-key-af_toggle{position:fixed !important;top:5% !important;"
         "right:" + geser + "px !important;transform:translateY(-50%) !important;"
         "width:46px !important;margin:0 !important;z-index:999995 !important;"
         "transition:right .3s cubic-bezier(.32,.72,0,1) !important;}"
         ".st-key-af_toggle div.stButton > button{"
-        "background:#F2E8D6 !important;border:1px solid #DBCEB9 !important;"
+        "background:#EDE2D1 !important;border:1px solid #DBCEB9 !important;"
         "color:#4A3559 !important;width:46px !important;min-width:46px !important;"
         "height:46px !important;padding:0 !important;border-radius:14px !important;"
         "box-shadow:0 4px 14px rgba(44,31,51,0.12) !important;"
