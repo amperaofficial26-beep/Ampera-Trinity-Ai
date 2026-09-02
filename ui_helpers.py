@@ -468,7 +468,6 @@ def render_quick_replies(msg: dict, aktif: bool = True) -> None:
                 args=(mid,),
             )
 
-
 def render_message(msg: dict) -> None:
     """Render 1 pesan: teks (bubble, bisa + gambar lampiran/suara) atau gambar."""
     if msg.get("type") == "image" and msg.get("image_bytes"):
@@ -477,7 +476,7 @@ def render_message(msg: dict) -> None:
                         msg.get("time", ""), icon_html=ICON_IMAGE),
             unsafe_allow_html=True,
         )
-                mid = msg.get("id", id(msg))
+        mid = msg.get("id", id(msg))
         # Hanya gambar TERAKHIR yang diberi animasi "tumbuh dari kotak
         # loading". Gambar lama di riwayat tidak ikut beranimasi setiap
         # kali halaman digambar ulang.
@@ -520,8 +519,7 @@ def render_message(msg: dict) -> None:
                 thread = active_thread()
                 terakhir = bool(thread) and thread[-1] is msg
                 render_quick_replies(msg, aktif=terakhir)
-
-
+                
 def _copy_button_html(text: str, key: str) -> str:
     """Tombol salin ala Claude (ikon polos) — teks disisipkan sebagai
     base64 di atribut data-* supaya aman dari karakter kutip/baris baru,
