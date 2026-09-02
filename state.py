@@ -48,6 +48,7 @@ def course_thread(cid: str) -> list[dict]:
         st.session_state[key] = []
     return st.session_state[key]
 
+
 def mode_thread(nama: str) -> list[dict]:
     """Riwayat pesan untuk halaman ber-mode khusus (desain, jadwal)."""
     key = f"mode_msgs_{nama}"
@@ -94,10 +95,11 @@ def drop_task(tid: int) -> None:
 
 def clear_done_tasks() -> None:
     st.session_state.tasks = [t for t in tasks() if not t["selesai"]]
-    
+
+
 def active_thread() -> list[dict]:
     """Riwayat pesan milik halaman yang sedang dibuka."""
-       page = st.session_state.get("page", "chat")
+    page = st.session_state.get("page", "chat")
     if page in ("desain", "jadwal"):
         return mode_thread(page)
     if page == "artefak":
