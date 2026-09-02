@@ -54,6 +54,7 @@ from ui_helpers import (
     _BOTTOM_RESET_CSS, _FRESH_BOTTOM_CSS, _page_footer, get_greeting,
     logo_img_html, render_message,
 )
+from anim import inject_anim_css, inject_page_anim
 from styles import inject_css
 from chat_handlers import (
     process_user_input, render_input_controls, render_pending_preview,
@@ -1288,6 +1289,7 @@ def page_kursus() -> None:
 def main() -> None:
     init_state()
     inject_css()
+    inject_anim_css()
 
     if st.session_state.get("logged_out"):
         st.session_state.logged_out = False
@@ -1305,13 +1307,7 @@ def main() -> None:
     # tombol apa pun (mengganggu).
     if st.session_state.get("_last_page") != page:
         st.session_state["_last_page"] = page
-        st.markdown(
-            "<style>[data-testid='stMainBlockContainer']{"
-            "animation:iosPageIn var(--ios-dur,450ms) "
-            "var(--ios-ease,cubic-bezier(.32,.72,0,1)) both;"
-            "transform-origin:left center;}</style>",
-            unsafe_allow_html=True,
-        )
+        inject_page_anim()
     if page == "artefak":
         page_artefak()
     elif page == "pengaturan":
