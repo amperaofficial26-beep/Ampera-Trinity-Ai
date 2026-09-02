@@ -24,9 +24,16 @@ HAS_DIALOG = hasattr(st, "dialog")
 #   melawan aturan lain. Perbesar Y = tombol naik.
 # ----------------------------------------------------------------------------
 ACCT_MENU_X_PX = 190   # jarak dari tepi KIRI layar
-ACCT_MENU_Y_PX = 5    # jarak dari DASAR layar
-# ============================================================================
+ACCT_MENU_Y_PX = 10    # jarak dari DASAR layar
 
+# Warna tombol ⋯ . Pakai "transparent" agar menyatu dengan latar sidebar,
+# atau tulis kode warna (mis. "#EDE2D1" = warna sidebar, "#E8DCC8" = warna
+# kanvas aplikasi).
+ACCT_MENU_BG = "transparent"        # latar tombol saat diam
+ACCT_MENU_BG_HOVER = "#E0D2BB"      # latar saat disentuh kursor
+ACCT_MENU_FG = "#6B6172"            # warna ikon titik tiga
+ACCT_MENU_BORDER = "transparent"    # garis tepi; "transparent" = tanpa garis
+# ============================================================================
 
 def go(page: str, **extra) -> None:
     """Pindah halaman internal (chat / artefak / pengaturan / …)."""
@@ -195,16 +202,45 @@ def render_sidebar() -> None:
                 # Style disuntik TEPAT di sini (setelah CSS utama), jadi
                 # pasti menang dan tombol tidak ikut hanyut mengikuti
                 # daftar menu sidebar.
-                st.markdown(
-                    "<style>.st-key-acct_menu{"
+                                # Gaya tombol titik tiga disusun sebagai string biasa
+                # (bukan f-string) supaya kurung kurawal CSS tidak bentrok
+                # dengan sintaks f-string Python.
+                gaya_acct = (
+                    "<style>"
+                    ".st-key-acct_menu{"
                     "position:fixed !important;"
-                    f"left:{ACCT_MENU_X_PX}px !important;"
-                    f"bottom:{ACCT_MENU_Y_PX}px !important;"
+                    "left:" + str(ACCT_MENU_X_PX) + "px !important;"
+                    "bottom:" + str(ACCT_MENU_Y_PX) + "px !important;"
                     "top:auto !important;right:auto !important;"
                     "width:32px !important;margin:0 !important;"
-                    "z-index:999996 !important;}</style>",
-                    unsafe_allow_html=True,
+                    "background:transparent !important;"
+                    "box-shadow:none !important;"
+                    "z-index:999996 !important;"
+                    "}"
+                    ".st-key-acct_menu [data-testid='stPopover'],"
+                    ".st-key-acct_menu [data-testid='stPopover'] > div,"
+                    ".st-key-acct_menu button,"
+                    ".st-key-acct_menu button[data-testid='stPopoverButton'],"
+                    ".st-key-acct_menu [data-testid='stBaseButton-secondary']{"
+                    "background:" + ACCT_MENU_BG + " !important;"
+                    "background-color:" + ACCT_MENU_BG + " !important;"
+                    "border:1px solid " + ACCT_MENU_BORDER + " !important;"
+                    "color:" + ACCT_MENU_FG + " !important;"
+                    "box-shadow:none !important;"
+                    "border-radius:8px !important;"
+                    "}"
+                    ".st-key-acct_menu button:hover{"
+                    "background:" + ACCT_MENU_BG_HOVER + " !important;"
+                    "background-color:" + ACCT_MENU_BG_HOVER + " !important;"
+                    "color:#2C1F33 !important;"
+                    "}"
+                    ".st-key-acct_menu button svg{"
+                    "fill:" + ACCT_MENU_FG + " !important;"
+                    "color:" + ACCT_MENU_FG + " !important;"
+                    "}"
+                    "</style>"
                 )
+                st.markdown(gaya_acct, unsafe_allow_html=True)
                 with st.container(key="acct_menu"):
                     with st.popover(":material/more_horiz:", use_container_width=False,
                                     help="Menu akun"):
