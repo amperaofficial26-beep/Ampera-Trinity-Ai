@@ -284,7 +284,17 @@ def _gambar_sesi() -> list[dict]:
 # ============================================================================
 def _css_panel(terbuka: bool, lebar: bool) -> str:
     w = PANEL_LEBAR_LEBAR_PX if lebar else PANEL_LEBAR_PX
-    geser = str(w + 5) if terbuka else "15"
+    geser = (str(w + TOMBOL_JARAK_PANEL_PX) if terbuka
+             else str(TOMBOL_JARAK_TEPI_PX))
+
+    if TOMBOL_POSISI == "atas":
+        posisi_css = ("top:" + str(TOMBOL_OFFSET_PX) + "px !important;"
+                      "bottom:auto !important;transform:none !important;")
+    elif TOMBOL_POSISI == "bawah":
+        posisi_css = ("bottom:" + str(TOMBOL_OFFSET_PX) + "px !important;"
+                      "top:auto !important;transform:none !important;")
+    else:
+        posisi_css = "top:50% !important;transform:translateY(-50%) !important;"
     return (
         "<style>"
         ".st-key-art_panel{"
@@ -300,23 +310,39 @@ def _css_panel(terbuka: bool, lebar: bool) -> str:
         "to{opacity:1;transform:translateX(0);}}"
         ".st-key-art_panel [data-testid='stVerticalBlock']{gap:.5rem !important;}"
 
-        # tombol mengambang buka/tutup - senada tema (krem), ikon Material
-        ".st-key-af_toggle{position:fixed !important;top:12% !important;"
-        "right:" + geser + "px !important;transform:translateY(-50%) !important;"
-        "width:46px !important;margin:0 !important;z-index:999995 !important;"
+        # --- tombol mengambang buka/tutup ---
+        # Awalan "body" menaikkan spesifisitas agar menang melawan aturan
+        # global div.stButton > button di styles.py.
+        "body .st-key-af_toggle{position:fixed !important;"
+        + posisi_css +
+        "right:" + geser + "px !important;"
+        "width:" + str(TOMBOL_UKURAN_PX) + "px !important;margin:0 !important;"
+        "z-index:999995 !important;"
         "transition:right .3s cubic-bezier(.32,.72,0,1) !important;}"
-        ".st-key-af_toggle div.stButton > button{"
-        "background:#EDE2D1 !important;border:1px solid #EDE2D1 !important;"
-        "color:#EDE2D1 !important;width:46px !important;min-width:46px !important;"
-        "height:46px !important;padding:0 !important;border-radius:14px !important;"
-        "box-shadow:0 4px 14px rgba(44,31,51,0.12) !important;"
+        "body .st-key-af_toggle div.stButton > button,"
+        "body .st-key-af_toggle button[kind='secondary'],"
+        "body .st-key-af_toggle [data-testid='stBaseButton-secondary']{"
+        "background:" + TOMBOL_BG + " !important;"
+        "background-color:" + TOMBOL_BG + " !important;"
+        "border:1px solid " + TOMBOL_GARIS + " !important;"
+        "color:" + TOMBOL_IKON + " !important;"
+        "width:" + str(TOMBOL_UKURAN_PX) + "px !important;"
+        "min-width:" + str(TOMBOL_UKURAN_PX) + "px !important;"
+        "height:" + str(TOMBOL_UKURAN_PX) + "px !important;"
+        "min-height:" + str(TOMBOL_UKURAN_PX) + "px !important;"
+        "padding:0 !important;"
+        "border-radius:" + str(TOMBOL_RADIUS_PX) + "px !important;"
+        "box-shadow:" + TOMBOL_BAYANGAN + " !important;"
         "transition:transform .15s ease, background .15s ease !important;}"
-        ".st-key-af_toggle div.stButton > button:hover{"
-        "background:#EDE2D1 !important;border-color:#EDE2D1 !important;"
+        "body .st-key-af_toggle div.stButton > button:hover{"
+        "background:" + TOMBOL_BG_HOVER + " !important;"
+        "background-color:" + TOMBOL_BG_HOVER + " !important;"
         "transform:scale(1.06) !important;}"
-        ".st-key-af_toggle div.stButton > button:active{transform:scale(.94) !important;}"
-        ".st-key-af_toggle [data-testid='stIconMaterial']{"
-        "font-size:1.35rem !important;width:1.35rem !important;height:1.35rem !important;}"
+        "body .st-key-af_toggle div.stButton > button:active{"
+        "transform:scale(.94) !important;}"
+        "body .st-key-af_toggle [data-testid='stIconMaterial']{"
+        "font-size:1.35rem !important;width:1.35rem !important;"
+        "height:1.35rem !important;color:" + TOMBOL_IKON + " !important;}"
 
         "[data-testid='stMainBlockContainer']{padding-right:"
         + (str(w + 40) + "px" if terbuka else "1rem")
@@ -325,12 +351,10 @@ def _css_panel(terbuka: bool, lebar: bool) -> str:
         "@media (max-width:1100px){"
         ".st-key-art_panel{width:100% !important;top:0 !important;}"
         "[data-testid='stMainBlockContainer']{padding-right:1rem !important;}"
-        ".st-key-af_toggle{right:14px !important;top:auto !important;"
+        "body .st-key-af_toggle{right:14px !important;top:auto !important;"
         "bottom:96px !important;transform:none !important;}}"
         "</style>"
     )
-
-
 # ============================================================================
 # TAMPILAN 1: DAFTAR (Artefak + Konten)
 # ============================================================================
