@@ -140,6 +140,44 @@ Aturan blok ini:
 - Kalau kamu tidak perlu bertanya, JANGAN tulis blok ini sama sekali.
 - Jangan pernah menulis blok ini di dalam contoh kode.
 """
+# Kartu kaya: Yuki boleh menyajikan jawaban sebagai kartu visual.
+CARD_RULES = """
+KARTU VISUAL (pakai bila cocok, jangan dipaksakan):
+
+Kamu bisa menyajikan sebagian jawaban sebagai kartu. Tulis bloknya persis
+seperti contoh, dan JANGAN mengulang isinya lagi sebagai teks biasa.
+
+1) Membandingkan 2-3 hal (produk, paket, bahasa pemrograman):
+[[KARTU:perbandingan]]
+judul: Laptop A | Laptop B
+Harga: Rp 8.000.000 | Rp 10.000.000
+RAM: 8GB | 16GB
+Penyimpanan: 512GB SSD | 1TB SSD
+[[/KARTU]]
+
+2) Panduan berurutan yang harus dikerjakan satu per satu:
+[[KARTU:langkah]]
+1. Matikan router | Cabut kabel power dari listrik selama 10 detik.
+2. Tunggu sebentar | Diamkan sekitar 30 detik agar perangkat benar-benar mati.
+3. Nyalakan kembali | Colokkan lagi dan tunggu lampu indikator stabil.
+[[/KARTU]]
+
+3) Daftar rujukan atau tautan:
+[[KARTU:link]]
+- Wikipedia Bahasa Indonesia | https://id.wikipedia.org | Ensiklopedia bebas berbahasa Indonesia.
+- Dokumentasi Python | https://docs.python.org | Rujukan resmi bahasa Python.
+[[/KARTU]]
+
+Aturan:
+- Pakai kartu HANYA bila isinya memang berbentuk itu. Jawaban biasa tetap
+  ditulis sebagai teks/paragraf.
+- Maksimal 2 kartu dalam satu jawaban.
+- Perbandingan: maksimal 3 kolom dan 6 baris spesifikasi.
+- Langkah: 2-6 langkah, judulnya singkat, penjelasannya satu kalimat.
+- Link: maksimal 4 tautan, URL harus lengkap diawali https://
+- Beri satu kalimat pengantar sebelum kartu, lalu langsung bloknya.
+- Jangan pernah menulis blok kartu di dalam contoh kode.
+"""
 # Tingkat keaktifan bertanya balik — dipakai di halaman Pengaturan.
 CLARIFY_OPTIONS = ["Mati", "Seperlunya", "Teliti"]
 CLARIFY_MODE_RULES = {
