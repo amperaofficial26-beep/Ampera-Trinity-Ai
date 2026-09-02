@@ -690,7 +690,7 @@ _BOTTOM_RESET_CSS = """
 #   Ubah angka-angka ini saja. Nilainya dikirim lewat tag <style>, bukan
 #   atribut style="..." inline — lihat catatan di dalam fungsi.
 # ----------------------------------------------------------------------------
-FOOTER_SIZE_PX = 18        # ukuran teks di halaman awal (sebelum mulai chat)
+FOOTER_SIZE_PX = 12        # ukuran teks di halaman awal (sebelum mulai chat)
 FOOTER_SIZE_CHAT_PX = 9    # ukuran teks saat chat sudah berjalan
 FOOTER_X_PX = 0            # geser mendatar: minus = kiri, plus = kanan
 FOOTER_Y_PX = -42            # geser tegak   : minus = naik, plus = turun
