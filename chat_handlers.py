@@ -192,7 +192,7 @@ def handle_chat_request(answer_slot) -> None:
     t0 = time.time()
     min_think = float(s.get("min_think_seconds", THINKING_MIN_SECONDS))
 
-       try:
+    try:
         client = build_chat_client()
 
         # Kumpulkan jawaban. Begitu terdeteksi Yuki mulai menulis kode
@@ -214,7 +214,7 @@ def handle_chat_request(answer_slot) -> None:
                 )
         full = "".join(potongan)
         elapsed = time.time() - t0
-           if elapsed < min_think:
+        if elapsed < min_think:
             time.sleep(min_think - elapsed)
         think_slot.empty()
         if not full:
@@ -230,7 +230,7 @@ def handle_chat_request(answer_slot) -> None:
             kartu = {}
         if not full:
             full = kartu.get("question") or "…"
-                # Blok [[TUGAS]] di halaman AI Penjadwal -> langsung masuk daftar tugas.
+        # Blok [[TUGAS]] di halaman AI Penjadwal -> langsung masuk daftar tugas.
         if st.session_state.get("page") == "jadwal":
             try:
                 from page_jadwal import serap_blok_tugas
@@ -240,6 +240,7 @@ def handle_chat_request(answer_slot) -> None:
                              icon=":material/task_alt:")
             except Exception:
                 pass
+
         # Blok [[KARTU:...]] -> kartu visual (perbandingan, langkah, link).
         hasil_kartu = parse_cards(full)
         if isinstance(hasil_kartu, (tuple, list)) and len(hasil_kartu) == 2:
@@ -249,7 +250,7 @@ def handle_chat_request(answer_slot) -> None:
             kartu_kaya = []
         if not full:
             full = "Ini hasilnya ya!"
-                # Blok kode -> disimpan sebagai FILE dan tampil di panel kanan,
+        # Blok kode -> disimpan sebagai FILE dan tampil di panel kanan,
         # bukan memenuhi ruang chat. Chat hanya menampilkan kartu ringkas.
         full, file_ids = ambil_artefak(full)
         if file_ids and mode_kode:
