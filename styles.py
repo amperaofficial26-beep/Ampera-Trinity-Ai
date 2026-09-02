@@ -1860,6 +1860,89 @@ div.stDownloadButton > button:hover {
     border-radius: 8px;
     padding: 4px 10px;
 }
+/* ====================================================================
+   ANIMASI ALA iOS  (scale + fade dari titik jangkar)
+   --------------------------------------------------------------------
+   Kurva cubic-bezier(.32,.72,0,1) adalah kurva khas iOS: melesat di
+   awal, mengerem sangat halus di akhir. Versi "dramatis": 450ms,
+   mulai dari scale(0.85), dengan sedikit pantulan.
+
+   >>> ATUR KEKUATAN ANIMASI DI SINI <<<
+==================================================================== */
+:root {
+    --ios-dur: 450ms;             /* durasi animasi */
+    --ios-scale: 0.85;            /* skala awal; makin kecil makin dramatis */
+    --ios-ease: cubic-bezier(.32,.72,0,1);
+}
+
+@keyframes iosPopIn {
+    0%   { opacity: 0; transform: scale(var(--ios-scale)) translateY(8px); }
+    60%  { opacity: 1; transform: scale(1.015) translateY(0); }  /* pantulan */
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes iosGrowIn {
+    0%   { opacity: 0; transform: scale(var(--ios-scale)); border-radius: 28px; }
+    60%  { opacity: 1; transform: scale(1.01); }
+    100% { opacity: 1; transform: scale(1); border-radius: 12px; }
+}
+@keyframes iosPageIn {
+    0%   { opacity: 0; transform: scale(0.94) translateY(10px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ---------- 1. POPOVER: tumbuh dari sudut tombol pemicunya ---------- */
+[data-testid="stPopoverBody"],
+[data-baseweb="popover"] [data-testid="stPopoverBody"] {
+    animation: iosPopIn var(--ios-dur) var(--ios-ease) both;
+    transform-origin: bottom left;   /* menu ⋯ & ➕ berada di bawah-kiri */
+    will-change: transform, opacity;
+}
+/* popover pilihan model ada di kanan bawah */
+[class*="st-key-model_row_"] ~ *,
+[data-testid="stPopoverBody"]:has([class*="st-key-model_row_"]) {
+    transform-origin: bottom right;
+}
+
+/* ---------- 2. TOMBOL DITEKAN: umpan balik saat popover dibuka/ditutup */
+[data-testid="stPopover"] button:active,
+button[data-testid="stPopoverButton"]:active {
+    transform: scale(0.94) !important;
+    transition: transform 90ms var(--ios-ease) !important;
+}
+
+/* ---------- 3. PERPINDAHAN HALAMAN ---------- */
+/* Kelas ini hanya disuntik saat halaman BENAR-BENAR berganti (lihat
+   app.py), supaya animasinya tidak terputar ulang tiap kali kirim chat. */
+.ios-page-anim [data-testid="stMainBlockContainer"] {
+    animation: iosPageIn var(--ios-dur) var(--ios-ease) both;
+    transform-origin: left center;   /* tumbuh dari arah sidebar */
+}
+
+/* ---------- 4. KARTU GAMBAR: tumbuh keluar dari kotak loading ---------- */
+[class*="st-key-img_pop_"] [data-testid="stImage"],
+[class*="st-key-img_pop_"] [data-testid="stImage"] img {
+    animation: iosGrowIn var(--ios-dur) var(--ios-ease) both;
+    transform-origin: center center;
+}
+[class*="st-key-img_pop_"] [data-testid="stImage"] img {
+    border-radius: 12px;
+}
+/* tombol unduh menyusul sedikit terlambat, biar berurutan */
+[class*="st-key-img_pop_"] div.stDownloadButton {
+    animation: iosPopIn var(--ios-dur) var(--ios-ease) both;
+    animation-delay: 120ms;
+}
+
+/* ---------- hormati preferensi "kurangi gerak" ---------- */
+@media (prefers-reduced-motion: reduce) {
+    [data-testid="stPopoverBody"],
+    .ios-page-anim [data-testid="stMainBlockContainer"],
+    [class*="st-key-img_pop_"] [data-testid="stImage"],
+    [class*="st-key-img_pop_"] [data-testid="stImage"] img,
+    [class*="st-key-img_pop_"] div.stDownloadButton {
+        animation: none !important;
+    }
+}
 /* ---------- alert / error ---------- */
 [data-testid="stAlert"] {
     background: #F2E8D6 !important;
