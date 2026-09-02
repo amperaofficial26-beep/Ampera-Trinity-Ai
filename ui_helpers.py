@@ -18,6 +18,7 @@ import streamlit as st
 from zoneinfo import ZoneInfo
 
 _WIB = ZoneInfo("Asia/Jakarta")
+
 from icons import ICON_COPY, ICON_MIC, ICON_IMAGE
 from logo import LOGO_B64
 from state import active_thread
@@ -126,6 +127,8 @@ IMAGE_STAGE_PHRASES = [
     "Melukis perlahan",
     "Menajamkan detail",
 ]
+
+
 def image_progress_html(labels: list[str] | None = None,
                         done: bool = False) -> str:
     """Kotak loading pembuatan gambar ala ChatGPT.
@@ -347,6 +350,8 @@ def parse_quick_replies(text: str) -> tuple[str, dict]:
     except Exception:
         # Apa pun yang terjadi, jawaban Yuki harus tetap tampil apa adanya.
         return raw, {}
+
+
 def send_quick_reply(text: str) -> None:
     """Kirim jawaban dari tombol kartu pilihan seolah User mengetiknya."""
     from state import active_thread, next_msg_id
@@ -462,6 +467,8 @@ def render_quick_replies(msg: dict, aktif: bool = True) -> None:
                 on_click=kirim_quick_choices,
                 args=(mid,),
             )
+
+
 def render_message(msg: dict) -> None:
     """Render 1 pesan: teks (bubble, bisa + gambar lampiran/suara) atau gambar."""
     if msg.get("type") == "image" and msg.get("image_bytes"):
@@ -506,7 +513,8 @@ def render_message(msg: dict) -> None:
                 thread = active_thread()
                 terakhir = bool(thread) and thread[-1] is msg
                 render_quick_replies(msg, aktif=terakhir)
-                
+
+
 def _copy_button_html(text: str, key: str) -> str:
     """Tombol salin ala Claude (ikon polos) — teks disisipkan sebagai
     base64 di atribut data-* supaya aman dari karakter kutip/baris baru,
@@ -675,6 +683,7 @@ _BOTTOM_RESET_CSS = """
 }
 </style>
 """
+
 
 # ============================================================================
 # >>> ATUR TAMPILAN & POSISI FOOTER DI SINI <<<
