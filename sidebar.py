@@ -24,7 +24,7 @@ HAS_DIALOG = hasattr(st, "dialog")
 #   melawan aturan lain. Perbesar Y = tombol naik.
 # ----------------------------------------------------------------------------
 ACCT_MENU_X_PX = 190   # jarak dari tepi KIRI layar
-ACCT_MENU_Y_PX = 10    # jarak dari DASAR layar
+ACCT_MENU_Y_PX = 6    # jarak dari DASAR layar
 
 # Warna tombol ⋯ . Pakai "transparent" agar menyatu dengan latar sidebar,
 # atau tulis kode warna (mis. "#EDE2D1" = warna sidebar, "#E8DCC8" = warna
