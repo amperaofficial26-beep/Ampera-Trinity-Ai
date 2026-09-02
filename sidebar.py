@@ -18,6 +18,14 @@ from ui_helpers import get_chat_export_text
 
 HAS_DIALOG = hasattr(st, "dialog")
 
+# ============================================================================
+# >>> ATUR POSISI TOMBOL TITIK TIGA (menu akun) DI SINI <<<
+#   Ditulis langsung sebagai <style> di dekat tombolnya, jadi PASTI menang
+#   melawan aturan lain. Perbesar Y = tombol naik.
+# ----------------------------------------------------------------------------
+ACCT_MENU_X_PX = 190   # jarak dari tepi KIRI layar
+ACCT_MENU_Y_PX = 10    # jarak dari DASAR layar
+# ============================================================================
 
 def go(page: str, **extra) -> None:
     """Pindah halaman internal (chat / artefak / pengaturan / …)."""
@@ -182,7 +190,20 @@ def render_sidebar() -> None:
                     '</div>'
                 )
                 st.markdown(acc_html, unsafe_allow_html=True)
-            with menu_col:
+             with menu_col:
+                # Style disuntik TEPAT di sini (setelah CSS utama), jadi
+                # pasti menang dan tombol tidak ikut hanyut mengikuti
+                # daftar menu sidebar.
+                st.markdown(
+                    "<style>.st-key-acct_menu{"
+                    "position:fixed !important;"
+                    f"left:{ACCT_MENU_X_PX}px !important;"
+                    f"bottom:{ACCT_MENU_Y_PX}px !important;"
+                    "top:auto !important;right:auto !important;"
+                    "width:32px !important;margin:0 !important;"
+                    "z-index:999996 !important;}</style>",
+                    unsafe_allow_html=True,
+                )
                 with st.container(key="acct_menu"):
                     with st.popover(":material/more_horiz:", use_container_width=False,
                                     help="Menu akun"):
