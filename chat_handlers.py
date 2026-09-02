@@ -201,7 +201,7 @@ def handle_chat_request(answer_slot) -> None:
             kartu = kartu if isinstance(kartu, dict) else {}
         else:
             kartu = {}
-                if not full:
+        if not full:
             full = kartu.get("question") or "…"
         # Blok [[KARTU:...]] -> kartu visual (perbandingan, langkah, link).
         hasil_kartu = parse_cards(full)
@@ -231,8 +231,7 @@ def handle_chat_request(answer_slot) -> None:
             "content": err, "time": now_wib(),
             "error_detail": f"{type(e).__name__}: {e}",
         })
-
-
+        
 def _make_square_preview(data: bytes, size: int = 160) -> tuple[bytes, str]:
     try:
         im = Image.open(io.BytesIO(data))
