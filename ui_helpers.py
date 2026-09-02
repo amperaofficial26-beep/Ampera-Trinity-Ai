@@ -693,7 +693,7 @@ _BOTTOM_RESET_CSS = """
 FOOTER_SIZE_PX = 10        # ukuran teks di halaman awal (sebelum mulai chat)
 FOOTER_SIZE_CHAT_PX = 9    # ukuran teks saat chat sudah berjalan
 FOOTER_X_PX = 0            # geser mendatar: minus = kiri, plus = kanan
-FOOTER_Y_PX = -6            # geser tegak   : minus = naik, plus = turun
+FOOTER_Y_PX = -15            # geser tegak   : minus = naik, plus = turun
 FOOTER_TOP_GAP_PX = 34     # jarak dari elemen di atasnya (halaman awal)
 FOOTER_TOP_GAP_CHAT_PX = 22  # jarak saat chat berjalan
 FOOTER_COLOR = "#7E7387"   # warna teks
