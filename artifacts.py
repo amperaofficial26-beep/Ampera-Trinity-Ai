@@ -286,7 +286,7 @@ def _css_panel(terbuka: bool, lebar: bool) -> str:
         ".st-key-art_panel [data-testid='stVerticalBlock']{gap:.5rem !important;}"
 
         # tombol mengambang buka/tutup - senada tema (krem), ikon Material
-        ".st-key-af_toggle{position:fixed !important;top:5% !important;"
+        ".st-key-af_toggle{position:fixed !important;top:12% !important;"
         "right:" + geser + "px !important;transform:translateY(-50%) !important;"
         "width:46px !important;margin:0 !important;z-index:999995 !important;"
         "transition:right .3s cubic-bezier(.32,.72,0,1) !important;}"
