@@ -26,6 +26,7 @@ from engines.groq_engine import (
     build_chat_client, collect_images, stream_chat_with_fallback,
     transcribe_audio,
 )
+from cards import parse_cards
 from engines.image_engine import generate_image
 from errors import public_error_chat, public_error_image
 from icons import ICON_MIC
@@ -200,8 +201,17 @@ def handle_chat_request(answer_slot) -> None:
             kartu = kartu if isinstance(kartu, dict) else {}
         else:
             kartu = {}
-        if not full:
+                if not full:
             full = kartu.get("question") or "…"
+        # Blok [[KARTU:...]] -> kartu visual (perbandingan, langkah, link).
+        hasil_kartu = parse_cards(full)
+        if isinstance(hasil_kartu, (tuple, list)) and len(hasil_kartu) == 2:
+            full, kartu_kaya = hasil_kartu
+            kartu_kaya = kartu_kaya if isinstance(kartu_kaya, list) else []
+        else:
+            kartu_kaya = []
+        if not full:
+            full = "Ini hasilnya ya!"
         stream_sentences(answer_slot, full)
         reply = {
             "id": next_msg_id(), "role": "assistant", "type": "text",
@@ -209,6 +219,8 @@ def handle_chat_request(answer_slot) -> None:
         }
         if kartu:
             reply["quick_replies"] = kartu
+        if kartu_kaya:
+            reply["cards"] = kartu_kaya
         thread.append(reply)
         _capture_artifacts_from_reply(full)
     except Exception as e:
