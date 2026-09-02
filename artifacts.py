@@ -389,7 +389,7 @@ def _render_isi(aktif: dict, lebar: bool) -> None:
            else aktif["lang"]).upper()
     nama = aktif["title"].rsplit(".", 1)[0]
 
-    judul, aksi = st.columns([1.0, 0.62])
+   judul, aksi = st.columns([1.0, 0.72])
     with judul:
         st.markdown(
             '<div class="af-title-row"><span class="af-title">'
@@ -399,7 +399,7 @@ def _render_isi(aktif: dict, lebar: bool) -> None:
         )
     with aksi:
         with st.container(key="af_actbar"):
-            c1, c2, c3 = st.columns([1.0, 0.42, 0.42])
+            c1, c2, c3 = st.columns([1.0, 0.34, 0.34])
             with c1:
                 st.markdown(_tombol_salin_html(aktif["content"]),
                             unsafe_allow_html=True)
