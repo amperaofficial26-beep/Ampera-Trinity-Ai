@@ -46,7 +46,7 @@ TOMBOL_GARIS = "#2C1F33"       # garis tepi ("transparent" = tanpa garis)
 TOMBOL_UKURAN_PX = 46          # lebar = tinggi
 TOMBOL_RADIUS_PX = 14          # kelengkungan sudut
 TOMBOL_POSISI = "atas"       # "tengah" | "atas" | "bawah"
-TOMBOL_OFFSET_PX = 60         # jarak dari atas/bawah bila posisi bukan tengah
+TOMBOL_OFFSET_PX = 53         # jarak dari atas/bawah bila posisi bukan tengah
 TOMBOL_JARAK_TEPI_PX = 15      # jarak dari tepi layar saat panel TERTUTUP
 TOMBOL_JARAK_PANEL_PX = 5     # jarak dari tepi panel saat panel TERBUKA
 TOMBOL_BAYANGAN = "0 4px 14px rgba(44,31,51,0.18)"   # "none" = tanpa bayangan
