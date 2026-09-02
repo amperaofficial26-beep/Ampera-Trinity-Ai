@@ -36,6 +36,21 @@ ACCT_MENU_BORDER = "transparent"    # garis tepi; "transparent" = tanpa garis
 # ============================================================================
 # Gaya agar tombol pemicu popover di sidebar tampak identik dengan tombol
 # menu biasa (rata kiri, tanpa kotak), dan panel popovernya cukup lebar.
+# ============================================================================
+# >>> ATUR POSISI TULISAN DI PANEL PROYEK DI SINI <<<
+#   Mengatur 3 tulisan: kotak "Cari proyek", teks "Belum ada proyek.",
+#   dan tombol "Mulai proyek baru".
+#   Nilai perataan: "left" | "center" | "right"
+# ----------------------------------------------------------------------------
+PROYEK_LEBAR_PX = 300         # lebar panel popover Proyek
+PROYEK_PADDING_PX = 14        # jarak isi dari tepi panel
+PROYEK_JARAK_PX = 15          # jarak antar elemen (kotak cari, teks, tombol)
+
+PROYEK_CARI_ALIGN = "left"    # perataan teks di dalam kotak "Cari proyek"
+PROYEK_KOSONG_ALIGN = "center"  # perataan teks "Belum ada proyek."
+PROYEK_KOSONG_PADDING_PX = 10   # jarak atas-bawah teks "Belum ada proyek."
+PROYEK_TOMBOL_ALIGN = "left"  # perataan label tombol "Mulai proyek baru"
+# ============================================================================
 _GAYA_MENU_POPOVER = (
     "<style>"
     ".st-key-sb_menu_proyek [data-testid='stPopover'] button,"
