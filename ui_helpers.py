@@ -676,9 +676,40 @@ _BOTTOM_RESET_CSS = """
 </style>
 """
 
+# ============================================================================
+# >>> ATUR TAMPILAN & POSISI FOOTER DI SINI <<<
+#   Nilai-nilai ini ditulis sebagai INLINE STYLE pada elemennya langsung,
+#   sehingga PASTI menang melawan CSS bawaan Streamlit maupun styles.py.
+#   Kalau sebelumnya angka di styles.py tidak berpengaruh, inilah gantinya.
+# ----------------------------------------------------------------------------
+FOOTER_SIZE_PX = 10        # ukuran teks di halaman awal (sebelum mulai chat)
+FOOTER_SIZE_CHAT_PX = 9    # ukuran teks saat chat sudah berjalan
+FOOTER_X_PX = 0            # geser mendatar: minus = kiri, plus = kanan
+FOOTER_Y_PX = 0            # geser tegak   : minus = naik, plus = turun
+FOOTER_TOP_GAP_PX = 34     # jarak dari elemen di atasnya (halaman awal)
+FOOTER_TOP_GAP_CHAT_PX = 22  # jarak saat chat berjalan
+FOOTER_COLOR = "#7E7387"   # warna teks
+FOOTER_TEXT = "© 2026 Ampera Trinity AI · by Ampera Official"
+# ============================================================================
+
+
 def _page_footer(in_chat: bool = False) -> None:
     foot_class = "trinity-foot" if not in_chat else "trinity-foot in-chat"
+    ukuran = FOOTER_SIZE_CHAT_PX if in_chat else FOOTER_SIZE_PX
+    jarak = FOOTER_TOP_GAP_CHAT_PX if in_chat else FOOTER_TOP_GAP_PX
+    gaya = (
+        f"display:block !important;"
+        f"width:100% !important;"
+        f"text-align:center !important;"
+        f"font-size:{ukuran}px !important;"
+        f"line-height:1.5 !important;"
+        f"color:{FOOTER_COLOR} !important;"
+        f"margin:{jarak}px 0 0 !important;"
+        f"transform:translate({FOOTER_X_PX}px,{FOOTER_Y_PX}px) !important;"
+        f"font-family:'Inter',sans-serif !important;"
+        f"-webkit-text-size-adjust:100%;text-size-adjust:100%;"
+    )
     st.markdown(
-        f'<p class="{foot_class}">© 2026 Ampera Trinity AI · by Ampera Official</p>',
+        f'<p class="{foot_class}" style="{gaya}">{FOOTER_TEXT}</p>',
         unsafe_allow_html=True,
     )
