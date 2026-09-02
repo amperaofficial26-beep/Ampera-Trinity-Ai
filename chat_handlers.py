@@ -26,6 +26,7 @@ from engines.groq_engine import (
     build_chat_client, collect_images, stream_chat_with_fallback,
     transcribe_audio,
 )
+from artifacts import ambil_artefak
 from cards import parse_cards
 from engines.image_engine import generate_image
 from errors import public_error_chat, public_error_image
@@ -222,17 +223,25 @@ def handle_chat_request(answer_slot) -> None:
             kartu_kaya = []
         if not full:
             full = "Ini hasilnya ya!"
+                # Blok kode -> disimpan sebagai FILE dan tampil di panel kanan,
+        # bukan memenuhi ruang chat. Chat hanya menampilkan kartu ringkas.
+        full, file_ids = ambil_artefak(full)
+        if not full:
+            full = ("Selesai! Filenya sudah kubuat, lihat panel di sebelah kanan ya."
+                    if file_ids else "…")
+
         stream_sentences(answer_slot, full)
         reply = {
             "id": next_msg_id(), "role": "assistant", "type": "text",
             "content": full, "time": now_wib(),
         }
+        if file_ids:
+            reply["artifact_ids"] = file_ids
         if kartu:
             reply["quick_replies"] = kartu
         if kartu_kaya:
             reply["cards"] = kartu_kaya
         thread.append(reply)
-        _capture_artifacts_from_reply(full)
     except Exception as e:
         think_slot.empty()
         err = public_error_chat(e)
