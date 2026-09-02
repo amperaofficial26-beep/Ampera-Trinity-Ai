@@ -477,15 +477,23 @@ def render_message(msg: dict) -> None:
                         msg.get("time", ""), icon_html=ICON_IMAGE),
             unsafe_allow_html=True,
         )
-        st.image(msg["image_bytes"], use_container_width=True)
-        ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-        st.download_button(
-            label=":material/download:  Unduh PNG",
-            data=msg["image_bytes"],
-            file_name=f"trinity_{ts}.png",
-            mime="image/png",
-            key=f"dl_{msg.get('id', id(msg))}",
-        )
+                mid = msg.get("id", id(msg))
+        # Hanya gambar TERAKHIR yang diberi animasi "tumbuh dari kotak
+        # loading". Gambar lama di riwayat tidak ikut beranimasi setiap
+        # kali halaman digambar ulang.
+        thread = active_thread()
+        baru = bool(thread) and thread[-1] is msg
+        wadah = st.container(key=f"img_pop_{mid}") if baru else st.container()
+        with wadah:
+            st.image(msg["image_bytes"], use_container_width=True)
+            ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+            st.download_button(
+                label=":material/download:  Unduh PNG",
+                data=msg["image_bytes"],
+                file_name=f"trinity_{ts}.png",
+                mime="image/png",
+                key=f"dl_{mid}",
+            )
     else:
         note = f"{ICON_MIC} via suara" if msg.get("via_voice") else ""
         imgs_html = images_bubble_html(msg.get("images") or [])
@@ -509,7 +517,6 @@ def render_message(msg: dict) -> None:
             render_message_actions(msg)
             # Kartu pilihan interaktif: hanya jawaban TERAKHIR yang bisa diklik.
             if msg.get("quick_replies"):
-                from state import active_thread
                 thread = active_thread()
                 terakhir = bool(thread) and thread[-1] is msg
                 render_quick_replies(msg, aktif=terakhir)
