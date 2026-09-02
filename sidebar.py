@@ -27,6 +27,7 @@ ACCT_MENU_X_PX = 190   # jarak dari tepi KIRI layar
 ACCT_MENU_Y_PX = 10    # jarak dari DASAR layar
 # ============================================================================
 
+
 def go(page: str, **extra) -> None:
     """Pindah halaman internal (chat / artefak / pengaturan / …)."""
     for k, v in extra.items():
@@ -190,7 +191,7 @@ def render_sidebar() -> None:
                     '</div>'
                 )
                 st.markdown(acc_html, unsafe_allow_html=True)
-             with menu_col:
+            with menu_col:
                 # Style disuntik TEPAT di sini (setelah CSS utama), jadi
                 # pasti menang dan tombol tidak ikut hanyut mengikuti
                 # daftar menu sidebar.
