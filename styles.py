@@ -1875,10 +1875,23 @@ div.stDownloadButton > button:hover {
    terlihat "tidak mau mengecil". Karena itu selektornya dinaikkan
    (elemen p + wadah markdown) dan diberi !important.
    >>> UBAH ANGKA DI SINI untuk mengatur ukuran footer <<< */
+/* >>> ATUR POSISI FOOTER DI SINI <<<
+   --foot-x : geser mendatar. Minus = ke kiri, plus = ke kanan.
+   --foot-y : geser tegak.    Minus = ke atas, plus = ke bawah. */
+:root {
+    --foot-x: 60px;
+    --foot-y: 0px;
+}
+
 .trinity-foot,
 p.trinity-foot,
 [data-testid="stMarkdownContainer"] p.trinity-foot,
 [data-testid="stMainBlockContainer"] [data-testid="stMarkdownContainer"] p.trinity-foot {
+    /* display:block + lebar penuh -> text-align:center benar-benar bekerja.
+       Tanpa ini footer bisa terlihat menempel ke kiri. */
+    display: block !important;
+    width: 100% !important;
+    transform: translate(var(--foot-x), var(--foot-y));
     text-align: center !important;
     color: #7E7387 !important;
     font-size: 12px !important;      /* halaman awal (sebelum mulai chat) */
@@ -1917,8 +1930,26 @@ p.trinity-foot.in-chat,
 }
 .st-key-sb_account [data-testid="stVerticalBlock"] { gap: 0 !important; }
 .st-key-sb_account [data-testid="stColumn"]:first-child { padding-right: 0 !important; }
+/* >>> ATUR POSISI TOMBOL TITIK TIGA (menu akun) DI SINI <<<
+   --acct-x : jarak dari tepi KIRI layar.
+   --acct-y : jarak dari DASAR layar. Perbesar = naik.
+   Catatan: dipakai position: fixed !important supaya tidak ikut hanyut
+   mengikuti daftar menu sidebar (itu penyebab tombolnya tadi nyangkut
+   di bawah "Unduh Chat"). */
+:root {
+    --acct-x: 190px;
+    --acct-y: -60px;
+}
+
 .st-key-acct_menu {
-    position: fixed; bottom: 10px; left: 190px; z-index: 999996;
+    position: fixed !important;
+    left: var(--acct-x) !important;
+    bottom: var(--acct-y) !important;
+    top: auto !important;
+    right: auto !important;
+    width: 32px !important;
+    margin: 0 !important;
+    z-index: 999996 !important;
 }
 /* Sembunyikan baris kartu nama user saat sidebar tertutup */
 section[data-testid="stSidebar"][aria-expanded="false"] .sb-account,
