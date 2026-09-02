@@ -39,11 +39,11 @@ BARIS_LANGSUNG_FILE = 5     # sebanyak ini baris ke atas: selalu jadi file
 # Catatan: styles.py punya aturan global "div.stButton > button" yang juga
 # memakai !important. Karena itu CSS di bawah ditulis dengan awalan "body"
 # agar spesifisitasnya lebih tinggi dan pasti menang.
-TOMBOL_BG = "#2C1F33"          # latar tombol saat diam
+TOMBOL_BG = "#F2E8D6"          # latar tombol saat diam
 TOMBOL_BG_HOVER = "#40304A"    # latar saat disentuh kursor
-TOMBOL_IKON = "#FBF6EC"        # warna ikon
+TOMBOL_IKON = "#4A3559"        # warna ikon
 TOMBOL_GARIS = "#2C1F33"       # garis tepi ("transparent" = tanpa garis)
-TOMBOL_UKURAN_PX = 46          # lebar = tinggi
+TOMBOL_UKURAN_PX =   30        # lebar = tinggi
 TOMBOL_RADIUS_PX = 50          # kelengkungan sudut
 TOMBOL_POSISI = "atas"       # "tengah" | "atas" | "bawah"
 TOMBOL_OFFSET_PX = 53         # jarak dari atas/bawah bila posisi bukan tengah
