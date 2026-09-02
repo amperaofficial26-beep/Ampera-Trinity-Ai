@@ -1303,6 +1303,11 @@ def main() -> None:
 
     page = st.session_state.get("page", "chat")
 
+    # Panel kanan berisi file/kode buatan Yuki (ala Claude Artifacts).
+    render_panel()
+
+    # Animasi ala iOS untuk perpindahan halaman.
+
     # Animasi ala iOS untuk perpindahan halaman. Kelasnya HANYA dipasang
     # saat halaman benar-benar berganti — kalau dipasang terus-menerus,
     # animasinya akan terputar ulang setiap kali kirim chat atau klik
