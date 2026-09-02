@@ -1298,6 +1298,20 @@ def main() -> None:
     render_sidebar()
 
     page = st.session_state.get("page", "chat")
+
+    # Animasi ala iOS untuk perpindahan halaman. Kelasnya HANYA dipasang
+    # saat halaman benar-benar berganti — kalau dipasang terus-menerus,
+    # animasinya akan terputar ulang setiap kali kirim chat atau klik
+    # tombol apa pun (mengganggu).
+    if st.session_state.get("_last_page") != page:
+        st.session_state["_last_page"] = page
+        st.markdown(
+            "<style>[data-testid='stMainBlockContainer']{"
+            "animation:iosPageIn var(--ios-dur,450ms) "
+            "var(--ios-ease,cubic-bezier(.32,.72,0,1)) both;"
+            "transform-origin:left center;}</style>",
+            unsafe_allow_html=True,
+        )
     if page == "artefak":
         page_artefak()
     elif page == "pengaturan":
