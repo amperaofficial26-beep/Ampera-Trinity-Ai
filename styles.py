@@ -1879,7 +1879,7 @@ div.stDownloadButton > button:hover {
    --foot-x : geser mendatar. Minus = ke kiri, plus = ke kanan.
    --foot-y : geser tegak.    Minus = ke atas, plus = ke bawah. */
 :root {
-    --foot-x: 60px;
+    --foot-x: 100px;
     --foot-y: 0px;
 }
 
