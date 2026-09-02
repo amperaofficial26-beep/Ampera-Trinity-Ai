@@ -1861,6 +1861,78 @@ div.stDownloadButton > button:hover {
     border: 1px solid #E4D9C6 !important;
     margin-bottom: 8px !important;
 }
+/* ---------- 9. PANEL FILE / ARTEFAK (sidebar kanan) ---------- */
+/* kartu ringkas pengganti blok kode di dalam chat */
+.af-chip {
+    display: flex; align-items: center; gap: 9px; flex-wrap: wrap;
+    background: #F7F1E6;
+    border: 1px solid #E0D2BB;
+    border-radius: 11px;
+    padding: 10px 13px;
+    margin: 6px 0 4px;
+    max-width: 460px;
+    animation: iosPopIn .34s cubic-bezier(.32,.72,0,1) both;
+}
+.af-chip-ic {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem; font-weight: 700; color: #FBF6EC;
+    background: #2C1F33; border-radius: 7px;
+    padding: 3px 7px; line-height: 1.2;
+}
+.af-chip-name {
+    font-size: 0.92rem; font-weight: 600; color: #2C1F33;
+    font-family: 'JetBrains Mono', monospace;
+}
+.af-chip-meta { font-size: 0.76rem; color: #A095AC; }
+
+/* tombol "Lihat di panel" di bawah kartu */
+[class*="st-key-af_open_"] div.stButton > button {
+    background: transparent !important;
+    border: 1px solid #DBCEB9 !important;
+    border-radius: 9px !important;
+    color: #4A3559 !important;
+    font-size: 0.82rem !important;
+    font-weight: 600 !important;
+    min-height: 34px !important;
+    margin-bottom: 12px !important;
+}
+[class*="st-key-af_open_"] div.stButton > button:hover {
+    background: #E0D2BB !important; border-color: #2C1F33 !important;
+}
+
+/* isi panel kanan */
+.af-head-title {
+    font-size: 1.0rem; font-weight: 650; color: #2C1F33;
+    font-family: 'JetBrains Mono', monospace;
+    word-break: break-all; line-height: 1.3;
+}
+.af-head-meta { font-size: 0.76rem; color: #A095AC; margin-top: 3px; }
+.st-key-art_panel [data-testid="stCode"],
+.st-key-art_panel pre {
+    border-radius: 12px !important;
+    border: 1px solid #E4D9C6 !important;
+    max-height: 62vh !important;
+}
+.st-key-art_panel div.stButton > button {
+    background: transparent !important;
+    border: none !important;
+    color: #6B6172 !important;
+    width: 30px !important; min-width: 30px !important; height: 30px !important;
+    padding: 0 !important; border-radius: 8px !important;
+}
+.st-key-art_panel div.stButton > button:hover {
+    background: #E0D2BB !important; color: #2C1F33 !important;
+}
+.st-key-art_panel div.stDownloadButton > button {
+    background: #2C1F33 !important;
+    border: none !important;
+    color: #FBF6EC !important;
+    border-radius: 10px !important;
+    font-size: 0.84rem !important;
+    font-weight: 600 !important;
+    min-height: 40px !important;
+    margin-top: 8px !important;
+}
 /* ---------- layar sempit ---------- */
 @media (max-width: 640px) {
     .rc-card { max-width: 100%; }
