@@ -24,7 +24,7 @@ HAS_DIALOG = hasattr(st, "dialog")
 #   melawan aturan lain. Perbesar Y = tombol naik.
 # ----------------------------------------------------------------------------
 ACCT_MENU_X_PX = 190   # jarak dari tepi KIRI layar
-ACCT_MENU_Y_PX = 4    # jarak dari DASAR layar
+ACCT_MENU_Y_PX = 10    # jarak dari DASAR layar
 
 # Warna tombol ⋯ . Pakai "transparent" agar menyatu dengan latar sidebar,
 # atau tulis kode warna (mis. "#EDE2D1" = warna sidebar, "#E8DCC8" = warna
@@ -34,8 +34,8 @@ ACCT_MENU_BG_HOVER = "#E0D2BB"      # latar saat disentuh kursor
 ACCT_MENU_FG = "#6B6172"            # warna ikon titik tiga
 ACCT_MENU_BORDER = "transparent"    # garis tepi; "transparent" = tanpa garis
 # ============================================================================
-# Gaya agar tombol pemicu popover di sidebar tampak identik dengan tombol
-# menu biasa (rata kiri, tanpa kotak), dan panel popovernya cukup lebar.
+
+
 # ============================================================================
 # >>> ATUR POSISI TULISAN DI PANEL PROYEK DI SINI <<<
 #   Mengatur 3 tulisan: kotak "Cari proyek", teks "Belum ada proyek.",
@@ -44,13 +44,16 @@ ACCT_MENU_BORDER = "transparent"    # garis tepi; "transparent" = tanpa garis
 # ----------------------------------------------------------------------------
 PROYEK_LEBAR_PX = 300         # lebar panel popover Proyek
 PROYEK_PADDING_PX = 14        # jarak isi dari tepi panel
-PROYEK_JARAK_PX = 15          # jarak antar elemen (kotak cari, teks, tombol)
+PROYEK_JARAK_PX = 10          # jarak antar elemen (kotak cari, teks, tombol)
 
 PROYEK_CARI_ALIGN = "left"    # perataan teks di dalam kotak "Cari proyek"
 PROYEK_KOSONG_ALIGN = "center"  # perataan teks "Belum ada proyek."
-PROYEK_KOSONG_PADDING_PX = "center"   # jarak atas-bawah teks "Belum ada proyek."
-PROYEK_TOMBOL_ALIGN = "center"  # perataan label tombol "Mulai proyek baru"
+PROYEK_KOSONG_PADDING_PX = 10   # jarak atas-bawah teks "Belum ada proyek."
+PROYEK_TOMBOL_ALIGN = "left"  # perataan label tombol "Mulai proyek baru"
 # ============================================================================
+
+# Gaya agar tombol pemicu popover di sidebar tampak identik dengan tombol
+# menu biasa (rata kiri, tanpa kotak), dan panel popovernya cukup lebar.
 _GAYA_MENU_POPOVER = (
     "<style>"
     ".st-key-sb_menu_proyek [data-testid='stPopover'] button,"
@@ -75,7 +78,7 @@ _GAYA_MENU_POPOVER = (
     ".st-key-sb_menu_proyek [data-testid='stIconMaterial']{"
     "font-size:1.35rem !important;width:1.35rem !important;height:1.35rem !important;"
     "}"
-        # ---- panel popover Proyek ----
+    # ---- panel popover Proyek ----
     "[data-testid='stPopoverBody']:has([class*='st-key-proj_']){"
     "min-width:" + str(PROYEK_LEBAR_PX) + "px !important;"
     "max-width:" + str(PROYEK_LEBAR_PX + 40) + "px !important;"
@@ -114,7 +117,8 @@ _GAYA_MENU_POPOVER = (
     "}"
     "</style>"
 )
-)
+
+
 def go(page: str, **extra) -> None:
     """Pindah halaman internal (chat / artefak / pengaturan / …)."""
     for k, v in extra.items():
@@ -284,10 +288,7 @@ def render_sidebar() -> None:
                 )
                 st.markdown(acc_html, unsafe_allow_html=True)
             with menu_col:
-                # Style disuntik TEPAT di sini (setelah CSS utama), jadi
-                # pasti menang dan tombol tidak ikut hanyut mengikuti
-                # daftar menu sidebar.
-                                # Gaya tombol titik tiga disusun sebagai string biasa
+                # Gaya tombol titik tiga disusun sebagai string biasa
                 # (bukan f-string) supaya kurung kurawal CSS tidak bentrok
                 # dengan sintaks f-string Python.
                 gaya_acct = (
