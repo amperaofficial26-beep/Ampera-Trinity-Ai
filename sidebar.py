@@ -48,8 +48,8 @@ PROYEK_JARAK_PX = 15          # jarak antar elemen (kotak cari, teks, tombol)
 
 PROYEK_CARI_ALIGN = "left"    # perataan teks di dalam kotak "Cari proyek"
 PROYEK_KOSONG_ALIGN = "center"  # perataan teks "Belum ada proyek."
-PROYEK_KOSONG_PADDING_PX = 10   # jarak atas-bawah teks "Belum ada proyek."
-PROYEK_TOMBOL_ALIGN = "left"  # perataan label tombol "Mulai proyek baru"
+PROYEK_KOSONG_PADDING_PX = "center"   # jarak atas-bawah teks "Belum ada proyek."
+PROYEK_TOMBOL_ALIGN = "center"  # perataan label tombol "Mulai proyek baru"
 # ============================================================================
 _GAYA_MENU_POPOVER = (
     "<style>"
@@ -75,11 +75,45 @@ _GAYA_MENU_POPOVER = (
     ".st-key-sb_menu_proyek [data-testid='stIconMaterial']{"
     "font-size:1.35rem !important;width:1.35rem !important;height:1.35rem !important;"
     "}"
-    # panel popovernya
+        # ---- panel popover Proyek ----
     "[data-testid='stPopoverBody']:has([class*='st-key-proj_']){"
-    "min-width:290px !important;max-width:330px !important;"
+    "min-width:" + str(PROYEK_LEBAR_PX) + "px !important;"
+    "max-width:" + str(PROYEK_LEBAR_PX + 40) + "px !important;"
+    "padding:" + str(PROYEK_PADDING_PX) + "px !important;"
+    "}"
+    # jarak antar elemen di dalam panel
+    "[data-testid='stPopoverBody']:has([class*='st-key-proj_']) "
+    "[data-testid='stVerticalBlock']{"
+    "gap:" + str(PROYEK_JARAK_PX) + "px !important;"
+    "}"
+    # 1) kotak "Cari proyek"
+    ".st-key-proj_search input,.st-key-proj_new_name input{"
+    "text-align:" + PROYEK_CARI_ALIGN + " !important;"
+    "font-size:0.9rem !important;"
+    "}"
+    # 2) teks "Belum ada proyek."
+    "[data-testid='stPopoverBody'] [data-testid='stCaptionContainer'],"
+    "[data-testid='stPopoverBody'] [data-testid='stCaptionContainer'] p{"
+    "text-align:" + PROYEK_KOSONG_ALIGN + " !important;"
+    "width:100% !important;"
+    "padding:" + str(PROYEK_KOSONG_PADDING_PX) + "px 0 !important;"
+    "margin:0 !important;"
+    "font-size:0.85rem !important;"
+    "color:#8E8398 !important;"
+    "}"
+    # 3) tombol "Mulai proyek baru" + tombol pilih proyek
+    "[data-testid='stPopoverBody'] div.stButton > button{"
+    "justify-content:" + ("flex-start" if PROYEK_TOMBOL_ALIGN == "left"
+                          else "center" if PROYEK_TOMBOL_ALIGN == "center"
+                          else "flex-end") + " !important;"
+    "text-align:" + PROYEK_TOMBOL_ALIGN + " !important;"
+    "}"
+    "[data-testid='stPopoverBody'] div.stButton > button p{"
+    "text-align:" + PROYEK_TOMBOL_ALIGN + " !important;"
+    "width:100% !important;"
     "}"
     "</style>"
+)
 )
 def go(page: str, **extra) -> None:
     """Pindah halaman internal (chat / artefak / pengaturan / …)."""
