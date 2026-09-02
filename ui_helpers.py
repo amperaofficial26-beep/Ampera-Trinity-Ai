@@ -687,9 +687,8 @@ _BOTTOM_RESET_CSS = """
 
 # ============================================================================
 # >>> ATUR TAMPILAN & POSISI FOOTER DI SINI <<<
-#   Nilai-nilai ini ditulis sebagai INLINE STYLE pada elemennya langsung,
-#   sehingga PASTI menang melawan CSS bawaan Streamlit maupun styles.py.
-#   Kalau sebelumnya angka di styles.py tidak berpengaruh, inilah gantinya.
+#   Ubah angka-angka ini saja. Nilainya dikirim lewat tag <style>, bukan
+#   atribut style="..." inline — lihat catatan di dalam fungsi.
 # ----------------------------------------------------------------------------
 FOOTER_SIZE_PX = 10        # ukuran teks di halaman awal (sebelum mulai chat)
 FOOTER_SIZE_CHAT_PX = 9    # ukuran teks saat chat sudah berjalan
@@ -703,22 +702,34 @@ FOOTER_TEXT = "© 2026 Ampera Trinity AI · by Ampera Official"
 
 
 def _page_footer(in_chat: bool = False) -> None:
+    """Footer halaman.
+
+    PENTING: gaya dikirim lewat tag <style>, BUKAN atribut style="..."
+    inline. Streamlit membuang setiap deklarasi inline yang memakai
+    !important (dibuktikan lewat Inspect: hanya properti tanpa !important
+    yang selamat), sehingga inline style tidak pernah berpengaruh.
+    Lewat <style> yang disuntik di sini — setelah CSS utama — aturan ini
+    pasti menang.
+    """
     foot_class = "trinity-foot" if not in_chat else "trinity-foot in-chat"
     ukuran = FOOTER_SIZE_CHAT_PX if in_chat else FOOTER_SIZE_PX
     jarak = FOOTER_TOP_GAP_CHAT_PX if in_chat else FOOTER_TOP_GAP_PX
-    gaya = (
-        f"display:block !important;"
-        f"width:100% !important;"
-        f"text-align:center !important;"
+    sel = "p.trinity-foot.in-chat" if in_chat else "p.trinity-foot"
+
+    st.markdown(
+        "<style>"
+        f"{sel}, [data-testid='stMarkdownContainer'] {sel} {{"
+        "display:block !important;"
+        "width:100% !important;"
+        "text-align:center !important;"
         f"font-size:{ukuran}px !important;"
-        f"line-height:1.5 !important;"
+        "line-height:1.5 !important;"
         f"color:{FOOTER_COLOR} !important;"
         f"margin:{jarak}px 0 0 !important;"
         f"transform:translate({FOOTER_X_PX}px,{FOOTER_Y_PX}px) !important;"
-        f"font-family:'Inter',sans-serif !important;"
-        f"-webkit-text-size-adjust:100%;text-size-adjust:100%;"
-    )
-    st.markdown(
-        f'<p class="{foot_class}" style="{gaya}">{FOOTER_TEXT}</p>',
+        "font-family:'Inter',sans-serif !important;"
+        "-webkit-text-size-adjust:100%;text-size-adjust:100%;"
+        "}</style>"
+        f'<p class="{foot_class}">{FOOTER_TEXT}</p>',
         unsafe_allow_html=True,
     )
