@@ -24,7 +24,7 @@ HAS_DIALOG = hasattr(st, "dialog")
 #   melawan aturan lain. Perbesar Y = tombol naik.
 # ----------------------------------------------------------------------------
 ACCT_MENU_X_PX = 190   # jarak dari tepi KIRI layar
-ACCT_MENU_Y_PX = 10    # jarak dari DASAR layar
+ACCT_MENU_Y_PX = 5    # jarak dari DASAR layar
 # ============================================================================
 
 
