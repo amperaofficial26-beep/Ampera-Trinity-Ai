@@ -239,31 +239,47 @@ def _css_panel(terbuka: bool) -> str:
     )
 
 
-def render_panel() -> None:
-    """Panel kanan berisi file/kode buatan Yuki + tombol buka/tutup.
-
-    Streamlit tidak punya sidebar kanan bawaan, jadi panel ini container
-    biasa yang DIPOSISIKAN ke kanan lewat CSS.
-    """
     daftar = daftar_artefak()
-    if not daftar:
-        return                      # belum ada file: tidak ada yang ditampilkan
-
     terbuka = bool(st.session_state.get("artifact_panel_open"))
     st.markdown(_css_panel(terbuka), unsafe_allow_html=True)
 
-    # ---- tombol mengambang: buka / tutup ----
+    # ---- tombol mengambang: SELALU tampil, walau belum ada file ----
     with st.container(key="af_toggle"):
         st.button(
             "›" if terbuka else "‹",
             key="af_toggle_btn",
-            help="Tutup panel file" if terbuka else f"Buka panel file ({len(daftar)})",
+            help=("Tutup panel file" if terbuka
+                  else (f"Buka panel file ({len(daftar)})" if daftar
+                        else "Panel file (masih kosong)")),
             on_click=toggle_panel,
         )
 
     if not terbuka:
         return
 
+    # ---- panel kosong: belum ada file yang dibuat Yuki ----
+    if not daftar:
+        with st.container(key="art_panel"):
+            atas, tutup = st.columns([1.0, 0.2])
+            with atas:
+                st.markdown(
+                    '<div class="af-head"><div class="af-head-row">'
+                    '<span class="af-head-ic">&lt;/&gt;</span>'
+                    '<span class="af-head-title">Panel File</span></div>'
+                    '<div class="af-head-meta">Belum ada file</div></div>',
+                    unsafe_allow_html=True,
+                )
+            with tutup:
+                st.button("✕", key="af_close_empty", help="Tutup panel",
+                          on_click=tutup_panel)
+            st.markdown(
+                '<div class="af-empty">Minta Yuki membuat kode atau file, '
+                "misalnya <b>\"buatkan kalkulator python\"</b>. Hasilnya otomatis "
+                "muncul di panel ini, bukan memenuhi ruang chat.</div>",
+                unsafe_allow_html=True,
+            )
+        return
+      
     aktif_id = st.session_state.get("artifact_panel_id") or daftar[0]["id"]
     aktif = next((a for a in daftar if a["id"] == aktif_id), daftar[0])
     baris = len(aktif["content"].splitlines())
