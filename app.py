@@ -58,8 +58,6 @@ from anim import inject_anim_css, inject_page_anim
 from artifacts import render_panel
 from page_desain import page_desain
 from page_jadwal import page_jadwal
-from page_desain import page_desain
-from page_jadwal import page_jadwal
 from styles import inject_css
 from chat_handlers import (
     process_user_input, render_input_controls, render_pending_preview,
