@@ -124,7 +124,7 @@ _GAYA_MENU_POPOVER = (
 #   CSS-nya disuntik langsung di dekat tombol + memakai awalan "body"
 #   supaya menang melawan aturan global div.stButton > button di styles.py.
 # ----------------------------------------------------------------------------
-KEMBALI_BG = "#F2E8D6"          # latar tombol
+KEMBALI_BG = ""#F2E8D6"          # latar tombol
 KEMBALI_BG_HOVER = "#E0D2BB"    # latar saat disentuh kursor
 KEMBALI_IKON = "#4A3559"        # warna panah
 KEMBALI_GARIS = "#DBCEB9"       # garis tepi ("transparent" = tanpa garis)
@@ -132,7 +132,6 @@ KEMBALI_LEBAR_PX = 44
 KEMBALI_TINGGI_PX = 40
 KEMBALI_RADIUS_PX = 12
 # ============================================================================
-
 
 def _gaya_kembali(kunci: str) -> str:
     """CSS satu tombol kembali (disuntik tepat sebelum tombolnya)."""
