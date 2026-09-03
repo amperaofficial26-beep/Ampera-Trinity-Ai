@@ -1861,57 +1861,6 @@ div.stDownloadButton > button:hover {
     border: 1px solid #E4D9C6 !important;
     margin-bottom: 8px !important;
 }
-/* ====================================================================
-   TOMBOL KEMBALI (panah kiri di pojok kiri atas tiap halaman)
-   >>> ATUR WARNA & UKURAN DI SINI <<<
-   Berlaku untuk: Artefak, Pengaturan, Bahasa, Bantuan, Pelajari,
-   Trinity Pro, Aplikasi, dan Trinity Kursus.
-==================================================================== */
-[class*="st-key-art_back"] div.stButton > button,
-[class*="st-key-set_back"] div.stButton > button,
-[class*="st-key-lang_back"] div.stButton > button,
-[class*="st-key-help_back"] div.stButton > button,
-[class*="st-key-pel_back"] div.stButton > button,
-[class*="st-key-pro_back"] div.stButton > button,
-[class*="st-key-app_back"] div.stButton > button,
-[class*="st-key-course_back"] div.stButton > button {
-    background: #F2E8D6 !important;      /* latar tombol */
-    border: 1px solid #DBCEB9 !important;/* garis tepi */
-    color: #4A3559 !important;           /* warna panah */
-    border-radius: 12px !important;
-    width: 44px !important;
-    min-width: 44px !important;
-    height: 40px !important;
-    min-height: 40px !important;
-    padding: 0 !important;
-    box-shadow: none !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    transition: background .15s ease, transform .1s ease !important;
-}
-[class*="st-key-art_back"] div.stButton > button:hover,
-[class*="st-key-set_back"] div.stButton > button:hover,
-[class*="st-key-lang_back"] div.stButton > button:hover,
-[class*="st-key-help_back"] div.stButton > button:hover,
-[class*="st-key-pel_back"] div.stButton > button:hover,
-[class*="st-key-pro_back"] div.stButton > button:hover,
-[class*="st-key-app_back"] div.stButton > button:hover,
-[class*="st-key-course_back"] div.stButton > button:hover {
-    background: #E0D2BB !important;      /* latar saat disentuh */
-    border-color: #2C1F33 !important;
-    color: #2C1F33 !important;
-}
-[class*="st-key-art_back"] div.stButton > button:active,
-[class*="st-key-set_back"] div.stButton > button:active,
-[class*="st-key-lang_back"] div.stButton > button:active,
-[class*="st-key-help_back"] div.stButton > button:active,
-[class*="st-key-pel_back"] div.stButton > button:active,
-[class*="st-key-pro_back"] div.stButton > button:active,
-[class*="st-key-app_back"] div.stButton > button:active,
-[class*="st-key-course_back"] div.stButton > button:active {
-    transform: scale(0.94) !important;
-}
 /* ---------- 9. PANEL FILE / ARTEFAK (sidebar kanan) ---------- */
 /* -- kartu ringkas di dalam chat -- */
 .af-chip {
