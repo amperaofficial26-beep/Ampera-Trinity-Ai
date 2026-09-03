@@ -175,15 +175,10 @@ def _artifact_workspace(aid: int) -> None:
             meta = m.get("meta") or ""
             break
 
-    back, _sp, new_btn = st.columns([0.18, 1.0, 0.22])
-    with back:
-        st.button(":material/arrow_back:", key="art_back",
-                  use_container_width=True, help="Kembali ke pilihan artefak",
-                  on_click=go_cb, args=("artefak",),
-                  kwargs={"artifact_active_id": None})
-    with new_btn:
-        tombol_kembali("art_back", "artefak", "Kembali ke pilihan artefak",
-                       artifact_active_id=None)
+back, _sp = st.columns([0.12, 1.0])
+with back:
+    tombol_kembali("art_back", "artefak", "Kembali ke pilihan artefak",
+                   artifact_active_id=None)
     st.markdown(
         f'<div class="page-head"><div class="page-head-icon">'
         f'{mi(":material/data_object:")}</div>'
