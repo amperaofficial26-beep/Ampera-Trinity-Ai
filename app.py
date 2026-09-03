@@ -182,10 +182,8 @@ def _artifact_workspace(aid: int) -> None:
                   on_click=go_cb, args=("artefak",),
                   kwargs={"artifact_active_id": None})
     with new_btn:
-        if st.button(":material/add: &nbsp;Baru", key="art_new",
-                     use_container_width=True):
-            go("artefak", artifact_active_id=None)
-
+        tombol_kembali("art_back", "artefak", "Kembali ke pilihan artefak",
+                       artifact_active_id=None)
     st.markdown(
         f'<div class="page-head"><div class="page-head-icon">'
         f'{mi(":material/data_object:")}</div>'
@@ -1213,10 +1211,8 @@ def _course_workspace(key: str) -> None:
 
     back, _sp = st.columns([0.12, 1.0])
     with back:
-        st.button(":material/arrow_back:", key="course_back", use_container_width=True,
-                  help="Kembali ke daftar kursus",
-                  on_click=go_cb, args=("kursus",),
-                  kwargs={"course_active_key": None})
+        tombol_kembali("course_back", "kursus", "Kembali ke daftar kursus",
+                       course_active_key=None)
 
     st.markdown(
         f'<div class="page-head"><div class="page-head-icon">{mi(course["icon"])}</div>'
