@@ -117,7 +117,66 @@ _GAYA_MENU_POPOVER = (
     "}"
     "</style>"
 )
+# ============================================================================
+# >>> ATUR WARNA & UKURAN TOMBOL KEMBALI DI SINI <<<
+#   Tombol panah kiri di pojok kiri atas halaman Artefak, Pengaturan,
+#   Bahasa, Bantuan, Pelajari, Trinity Pro, Aplikasi, dan Kursus.
+#   CSS-nya disuntik langsung di dekat tombol + memakai awalan "body"
+#   supaya menang melawan aturan global div.stButton > button di styles.py.
+# ----------------------------------------------------------------------------
+KEMBALI_BG = "#F2E8D6"          # latar tombol
+KEMBALI_BG_HOVER = "#E0D2BB"    # latar saat disentuh kursor
+KEMBALI_IKON = "#4A3559"        # warna panah
+KEMBALI_GARIS = "#DBCEB9"       # garis tepi ("transparent" = tanpa garis)
+KEMBALI_LEBAR_PX = 44
+KEMBALI_TINGGI_PX = 40
+KEMBALI_RADIUS_PX = 12
+# ============================================================================
 
+
+def _gaya_kembali(kunci: str) -> str:
+    """CSS satu tombol kembali (disuntik tepat sebelum tombolnya)."""
+    sel = "body .st-key-" + kunci + " div.stButton > button"
+    return (
+        "<style>"
+        + sel + ","
+        "body .st-key-" + kunci + " [data-testid='stBaseButton-secondary']{"
+        "background:" + KEMBALI_BG + " !important;"
+        "background-color:" + KEMBALI_BG + " !important;"
+        "border:1px solid " + KEMBALI_GARIS + " !important;"
+        "color:" + KEMBALI_IKON + " !important;"
+        "width:" + str(KEMBALI_LEBAR_PX) + "px !important;"
+        "min-width:" + str(KEMBALI_LEBAR_PX) + "px !important;"
+        "height:" + str(KEMBALI_TINGGI_PX) + "px !important;"
+        "min-height:" + str(KEMBALI_TINGGI_PX) + "px !important;"
+        "padding:0 !important;box-shadow:none !important;"
+        "border-radius:" + str(KEMBALI_RADIUS_PX) + "px !important;"
+        "display:inline-flex !important;align-items:center !important;"
+        "justify-content:center !important;"
+        "transition:background .15s ease, transform .1s ease !important;}"
+        + sel + ":hover{"
+        "background:" + KEMBALI_BG_HOVER + " !important;"
+        "background-color:" + KEMBALI_BG_HOVER + " !important;"
+        "border-color:#2C1F33 !important;color:#2C1F33 !important;}"
+        + sel + ":active{transform:scale(.94) !important;}"
+        "body .st-key-" + kunci + " [data-testid='stIconMaterial']{"
+        "color:" + KEMBALI_IKON + " !important;font-size:1.15rem !important;"
+        "width:1.15rem !important;height:1.15rem !important;}"
+        "</style>"
+    )
+
+def tombol_kembali(kunci: str, tujuan: str, bantuan: str = "Kembali", **extra) -> None:
+    """Tombol panah kembali yang seragam di semua halaman.
+
+    Memakai on_click (bukan "if st.button(): ...") supaya kliknya tidak
+    hilang pada halaman yang juga memanggil st.rerun() di tempat lain.
+    """
+    st.markdown(_gaya_kembali(kunci), unsafe_allow_html=True)
+    with st.container(key=kunci):
+        st.button(":material/arrow_back:", key=kunci + "_btn",
+                  use_container_width=True, help=bantuan,
+                  on_click=go_cb, args=(tujuan,), kwargs=extra)
+      
 def go(page: str, **extra) -> None:
     """Pindah halaman internal (chat / artefak / pengaturan / …)."""
     for k, v in extra.items():
