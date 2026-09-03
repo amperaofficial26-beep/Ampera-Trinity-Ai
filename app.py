@@ -752,8 +752,7 @@ def _set_trinity_code() -> None:
 def page_pengaturan() -> None:
     back, _sp = st.columns([0.12, 1.0])
     with back:
-        st.button(":material/arrow_back:", key="set_back", use_container_width=True,
-                  help="Kembali ke chat", on_click=go_cb, args=("chat",))
+        tombol_kembali("set_back", "chat", "Kembali ke chat")
     st.markdown(
         f'<div class="page-head"><div class="page-head-icon">{mi(":material/settings:")}</div>'
         '<div><h2 class="page-title">Pengaturan</h2>'
