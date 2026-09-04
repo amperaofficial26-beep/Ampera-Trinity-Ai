@@ -141,9 +141,6 @@ def ambil_artefak(teks: str) -> tuple[str, list[int]]:
 
     # Jika ada file/artefak baru yang berhasil dibuat, 
     # sematkan kartu ringkasnya di akhir teks pesan chat
-    if baru and BUKA_OTOMATIS:
-          st.session_state["artifact_panel_open"] = True
-          st.session_state["artifact_panel_id"] = baru[-1]
     if baru:
         bersih += "\n\n" + kartu_file_html(baru)
 
@@ -290,188 +287,194 @@ def _gambar_sesi() -> list[dict]:
 # ============================================================================
 def _css_panel(terbuka: bool, lebar: bool) -> str:
     w = PANEL_LEBAR_LEBAR_PX if lebar else PANEL_LEBAR_PX
-    geser = (str(w + TOMBOL_JARAK_PANEL_PX) if terbuka
-             else str(TOMBOL_JARAK_TEPI_PX))
+    geser = str(w + 12) if terbuka else "16"
 
-    if TOMBOL_POSISI == "atas":
-        posisi_css = ("top:" + str(TOMBOL_OFFSET_PX) + "px !important;"
-                      "bottom:auto !important;transform:none !important;")
-    elif TOMBOL_POSISI == "bawah":
-        posisi_css = ("bottom:" + str(TOMBOL_OFFSET_PX) + "px !important;"
-                      "top:auto !important;transform:none !important;")
-    else:
-        posisi_css = "top:50% !important;transform:translateY(-50%) !important;"
     return (
         "<style>"
         ".st-key-art_panel{"
-        "position:fixed !important;top:3.2rem !important;right:0 !important;"
-        "bottom:0 !important;width:" + str(w) + "px !important;"
-        "background:#FBF7F0 !important;border-left:1px solid #E4D9C6 !important;"
-        "padding:18px 18px 90px !important;overflow-y:auto !important;"
-        "z-index:999990 !important;"
-        "box-shadow:-10px 0 30px rgba(44,31,51,0.07) !important;"
-        "transition:width .3s cubic-bezier(.32,.72,0,1) !important;"
-        "animation:afSlideIn .34s cubic-bezier(.32,.72,0,1) both;}"
-        "@keyframes afSlideIn{from{opacity:0;transform:translateX(30px);}"
-        "to{opacity:1;transform:translateX(0);}}"
-        ".st-key-art_panel [data-testid='stVerticalBlock']{gap:.5rem !important;}"
-
-        # --- tombol mengambang buka/tutup ---
-        # Awalan "body" menaikkan spesifisitas agar menang melawan aturan
-        # global div.stButton > button di styles.py.
-        "body .st-key-af_toggle{position:fixed !important;"
-        + posisi_css +
-        "right:" + geser + "px !important;"
-        "width:" + str(TOMBOL_UKURAN_PX) + "px !important;margin:0 !important;"
-        "z-index:999995 !important;"
-        "transition:right .3s cubic-bezier(.32,.72,0,1) !important;}"
-        "body .st-key-af_toggle div.stButton > button,"
-        "body .st-key-af_toggle button[kind='secondary'],"
-        "body .st-key-af_toggle [data-testid='stBaseButton-secondary']{"
-        "background:" + TOMBOL_BG + " !important;"
-        "background-color:" + TOMBOL_BG + " !important;"
-        "border:1px solid " + TOMBOL_GARIS + " !important;"
-        "color:" + TOMBOL_IKON + " !important;"
-        "width:" + str(TOMBOL_UKURAN_PX) + "px !important;"
-        "min-width:" + str(TOMBOL_UKURAN_PX) + "px !important;"
-        "height:" + str(TOMBOL_UKURAN_PX) + "px !important;"
-        "min-height:" + str(TOMBOL_UKURAN_PX) + "px !important;"
-        "padding:0 !important;"
-        "border-radius:" + str(TOMBOL_RADIUS_PX) + "px !important;"
-        "box-shadow:" + TOMBOL_BAYANGAN + " !important;"
-        "transition:transform .15s ease, background .15s ease !important;}"
-        "body .st-key-af_toggle div.stButton > button:hover{"
-        "background:" + TOMBOL_BG_HOVER + " !important;"
-        "background-color:" + TOMBOL_BG_HOVER + " !important;"
-        "transform:scale(1.06) !important;}"
-        "body .st-key-af_toggle div.stButton > button:active{"
-        "transform:scale(.94) !important;}"
-        "body .st-key-af_toggle [data-testid='stIconMaterial']{"
-        "font-size:1.35rem !important;width:1.35rem !important;"
-        "height:1.35rem !important;color:" + TOMBOL_IKON + " !important;}"
-
-        "[data-testid='stMainBlockContainer']{padding-right:"
-        + (str(w + 40) + "px" if terbuka else "1rem")
-        + " !important;transition:padding-right .3s cubic-bezier(.32,.72,0,1);}"
-
-        "@media (max-width:1100px){"
-        ".st-key-art_panel{width:100% !important;top:0 !important;}"
-        "[data-testid='stMainBlockContainer']{padding-right:1rem !important;}"
-        "body .st-key-af_toggle{right:14px !important;top:auto !important;"
-        "bottom:96px !important;transform:none !important;}}"
+        "position:fixed!important;top:0!important;right:0!important;"
+        "bottom:0!important;width:" + str(w) + "px!important;"
+        "padding:24px 20px 32px!important;overflow-y:auto!important;"
+        "background:#FFFCF7!important;border-left:1px solid #E8E0D4!important;"
+        "box-shadow:-12px 0 36px rgba(44,31,51,.10)!important;"
+        "z-index:999990!important;"
+        "}"
+        "[class*='st-key-af_card_']{"
+        "padding:12px!important;margin:0 0 10px!important;"
+        "background:#FFFFFF!important;border:1px solid #E8E0D4!important;"
+        "border-radius:12px!important;"
+        "}"
+        ".af-panel-title{font-size:20px;font-weight:700;color:#2C1F33;margin:0;}"
+        ".af-panel-sub{font-size:13px;color:#8A7B8F;margin:4px 0 18px;}"
+        ".af-file-name{font-size:15px;font-weight:650;color:#2C1F33;}"
+        ".af-file-meta{font-size:12px;color:#8A7B8F;margin-top:3px;}"
+        ".af-preview-head{font-size:18px;font-weight:700;color:#2C1F33;margin:0;}"
+        ".af-preview-meta{font-size:12px;color:#8A7B8F;margin-top:4px;}"
+        ".af-empty{padding:28px 12px;color:#75697A;text-align:center;line-height:1.55;}"
+        ".af-codebox{margin-top:18px!important;border:1px solid #E8E0D4!important;"
+        "border-radius:12px!important;background:#FFFDF9!important;padding:14px 0!important;}"
+        ".af-ln{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;"
+        "font-size:13px!important;line-height:1.75!important;}"
+        ".af-num{color:#B3A6B8!important;min-width:38px!important;}"
+        ".af-code{color:#34283A!important;}"
+        ".k-key{color:#7D3FB2!important;font-weight:700;}"
+        ".k-str{color:#13795B!important;}"
+        ".k-com{color:#8A7B8F!important;}"
+        ".k-num{color:#B45309!important;}"
+        ".af-copy{width:100%;padding:10px 14px;border:1px solid #DCCEBB;"
+        "border-radius:9px;background:#FFFFFF;color:#2C1F33;font-weight:650;"
+        "cursor:pointer;font-size:14px;}"
+        ".af-copy:hover{background:#F7F0E5;}"
+        "body .st-key-af_toggle{position:fixed!important;right:" + geser + "px!important;"
+        "top:18px!important;z-index:999995!important;}"
+        "body .st-key-af_toggle button{border-radius:10px!important;"
+        "background:#FFFFFF!important;border:1px solid #DCCEBB!important;"
+        "color:#4A3559!important;box-shadow:0 4px 14px rgba(44,31,51,.10)!important;}"
+        "body [class*='st-key-af_preview_'] button,"
+        "body [class*='st-key-af_download_'] button,"
+        "body .st-key-af_back button,body .st-key-af_close button,"
+        "body .st-key-af_wide button{border-radius:9px!important;"
+        "border:1px solid #DCCEBB!important;background:#FFFFFF!important;"
+        "color:#4A3559!important;font-weight:600!important;}"
+        "@media(max-width:850px){"
+        ".st-key-art_panel{width:100%!important;padding:20px 16px 28px!important;}"
+        "body .st-key-af_toggle{right:14px!important;top:auto!important;bottom:92px!important;}"
+        "}"
         "</style>"
     )
-# ============================================================================
-# TAMPILAN 1: DAFTAR (Artefak + Konten)
-# ============================================================================
+
+
 def _render_daftar(daftar: list[dict]) -> None:
-    st.markdown('<div class="af-sec">Artefak</div>', unsafe_allow_html=True)
+    jumlah = len(daftar)
+    st.markdown(
+        '<div class="af-panel-title">File</div>'
+        f'<div class="af-panel-sub">{jumlah} file tersimpan di percakapan ini</div>',
+        unsafe_allow_html=True,
+    )
 
     if not daftar:
         st.markdown(
-            '<div class="af-empty">Minta Yuki membuat kode atau file, '
-            "misalnya <b>\"buatkan kalkulator python\"</b>. Hasilnya otomatis "
-            "muncul di panel ini, bukan memenuhi ruang chat.</div>",
+            '<div class="af-empty">Belum ada file.<br>'
+            'Minta Yuki membuat kode atau dokumen untuk melihat preview di sini.</div>',
             unsafe_allow_html=True,
         )
-    else:
-        with st.container(key="af_dlall"):
+        return
+
+    with st.container(key="af_download_all"):
+        st.download_button(
+            ":material/folder_zip:  Unduh semua",
+            data=_zip_semua(daftar),
+            file_name="artefak-trinity.zip",
+            mime="application/zip",
+            key="af_zip",
+            use_container_width=True,
+        )
+
+    st.divider()
+
+    for a in daftar[:20]:
+        ext = (
+            a["title"].rsplit(".", 1)[-1].upper()
+            if "." in a["title"]
+            else a["lang"].upper()
+        )
+
+        with st.container(key=f"af_card_{a['id']}"):
+            info, aksi = st.columns([1.75, 1])
+
+            with info:
+                st.markdown(
+                    '<div class="af-file-name">' + html.escape(a["title"]) + "</div>"
+                    '<div class="af-file-meta">' + html.escape(ext)
+                    + " · " + str(len(a["content"].splitlines()))
+                    + " baris · " + html.escape(a.get("time", "")) + "</div>",
+                    unsafe_allow_html=True,
+                )
+
+            with aksi:
+                left, right = st.columns(2)
+
+                with left:
+                    with st.container(key=f"af_preview_{a['id']}"):
+                        if st.button(
+                            "Preview",
+                            key=f"af_open_{a['id']}",
+                            use_container_width=True,
+                        ):
+                            pilih_file(a["id"])
+
+                with right:
+                    with st.container(key=f"af_download_{a['id']}"):
+                        st.download_button(
+                            ":material/download:",
+                            data=a["content"],
+                            file_name=a["title"],
+                            mime="text/plain",
+                            key=f"af_dl_{a['id']}",
+                            use_container_width=True,
+                        )
+
+
+def _render_isi(aktif: dict, lebar: bool) -> None:
+    ext = (
+        aktif["title"].rsplit(".", 1)[-1].upper()
+        if "." in aktif["title"]
+        else aktif["lang"].upper()
+    )
+
+    judul, tutup = st.columns([4, 1])
+
+    with judul:
+        st.markdown(
+            '<div class="af-preview-head">' + html.escape(aktif["title"]) + "</div>"
+            '<div class="af-preview-meta">' + html.escape(ext)
+            + " · " + str(len(aktif["content"].splitlines()))
+            + " baris · dibuat " + html.escape(aktif.get("time", "")) + "</div>",
+            unsafe_allow_html=True,
+        )
+
+    with tutup:
+        with st.container(key="af_close"):
+            if st.button(":material/close:", key="af_close_btn",
+                         help="Tutup panel", use_container_width=True):
+                tutup_panel()
+
+    st.divider()
+
+    kembali, salin, unduh, lebar_btn = st.columns([1.15, 1, 1, 1])
+
+    with kembali:
+        with st.container(key="af_back"):
+            if st.button(":material/arrow_back:  File", key="af_back",
+                         use_container_width=True):
+                kembali_ke_daftar()
+
+    with salin:
+        st.markdown(_tombol_salin_html(aktif["content"], "Salin"),
+                    unsafe_allow_html=True)
+
+    with unduh:
+        with st.container(key=f"af_download_view_{aktif['id']}"):
             st.download_button(
-                ":material/download:  Unduh semua",
-                data=_zip_semua(daftar),
-                file_name="artefak-trinity.zip",
-                mime="application/zip",
-                key="af_zip",
+                ":material/download:  Unduh",
+                data=aktif["content"],
+                file_name=aktif["title"],
+                mime="text/plain",
+                key=f"af_dl_{aktif['id']}",
                 use_container_width=True,
             )
 
-        for a in daftar[:20]:
-            nama = a["title"].rsplit(".", 1)[0]
-            ext = (a["title"].rsplit(".", 1)[-1] if "." in a["title"]
-                   else a["lang"]).upper()
-            with st.container(key=f"af_card_{a['id']}"):
-                ikon, isi, unduh = st.columns([0.22, 1.0, 0.2])
-                with ikon:
-                    st.markdown('<div class="af-file-ic">&lt;/&gt;</div>',
-                                unsafe_allow_html=True)
-                with isi:
-                    st.markdown(
-                        '<div class="af-file-name">' + html.escape(nama) + "</div>"
-                        '<div class="af-file-ext">' + html.escape(ext) + "</div>",
-                        unsafe_allow_html=True,
-                    )
-                    if st.button("Buka", key=f"af_open_{a['id']}",
-                                 use_container_width=True):
-                        pilih_file(a["id"])
-                with unduh:
-                    st.download_button(
-                        ":material/download:",
-                        data=a["content"],
-                        file_name=a["title"],
-                        mime="text/plain",
-                        key=f"af_dl1_{a['id']}",
-                    )
-
-    # ---- bagian Konten: gambar hasil buatan Yuki ----
-    gambar = _gambar_sesi()
-    if gambar:
-        st.markdown('<div class="af-sec af-sec-2">Konten</div>',
-                    unsafe_allow_html=True)
-        with st.container(key="af_konten"):
-            for i in range(0, len(gambar), 2):
-                pasangan = gambar[i:i + 2]
-                cols = st.columns(len(pasangan))
-                for j, m in enumerate(pasangan):
-                    with cols[j]:
-                        st.image(m["image_bytes"], use_container_width=True)
-
-
-# ============================================================================
-# TAMPILAN 2: ISI FILE
-# ============================================================================
-def _render_isi(aktif: dict, lebar: bool) -> None:
-    ext = (aktif["title"].rsplit(".", 1)[-1] if "." in aktif["title"]
-           else aktif["lang"]).upper()
-    nama = aktif["title"].rsplit(".", 1)[0]
-
-    judul, aksi = st.columns([1.0, 0.72])
-    with judul:
-        st.markdown(
-            '<div class="af-title-row"><span class="af-title">'
-            + html.escape(nama) + '</span><span class="af-title-ext"> · '
-            + html.escape(ext) + "</span></div>",
-            unsafe_allow_html=True,
-        )
-    with aksi:
-        with st.container(key="af_actbar"):
-            c1, c2, c3 = st.columns([1.0, 0.34, 0.34])
-            with c1:
-                st.markdown(_tombol_salin_html(aktif["content"]),
-                            unsafe_allow_html=True)
-            with c2:
-                if st.button(":material/close_fullscreen:" if lebar
-                             else ":material/open_in_full:",
-                             key="af_wide", help="Perlebar / kecilkan panel"):
-                    toggle_lebar()
-            with c3:
-                if st.button(":material/close:", key="af_close",
-                             help="Tutup panel"):
-                    tutup_panel()
-
-    if st.button(":material/arrow_back:  Semua file", key="af_back"):
-        kembali_ke_daftar()
+    with lebar_btn:
+        with st.container(key="af_wide"):
+            if st.button(
+                ":material/close_fullscreen:" if lebar else ":material/open_in_full:",
+                key="af_wide",
+                help="Lebarkan atau kecilkan panel",
+                use_container_width=True,
+            ):
+                toggle_lebar()
 
     st.markdown(_kode_html(aktif["content"]), unsafe_allow_html=True)
-
-    with st.container(key="af_actions"):
-        st.download_button(
-            ":material/download:  Unduh " + aktif["title"],
-            data=aktif["content"],
-            file_name=aktif["title"],
-            mime="text/plain",
-            key=f"af_dl_{aktif['id']}",
-            use_container_width=True,
-        )
 # ============================================================================
 # PINTU MASUK
 # ============================================================================
