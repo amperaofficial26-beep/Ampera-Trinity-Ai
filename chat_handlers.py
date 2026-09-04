@@ -33,7 +33,7 @@ from engines.compatible_engine import (
     build_compatible_client,
     stream_compatible_reply,
 )
-from artifacts import ambil_artefak
+from artifacts import BUKA_OTOMATIS, ambil_artefak, buka_panel
 from loading_code import code_loading_html, inject_code_loading_css
 from cards import parse_cards
 from engines.image_engine import generate_image
@@ -392,7 +392,14 @@ def handle_chat_request(answer_slot) -> None:
             reply["cards"] = kartu_kaya
 
         thread.append(reply)
-
+        
+        # Panel hanya dibuka setelah respons selesai dan benar-benar
+        # menghasilkan artefak/file baru. Rerun ini menampilkan panel
+        # sekarang, bukan saat user mengirim pesan berikutnya.
+        if file_ids and BUKA_OTOMATIS:
+            buka_panel(file_ids[-1])
+            st.rerun()
+            
     except Exception as e:
         think_slot.empty()
 
