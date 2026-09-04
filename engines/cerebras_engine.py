@@ -1,13 +1,7 @@
 # -*- coding: utf-8 -*-
 
-"""
-ENGINE CEREBRAS
-Chat AI menggunakan Cerebras melalui OpenAI-compatible API.
-"""
-
 from __future__ import annotations
 
-import streamlit as st
 from openai import OpenAI
 
 from config import (
@@ -17,13 +11,24 @@ from config import (
     YUKI_SYSTEM_PROMPT,
     LANG_BY_CODE,
     DEFAULT_LANG_CODE,
+    CARD_RULES,
+    CLARIFY_RULES,
+    CLARIFY_MODE_RULES,
+    QUICK_REPLY_RULES,
+    DESAIN_PROMPT,
+    JADWAL_PROMPT,
 )
 from state import get_settings
 
 
+CEREBRAS_MODEL = "gpt-oss-120b"
+
+
 def build_cerebras_client():
     if not CEREBRAS_API_KEY:
-        raise RuntimeError("CEREBRAS_API_KEY belum dikonfigurasi.")
+        raise RuntimeError(
+            "CEREBRAS_API_KEY belum dikonfigurasi."
+        )
 
     return OpenAI(
         api_key=CEREBRAS_API_KEY,
@@ -32,12 +37,56 @@ def build_cerebras_client():
 
 
 def build_system_prompt() -> str:
-    settings = get_settings()
+    s = get_settings()
 
-    parts = [YUKI_SYSTEM_PROMPT]
+    parts = [
+        YUKI_SYSTEM_PROMPT,
+        CARD_RULES,
+    ]
+
+    halaman = s.get("page") or "chat"
+
+    if halaman == "desain":
+        parts.append(DESAIN_PROMPT)
+
+    elif halaman == "jadwal":
+        parts.append(JADWAL_PROMPT)
+
+    persona_map = {
+        "Santai & kocak":
+            "Pertahankan gaya santai, kocak, dan penuh candaan receh.",
+
+        "Serius & ringkas":
+            "Kurangi candaan. Jawab ringkas dan langsung ke inti.",
+
+        "Mentor sabar":
+            "Bersikap seperti mentor yang sabar dan jelaskan langkah demi langkah.",
+
+        "Profesional formal":
+            "Gunakan bahasa Indonesia formal dan profesional.",
+    }
+
+    personality = s.get("personality")
+
+    if personality in persona_map:
+        parts.append(persona_map[personality])
+
+    clarify_mode = s.get("clarify_mode", "Seperlunya")
+
+    if clarify_mode == "Mati":
+        parts.append(CLARIFY_MODE_RULES["Mati"])
+    else:
+        parts.append(CLARIFY_RULES)
+
+    parts.append(QUICK_REPLY_RULES)
+
+    extra = CLARIFY_MODE_RULES.get(clarify_mode, "")
+
+    if extra:
+        parts.append(extra)
 
     lang = LANG_BY_CODE.get(
-        settings.get("yuki_lang") or DEFAULT_LANG_CODE
+        s.get("yuki_lang") or DEFAULT_LANG_CODE
     )
 
     if lang and lang["code"] != "id":
@@ -45,8 +94,17 @@ def build_system_prompt() -> str:
             f"Selalu jawab dalam bahasa {lang['name']}."
         )
 
+    nickname = (
+        s.get("custom_nickname") or ""
+    ).strip()
+
+    if nickname:
+        parts.append(
+            f"Panggil User dengan sebutan: {nickname}."
+        )
+
     display_name = (
-        settings.get("display_name") or ""
+        s.get("display_name") or ""
     ).strip()
 
     if display_name and display_name.lower() != "user":
@@ -57,12 +115,17 @@ def build_system_prompt() -> str:
     return "\n\n".join(parts)
 
 
-def messages_for_cerebras(history: list[dict]) -> list[dict]:
+def messages_for_cerebras(
+    history: list[dict],
+) -> list[dict]:
+
     trimmed = [
         m
         for m in history
-        if m.get("role") in ("user", "assistant")
-        and m.get("type", "text") == "text"
+        if (
+            m.get("role") in ("user", "assistant")
+            and m.get("type", "text") == "text"
+        )
     ][-MAX_HISTORY_MESSAGES:]
 
     messages = [
@@ -85,10 +148,11 @@ def messages_for_cerebras(history: list[dict]) -> list[dict]:
 
 def stream_cerebras_reply(
     client: OpenAI,
-    model: str,
     history: list[dict],
+    model: str = CEREBRAS_MODEL,
 ):
-    stream = client.chat.completions.create(
+
+    response = client.chat.completions.create(
         model=model,
         messages=messages_for_cerebras(history),
         temperature=float(
@@ -97,13 +161,12 @@ def stream_cerebras_reply(
         stream=True,
     )
 
-    for chunk in stream:
+    for chunk in response:
         try:
-            delta = chunk.choices[0].delta
-            piece = getattr(delta, "content", None)
+            content = chunk.choices[0].delta.content
 
-            if piece:
-                yield piece
+            if content:
+                yield content
 
         except Exception:
             continue
