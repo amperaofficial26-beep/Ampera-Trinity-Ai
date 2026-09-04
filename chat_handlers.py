@@ -676,7 +676,11 @@ def process_user_input(user_input, answer_slot, is_fresh: bool = False) -> bool:
 
     if not (text or images):
         return False
-
+        # Pesan baru selalu mulai tanpa panel.
+        # Jika respons Yuki benar-benar membuat file, panel akan dibuka lagi
+        # setelah respons selesai.
+        st.session_state["artifact_panel_open"] = False
+        st.session_state["artifact_panel_id"] = None
     now = now_wib()
 
     if is_fresh:
