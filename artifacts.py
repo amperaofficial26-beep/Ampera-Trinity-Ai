@@ -444,8 +444,8 @@ def _render_isi(aktif: dict, lebar: bool) -> None:
     kembali, salin, unduh, lebar_btn = st.columns([1.15, 1, 1, 1])
 
     with kembali:
-        with st.container(key="af_back"):
-            if st.button(":material/arrow_back:  File", key="af_back",
+        with st.container(key="af_back_wrap"):
+            if st.button(":material/arrow_back:  File", key="af_back_btn",
                          use_container_width=True):
                 kembali_ke_daftar()
 
@@ -465,7 +465,7 @@ def _render_isi(aktif: dict, lebar: bool) -> None:
             )
 
     with lebar_btn:
-        with st.container(key="af_wide"):
+        with st.container(key="af_wide_wrap"):
             if st.button(
                 ":material/close_fullscreen:" if lebar else ":material/open_in_full:",
                 key="af_wide",
