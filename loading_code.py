@@ -7,9 +7,19 @@ def code_loading_html(nama_file: str = "", done: bool = False) -> str:
     if done:
         return ""
 
-    return """<div style="display:flex;align-items:center;justify-content:center;padding:2.5rem 0;">
+    return """<style>
+@keyframes thinkingPulse {
+  0% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.2); opacity: 1; filter: drop-shadow(0 0 4px #3C3489); }
+  100% { transform: scale(1); opacity: 0.8; }
+}
+.thinking-logo {
+  animation: thinkingPulse 1.5s ease-in-out infinite;
+}
+</style>
+<div style="display:flex;align-items:center;justify-content:flex-start;padding:1.5rem 0;">
   <div style="display:flex;align-items:center;gap:10px;font-family:var(--font-mono);font-size:14px;color:var(--text-secondary);">
-    <span id="dot" style="width:7px;height:7px;border-radius:50%;background:#3C3489;display:inline-block;flex-shrink:0;"></span>
+    <span id="dot" class="thinking-logo" style="display:inline-block;flex-shrink:0;font-size:16px;line-height:1;">✦</span>
     <span id="line">Menyalakan mode coding</span>
   </div>
 </div>
@@ -159,6 +169,7 @@ def code_loading_html(nama_file: str = "", done: bool = False) -> str:
   }
 
   nextScene();
-  setInterval(nextScene, 3200);
+  // Durasi diperbarui menjadi 30 detik (30000 ms)
+  setInterval(nextScene, 30000);
 })();
 </script>"""
