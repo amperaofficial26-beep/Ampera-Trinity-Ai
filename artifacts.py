@@ -272,18 +272,16 @@ def render_tombol_salin(teks: str) -> None:
                 overflow: hidden;
             }}
 
-            #copy-code {{
-                width: 100%;
-                height: 46px;
-                border: 1px solid #DCCFBE;
-                border-radius: 8px;
-                background: #FFFFFF;
-                color: #382843;
-                font-size: 14px;
-                font-weight: 650;
-                cursor: pointer;
-                transition: background .18s ease, color .18s ease;
-            }}
+            #copy-code {
+            width: 48px;
+            height: 48px;
+            border: 1px solid #DCCFBE;
+            border-radius: 12px;
+            background: #FFFFFF;
+            color: #382843;
+            cursor: pointer;
+            };
+            
 
             #copy-code:hover {{
                 background: #F7F0E5;
@@ -329,7 +327,8 @@ def render_tombol_salin(teks: str) -> None:
                 }}
 
                 button.classList.add("copied");
-                button.textContent = "✓";
+                button.innerHTML =
+                    '<span class="material-symbols-rounded">check</span>';
 
                 setTimeout(() => {{
                     button.classList.remove("copied");
