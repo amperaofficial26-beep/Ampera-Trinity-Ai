@@ -73,15 +73,23 @@ def maybe_run_yuki(answer_slot) -> bool:
         handle_chat_request(answer_slot)
     return True
 
+import re
+
 def rapihkan_teks_chat(teks: str) -> str:
-    """Merapikan format teks chat biasa dari Yuki agar lebih enak dibaca."""
+    """Merapikan jarak antar baris dan spasi berlebih tanpa merusak format Markdown."""
     if not teks:
         return ""
-    # Menghilangkan baris kosong berlebihan (lebih dari 2 baris enter)
+    
+    # Hanya membersihkan spasi berlebih di ujung kanan baris (trailing spaces)
+    # Tanpa merusak indentasi markdown (seperti daftar/poin) di sebelah kiri
+    lines = [line.rstrip() for line in teks.splitlines()]
+    teks = "\n".join(lines)
+    
+    # Merapikan jarak enter yang terlalu renggang (lebih dari 2 baris kosong disusutkan)
     teks = re.sub(r"\n{3,}", "\n\n", teks)
-    # Merapikan spasi di awal/akhir baris
-    teks = "\n".join([line.strip() for line in teks.splitlines()])
+    
     return teks.strip()
+    
 def handle_image_request(prompt: str) -> None:
     thread = active_thread()
     if not IMAGE_READY:
