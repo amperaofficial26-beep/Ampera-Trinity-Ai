@@ -2,6 +2,7 @@
 """
 LOADING KHUSUS PEMBUATAN KODE / FILE.
 Menggunakan animasi CSS murni (tanpa JavaScript) agar kompatibel dengan st.markdown.
+Durasi total sekitar 25 detik.
 """
 
 from __future__ import annotations
@@ -25,14 +26,17 @@ TEKS_TAHAP = [
     "hash: 0x3F2A",
 ]
 
+# Durasi per tampilan teks (detik) - total durasi = DURASI_PER_TEKS * len(TEKS_TAHAP)
+DURASI_PER_TEKS = 2.8   # 2.8 * 9 = 25.2 detik (total ~25 detik)
+
 WARNA_AKSEN = "#3C3489"          # warna titik & bar
 WARNA_TEKS_REDUP = "#6B6172"
 LEBAR_MAKS_PX = 460
-DURASI_SIKLUS = 2.8              # detik per tampilan teks (total durasi = DURASI_SIKLUS * jumlah teks)
 # ============================================================================
 
 def inject_code_loading_css() -> None:
     """Suntikkan CSS untuk loader. Dipanggil sekali sebelum loader dipakai."""
+    total_durasi = DURASI_PER_TEKS * len(TEKS_TAHAP)
     css = f"""
 <style>
 .cl-loader {{
@@ -75,11 +79,11 @@ def inject_code_loading_css() -> None:
     top: 0;
     white-space: nowrap;
     opacity: 0;
-    animation: clTextCycle {DURASI_SIKLUS * len(TEKS_TAHAP)}s linear infinite;
+    animation: clTextCycle {total_durasi}s linear infinite;
 }}
 """
     for i, _ in enumerate(TEKS_TAHAP):
-        delay = i * DURASI_SIKLUS
+        delay = i * DURASI_PER_TEKS
         css += f".cl-text:nth-child({i+1}) {{ animation-delay: {delay}s; }}\n"
 
     css += """
