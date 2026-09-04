@@ -166,6 +166,6 @@ def code_loading_html(nama_file: str = "", done: bool = False) -> str:
 
   nextScene();
   // Berganti adegan setiap 3.5 detik
-  setInterval(nextScene, 3500);
+  setInterval(nextScene, 7000);
 })();
 </script>"""
