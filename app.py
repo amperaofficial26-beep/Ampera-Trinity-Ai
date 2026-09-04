@@ -175,10 +175,10 @@ def _artifact_workspace(aid: int) -> None:
             meta = m.get("meta") or ""
             break
 
-back, _sp = st.columns([0.12, 1.0])
-with back:
-    tombol_kembali("art_back", "artefak", "Kembali ke pilihan artefak",
-                   artifact_active_id=None)
+    back, _sp = st.columns([0.12, 1.0])
+    with back:
+        tombol_kembali("art_back", "artefak", "Kembali ke pilihan artefak",
+                       artifact_active_id=None)
     st.markdown(
         f'<div class="page-head"><div class="page-head-icon">'
         f'{mi(":material/data_object:")}</div>'
@@ -189,7 +189,7 @@ with back:
     )
 
     if thread and thread[-1].get("awaiting_reply"):
-        thread[-1].pop("awaiting_reply", None)
+        ...        thread[-1].pop("awaiting_reply", None)
         from chat_handlers import handle_chat_request
         handle_chat_request(st.empty())
         st.rerun()
