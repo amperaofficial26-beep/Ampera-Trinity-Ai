@@ -141,12 +141,11 @@ def ambil_artefak(teks: str) -> tuple[str, list[int]]:
 
     # Jika ada file/artefak baru yang berhasil dibuat, 
     # sematkan kartu ringkasnya di akhir teks pesan chat
+    if baru and BUKA_OTOMATIS:
+          st.session_state["artifact_panel_open"] = True
+          st.session_state["artifact_panel_id"] = baru[-1]
     if baru:
         bersih += "\n\n" + kartu_file_html(baru)
-
-    if baru and BUKA_OTOMATIS:
-        st.session_state["artifact_panel_open"] = True
-        st.session_state["artifact_panel_id"] = baru[-1]
 
     return bersih, baru
 
