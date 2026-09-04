@@ -596,14 +596,14 @@ def _render_isi(aktif: dict, lebar: bool) -> None:
                 help="Unduh file",
             )
     
-    with perluas:
-        with st.container(key="af_expand_wrap"):
-            if st.button(
-                ":material/close_fullscreen:" if lebar
-                else ":material/open_in_full:",
-                key="af_expand_btn",
-                help="Kecilkan panel" if lebar else "Perlebar panel",
-            ):
+   with perluas:
+    with st.container(key="af_expand_wrap"):
+        if st.button(
+            ":material/close_fullscreen:" if lebar
+            else ":material/open_in_full:",
+            key="af_expand_btn",
+            help="Kecilkan panel" if lebar else "Perlebar panel",
+        ):
             toggle_lebar()
             
     st.markdown(_kode_html(aktif["content"]), unsafe_allow_html=True)
