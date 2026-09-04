@@ -33,9 +33,7 @@ MODEL_CATALOG = [
     {"key": "compound",      "name": "Trinity Hard",    "desc": "Browsing web & eksekusi kode",          "id": "groq/compound", "premium": True},
     {"key": "qwen3_6_27b",   "name": "Trinity Hard",    "desc": "Reasoning & matematika",                "id": "qwen/qwen3.6-27b", "premium": True},
     {"key": "gpt_oss_120b",  "name": "Trinity Extreme", "desc": "Reasoning mendalam untuk tugas berat",  "id": "openai/gpt-oss-120b", "premium": True},
-    # Cerebras
-    {"key": "cerebras_gpt_oss_120b", "name": "Trinity Plus", "desc": "Reasoning cepat & kuat via Cerebras", "id": "gpt-oss-120b", "provider": "cerebras", "premium": False},
-]
+   ]
 AVAILABLE_MODELS = {m["key"]: m["id"] for m in MODEL_CATALOG}
 MODEL_BY_KEY = {m["key"]: m for m in MODEL_CATALOG}
 DEFAULT_MODEL_KEY = "gpt_oss_20b"
@@ -483,11 +481,17 @@ def _get_secret(*keys: str) -> str:
 
 
 GROQ_API_KEY = _get_secret("GROQ_API_KEY", "GROQ_KEY")
-CEREBRAS_API_KEY = _get_secret("CEREBRAS_API_KEY")
-CEREBRAS_BASE_URL = "https://api.cerebras.ai/v1"
 CF_ACCOUNT_ID = _get_secret("CF_ACCOUNT_ID", "CLOUDFLARE_ACCOUNT_ID")
 CF_API_TOKEN = _get_secret("CF_API_TOKEN", "CLOUDFLARE_API_TOKEN")
 
+PLUGSKY_API_KEY = _get_secret("PLUGSKY_API_KEY")
+PLUGSKY_BASE_URL = "https://api.plugsky.com/v1"
+
+AION_API_KEY = _get_secret("AION_API_KEY")
+AION_BASE_URL = "https://api.aionlabs.ai/v1"
+
+FINAL_ROUTER_API_KEY = _get_secret("FINAL_ROUTER_API_KEY")
+FINAL_ROUTER_BASE_URL = "https://finalrouter.com/api/v1"
 CHAT_READY = bool(GROQ_API_KEY or CEREBRAS_API_KEY)
-CEREBRAS_READY = bool(CEREBRAS_API_KEY)
 IMAGE_READY = bool(CF_ACCOUNT_ID and CF_API_TOKEN)
+
