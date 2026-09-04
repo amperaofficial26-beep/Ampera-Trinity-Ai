@@ -312,7 +312,7 @@ def render_sidebar() -> None:
             if st.button(":material/tune: &nbsp;Sesuaikan", use_container_width=True):
                 show_sesuaikan_dialog()
 
-                st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
+        st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
 
         # ---- Kelompok AI khusus ----
         with st.container(key="sb_menu_desain"):

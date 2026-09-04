@@ -45,8 +45,6 @@ LEBAR_MAKS_PX = 460
 
 def inject_code_loading_css() -> None:
     """Suntik CSS loader. Dipanggil sekali sebelum loader dipakai."""
-    n = max(1, len(TEKS_TAHAP))
-    per = round(DURASI_SIKLUS_DETIK / n, 2)
     css = (
         "<style>"
         ".cl-box{"

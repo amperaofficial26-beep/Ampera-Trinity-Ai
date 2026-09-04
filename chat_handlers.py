@@ -34,7 +34,7 @@ from errors import public_error_chat, public_error_image
 from icons import ICON_MIC
 from state import active_thread, get_settings, next_msg_id
 from ui_helpers import (
-    THINKING_PHRASES_CHAT, _BOTTOM_RESET_CSS, _capture_artifacts_from_reply,
+    THINKING_PHRASES_CHAT, _BOTTOM_RESET_CSS,
     bubble_html, image_progress_html, images_bubble_html, stream_sentences,
     thinking_html, parse_quick_replies,
 )

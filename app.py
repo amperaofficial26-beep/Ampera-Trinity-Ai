@@ -40,18 +40,18 @@ from config import (
     AVAILABLE_MODELS, CHAT_INPUT_SUPPORTS_AUDIO, CHAT_INPUT_SUPPORTS_FILE,
     CHAT_READY, COURSE_BY_KEY, COURSE_CATALOG, DEFAULT_MODEL_KEY,
     GROQ_API_KEY, GROQ_BASE_URL, IMAGE_INPUT_TYPES, IMAGE_READY,
-    ARTIFACT_BY_KEY, ARTIFACT_CATEGORIES, DEFAULT_LANG_CODE, LANG_BY_CODE,
+    ARTIFACT_BY_KEY, ARTIFACT_CATEGORIES, DEFAULT_LANG_CODE,
     SUPPORTED_LANGUAGES, course_curriculum, CLARIFY_OPTIONS,
 )
 from icons import mi
 from logo import LOGO_B64
 from state import (
-    active_thread, artifact_thread, course_thread, get_settings, init_state,
-    main_thread, next_msg_id, open_conversation, reset_conversation,
+    artifact_thread, course_thread, get_settings, init_state,
+    main_thread, next_msg_id,
 )
-from sidebar import go, go_cb, render_sidebar, tombol_kembali
+from sidebar import go, render_sidebar, tombol_kembali
 from ui_helpers import (
-    _BOTTOM_RESET_CSS, _FRESH_BOTTOM_CSS, _page_footer, get_greeting,
+    _FRESH_BOTTOM_CSS, _page_footer, get_greeting,
     logo_img_html, render_message,
 )
 from anim import inject_anim_css, inject_page_anim
@@ -175,10 +175,10 @@ def _artifact_workspace(aid: int) -> None:
             meta = m.get("meta") or ""
             break
 
-back, _sp = st.columns([0.12, 1.0])
-with back:
-    tombol_kembali("art_back", "artefak", "Kembali ke pilihan artefak",
-                   artifact_active_id=None)
+    back, _sp = st.columns([0.12, 1.0])
+    with back:
+        tombol_kembali("art_back", "artefak", "Kembali ke pilihan artefak",
+                       artifact_active_id=None)
     st.markdown(
         f'<div class="page-head"><div class="page-head-icon">'
         f'{mi(":material/data_object:")}</div>'

@@ -396,7 +396,7 @@ def course_curriculum(course: dict) -> list[str]:
     return [
         f"Modul 1 · Fondasi {t} — istilah penting & peta besar",
         f"Modul 2 · Alat & workflow {t} yang benar-benar terpakai",
-        f"Modul 3 · Strategi tingkat lanjut + studi kasus nyata",
+        "Modul 3 · Strategi tingkat lanjut + studi kasus nyata",
         "Modul 4 · Proyek praktik & evaluasi hasil belajar",
     ]
 

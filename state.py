@@ -9,8 +9,6 @@ fungsi-fungsi di modul ini supaya struktur data tetap konsisten.
 
 from __future__ import annotations
 
-from datetime import datetime
-
 import streamlit as st
 
 from config import DEFAULT_SETTINGS
