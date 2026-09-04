@@ -188,8 +188,7 @@ def _artifact_workspace(aid: int) -> None:
         unsafe_allow_html=True,
     )
 
-    if thread and thread[-1].get("awaiting_reply"):
-        ...        thread[-1].pop("awaiting_reply", None)
+    if thread and thread[-1].get("awaiting_reply"):  
         from chat_handlers import handle_chat_request
         handle_chat_request(st.empty())
         st.rerun()
