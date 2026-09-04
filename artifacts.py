@@ -260,6 +260,11 @@ def render_tombol_salin(teks: str) -> None:
     components.html(
         f"""
         <style>
+        @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,0,0');
+        .material-symbols-rounded {
+            font-family: 'Material Symbols Rounded';
+            font-size: 21px;
+        }
             html, body {{
                 margin: 0;
                 padding: 0;
@@ -301,8 +306,9 @@ def render_tombol_salin(teks: str) -> None:
             }}
         </style>
 
-        <button id="copy-code" type="button">Salin</button>
-
+        <button id="copy-code" type="button" title="Salin kode">
+            <span class="material-symbols-rounded">content_copy</span>
+        </button>
         <script>
             const button = document.getElementById("copy-code");
             const encoded = "{data}";
@@ -453,32 +459,22 @@ def _css_panel(terbuka: bool, lebar: bool) -> str:
         "body .st-key-af_back_wrap button,"
         "body [class*='st-key-af_download_current_wrap_'] button,"
         "body .st-key-af_expand_wrap button{"
-        "height:60px!important;"
-        "min-height:46px!important;"
+        "width:48px!important;"
+        "min-width:48px!important;"
+        "height:48px!important;"
+        "min-height:48px!important;"
+        "padding:0!important;"
         "border:1px solid #DCCFBE!important;"
-        "border-radius:40px!important;"
+        "border-radius:12px!important;"
         "background:#FFFFFF!important;"
         "color:#382843!important;"
-        "font-weight:650!important;"
-        "box-shadow:none!important;"
+        "box-shadow:0 3px 10px rgba(44,31,51,.08)!important;"
         "}"
-        "html body div.st-key-af_toggle{"
-        "position:fixed!important;"
-        "top:16px!important;"
-        "right:16px!important;"
-        "left:auto!important;"
-        "bottom:auto!important;"
-        "transform:none!important;"
-        "margin:0!important;"
-        "z-index:999999!important;"
-        "}"
-        "html body div.st-key-af_toggle button{"
-        "width:48px!important;"
-        "height:48px!important;"
-        "min-width:48px!important;"
-        "min-height:48px!important;"
-        "margin:0!important;"
-        "padding:0!important;"
+        "body .st-key-af_back_wrap button:hover,"
+        "body [class*='st-key-af_download_current_wrap_'] button:hover,"
+        "body .st-key-af_expand_wrap button:hover{"
+        "background:#F7F0E5!important;"
+        "transform:translateY(-1px)!important;"
         "}"
         "</style>"
     )
@@ -572,43 +568,45 @@ def _render_isi(aktif: dict, lebar: bool) -> None:
 
     st.divider()
 
-    # Semua tombol berukuran dan sejajar sama.
-    kembali, salin, unduh, perluas = st.columns(4, gap="small")
-
+    # Empat tombol kubus di sisi kiri, sisanya ruang kosong.
+    kembali, salin, unduh, perluas, ruang = st.columns(
+        [0.55, 0.55, 0.55, 0.55, 4.3],
+        gap="small",
+    )
+    
     with kembali:
         with st.container(key="af_back_wrap"):
             if st.button(
-                "← File",
+                ":material/arrow_back:",
                 key="af_back_btn",
-                use_container_width=True,
+                help="Kembali ke daftar file",
             ):
                 kembali_ke_daftar()
-
+    
     with salin:
         render_tombol_salin(aktif["content"])
-
+    
     with unduh:
         with st.container(key=f"af_download_current_wrap_{aktif['id']}"):
             st.download_button(
-                "Unduh",
+                ":material/download:",
                 data=aktif["content"],
                 file_name=aktif["title"],
                 mime="text/plain",
                 key=f"af_download_current_{aktif['id']}",
-                use_container_width=True,
+                help="Unduh file",
             )
-
+    
     with perluas:
         with st.container(key="af_expand_wrap"):
             if st.button(
                 ":material/close_fullscreen:" if lebar
                 else ":material/open_in_full:",
                 key="af_expand_btn",
-                help="Perlebar atau kecilkan panel",
-                use_container_width=True,
+                help="Kecilkan panel" if lebar else "Perlebar panel",
             ):
-                toggle_lebar()
-
+            toggle_lebar()
+            
     st.markdown(_kode_html(aktif["content"]), unsafe_allow_html=True)
 # ============================================================================
 # PINTU MASUK
