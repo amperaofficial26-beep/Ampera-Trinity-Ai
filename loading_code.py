@@ -7,9 +7,7 @@ def code_loading_html(nama_file: str = "", done: bool = False) -> str:
     if done:
         return ""
 
-    # Posisi HTML harus menempel di batas kiri tanpa spasi agar tidak dianggap sebagai Markdown Code Block
-    return """<h2 class="sr-only">Loading gabungan bergaya ASCII: simbol matematika dan aneh, potongan kode dengan angka bergulir, dan metrik progress bar, dengan kecepatan lebih lambat</h2>
-<div style="display:flex;align-items:center;justify-content:center;padding:2.5rem 0;">
+    return """<div style="display:flex;align-items:center;justify-content:center;padding:2.5rem 0;">
   <div style="display:flex;align-items:center;gap:10px;font-family:var(--font-mono);font-size:14px;color:var(--text-secondary);">
     <span id="dot" style="width:7px;height:7px;border-radius:50%;background:#3C3489;display:inline-block;flex-shrink:0;"></span>
     <span id="line">Menyalakan mode coding</span>
