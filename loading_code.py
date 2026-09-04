@@ -9,16 +9,16 @@ def code_loading_html(nama_file: str = "", done: bool = False, mode: str = "code
 
     # Menentukan interval berdasarkan mode:
     # "code" = 7000ms (7 detik per adegan)
-    # "biasa" = 1200ms (1.2 detik per adegan agar cepat berganti dalam ~10 detik)
+    # "biasa" = 1200ms (1.2 detik per adegan agar cepat berganti dalam durasi ~10 detik)
     interval = 7000 if mode == "code" else 1200
 
-    return f"""<style>
-@keyframes thinkingPulse {{
-  0% {{ transform: scale(1); opacity: 0.8; }}
-  50% {{ transform: scale(1.2); opacity: 1; filter: drop-shadow(0 0 4px #3C3489); }}
-  100% {{ transform: scale(1); opacity: 0.8; }}
-}}
-.thinking-logo {{
+    html_template = """<style>
+@keyframes thinkingPulse {
+  0% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.2); opacity: 1; filter: drop-shadow(0 0 4px #3C3489); }
+  100% { transform: scale(1); opacity: 0.8; }
+}
+.thinking-logo {
   animation: thinkingPulse 1.5s ease-in-out infinite;
 }
 </style>
@@ -72,9 +72,9 @@ def code_loading_html(nama_file: str = "", done: bool = False, mode: str = "code
 
   // 3. A: B: C: D: (naik turun acak dengan bar tersegmentasi)
   function runABCD(){
-    let vals = {{A:ri(1,8), B:ri(1,8), C:ri(1,8), D:ri(1,8)}};
+    let vals = {A:ri(1,8), B:ri(1,8), C:ri(1,8), D:ri(1,8)};
     const t = setInterval(()=>{
-      Object.keys(vals).forEach(k=>{{ vals[k] = Math.max(1, Math.min(8, vals[k]+ri(-1,1))); }});
+      Object.keys(vals).forEach(k=>{ vals[k] = Math.max(1, Math.min(8, vals[k]+ri(-1,1))); });
       const seg = k => '█'.repeat(vals[k]);
       lineEl.textContent = `A|${seg('A')}  | B|${seg('B')}  | C|${seg('C')}  | D|${seg('D')}`;
     }, 120);
@@ -131,11 +131,11 @@ def code_loading_html(nama_file: str = "", done: bool = False, mode: str = "code
     ];
     const tpl = rand(templates);
     let v = tpl[1];
-    lineEl.textContent = `${{tpl[0]}} ${{v}}${{tpl[3]}}`;
+    lineEl.textContent = `${tpl[0]} ${v}${tpl[3]}`;
     const t = setInterval(()=>{
       v++;
       if(v > tpl[2]) v = tpl[1];
-      lineEl.textContent = `${{tpl[0]}} ${{v}}${{tpl[3]}}`;
+      lineEl.textContent = `${tpl[0]} ${v}${tpl[3]}`;
     }, 80);
     timers.push(t);
   }
@@ -145,7 +145,7 @@ def code_loading_html(nama_file: str = "", done: bool = False, mode: str = "code
     const t = setInterval(()=>{
       a += ri(-15,20); b += ri(-15,20);
       const d = Math.abs(a-b);
-      lineEl.textContent = `A:${{a}} >>> B:${{b}}  Δ=${{d}}`;
+      lineEl.textContent = `A:${a} >>> B:${b}  Δ=${d}`;
     }, 90);
     timers.push(t);
   }
@@ -154,7 +154,7 @@ def code_loading_html(nama_file: str = "", done: bool = False, mode: str = "code
     let v = ri(0,65535);
     const t = setInterval(()=>{
       v = (v + ri(1,700)) % 65536;
-      lineEl.textContent = `hash: 0x${{hex(v).padStart(4,'0')}}`;
+      lineEl.textContent = `hash: 0x${hex(v).padStart(4,'0')}`;
     }, 70);
     timers.push(t);
   }
@@ -171,6 +171,8 @@ def code_loading_html(nama_file: str = "", done: bool = False, mode: str = "code
 
   nextScene();
   // Berganti adegan sesuai durasi mode
-  setInterval(nextScene, {interval});
-}})();
+  setInterval(nextScene, INTERVAL_PLACEHOLDER);
+})();
 </script>"""
+
+    return html_template.replace("INTERVAL_PLACEHOLDER", str(interval))
