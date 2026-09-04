@@ -175,7 +175,6 @@ def _artifact_workspace(aid: int) -> None:
             meta = m.get("meta") or ""
             break
 
-    tombol_kembali_chat()
     st.markdown(
         f'<div class="page-head"><div class="page-head-icon">'
         f'{mi(":material/data_object:")}</div>'
@@ -740,7 +739,7 @@ def _set_trinity_code() -> None:
 
 
 def page_pengaturan() -> None:
-    tombol_kembali_chat()
+    
     st.markdown(
         f'<div class="page-head"><div class="page-head-icon">{mi(":material/settings:")}</div>'
         '<div><h2 class="page-title">Pengaturan</h2>'
@@ -784,7 +783,7 @@ def page_pengaturan() -> None:
 # HALAMAN: BAHASA
 # ============================================================================
 def page_bahasa() -> None:
-    tombol_kembali_chat()
+    
     s = get_settings()
     ui_code = s.get("ui_lang", DEFAULT_LANG_CODE)
     yuki_code = s.get("yuki_lang", DEFAULT_LANG_CODE)
@@ -911,7 +910,7 @@ HELP_FAQ = [
 
 
 def page_bantuan() -> None:
-    tombol_kembali_chat()
+    
     st.markdown(
         f'<div class="page-head"><div class="page-head-icon">{mi(":material/help:")}</div>'
         '<div><h2 class="page-title">Dapatkan bantuan</h2>'
@@ -994,7 +993,7 @@ TIPS_LIST = [
 
 
 def page_pelajari() -> None:
-    tombol_kembali_chat()
+    
     st.markdown(
         f'<div class="trinity-hero">{logo_img_html("logo-greeting")}'
         '<div class="hero-text"><h1>Ampera Trinity AI</h1>'
@@ -1058,7 +1057,7 @@ def page_pelajari() -> None:
 # HALAMAN: TINGKATKAN PAKET
 # ============================================================================
 def page_tingkatkan() -> None:
-    tombol_kembali_chat()
+    
     s = get_settings()
     st.markdown(
         '<div class="trinity-hero"><div class="hero-text">'
@@ -1104,7 +1103,7 @@ def page_tingkatkan() -> None:
 # HALAMAN: DAPATKAN APLIKASI
 # ============================================================================
 def page_aplikasi() -> None:
-    tombol_kembali_chat()
+    
     st.markdown(
         f'<div class="trinity-hero">{logo_img_html("logo-greeting")}'
         '<div class="hero-text"><h1>Trinity di genggaman</h1>'
@@ -1179,7 +1178,7 @@ def _course_workspace(key: str) -> None:
     course = COURSE_BY_KEY.get(key) or COURSE_CATALOG[0]
     thread = course_thread(key)
 
-    tombol_kembali_chat()
+    
 
     st.markdown(
         f'<div class="page-head"><div class="page-head-icon">{mi(course["icon"])}</div>'
