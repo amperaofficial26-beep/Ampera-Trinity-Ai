@@ -196,7 +196,7 @@ def handle_chat_request(answer_slot) -> None:
     if not CHAT_READY:
         thread.append({
             "id": next_msg_id(), "role": "assistant", "type": "text",
-            "content": "Fitur chat belum dikonfigurasi pemilik (GROQ_API_KEY).",
+            "content": "Fitur chat belum dikonfigurasi pemilik (GROQ_API_KEY / CEREBRAS_API_KEY).",
             "time": now_wib(),
         })
         return
