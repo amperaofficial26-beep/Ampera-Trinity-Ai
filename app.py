@@ -49,7 +49,7 @@ from state import (
     active_thread, artifact_thread, course_thread, get_settings, init_state,
     main_thread, next_msg_id, open_conversation, reset_conversation,
 )
-from sidebar import go, go_cb, render_sidebar, tombol_kembali
+from sidebar import go, go_cb, render_sidebar, tombol_kembali_chat
 from ui_helpers import (
     _BOTTOM_RESET_CSS, _FRESH_BOTTOM_CSS, _page_footer, get_greeting,
     logo_img_html, render_message,
@@ -175,10 +175,7 @@ def _artifact_workspace(aid: int) -> None:
             meta = m.get("meta") or ""
             break
 
-    back, _sp = st.columns([0.12, 1.0])
-    with back:
-        tombol_kembali("art_back", "artefak", "Kembali ke pilihan artefak",
-                       artifact_active_id=None)
+    tombol_kembali_chat()
     st.markdown(
         f'<div class="page-head"><div class="page-head-icon">'
         f'{mi(":material/data_object:")}</div>'
@@ -220,6 +217,8 @@ def _artifact_workspace(aid: int) -> None:
         st.rerun()
 
     _page_footer(in_chat=True)
+
+
 def page_artefak() -> None:
     aid = st.session_state.get("artifact_active_id")
     if aid is not None:
@@ -741,9 +740,7 @@ def _set_trinity_code() -> None:
 
 
 def page_pengaturan() -> None:
-    back, _sp = st.columns([0.12, 1.0])
-    with back:
-        tombol_kembali("set_back", "chat", "Kembali ke chat")
+    tombol_kembali_chat()
     st.markdown(
         f'<div class="page-head"><div class="page-head-icon">{mi(":material/settings:")}</div>'
         '<div><h2 class="page-title">Pengaturan</h2>'
@@ -787,11 +784,7 @@ def page_pengaturan() -> None:
 # HALAMAN: BAHASA
 # ============================================================================
 def page_bahasa() -> None:
-    back, _sp = st.columns([0.12, 1.0])
-    with back:
-        if st.button(":material/arrow_back:", key="lang_back", use_container_width=True,
-                     help="Kembali ke chat"):
-            go("chat")
+    tombol_kembali_chat()
     s = get_settings()
     ui_code = s.get("ui_lang", DEFAULT_LANG_CODE)
     yuki_code = s.get("yuki_lang", DEFAULT_LANG_CODE)
@@ -918,11 +911,7 @@ HELP_FAQ = [
 
 
 def page_bantuan() -> None:
-    back, _sp = st.columns([0.12, 1.0])
-    with back:
-        if st.button(":material/arrow_back:", key="help_back", use_container_width=True,
-                     help="Kembali ke chat"):
-            go("chat")
+    tombol_kembali_chat()
     st.markdown(
         f'<div class="page-head"><div class="page-head-icon">{mi(":material/help:")}</div>'
         '<div><h2 class="page-title">Dapatkan bantuan</h2>'
@@ -1005,11 +994,7 @@ TIPS_LIST = [
 
 
 def page_pelajari() -> None:
-    back, _sp = st.columns([0.12, 1.0])
-    with back:
-        if st.button(":material/arrow_back:", key="pel_back", use_container_width=True,
-                     help="Kembali ke chat"):
-            go("chat")
+    tombol_kembali_chat()
     st.markdown(
         f'<div class="trinity-hero">{logo_img_html("logo-greeting")}'
         '<div class="hero-text"><h1>Ampera Trinity AI</h1>'
@@ -1073,11 +1058,7 @@ def page_pelajari() -> None:
 # HALAMAN: TINGKATKAN PAKET
 # ============================================================================
 def page_tingkatkan() -> None:
-    back, _sp = st.columns([0.12, 1.0])
-    with back:
-        if st.button(":material/arrow_back:", key="pro_back", use_container_width=True,
-                     help="Kembali ke chat"):
-            go("chat")
+    tombol_kembali_chat()
     s = get_settings()
     st.markdown(
         '<div class="trinity-hero"><div class="hero-text">'
@@ -1123,11 +1104,7 @@ def page_tingkatkan() -> None:
 # HALAMAN: DAPATKAN APLIKASI
 # ============================================================================
 def page_aplikasi() -> None:
-    back, _sp = st.columns([0.12, 1.0])
-    with back:
-        if st.button(":material/arrow_back:", key="app_back", use_container_width=True,
-                     help="Kembali ke chat"):
-            go("chat")
+    tombol_kembali_chat()
     st.markdown(
         f'<div class="trinity-hero">{logo_img_html("logo-greeting")}'
         '<div class="hero-text"><h1>Trinity di genggaman</h1>'
@@ -1202,10 +1179,7 @@ def _course_workspace(key: str) -> None:
     course = COURSE_BY_KEY.get(key) or COURSE_CATALOG[0]
     thread = course_thread(key)
 
-    back, _sp = st.columns([0.12, 1.0])
-    with back:
-        tombol_kembali("course_back", "kursus", "Kembali ke daftar kursus",
-                       course_active_key=None)
+    tombol_kembali_chat()
 
     st.markdown(
         f'<div class="page-head"><div class="page-head-icon">{mi(course["icon"])}</div>'
