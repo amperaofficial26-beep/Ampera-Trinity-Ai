@@ -188,7 +188,8 @@ def _artifact_workspace(aid: int) -> None:
         unsafe_allow_html=True,
     )
 
-    if thread and thread[-1].get("awaiting_reply"):  
+    if thread and thread[-1].get("awaiting_reply"):
+        thread[-1].pop("awaiting_reply", None)
         from chat_handlers import handle_chat_request
         handle_chat_request(st.empty())
         st.rerun()
@@ -219,8 +220,6 @@ def _artifact_workspace(aid: int) -> None:
         st.rerun()
 
     _page_footer(in_chat=True)
-
-
 def page_artefak() -> None:
     aid = st.session_state.get("artifact_active_id")
     if aid is not None:
