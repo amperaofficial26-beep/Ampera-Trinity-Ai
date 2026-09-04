@@ -453,7 +453,7 @@ def _css_panel(terbuka: bool, lebar: bool) -> str:
         "body .st-key-af_back_wrap button,"
         "body [class*='st-key-af_download_current_wrap_'] button,"
         "body .st-key-af_expand_wrap button{"
-        "height:46px!important;"
+        "height:40px!important;"
         "min-height:46px!important;"
         "border:1px solid #DCCFBE!important;"
         "border-radius:2px!important;"
