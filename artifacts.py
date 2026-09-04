@@ -456,7 +456,7 @@ def _css_panel(terbuka: bool, lebar: bool) -> str:
         "height:46px!important;"
         "min-height:46px!important;"
         "border:1px solid #DCCFBE!important;"
-        "border-radius:8px!important;"
+        "border-radius:2px!important;"
         "background:#FFFFFF!important;"
         "color:#382843!important;"
         "font-weight:650!important;"
