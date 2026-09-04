@@ -16,7 +16,7 @@ import io
 
 from PIL import Image
 import streamlit as st
-
+import streamlit.components.v1 as components
 from config import (
     AVAILABLE_MODELS, DEFAULT_MODEL_KEY, IMAGE_INPUT_TYPES, IMAGE_READY,
     CHAT_READY, MAX_IMAGES_PER_MESSAGE, MODEL_BY_KEY, MODEL_CATALOG,
