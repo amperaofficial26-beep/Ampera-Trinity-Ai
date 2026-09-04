@@ -5,8 +5,8 @@ from __future__ import annotations
 from openai import OpenAI
 
 from config import (
-    CEREBRAS_API_KEY,
-    CEREBRAS_BASE_URL,
+    PLUGSKY_API_KEY,
+    PLUGSKY_BASE_URL,
     MAX_HISTORY_MESSAGES,
     YUKI_SYSTEM_PROMPT,
     LANG_BY_CODE,
@@ -18,21 +18,22 @@ from config import (
     DESAIN_PROMPT,
     JADWAL_PROMPT,
 )
+
 from state import get_settings
 
 
-CEREBRAS_MODEL = "gpt-oss-120b"
+PLUGSKY_MODEL = "openai/gpt-oss-120b"
 
 
-def build_cerebras_client():
-    if not CEREBRAS_API_KEY:
+def build_plugsky_client():
+    if not PLUGSKY_API_KEY:
         raise RuntimeError(
-            "CEREBRAS_API_KEY belum dikonfigurasi."
+            "PLUGSKY_API_KEY belum dikonfigurasi."
         )
 
     return OpenAI(
-        api_key=CEREBRAS_API_KEY,
-        base_url=CEREBRAS_BASE_URL,
+        api_key=PLUGSKY_API_KEY,
+        base_url=PLUGSKY_BASE_URL,
     )
 
 
@@ -115,7 +116,7 @@ def build_system_prompt() -> str:
     return "\n\n".join(parts)
 
 
-def messages_for_cerebras(
+def messages_for_plugsky(
     history: list[dict],
 ) -> list[dict]:
 
@@ -146,15 +147,15 @@ def messages_for_cerebras(
     return messages
 
 
-def stream_cerebras_reply(
+def stream_plugsky_reply(
     client: OpenAI,
     history: list[dict],
-    model: str = CEREBRAS_MODEL,
+    model: str = PLUGSKY_MODEL,
 ):
 
     response = client.chat.completions.create(
         model=model,
-        messages=messages_for_cerebras(history),
+        messages=messages_for_plugsky(history),
         temperature=float(
             get_settings().get("temperature", 0.7)
         ),
