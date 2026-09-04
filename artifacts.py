@@ -138,7 +138,7 @@ def ambil_artefak(teks: str) -> tuple[str, list[int]]:
     bersih = re.sub(r"\n{3,}", "\n\n", "".join(potongan)).strip()
 
     if baru and BUKA_OTOMATIS:
-        st.session_state["artifact_panel_open"] = False
+        st.session_state["artifact_panel_open"] = True
         st.session_state["artifact_panel_id"] = baru[0]
 
     return bersih, baru
