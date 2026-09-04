@@ -95,9 +95,9 @@ def _tebak_nama(lang: str, kode: str, sebelum: str) -> str:
     ext = _EKSTENSI.get((lang or "").lower(), "txt")
     return f"file_{len(daftar_artefak()) + 1}.{ext}"
 
-
 def ambil_artefak(teks: str) -> tuple[str, list[int]]:
-    """Potong blok kode dari jawaban Yuki -> simpan sebagai file."""
+    """Potong blok kode dari jawaban Yuki -> simpan sebagai file, 
+    sekaligus merapikan teks dan menyisipkan kartu artefak di chat."""
     raw = teks or ""
     if "```" not in raw:
         return raw, []
@@ -135,7 +135,14 @@ def ambil_artefak(teks: str) -> tuple[str, list[int]]:
         baru.append(aid)
 
     potongan.append(raw[posisi:])
+    
+    # Rapikan spasi atau baris kosong berlebih yang tertinggal
     bersih = re.sub(r"\n{3,}", "\n\n", "".join(potongan)).strip()
+
+    # Jika ada file/artefak baru yang berhasil dibuat, 
+    # sematkan kartu ringkasnya di akhir teks pesan chat
+    if baru:
+        bersih += "\n\n" + kartu_file_html(baru)
 
     if baru and BUKA_OTOMATIS:
         st.session_state["artifact_panel_open"] = True
