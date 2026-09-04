@@ -567,12 +567,11 @@ def _render_isi(aktif: dict, lebar: bool) -> None:
 
     st.divider()
 
-    # Empat tombol kubus di sisi kiri, sisanya ruang kosong.
     kembali, salin, unduh, perluas, ruang = st.columns(
         [0.55, 0.55, 0.55, 0.55, 4.3],
         gap="small",
     )
-    
+
     with kembali:
         with st.container(key="af_back_wrap"):
             if st.button(
@@ -581,10 +580,10 @@ def _render_isi(aktif: dict, lebar: bool) -> None:
                 help="Kembali ke daftar file",
             ):
                 kembali_ke_daftar()
-    
+
     with salin:
         render_tombol_salin(aktif["content"])
-    
+
     with unduh:
         with st.container(key=f"af_download_current_wrap_{aktif['id']}"):
             st.download_button(
@@ -595,17 +594,17 @@ def _render_isi(aktif: dict, lebar: bool) -> None:
                 key=f"af_download_current_{aktif['id']}",
                 help="Unduh file",
             )
-    
-   with perluas:
-    with st.container(key="af_expand_wrap"):
-        if st.button(
-            ":material/close_fullscreen:" if lebar
-            else ":material/open_in_full:",
-            key="af_expand_btn",
-            help="Kecilkan panel" if lebar else "Perlebar panel",
-        ):
-            toggle_lebar()
-            
+
+    with perluas:
+        with st.container(key="af_expand_wrap"):
+            if st.button(
+                ":material/close_fullscreen:" if lebar
+                else ":material/open_in_full:",
+                key="af_expand_btn",
+                help="Kecilkan panel" if lebar else "Perlebar panel",
+            ):
+                toggle_lebar()
+
     st.markdown(_kode_html(aktif["content"]), unsafe_allow_html=True)
 # ============================================================================
 # PINTU MASUK
