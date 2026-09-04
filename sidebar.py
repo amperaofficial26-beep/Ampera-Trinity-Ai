@@ -166,14 +166,13 @@ def tombol_kembali_chat() -> None:
     """Satu tombol kembali yang seragam untuk SEMUA halaman selain chat.
 
     Selalu membawa balik ke halaman chat, muncul di pojok kiri atas
-    halaman. Memakai on_click (bukan "if st.button(): ...") supaya
-    kliknya tidak hilang pada halaman yang juga memanggil st.rerun()
-    di tempat lain.
+    halaman.
     """
     st.markdown(_GAYA_KEMBALI_CHAT, unsafe_allow_html=True)
     with st.container(key="back_to_chat"):
-        st.button(":material/arrow_back:", key="back_to_chat_btn",
-                  help="Kembali ke chat", on_click=go_cb, args=("chat",))
+        if st.button(":material/arrow_back:", key="back_to_chat_btn",
+                     help="Kembali ke chat"):
+            go("chat")
       
 def go(page: str, **extra) -> None:
     """Pindah halaman internal (chat / artefak / pengaturan / …)."""
