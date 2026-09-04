@@ -225,9 +225,13 @@ def handle_chat_request(answer_slot) -> None:
     try:
     model_key = st.session_state.selected_model_key
 
-    if _is_cerebras_model(model_key):
+    web_search_active = (
+        st.session_state.get("web_search_on")
+        and s.get("cap_web_search", True)
+    )
+    
+    if _is_cerebras_model(model_key) and not has_images and not web_search_active:
         client = build_cerebras_client()
-
         stream = stream_cerebras_reply(
             client,
             thread,
@@ -235,59 +239,12 @@ def handle_chat_request(answer_slot) -> None:
         )
     else:
         client = build_chat_client()
-
         stream = stream_chat_with_fallback(
             client,
             model_id,
             thread,
             vision=has_images,
         )
-
-    potongan: list[str] = []
-    mode_kode = False
-
-    for piece in stream:
-        potongan.append(piece or "")
-
-        if not mode_kode and "```" in "".join(potongan):
-            mode_kode = True
-            inject_code_loading_css()
-
-            with think_slot:
-                components.html(
-                    code_loading_html(
-                        _tebak_nama_file("".join(potongan))
-                    ),
-                    height=90,
-                    scrolling=False,
-                )
-
-    full = "".join(potongan)
-        elapsed = time.time() - t0
-        if elapsed < min_think:
-            time.sleep(min_think - elapsed)
-        think_slot.empty()
-        if not full:
-            full = "…"
-        # Pisahkan blok [[PILIHAN]] -> jadi kartu tombol, bukan teks mentah.
-        # Dibungkus pemeriksaan supaya jawaban Yuki tetap tampil walau
-        # parser bermasalah (mis. mengembalikan None karena salah edit).
-        hasil = parse_quick_replies(full)
-        if isinstance(hasil, (tuple, list)) and len(hasil) == 2:
-            full, kartu = hasil
-            kartu = kartu if isinstance(kartu, dict) else {}
-        else:
-            kartu = {}
-        if not full:
-            full = kartu.get("question") or "…"
-        # Blok [[TUGAS]] di halaman AI Penjadwal -> langsung masuk daftar tugas.
-        if st.session_state.get("page") == "jadwal":
-            try:
-                from page_jadwal import serap_blok_tugas
-                full, jml = serap_blok_tugas(full)
-                if jml:
-                    st.toast(f"{jml} tugas ditambahkan ke daftar.",
-                             icon=":material/task_alt:")
             except Exception:
                 pass
 
