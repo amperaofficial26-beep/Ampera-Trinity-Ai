@@ -394,9 +394,9 @@ def _render_daftar(daftar: list[dict]) -> None:
                         '<div class="af-file-ext">' + html.escape(ext) + "</div>",
                         unsafe_allow_html=True,
                     )
-                    st.button("Buka", key=f"af_open_{a['id']}",
-                              use_container_width=True,
-                              on_click=pilih_file, args=(a["id"],))
+                    if st.button("Buka", key=f"af_open_{a['id']}",
+                                 use_container_width=True):
+                        pilih_file(a["id"])
                 with unduh:
                     st.download_button(
                         ":material/download:",
@@ -443,16 +443,17 @@ def _render_isi(aktif: dict, lebar: bool) -> None:
                 st.markdown(_tombol_salin_html(aktif["content"]),
                             unsafe_allow_html=True)
             with c2:
-                st.button(":material/close_fullscreen:" if lebar
-                          else ":material/open_in_full:",
-                          key="af_wide", help="Perlebar / kecilkan panel",
-                          on_click=toggle_lebar)
+                if st.button(":material/close_fullscreen:" if lebar
+                             else ":material/open_in_full:",
+                             key="af_wide", help="Perlebar / kecilkan panel"):
+                    toggle_lebar()
             with c3:
-                st.button(":material/close:", key="af_close",
-                          help="Tutup panel", on_click=tutup_panel)
+                if st.button(":material/close:", key="af_close",
+                             help="Tutup panel"):
+                    tutup_panel()
 
-    st.button(":material/arrow_back:  Semua file", key="af_back",
-              on_click=kembali_ke_daftar)
+    if st.button(":material/arrow_back:  Semua file", key="af_back"):
+        kembali_ke_daftar()
 
     st.markdown(_kode_html(aktif["content"]), unsafe_allow_html=True)
 
@@ -481,15 +482,15 @@ def render_panel() -> None:
 
     # tombol mengambang: SELALU tampil
     with st.container(key="af_toggle"):
-        st.button(
+        if st.button(
             ":material/right_panel_close:" if terbuka
             else ":material/right_panel_open:",
             key="af_toggle_btn",
             help=("Tutup panel file" if terbuka
                   else (f"Buka panel file ({len(daftar)})" if daftar
                         else "Panel file (masih kosong)")),
-            on_click=toggle_panel,
-        )
+        ):
+            toggle_panel()
 
     if not terbuka:
         return
