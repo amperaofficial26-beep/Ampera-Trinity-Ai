@@ -612,7 +612,7 @@ def _render_isi(aktif: dict, lebar: bool) -> None:
 
     st.divider()
 
-    kembali, salin, unduh, perluas, ruang = st.columns(4, gap="small")
+    kembali, salin, unduh, perluas = st.columns(4, gap="small")
 
     with kembali:
         with st.container(key="af_back_wrap"):
