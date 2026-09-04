@@ -10,7 +10,7 @@ def code_loading_html(nama_file: str = "", done: bool = False, mode: str = "code
     # Menentukan interval berdasarkan mode:
     # "code" = 7000ms (7 detik per adegan)
     # "biasa" = 1200ms (1.2 detik per adegan agar cepat berganti dalam durasi ~10 detik)
-    interval = 7000 if mode == "code" else 1200
+    interval = 1200 if mode == "code" else 1200
 
     html_template = """<style>
 @keyframes thinkingPulse {
