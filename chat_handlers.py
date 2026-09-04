@@ -193,43 +193,62 @@ def _is_cerebras_model(model_key: str) -> bool:
     
 def handle_chat_request(answer_slot) -> None:
     thread = active_thread()
+
     if not CHAT_READY:
         thread.append({
-            "id": next_msg_id(), "role": "assistant", "type": "text",
-            "content": "Fitur chat belum dikonfigurasi pemilik (GROQ_API_KEY / CEREBRAS_API_KEY).",
+            "id": next_msg_id(),
+            "role": "assistant",
+            "type": "text",
+            "content": (
+                "Fitur chat belum dikonfigurasi pemilik "
+                "(GROQ_API_KEY / CEREBRAS_API_KEY)."
+            ),
             "time": now_wib(),
         })
         return
 
     s = get_settings()
+
+    model_key = st.session_state.selected_model_key
+
     model_id = AVAILABLE_MODELS.get(
-        st.session_state.selected_model_key,
+        model_key,
         AVAILABLE_MODELS[DEFAULT_MODEL_KEY],
     )
+
     last_user = next(
         (m for m in reversed(thread) if m.get("role") == "user"),
         None,
     )
+
     has_images = bool(last_user and last_user.get("images"))
+
+    web_search_active = (
+        st.session_state.get("web_search_on")
+        and s.get("cap_web_search", True)
+    )
+
     if has_images:
         model_id = VISION_MODEL_ID
-    elif st.session_state.get("web_search_on") and s.get("cap_web_search", True):
+    elif web_search_active:
         model_id = AVAILABLE_MODELS["compound"]
 
     from ui_helpers import THINKING_MIN_SECONDS
+
     think_slot = st.empty()
-    think_slot.markdown(thinking_html(THINKING_PHRASES_CHAT), unsafe_allow_html=True)
+    think_slot.markdown(
+        thinking_html(THINKING_PHRASES_CHAT),
+        unsafe_allow_html=True,
+    )
+
     t0 = time.time()
-    min_think = float(s.get("min_think_seconds", THINKING_MIN_SECONDS))
+    min_think = float(
+        s.get("min_think_seconds", THINKING_MIN_SECONDS)
+    )
 
     try:
-        model_key = st.session_state.selected_model_key
-
-        web_search_active = (
-            st.session_state.get("web_search_on")
-            and s.get("cap_web_search", True)
-        )
-
+        # Trinity Plus -> Cerebras
+        # Gambar / Web Search -> tetap menggunakan Groq
         if (
             _is_cerebras_model(model_key)
             and not has_images
@@ -274,6 +293,7 @@ def handle_chat_request(answer_slot) -> None:
         full = "".join(potongan)
 
         elapsed = time.time() - t0
+
         if elapsed < min_think:
             time.sleep(min_think - elapsed)
 
@@ -282,9 +302,7 @@ def handle_chat_request(answer_slot) -> None:
         if not full:
             full = "…"
 
-        # Pisahkan blok [[PILIHAN]] -> jadi kartu tombol, bukan teks mentah.
-        # Dibungkus pemeriksaan supaya jawaban Yuki tetap tampil walau
-        # parser bermasalah.
+        # Pisahkan blok [[PILIHAN]]
         hasil = parse_quick_replies(full)
 
         if isinstance(hasil, (tuple, list)) and len(hasil) == 2:
@@ -311,7 +329,7 @@ def handle_chat_request(answer_slot) -> None:
             except Exception:
                 pass
 
-        # Blok [[KARTU:...]] -> kartu visual
+        # Blok [[KARTU:...]]
         hasil_kartu = parse_cards(full)
 
         if isinstance(hasil_kartu, (tuple, list)) and len(hasil_kartu) == 2:
@@ -327,14 +345,17 @@ def handle_chat_request(answer_slot) -> None:
         if not full:
             full = "Ini hasilnya ya!"
 
-        # Blok kode -> disimpan sebagai FILE
+        # Blok kode -> file
         full, file_ids = ambil_artefak(full)
         full = rapihkan_teks_chat(full)
 
         if file_ids and mode_kode:
             with think_slot:
                 components.html(
-                    code_loading_html("Selesai", done=True),
+                    code_loading_html(
+                        "Selesai",
+                        done=True,
+                    ),
                     height=90,
                     scrolling=False,
                 )
@@ -370,14 +391,22 @@ def handle_chat_request(answer_slot) -> None:
             reply["cards"] = kartu_kaya
 
         thread.append(reply)
+
+    except Exception as e:
         think_slot.empty()
+
         err = public_error_chat(e)
+
         thread.append({
-            "id": next_msg_id(), "role": "assistant", "type": "text",
-            "content": err, "time": now_wib(),
+            "id": next_msg_id(),
+            "role": "assistant",
+            "type": "text",
+            "content": err,
+            "time": now_wib(),
             "error_detail": f"{type(e).__name__}: {e}",
         })
-        
+
+
 def _make_square_preview(data: bytes, size: int = 160) -> tuple[bytes, str]:
     try:
         im = Image.open(io.BytesIO(data))
