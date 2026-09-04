@@ -30,7 +30,7 @@ import streamlit as st
 # ============================================================================
 PANEL_LEBAR_PX = 470        # lebar panel kanan
 PANEL_LEBAR_LEBAR_PX = 860  # lebar saat tombol "perlebar" ditekan
-BUKA_OTOMATIS = True        # panel langsung terbuka saat file baru dibuat
+BUKA_OTOMATIS = False        # panel langsung terbuka saat file baru dibuat
 MIN_BARIS_JADI_FILE = 3     # blok kode lebih pendek dari ini tetap di chat
 MIN_KARAKTER_JADI_FILE = 40
 BARIS_LANGSUNG_FILE = 5     # sebanyak ini baris ke atas: selalu jadi file
@@ -138,7 +138,7 @@ def ambil_artefak(teks: str) -> tuple[str, list[int]]:
     bersih = re.sub(r"\n{3,}", "\n\n", "".join(potongan)).strip()
 
     if baru and BUKA_OTOMATIS:
-        st.session_state["artifact_panel_open"] = True
+        st.session_state["artifact_panel_open"] = False
         st.session_state["artifact_panel_id"] = baru[0]
 
     return bersih, baru
