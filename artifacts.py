@@ -144,9 +144,9 @@ def ambil_artefak(teks: str) -> tuple[str, list[int]]:
     if baru:
         bersih += "\n\n" + kartu_file_html(baru)
 
-    if baru and BUKA_OTOMATIS:
-        st.session_state["artifact_panel_open"] = True
-        st.session_state["artifact_panel_id"] = baru[0]
+    #if baru and BUKA_OTOMATIS:
+    #    st.session_state["artifact_panel_open"] = True
+    #    st.session_state["artifact_panel_id"] = baru[0]
 
     return bersih, baru
 
