@@ -481,8 +481,11 @@ def _get_secret(*keys: str) -> str:
 
 
 GROQ_API_KEY = _get_secret("GROQ_API_KEY", "GROQ_KEY")
+CEREBRAS_API_KEY = _get_secret("CEREBRAS_API_KEY")
+CEREBRAS_BASE_URL = "https://api.cerebras.ai/v1"
 CF_ACCOUNT_ID = _get_secret("CF_ACCOUNT_ID", "CLOUDFLARE_ACCOUNT_ID")
 CF_API_TOKEN = _get_secret("CF_API_TOKEN", "CLOUDFLARE_API_TOKEN")
 
-CHAT_READY = bool(GROQ_API_KEY)
+CHAT_READY = bool(GROQ_API_KEY or CEREBRAS_API_KEY)
+CEREBRAS_READY = bool(CEREBRAS_API_KEY)
 IMAGE_READY = bool(CF_ACCOUNT_ID and CF_API_TOKEN)
