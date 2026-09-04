@@ -29,10 +29,9 @@ from engines.groq_engine import (
     stream_chat_with_fallback,
     transcribe_audio,
 )
-
-from engines.cerebras_engine import (
-    build_cerebras_client,
-    stream_cerebras_reply,
+from engines.compatible_engine import (
+    build_compatible_client,
+    stream_compatible_reply,
 )
 from artifacts import ambil_artefak
 from loading_code import code_loading_html, inject_code_loading_css
@@ -186,10 +185,10 @@ def _tebak_nama_file(teks: str) -> str:
         return "Menulis kode " + m2[-1]
     return "Menyiapkan berkas…"
     
-def _is_cerebras_model(model_key: str) -> bool:
-    """Cek apakah model yang dipilih menggunakan Cerebras."""
+def _get_model_provider(model_key: str) -> str:
+    """Mengambil provider dari model yang dipilih."""
     model = MODEL_BY_KEY.get(model_key, {})
-    return model.get("provider") == "cerebras"
+    return model.get("provider", "groq")
     
 def handle_chat_request(answer_slot) -> None:
     thread = active_thread()
@@ -247,23 +246,24 @@ def handle_chat_request(answer_slot) -> None:
     )
 
     try:
-        # Trinity Plus -> Cerebras
-        # Gambar / Web Search -> tetap menggunakan Groq
+    provider = _get_model_provider(model_key)
+        # Vision dan Web Search tetap menggunakan Groq.
+        # Model OpenAI-compatible digunakan untuk chat teks biasa.
         if (
-            _is_cerebras_model(model_key)
+            provider in ("plugsky", "aion", "final_router")
             and not has_images
             and not web_search_active
         ):
-            client = build_cerebras_client()
-
-            stream = stream_cerebras_reply(
+            client = build_compatible_client(provider)
+        
+            stream = stream_compatible_reply(
                 client,
                 thread,
                 model=model_id,
             )
         else:
             client = build_chat_client()
-
+        
             stream = stream_chat_with_fallback(
                 client,
                 model_id,
