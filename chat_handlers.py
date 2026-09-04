@@ -208,10 +208,13 @@ def handle_chat_request(answer_slot) -> None:
             if not mode_kode and "```" in "".join(potongan):
                 mode_kode = True
                 inject_code_loading_css()
-                think_slot.markdown(
-                    code_loading_html(_tebak_nama_file("".join(potongan))),
-                    unsafe_allow_html=True,
-                )
+                # Ubah dari st.markdown menjadi components.html di dalam think_slot
+                with think_slot:
+                    components.html(
+                        code_loading_html(_tebak_nama_file("".join(potongan))), 
+                        height=90, 
+                        scrolling=False
+                    )
         full = "".join(potongan)
         elapsed = time.time() - t0
         if elapsed < min_think:
@@ -254,9 +257,12 @@ def handle_chat_request(answer_slot) -> None:
         # bukan memenuhi ruang chat. Chat hanya menampilkan kartu ringkas.
         full, file_ids = ambil_artefak(full)
         if file_ids and mode_kode:
-            think_slot.markdown(
-                code_loading_html("Selesai", done=True), unsafe_allow_html=True
-            )
+            with think_slot:
+                components.html(
+                    code_loading_html("Selesai", done=True), 
+                    height=90, 
+                    scrolling=False
+                )
             time.sleep(0.6)
             think_slot.empty()
         if not full:
