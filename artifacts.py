@@ -22,7 +22,7 @@ import io
 import re
 import zipfile
 from datetime import datetime
-
+import streamlit.components.v1 as components
 import streamlit as st
 
 # ============================================================================
@@ -190,9 +190,12 @@ def kembali_ke_daftar() -> None:
 
 
 def toggle_lebar() -> None:
-    st.session_state["artifact_panel_wide"] = not st.session_state.get(
-        "artifact_panel_wide", False
+    st.session_state["artifact_panel_wide"] = not bool(
+        st.session_state.get("artifact_panel_wide", False)
     )
+
+    # Menekan perluas tidak boleh menutup panel.
+    st.session_state["artifact_panel_open"] = True
 
 
 # ============================================================================
@@ -249,7 +252,91 @@ def _tombol_salin_html(teks: str, label: str = "Salin") -> str:
         'setTimeout(()=>{this.innerHTML=o;},1300);" '
         'title="Salin seluruh isi">' + html.escape(label) + "</button>"
     )
+  
+def render_tombol_salin(teks: str) -> None:
+    """Tombol salin yang benar-benar menyalin isi file ke clipboard."""
+    data = base64.b64encode((teks or "").encode("utf-8")).decode("ascii")
 
+    components.html(
+        f"""
+        <style>
+            html, body {{
+                margin: 0;
+                padding: 0;
+                background: transparent;
+                overflow: hidden;
+            }}
+
+            #copy-code {{
+                width: 100%;
+                height: 46px;
+                border: 1px solid #DCCFBE;
+                border-radius: 8px;
+                background: #FFFFFF;
+                color: #382843;
+                font-size: 14px;
+                font-weight: 650;
+                cursor: pointer;
+                transition: background .18s ease, color .18s ease;
+            }}
+
+            #copy-code:hover {{
+                background: #F7F0E5;
+            }}
+
+            #copy-code.copied {{
+                background: #382843;
+                color: #FFFFFF;
+                animation: copy-in .18s ease-out, copy-out .18s ease-in 1.15s;
+            }}
+
+            @keyframes copy-in {{
+                from {{ transform: scale(.82) rotate(-8deg); opacity: .4; }}
+                to {{ transform: scale(1) rotate(0deg); opacity: 1; }}
+            }}
+
+            @keyframes copy-out {{
+                from {{ transform: scale(1) rotate(0deg); opacity: 1; }}
+                to {{ transform: scale(.82) rotate(8deg); opacity: .4; }}
+            }}
+        </style>
+
+        <button id="copy-code" type="button">Salin</button>
+
+        <script>
+            const button = document.getElementById("copy-code");
+            const encoded = "{data}";
+
+            async function copyText() {{
+                const bytes = Uint8Array.from(atob(encoded), c => c.charCodeAt(0));
+                const text = new TextDecoder().decode(bytes);
+
+                try {{
+                    await navigator.clipboard.writeText(text);
+                }} catch (_) {{
+                    const area = document.createElement("textarea");
+                    area.value = text;
+                    document.body.appendChild(area);
+                    area.select();
+                    document.execCommand("copy");
+                    area.remove();
+                }}
+
+                button.classList.add("copied");
+                button.textContent = "✓";
+
+                setTimeout(() => {{
+                    button.classList.remove("copied");
+                    button.textContent = "Salin";
+                }}, 1350);
+            }}
+
+            button.addEventListener("click", copyText);
+        </script>
+        """,
+        height=48,
+        scrolling=False,
+    )
 
 def _zip_semua(daftar: list[dict]) -> bytes:
     buf = io.BytesIO()
@@ -363,6 +450,18 @@ def _css_panel(terbuka: bool, lebar: bool) -> str:
         "left:auto!important;"
         "bottom:auto!important;"
         "}"
+        "body .st-key-af_back_wrap button,"
+        "body [class*='st-key-af_download_current_wrap_'] button,"
+        "body .st-key-af_expand_wrap button{"
+        "height:46px!important;"
+        "min-height:46px!important;"
+        "border:1px solid #DCCFBE!important;"
+        "border-radius:8px!important;"
+        "background:#FFFFFF!important;"
+        "color:#382843!important;"
+        "font-weight:650!important;"
+        "box-shadow:none!important;"
+        "}"
         "</style>"
     )
 
@@ -445,54 +544,49 @@ def _render_isi(aktif: dict, lebar: bool) -> None:
         else aktif["lang"].upper()
     )
 
-    judul, tutup = st.columns([4, 1])
-
-    with judul:
-        st.markdown(
-            '<div class="af-preview-head">' + html.escape(aktif["title"]) + "</div>"
-            '<div class="af-preview-meta">' + html.escape(ext)
-            + " · " + str(len(aktif["content"].splitlines()))
-            + " baris · dibuat " + html.escape(aktif.get("time", "")) + "</div>",
-            unsafe_allow_html=True,
-        )
-
-    with tutup:
-        with st.container(key="af_close"):
-            if st.button(":material/close:", key="af_close_btn",
-                         help="Tutup panel", use_container_width=True):
-                tutup_panel()
+    st.markdown(
+        '<div class="af-head-title">' + html.escape(aktif["title"]) + "</div>"
+        '<div class="af-head-sub">' + html.escape(ext)
+        + " · " + str(len(aktif["content"].splitlines()))
+        + " baris</div>",
+        unsafe_allow_html=True,
+    )
 
     st.divider()
 
-    kembali, salin, unduh, lebar_btn = st.columns([1.15, 1, 1, 1])
+    # Semua tombol berukuran dan sejajar sama.
+    kembali, salin, unduh, perluas = st.columns(4, gap="small")
 
     with kembali:
         with st.container(key="af_back_wrap"):
-            if st.button(":material/arrow_back:  File", key="af_back_btn",
-                         use_container_width=True):
+            if st.button(
+                "← File",
+                key="af_back_btn",
+                use_container_width=True,
+            ):
                 kembali_ke_daftar()
 
     with salin:
-        st.markdown(_tombol_salin_html(aktif["content"], "Salin"),
-                    unsafe_allow_html=True)
+        render_tombol_salin(aktif["content"])
 
     with unduh:
-        with st.container(key=f"af_download_view_{aktif['id']}"):
+        with st.container(key=f"af_download_current_wrap_{aktif['id']}"):
             st.download_button(
-                ":material/download:  Unduh",
+                "Unduh",
                 data=aktif["content"],
                 file_name=aktif["title"],
                 mime="text/plain",
-                key=f"af_dl_{aktif['id']}",
+                key=f"af_download_current_{aktif['id']}",
                 use_container_width=True,
             )
 
-    with lebar_btn:
-        with st.container(key="af_wide_wrap"):
+    with perluas:
+        with st.container(key="af_expand_wrap"):
             if st.button(
-                ":material/close_fullscreen:" if lebar else ":material/open_in_full:",
-                key="af_wide",
-                help="Lebarkan atau kecilkan panel",
+                ":material/close_fullscreen:" if lebar
+                else ":material/open_in_full:",
+                key="af_expand_btn",
+                help="Perlebar atau kecilkan panel",
                 use_container_width=True,
             ):
                 toggle_lebar()
