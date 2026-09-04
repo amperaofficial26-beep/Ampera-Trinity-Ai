@@ -13,6 +13,7 @@ import threading
 import time
 import base64
 import io
+import re
 
 from PIL import Image
 import streamlit as st
@@ -72,6 +73,15 @@ def maybe_run_yuki(answer_slot) -> bool:
         handle_chat_request(answer_slot)
     return True
 
+def rapihkan_teks_chat(teks: str) -> str:
+    """Merapikan format teks chat biasa dari Yuki agar lebih enak dibaca."""
+    if not teks:
+        return ""
+    # Menghilangkan baris kosong berlebihan (lebih dari 2 baris enter)
+    teks = re.sub(r"\n{3,}", "\n\n", teks)
+    # Merapikan spasi di awal/akhir baris
+    teks = "\n".join([line.strip() for line in teks.splitlines()])
+    return teks.strip()
 def handle_image_request(prompt: str) -> None:
     thread = active_thread()
     if not IMAGE_READY:
@@ -256,6 +266,7 @@ def handle_chat_request(answer_slot) -> None:
         # Blok kode -> disimpan sebagai FILE dan tampil di panel kanan,
         # bukan memenuhi ruang chat. Chat hanya menampilkan kartu ringkas.
         full, file_ids = ambil_artefak(full)
+        full = rapihkan_teks_chat(full)
         if file_ids and mode_kode:
             with think_slot:
                 components.html(
