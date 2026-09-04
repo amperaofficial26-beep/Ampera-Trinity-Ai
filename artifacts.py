@@ -481,7 +481,7 @@ def _css_panel(terbuka: bool, lebar: bool) -> str:
         ".st-key-art_panel{width:100%!important;padding:20px 16px 28px!important;}"
         "body [class*='st-key-af_toggle']{"
         "top:14px!important;"
-        "right:14px!important;"
+        "right:-60px!important;"
         "left:auto!important;"
         "bottom:auto!important;"
         "}"
