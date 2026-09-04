@@ -33,6 +33,8 @@ MODEL_CATALOG = [
     {"key": "compound",      "name": "Trinity Hard",    "desc": "Browsing web & eksekusi kode",          "id": "groq/compound", "premium": True},
     {"key": "qwen3_6_27b",   "name": "Trinity Hard",    "desc": "Reasoning & matematika",                "id": "qwen/qwen3.6-27b", "premium": True},
     {"key": "gpt_oss_120b",  "name": "Trinity Extreme", "desc": "Reasoning mendalam untuk tugas berat",  "id": "openai/gpt-oss-120b", "premium": True},
+    # Cerebras
+    {"key": "cerebras_gpt_oss_120b", "name": "Trinity Plus", "desc": "Reasoning cepat & kuat via Cerebras", "id": "gpt-oss-120b", "provider": "cerebras", "premium": False},
 ]
 AVAILABLE_MODELS = {m["key"]: m["id"] for m in MODEL_CATALOG}
 MODEL_BY_KEY = {m["key"]: m for m in MODEL_CATALOG}
