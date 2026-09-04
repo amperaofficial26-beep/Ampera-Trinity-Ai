@@ -223,70 +223,153 @@ def handle_chat_request(answer_slot) -> None:
     min_think = float(s.get("min_think_seconds", THINKING_MIN_SECONDS))
 
     try:
-    model_key = st.session_state.selected_model_key
+        model_key = st.session_state.selected_model_key
 
-    web_search_active = (
-        st.session_state.get("web_search_on")
-        and s.get("cap_web_search", True)
-    )
-    
-    if _is_cerebras_model(model_key) and not has_images and not web_search_active:
-        client = build_cerebras_client()
-        stream = stream_cerebras_reply(
-            client,
-            thread,
-            model=model_id,
+        web_search_active = (
+            st.session_state.get("web_search_on")
+            and s.get("cap_web_search", True)
         )
-    else:
-        client = build_chat_client()
-        stream = stream_chat_with_fallback(
-            client,
-            model_id,
-            thread,
-            vision=has_images,
-        )
+
+        if (
+            _is_cerebras_model(model_key)
+            and not has_images
+            and not web_search_active
+        ):
+            client = build_cerebras_client()
+
+            stream = stream_cerebras_reply(
+                client,
+                thread,
+                model=model_id,
+            )
+        else:
+            client = build_chat_client()
+
+            stream = stream_chat_with_fallback(
+                client,
+                model_id,
+                thread,
+                vision=has_images,
+            )
+
+        potongan: list[str] = []
+        mode_kode = False
+
+        for piece in stream:
+            potongan.append(piece or "")
+
+            if not mode_kode and "```" in "".join(potongan):
+                mode_kode = True
+                inject_code_loading_css()
+
+                with think_slot:
+                    components.html(
+                        code_loading_html(
+                            _tebak_nama_file("".join(potongan))
+                        ),
+                        height=90,
+                        scrolling=False,
+                    )
+
+        full = "".join(potongan)
+
+        elapsed = time.time() - t0
+        if elapsed < min_think:
+            time.sleep(min_think - elapsed)
+
+        think_slot.empty()
+
+        if not full:
+            full = "…"
+
+        # Pisahkan blok [[PILIHAN]] -> jadi kartu tombol, bukan teks mentah.
+        # Dibungkus pemeriksaan supaya jawaban Yuki tetap tampil walau
+        # parser bermasalah.
+        hasil = parse_quick_replies(full)
+
+        if isinstance(hasil, (tuple, list)) and len(hasil) == 2:
+            full, kartu = hasil
+            kartu = kartu if isinstance(kartu, dict) else {}
+        else:
+            kartu = {}
+
+        if not full:
+            full = kartu.get("question") or "…"
+
+        # Blok [[TUGAS]] di halaman AI Penjadwal
+        if st.session_state.get("page") == "jadwal":
+            try:
+                from page_jadwal import serap_blok_tugas
+
+                full, jml = serap_blok_tugas(full)
+
+                if jml:
+                    st.toast(
+                        f"{jml} tugas ditambahkan ke daftar.",
+                        icon=":material/task_alt:",
+                    )
             except Exception:
                 pass
 
-        # Blok [[KARTU:...]] -> kartu visual (perbandingan, langkah, link).
+        # Blok [[KARTU:...]] -> kartu visual
         hasil_kartu = parse_cards(full)
+
         if isinstance(hasil_kartu, (tuple, list)) and len(hasil_kartu) == 2:
             full, kartu_kaya = hasil_kartu
-            kartu_kaya = kartu_kaya if isinstance(kartu_kaya, list) else []
+            kartu_kaya = (
+                kartu_kaya
+                if isinstance(kartu_kaya, list)
+                else []
+            )
         else:
             kartu_kaya = []
+
         if not full:
             full = "Ini hasilnya ya!"
-        # Blok kode -> disimpan sebagai FILE dan tampil di panel kanan,
-        # bukan memenuhi ruang chat. Chat hanya menampilkan kartu ringkas.
+
+        # Blok kode -> disimpan sebagai FILE
         full, file_ids = ambil_artefak(full)
         full = rapihkan_teks_chat(full)
+
         if file_ids and mode_kode:
             with think_slot:
                 components.html(
-                    code_loading_html("Selesai", done=True), 
-                    height=90, 
-                    scrolling=False
+                    code_loading_html("Selesai", done=True),
+                    height=90,
+                    scrolling=False,
                 )
+
             time.sleep(0.6)
             think_slot.empty()
+
         if not full:
-            full = ("Selesai! Filenya sudah kubuat, lihat panel di sebelah kanan ya."
-                    if file_ids else "…")
+            full = (
+                "Selesai! Filenya sudah kubuat, "
+                "lihat panel di sebelah kanan ya."
+                if file_ids
+                else "…"
+            )
 
         stream_sentences(answer_slot, full)
+
         reply = {
-            "id": next_msg_id(), "role": "assistant", "type": "text",
-            "content": full, "time": now_wib(),
+            "id": next_msg_id(),
+            "role": "assistant",
+            "type": "text",
+            "content": full,
+            "time": now_wib(),
         }
+
         if file_ids:
             reply["artifact_ids"] = file_ids
+
         if kartu:
             reply["quick_replies"] = kartu
+
         if kartu_kaya:
             reply["cards"] = kartu_kaya
+
         thread.append(reply)
-    except Exception as e:
         think_slot.empty()
         err = public_error_chat(e)
         thread.append({
