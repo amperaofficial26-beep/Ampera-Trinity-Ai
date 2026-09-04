@@ -279,11 +279,13 @@ html, body {
 }
 
 #copy-code {
-    width: 48px;
-    height: 48px;
+    box-sizing: border-box;
+    width: 56px;
+    height: 56px;
+    margin: 0;
     padding: 0;
     border: 1px solid #DCCFBE;
-    border-radius: 12px;
+    border-radius: 14px;
     background: #FFFFFF;
     color: #382843;
     cursor: pointer;
@@ -368,7 +370,7 @@ button.addEventListener("click", copyText);
 
     components.html(
         markup.replace("__COPY_DATA__", data),
-        height=50,
+        height=58,
         scrolling=False,
     )
 def _zip_semua(daftar: list[dict]) -> bytes:
@@ -483,43 +485,38 @@ def _css_panel(terbuka: bool, lebar: bool) -> str:
         "left:auto!important;"
         "bottom:auto!important;"
         "}"
-        "body .st-key-af_back_wrap button,"
-        "body [class*='st-key-af_download_current_wrap_'] button,"
-        "body .st-key-af_expand_wrap button{"
-        "width:48px!important;"
-        "min-width:48px!important;"
-        "height:48px!important;"
-        "min-height:48px!important;"
+        "body .st-key-af_back_wrap,"
+        "body [class*='st-key-af_download_current_wrap_'],"
+        "body .st-key-af_expand_wrap{"
+        "display:flex!important;"
+        "align-items:center!important;"
+        "justify-content:center!important;"
+        "height:56px!important;"
+        "}"
+        
+        "body .st-key-af_back_wrap [data-testid='stBaseButton-secondary'],"
+        "body [class*='st-key-af_download_current_wrap_'] [data-testid='stBaseButton-secondary'],"
+        "body .st-key-af_expand_wrap [data-testid='stBaseButton-secondary']{"
+        "box-sizing:border-box!important;"
+        "width:56px!important;"
+        "min-width:56px!important;"
+        "height:56px!important;"
+        "min-height:56px!important;"
+        "margin:0!important;"
         "padding:0!important;"
         "border:1px solid #DCCFBE!important;"
-        "border-radius:12px!important;"
+        "border-radius:14px!important;"
         "background:#FFFFFF!important;"
         "color:#382843!important;"
-        "box-shadow:0 3px 10px rgba(44,31,51,.08)!important;"
+        "box-shadow:none!important;"
         "}"
-        "body .st-key-af_back_wrap button:hover,"
-        "body [class*='st-key-af_download_current_wrap_'] button:hover,"
-        "body .st-key-af_expand_wrap button:hover{"
+        
+        "body .st-key-af_back_wrap [data-testid='stBaseButton-secondary']:hover,"
+        "body [class*='st-key-af_download_current_wrap_'] [data-testid='stBaseButton-secondary']:hover,"
+        "body .st-key-af_expand_wrap [data-testid='stBaseButton-secondary']:hover{"
         "background:#F7F0E5!important;"
-        "transform:translateY(-1px)!important;"
+        "border-color:#BCA784!important;"
         "}"
-      "body .st-key-af_back_wrap,"
-      "body [class*='st-key-af_download_current_wrap_'],"
-      "body .st-key-af_expand_wrap{"
-      "display:flex!important;"
-      "justify-content:center!important;"
-      "align-items:center!important;"
-      "}"
-      "body .st-key-af_back_wrap button,"
-      "body [class*='st-key-af_download_current_wrap_'] button,"
-      "body .st-key-af_expand_wrap button{"
-      "width:48px!important;"
-      "min-width:48px!important;"
-      "height:48px!important;"
-      "min-height:48px!important;"
-      "padding:0!important;"
-      "border-radius:12px!important;"
-      "}"
         "</style>"
     )
 
