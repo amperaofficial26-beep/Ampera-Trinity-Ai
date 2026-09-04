@@ -254,95 +254,118 @@ def _tombol_salin_html(teks: str, label: str = "Salin") -> str:
     )
   
 def render_tombol_salin(teks: str) -> None:
-    """Tombol salin yang benar-benar menyalin isi file ke clipboard."""
+    """Tombol ikon untuk menyalin isi file ke clipboard."""
     data = base64.b64encode((teks or "").encode("utf-8")).decode("ascii")
 
+    markup = """
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,0,0');
+
+html, body {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    overflow: hidden;
+}
+
+.material-symbols-rounded {
+    font-family: 'Material Symbols Rounded';
+    font-size: 21px;
+}
+
+#copy-code {
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border: 1px solid #DCCFBE;
+    border-radius: 12px;
+    background: #FFFFFF;
+    color: #382843;
+    cursor: pointer;
+    transition: background .18s ease, color .18s ease;
+}
+
+#copy-code:hover {
+    background: #F7F0E5;
+}
+
+#copy-code.copied {
+    background: #382843;
+    color: #FFFFFF;
+    animation: copy-in .18s ease-out, copy-out .18s ease-in 1.15s;
+}
+
+@keyframes copy-in {
+    from {
+        transform: scale(.82) rotate(-8deg);
+        opacity: .4;
+    }
+
+    to {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+}
+
+@keyframes copy-out {
+    from {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+
+    to {
+        transform: scale(.82) rotate(8deg);
+        opacity: .4;
+    }
+}
+</style>
+
+<button id="copy-code" type="button" title="Salin kode">
+    <span class="material-symbols-rounded">content_copy</span>
+</button>
+
+<script>
+const button = document.getElementById("copy-code");
+const encoded = "__COPY_DATA__";
+
+async function copyText() {
+    const bytes = Uint8Array.from(
+        atob(encoded),
+        character => character.charCodeAt(0)
+    );
+    const text = new TextDecoder().decode(bytes);
+
+    try {
+        await navigator.clipboard.writeText(text);
+    } catch (error) {
+        const area = document.createElement("textarea");
+        area.value = text;
+        document.body.appendChild(area);
+        area.select();
+        document.execCommand("copy");
+        area.remove();
+    }
+
+    button.classList.add("copied");
+    button.innerHTML =
+        '<span class="material-symbols-rounded">check</span>';
+
+    setTimeout(() => {
+        button.classList.remove("copied");
+        button.innerHTML =
+            '<span class="material-symbols-rounded">content_copy</span>';
+    }, 1350);
+}
+
+button.addEventListener("click", copyText);
+</script>
+"""
+
     components.html(
-        f"""
-        <style>
-        @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,0,0');
-        .material-symbols-rounded {
-            font-family: 'Material Symbols Rounded';
-            font-size: 21px;
-        }
-            html, body {{
-                margin: 0;
-                padding: 0;
-                background: transparent;
-                overflow: hidden;
-            }}
-
-            #copy-code {
-            width: 48px;
-            height: 48px;
-            border: 1px solid #DCCFBE;
-            border-radius: 12px;
-            background: #FFFFFF;
-            color: #382843;
-            cursor: pointer;
-            };
-            
-
-            #copy-code:hover {{
-                background: #F7F0E5;
-            }}
-
-            #copy-code.copied {{
-                background: #382843;
-                color: #FFFFFF;
-                animation: copy-in .18s ease-out, copy-out .18s ease-in 1.15s;
-            }}
-
-            @keyframes copy-in {{
-                from {{ transform: scale(.82) rotate(-8deg); opacity: .4; }}
-                to {{ transform: scale(1) rotate(0deg); opacity: 1; }}
-            }}
-
-            @keyframes copy-out {{
-                from {{ transform: scale(1) rotate(0deg); opacity: 1; }}
-                to {{ transform: scale(.82) rotate(8deg); opacity: .4; }}
-            }}
-        </style>
-
-        <button id="copy-code" type="button" title="Salin kode">
-            <span class="material-symbols-rounded">content_copy</span>
-        </button>
-        <script>
-            const button = document.getElementById("copy-code");
-            const encoded = "{data}";
-
-            async function copyText() {{
-                const bytes = Uint8Array.from(atob(encoded), c => c.charCodeAt(0));
-                const text = new TextDecoder().decode(bytes);
-
-                try {{
-                    await navigator.clipboard.writeText(text);
-                }} catch (_) {{
-                    const area = document.createElement("textarea");
-                    area.value = text;
-                    document.body.appendChild(area);
-                    area.select();
-                    document.execCommand("copy");
-                    area.remove();
-                }}
-
-                button.classList.add("copied");
-                button.innerHTML =
-                    '<span class="material-symbols-rounded">check</span>';
-
-                setTimeout(() => {{
-                    button.classList.remove("copied");
-                    button.textContent = "Salin";
-                }}, 1350);
-            }}
-
-            button.addEventListener("click", copyText);
-        </script>
-        """,
-        height=48,
+        markup.replace("__COPY_DATA__", data),
+        height=50,
         scrolling=False,
     )
-
 def _zip_semua(daftar: list[dict]) -> bytes:
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
