@@ -264,6 +264,11 @@ def render_tombol_salin(teks: str) -> None:
 html, body {
     margin: 0;
     padding: 0;
+    width: 100%;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     background: transparent;
     overflow: hidden;
 }
@@ -498,6 +503,23 @@ def _css_panel(terbuka: bool, lebar: bool) -> str:
         "background:#F7F0E5!important;"
         "transform:translateY(-1px)!important;"
         "}"
+      "body .st-key-af_back_wrap,"
+      "body [class*='st-key-af_download_current_wrap_'],"
+      "body .st-key-af_expand_wrap{"
+      "display:flex!important;"
+      "justify-content:center!important;"
+      "align-items:center!important;"
+      "}"
+      "body .st-key-af_back_wrap button,"
+      "body [class*='st-key-af_download_current_wrap_'] button,"
+      "body .st-key-af_expand_wrap button{"
+      "width:48px!important;"
+      "min-width:48px!important;"
+      "height:48px!important;"
+      "min-height:48px!important;"
+      "padding:0!important;"
+      "border-radius:12px!important;"
+      "}"
         "</style>"
     )
 
@@ -590,10 +612,7 @@ def _render_isi(aktif: dict, lebar: bool) -> None:
 
     st.divider()
 
-    kembali, salin, unduh, perluas, ruang = st.columns(
-        [0.55, 0.55, 0.55, 0.55, 4.3],
-        gap="small",
-    )
+    kembali, salin, unduh, perluas, ruang = st.columns(4, gap="small")
 
     with kembali:
         with st.container(key="af_back_wrap"):
