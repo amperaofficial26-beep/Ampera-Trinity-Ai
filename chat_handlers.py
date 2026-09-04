@@ -24,8 +24,15 @@ from config import (
     VISION_MODEL_ID,
 )
 from engines.groq_engine import (
-    build_chat_client, collect_images, stream_chat_with_fallback,
+    build_chat_client,
+    collect_images,
+    stream_chat_with_fallback,
     transcribe_audio,
+)
+
+from engines.cerebras_engine import (
+    build_cerebras_client,
+    stream_cerebras_reply,
 )
 from artifacts import ambil_artefak
 from loading_code import code_loading_html, inject_code_loading_css
@@ -179,6 +186,11 @@ def _tebak_nama_file(teks: str) -> str:
         return "Menulis kode " + m2[-1]
     return "Menyiapkan berkas…"
     
+def _is_cerebras_model(model_key: str) -> bool:
+    """Cek apakah model yang dipilih menggunakan Cerebras."""
+    model = MODEL_BY_KEY.get(model_key, {})
+    return model.get("provider") == "cerebras"
+    
 def handle_chat_request(answer_slot) -> None:
     thread = active_thread()
     if not CHAT_READY:
@@ -211,29 +223,46 @@ def handle_chat_request(answer_slot) -> None:
     min_think = float(s.get("min_think_seconds", THINKING_MIN_SECONDS))
 
     try:
+    model_key = st.session_state.selected_model_key
+
+    if _is_cerebras_model(model_key):
+        client = build_cerebras_client()
+
+        stream = stream_cerebras_reply(
+            client,
+            thread,
+            model=model_id,
+        )
+    else:
         client = build_chat_client()
 
-        # Kumpulkan jawaban. Begitu terdeteksi Yuki mulai menulis kode
-        # (muncul pagar ```), animasi "berpikir" diganti loader khusus
-        # pembuatan file. Diganti SEKALI saja supaya animasi CSS-nya tidak
-        # ter-reset (pelajaran dari kotak loading gambar).
-        potongan: list[str] = []
-        mode_kode = False
-        for piece in stream_chat_with_fallback(
-            client, model_id, thread, vision=has_images
-        ):
-            potongan.append(piece or "")
-            if not mode_kode and "```" in "".join(potongan):
-                mode_kode = True
-                inject_code_loading_css()
-                # Ubah dari st.markdown menjadi components.html di dalam think_slot
-                with think_slot:
-                    components.html(
-                        code_loading_html(_tebak_nama_file("".join(potongan))), 
-                        height=90, 
-                        scrolling=False
-                    )
-        full = "".join(potongan)
+        stream = stream_chat_with_fallback(
+            client,
+            model_id,
+            thread,
+            vision=has_images,
+        )
+
+    potongan: list[str] = []
+    mode_kode = False
+
+    for piece in stream:
+        potongan.append(piece or "")
+
+        if not mode_kode and "```" in "".join(potongan):
+            mode_kode = True
+            inject_code_loading_css()
+
+            with think_slot:
+                components.html(
+                    code_loading_html(
+                        _tebak_nama_file("".join(potongan))
+                    ),
+                    height=90,
+                    scrolling=False,
+                )
+
+    full = "".join(potongan)
         elapsed = time.time() - t0
         if elapsed < min_think:
             time.sleep(min_think - elapsed)
