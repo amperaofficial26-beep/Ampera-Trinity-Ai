@@ -200,7 +200,7 @@ def handle_chat_request(answer_slot) -> None:
             "type": "text",
             "content": (
                 "Fitur chat belum dikonfigurasi pemilik "
-                "(GROQ_API_KEY / CEREBRAS_API_KEY)."
+                "(GROQ_API_KEY / PLUGSKY_API_KEY / AION_API_KEY / FINAL_ROUTER_API_KEY)."
             ),
             "time": now_wib(),
         })
@@ -245,31 +245,32 @@ def handle_chat_request(answer_slot) -> None:
         s.get("min_think_seconds", THINKING_MIN_SECONDS)
     )
 
-    try:
+try:
     provider = _get_model_provider(model_key)
-        # Vision dan Web Search tetap menggunakan Groq.
-        # Model OpenAI-compatible digunakan untuk chat teks biasa.
-        if (
-            provider in ("plugsky", "aion", "final_router")
-            and not has_images
-            and not web_search_active
-        ):
-            client = build_compatible_client(provider)
-        
-            stream = stream_compatible_reply(
-                client,
-                thread,
-                model=model_id,
-            )
-        else:
-            client = build_chat_client()
-        
-            stream = stream_chat_with_fallback(
-                client,
-                model_id,
-                thread,
-                vision=has_images,
-            )
+
+    # Vision dan Web Search tetap menggunakan Groq.
+    # Model OpenAI-compatible digunakan untuk chat teks biasa.
+    if (
+        provider in ("plugsky", "aion", "final_router")
+        and not has_images
+        and not web_search_active
+    ):
+        client = build_compatible_client(provider)
+
+        stream = stream_compatible_reply(
+            client,
+            thread,
+            model=model_id,
+        )
+    else:
+        client = build_chat_client()
+
+        stream = stream_chat_with_fallback(
+            client,
+            model_id,
+            thread,
+            vision=has_images,
+        )
 
         potongan: list[str] = []
         mode_kode = False
