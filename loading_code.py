@@ -39,19 +39,7 @@ def inject_code_loading_css() -> None:
 def code_loading_html(nama_file: str = "", done: bool = False) -> str:
     """HTML loader dengan CSS internal."""
     if done:
-        return f'''
-<div style="display:flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:14px;color:{WARNA_TEKS_REDUP};padding:0.8rem 0;animation:tlFadeIn 0.35s ease both;max-width:{LEBAR_MAKS_PX}px;">
-  <style>
-    /* Sembunyikan semua loader lama */
-    .cl-box, .cl-loader, .cl-dot, .cl-text-wrap, .cl-stage, .cl-lines, .cl-bar, .cl-fill,
-    .cl-top, .cl-ic, .cl-name, .cl-line, .cl-filename {{ display: none !important; }}
-    @keyframes tlFadeIn {{ from {{ opacity:0; transform:translateY(6px); }} to {{ opacity:1; transform:translateY(0); }} }}
-  </style>
-  <span style="width:7px;height:7px;border-radius:50%;background:#4CAF50;display:inline-block;flex-shrink:0;"></span>
-  <span style="font-weight:500;color:#2C1F33;">Selesai</span>
-  <span style="font-size:0.8rem;color:#8E8398;">{html.escape(nama_file or "Berkas siap")}</span>
-</div>
-'''
+        return 
 
     total_durasi = DURASI_PER_TEKS * len(TEKS_TAHAP)
     # Bangun CSS delay untuk tiap teks
@@ -66,43 +54,3 @@ def code_loading_html(nama_file: str = "", done: bool = False) -> str:
     )
 
     return f'''
-<div style="display:flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:14px;color:{WARNA_TEKS_REDUP};padding:0.8rem 0;max-width:{LEBAR_MAKS_PX}px;animation:tlFadeIn 0.35s ease both;">
-  <style>
-    /* Sembunyikan semua loader lama */
-    .cl-box, .cl-loader, .cl-dot, .cl-text-wrap, .cl-stage, .cl-lines, .cl-bar, .cl-fill,
-    .cl-top, .cl-ic, .cl-name, .cl-line, .cl-filename {{ display: none !important; }}
-    @keyframes tlFadeIn {{ from {{ opacity:0; transform:translateY(6px); }} to {{ opacity:1; transform:translateY(0); }} }}
-    @keyframes tlDotPulse {{ 0%,100% {{ opacity:0.3; transform:scale(0.8); }} 50% {{ opacity:1; transform:scale(1.2); }} }}
-    @keyframes tlTextCycle {{
-      0%   {{ opacity:0; transform:translateY(4px); }}
-      4%   {{ opacity:1; transform:translateY(0); }}
-      20%  {{ opacity:1; transform:translateY(0); }}
-      24%  {{ opacity:0; transform:translateY(-4px); }}
-      100% {{ opacity:0; }}
-    }}
-    @keyframes tlBarRun {{
-      0%   {{ margin-left:-30%; }}
-      100% {{ margin-left:100%; }}
-    }}
-    .tl-text {{
-      position: absolute;
-      left: 0;
-      top: 0;
-      white-space: nowrap;
-      opacity: 0;
-      animation: tlTextCycle {total_durasi}s linear infinite;
-    }}
-    {delays}
-  </style>
-  <span style="width:7px;height:7px;border-radius:50%;background:{WARNA_AKSEN};display:inline-block;flex-shrink:0;animation:tlDotPulse 1.2s ease-in-out infinite;"></span>
-  <div style="position:relative;height:1.4em;overflow:hidden;flex:1;">
-    {texts}
-  </div>
-  <div style="flex:1;min-width:0;">
-    <div style="position:relative;height:2px;background:#E2D6C1;border-radius:99px;overflow:hidden;margin-top:4px;">
-      <span style="display:block;height:100%;width:30%;border-radius:99px;background:{WARNA_AKSEN};animation:tlBarRun 1.8s ease-in-out infinite;"></span>
-    </div>
-    <div style="font-size:0.7rem;color:#A095AC;text-align:right;margin-top:2px;">{html.escape(nama_file or "menyiapkan berkas")}</div>
-  </div>
-</div>
-'''
