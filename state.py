@@ -12,7 +12,7 @@ from __future__ import annotations
 from datetime import datetime
 
 import streamlit as st
-
+import re
 from config import DEFAULT_SETTINGS
 
 # ============================================================================
@@ -34,7 +34,19 @@ def get_settings() -> dict:
 def main_thread() -> list[dict]:
     return st.session_state.messages
 
-
+def rapihkan_teks_chat(teks: str) -> str:
+    """Merapikan format teks chat biasa dari Yuki agar lebih enak dibaca."""
+    if not teks:
+        return ""
+    
+    # Menghilangkan baris kosong yang berlebihan (lebih dari 2 baris enter)
+    teks = re.sub(r"\n{3,}", "\n\n", teks)
+    
+    # Memastikan spasi berlebih di awal/akhir baris dibersihkan
+    teks = "\n".join([line.strip() for line in teks.splitlines()])
+    
+    return teks.strip()
+    
 def artifact_thread(art_id: int) -> list[dict]:
     key = f"artifact_msgs_{art_id}"
     if key not in st.session_state:
