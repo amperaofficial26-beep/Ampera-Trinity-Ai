@@ -49,7 +49,7 @@ from state import (
     active_thread, artifact_thread, course_thread, get_settings, init_state,
     main_thread, next_msg_id, open_conversation, reset_conversation,
 )
-from sidebar import go, go_cb, render_sidebar,
+from sidebar import go, go_cb, render_sidebar
 from ui_helpers import (
     _BOTTOM_RESET_CSS, _FRESH_BOTTOM_CSS, _page_footer, get_greeting,
     logo_img_html, render_message,
