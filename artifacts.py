@@ -462,6 +462,24 @@ def _css_panel(terbuka: bool, lebar: bool) -> str:
         "font-weight:650!important;"
         "box-shadow:none!important;"
         "}"
+        "html body div.st-key-af_toggle{"
+        "position:fixed!important;"
+        "top:16px!important;"
+        "right:16px!important;"
+        "left:auto!important;"
+        "bottom:auto!important;"
+        "transform:none!important;"
+        "margin:0!important;"
+        "z-index:999999!important;"
+        "}"
+        "html body div.st-key-af_toggle button{"
+        "width:48px!important;"
+        "height:48px!important;"
+        "min-width:48px!important;"
+        "min-height:48px!important;"
+        "margin:0!important;"
+        "padding:0!important;"
+        "}"
         "</style>"
     )
 
@@ -609,14 +627,14 @@ def render_panel() -> None:
     # tombol mengambang: SELALU tampil
     with st.container(key="af_toggle"):
         if st.button(
-            ":material/right_panel_close:" if terbuka
-            else ":material/right_panel_open:",
-            key="af_toggle_btn",
-            help=("Tutup panel file" if terbuka
-                  else (f"Buka panel file ({len(daftar)})" if daftar
-                        else "Panel file (masih kosong)")),
-        ):
+           ":material/right_panel_close:" if terbuka
+              else ":material/right_panel_open:",
+              key="af_toggle_btn",
+              help="Buka atau tutup panel file",
+            ):
+            
             toggle_panel()
+            st.rerun()
 
     if not terbuka:
         return
