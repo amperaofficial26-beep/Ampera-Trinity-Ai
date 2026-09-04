@@ -177,7 +177,8 @@ def init_state() -> None:
         st.session_state.conv_counter = 0
     if "active_conv_id" not in st.session_state:
         st.session_state.active_conv_id = None
-
+    if "artifact_panel_open" not in st.session_state:
+        st.session_state.artifact_panel_open = False
 
 def next_msg_id() -> int:
     st.session_state.msg_counter += 1
