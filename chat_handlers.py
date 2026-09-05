@@ -33,17 +33,18 @@ from engines.compatible_engine import (
     build_compatible_client,
     stream_compatible_reply,
 )
-from artifacts import BUKA_OTOMATIS, ambil_artefak, buka_panel
-from loading_code import code_loading_html, inject_code_loading_css
+from artifacts import ambil_artefak
+from loading_params import param_loading_html
+from model_dna import DNA_CSS, dna_header_html, active_node_css
 from cards import parse_cards
 from engines.image_engine import generate_image
 from errors import public_error_chat, public_error_image
 from icons import ICON_MIC
 from state import active_thread, get_settings, next_msg_id
 from ui_helpers import (
-    THINKING_PHRASES_CHAT, _BOTTOM_RESET_CSS, _capture_artifacts_from_reply,
+    _BOTTOM_RESET_CSS, _capture_artifacts_from_reply,
     bubble_html, image_progress_html, images_bubble_html, stream_sentences,
-    thinking_html, parse_quick_replies,
+    parse_quick_replies,
 )
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -173,18 +174,6 @@ def handle_image_request(prompt: str) -> None:
         "content": msg, "time": now_wib(), "error_detail": detail,
     })
 
-def _tebak_nama_file(teks: str) -> str:
-    """Ambil nama file yang disebut Yuki tepat sebelum blok kode, kalau ada.
-    Dipakai sebagai judul pada loader pembuatan kode."""
-    import re
-    m = re.findall(r"([\w./-]+\.[A-Za-z0-9]{1,5})\s*:?\s*\n*```", teks or "")
-    if m:
-        return m[-1]
-    m2 = re.findall(r"```([a-zA-Z0-9_+-]+)", teks or "")
-    if m2:
-        return "Menulis kode " + m2[-1]
-    return "Menyiapkan berkas…"
-    
 def _get_model_provider(model_key: str) -> str:
     """Mengambil provider dari model yang dipilih."""
     model = MODEL_BY_KEY.get(model_key, {})
@@ -235,15 +224,21 @@ def handle_chat_request(answer_slot) -> None:
     from ui_helpers import THINKING_MIN_SECONDS
 
     think_slot = st.empty()
-    think_slot.markdown(
-        thinking_html(THINKING_PHRASES_CHAT),
-        unsafe_allow_html=True,
-    )
+    # Animasi loading BARU: 5 parameter acak x 5 detik = 25 detik per
+    # putaran (loop kalau API belum selesai). Diacak di sisi Python
+    # supaya tiap chat kombinasinya beda.
+    with think_slot:
+        components.html(
+            param_loading_html(),
+            height=90,
+            scrolling=False,
+        )
 
     t0 = time.time()
-    min_think = float(
-        s.get("min_think_seconds", THINKING_MIN_SECONDS)
-    )
+    # Durasi loading DIKUNCI mengikuti animasi parameter:
+    # 5 parameter x 5 detik = 25 detik (THINKING_MIN_SECONDS).
+    # Pengaturan manual "min_think_seconds" sudah dihapus.
+    min_think = float(THINKING_MIN_SECONDS)
 
     try:
         provider = _get_model_provider(model_key)
@@ -278,18 +273,10 @@ def handle_chat_request(answer_slot) -> None:
         for piece in stream:
             potongan.append(piece or "")
 
+            # Mode kode terdeteksi — animasi parameter TETAP jalan
+            # (tidak diganti), cukup tandai untuk pesan "Selesai" nanti.
             if not mode_kode and "```" in "".join(potongan):
                 mode_kode = True
-                inject_code_loading_css()
-
-                with think_slot:
-                    components.html(
-                        code_loading_html(
-                            _tebak_nama_file("".join(potongan))
-                        ),
-                        height=90,
-                        scrolling=False,
-                    )
 
         full = "".join(potongan)
 
@@ -351,23 +338,11 @@ def handle_chat_request(answer_slot) -> None:
         full = rapihkan_teks_chat(full)
 
         if file_ids and mode_kode:
-            with think_slot:
-                components.html(
-                    code_loading_html(
-                        "Selesai",
-                        done=True,
-                    ),
-                    height=90,
-                    scrolling=False,
-                )
-
-            time.sleep(0.6)
             think_slot.empty()
 
         if not full:
             full = (
-                "Selesai! Filenya sudah kubuat, "
-                "lihat panel di sebelah kanan ya."
+                "Selesai! Filenya sudah kubuat ya."
                 if file_ids
                 else "…"
             )
@@ -392,14 +367,8 @@ def handle_chat_request(answer_slot) -> None:
             reply["cards"] = kartu_kaya
 
         thread.append(reply)
-        
-        # Panel hanya dibuka setelah respons selesai dan benar-benar
-        # menghasilkan artefak/file baru. Rerun ini menampilkan panel
-        # sekarang, bukan saat user mengirim pesan berikutnya.
-        if file_ids and BUKA_OTOMATIS:
-            buka_panel(file_ids[-1])
-            st.rerun()
-            
+
+
     except Exception as e:
         think_slot.empty()
 
@@ -613,13 +582,25 @@ def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> Non
 
     with ctrl_model:
         current_key = st.session_state.selected_model_key
-        current_name = MODEL_BY_KEY.get(current_key, MODEL_BY_KEY[DEFAULT_MODEL_KEY])["name"]
+        current_model = MODEL_BY_KEY.get(current_key, MODEL_BY_KEY[DEFAULT_MODEL_KEY])
+        current_name = current_model["name"]
         with st.popover(current_name, use_container_width=False):
+            # Tampilan "DNA DOUBLE HELIX" (model_dna.py):
+            # heliks DNA beranimasi di atas, daftar model = anak tangga DNA.
+            st.markdown(DNA_CSS, unsafe_allow_html=True)
+            st.markdown(
+                dna_header_html(current_name, current_model.get("desc", "")),
+                unsafe_allow_html=True,
+            )
             for m in MODEL_CATALOG:
                 is_active = m["key"] == st.session_state.selected_model_key
-                check = " :orange[✓]" if is_active else ""
-                label = f"{m['name']}{check}  \n:gray[{m['desc']}]"
+                # Model aktif TIDAK pakai tanda ✓ lagi — ditandai lewat
+                # animasi glow putih berjalan (active_node_css).
+                label = f"{m['name']}  \n:gray[{m['desc']}]"
                 row_key = f"{kp}model_row_{m['key']}" + ("_premium" if m.get("premium") else "")
+                if is_active:
+                    # nyalakan titik sinaps node yang aktif
+                    st.markdown(active_node_css(row_key), unsafe_allow_html=True)
                 with st.container(key=row_key):
                     if st.button(label, key=f"{kp}model_{m['key']}", use_container_width=True):
                         st.session_state.selected_model_key = m["key"]
@@ -676,11 +657,6 @@ def process_user_input(user_input, answer_slot, is_fresh: bool = False) -> bool:
 
     if not (text or images):
         return False
-        # Pesan baru selalu mulai tanpa panel.
-        # Jika respons Yuki benar-benar membuat file, panel akan dibuka lagi
-        # setelah respons selesai.
-        st.session_state["artifact_panel_open"] = False
-        st.session_state["artifact_panel_id"] = None
     now = now_wib()
 
     if is_fresh:

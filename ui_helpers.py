@@ -44,7 +44,7 @@ THINKING_PHRASES_IMAGE = [
 ]
 
 # Durasi minimum proses berpikir (detik) — ±10 detik ala Claude
-THINKING_MIN_SECONDS = 10.0
+THINKING_MIN_SECONDS = 25.0  # 5 parameter x 5 detik (loading_params.py)
 
 # Durasi minimum progress bar gambar (detik) — biar animasi % terasa
 IMAGE_MIN_SECONDS = 10.0

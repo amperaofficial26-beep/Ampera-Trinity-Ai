@@ -55,7 +55,7 @@ from ui_helpers import (
     logo_img_html, render_message,
 )
 from anim import inject_anim_css, inject_page_anim
-from artifacts import render_panel
+from panel_file import render_file_dock
 from page_desain import page_desain
 from page_jadwal import page_jadwal
 from styles import inject_css
@@ -350,11 +350,6 @@ def _set_umum() -> None:
                  "Seperlunya: bertanya hanya kalau permintaan benar-benar kabur. "
                  "Teliti: lebih sering memastikan detail penting dulu.",
         )
-    with c6:
-        min_think = st.slider("Durasi \"berpikir\" minimum (detik)", 0.0, 20.0,
-                              float(s["min_think_seconds"]), 0.5, key="set_think",
-                              help="Animasi berpikir ditahan minimal selama ini "
-                                   "sebelum jawaban ditampilkan.")
     mode = st.radio("Mode bawaan saat membuka aplikasi", ["Chat", "Gambar"],
                     index=_opt_index(["Chat", "Gambar"], s["default_mode"]),
                     key="set_mode", horizontal=True)
@@ -364,7 +359,7 @@ def _set_umum() -> None:
             "theme": theme, "font_size": font, "compact_mode": compact,
             "stream_speed": speed, "personality": persona,
             "clarify_mode": clarify,
-            "min_think_seconds": float(min_think), "default_mode": mode,
+            "default_mode": mode,
         }, "Pengaturan umum disimpan.")
         st.rerun()
 
@@ -1266,8 +1261,9 @@ def main() -> None:
 
     page = st.session_state.get("page", "chat")
 
-    # Panel kanan berisi file/kode buatan Yuki (ala Claude Artifacts).
-    render_panel()
+    # Dok file kecil (panel_file.py): ikon folder melayang + daftar file
+    # buatan Yuki. Tidak buka otomatis — hanya gelembung penanda.
+    render_file_dock()
 
     # Animasi ala iOS untuk perpindahan halaman.
 
