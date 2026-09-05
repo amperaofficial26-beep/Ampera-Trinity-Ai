@@ -34,16 +34,16 @@ from engines.compatible_engine import (
     stream_compatible_reply,
 )
 from artifacts import ambil_artefak
-from loading_code import code_loading_html, inject_code_loading_css
+from loading_params import param_loading_html
 from cards import parse_cards
 from engines.image_engine import generate_image
 from errors import public_error_chat, public_error_image
 from icons import ICON_MIC
 from state import active_thread, get_settings, next_msg_id
 from ui_helpers import (
-    THINKING_PHRASES_CHAT, _BOTTOM_RESET_CSS, _capture_artifacts_from_reply,
+    _BOTTOM_RESET_CSS, _capture_artifacts_from_reply,
     bubble_html, image_progress_html, images_bubble_html, stream_sentences,
-    thinking_html, parse_quick_replies,
+    parse_quick_replies,
 )
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -235,10 +235,15 @@ def handle_chat_request(answer_slot) -> None:
     from ui_helpers import THINKING_MIN_SECONDS
 
     think_slot = st.empty()
-    think_slot.markdown(
-        thinking_html(THINKING_PHRASES_CHAT),
-        unsafe_allow_html=True,
-    )
+    # Animasi loading BARU: 5 parameter acak x 5 detik = 25 detik per
+    # putaran (loop kalau API belum selesai). Diacak di sisi Python
+    # supaya tiap chat kombinasinya beda.
+    with think_slot:
+        components.html(
+            param_loading_html(),
+            height=90,
+            scrolling=False,
+        )
 
     t0 = time.time()
     min_think = float(
@@ -280,16 +285,6 @@ def handle_chat_request(answer_slot) -> None:
 
             if not mode_kode and "```" in "".join(potongan):
                 mode_kode = True
-                inject_code_loading_css()
-
-                with think_slot:
-                    components.html(
-                        code_loading_html(
-                            _tebak_nama_file("".join(potongan))
-                        ),
-                        height=90,
-                        scrolling=False,
-                    )
 
         full = "".join(potongan)
 
@@ -351,17 +346,6 @@ def handle_chat_request(answer_slot) -> None:
         full = rapihkan_teks_chat(full)
 
         if file_ids and mode_kode:
-            with think_slot:
-                components.html(
-                    code_loading_html(
-                        "Selesai",
-                        done=True,
-                    ),
-                    height=90,
-                    scrolling=False,
-                )
-
-            time.sleep(0.6)
             think_slot.empty()
 
         if not full:
