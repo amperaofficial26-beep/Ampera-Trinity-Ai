@@ -28,7 +28,7 @@ except Exception:
 # ============================================================================
 # PENGATURAN
 # ============================================================================
-WARNA_LATAR = "#9B5CFF"      # latar popover (ungu ruang angkasa)
+WARNA_LATAR = "#E2D6C1"      # latar popover (ungu ruang angkasa)
 WARNA_GARIS = "#3A2B4A"      # garis tepi popover & node
 WARNA_AKSEN = "#E8B04B"      # emas: elektron, node aktif, glow
 WARNA_TEKS = "#E8B04B"       # teks utama
