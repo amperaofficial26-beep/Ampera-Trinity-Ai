@@ -1,7 +1,8 @@
+from __future__ import annotations
+
 import html
 
 import streamlit as st
-
 
 def _files() -> list[dict]:
     """Daftar file buatan Yuki, dibaca langsung dari session_state.
@@ -26,7 +27,7 @@ TEKS_GELEMBUNG = "File kamu ada di sini"
 
 def render_file_dock() -> None:
     """Ikon folder melayang + gelembung penanda + kartu daftar file."""
-        files = _files()
+    files = _files()
     terbuka = bool(st.session_state.get("file_dock_open"))
     dilihat = int(st.session_state.get("file_dock_seen", 0))
     baru = max(0, len(files) - dilihat)
