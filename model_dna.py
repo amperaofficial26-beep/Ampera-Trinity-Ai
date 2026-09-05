@@ -123,31 +123,39 @@ DNA_CSS = (
     "[data-testid='stPopoverBody']:has(.dna-wrap) [class*='model_row_'] > div::before{"
     "content:'';position:absolute;left:14px;top:calc(50% + 2px);"
     f"width:7px;height:7px;border-radius:50%;background:{WARNA_UNTAI2};"
-    "opacity:.55;z-index:2;transition:all .18s ease;}"
-    # tulang punggung penghubung antar anak tangga (atas -> bawah)
-    "[data-testid='stPopoverBody']:has(.dna-wrap) [class*='model_row_']::after{"
+    "opacity:.55;z-index:2;transition:all .18s ease;}"    
+    # tulang punggung penghubung antar anak tangga (atas -> bawah).
+    # PENTING: dipasang di "> div::after" (bukan container::after) supaya
+    # ::after milik container tetap bebas untuk badge Premium.
+    "[data-testid='stPopoverBody']:has(.dna-wrap) [class*='model_row_'] > div::after{"
     "content:'';position:absolute;left:17px;top:calc(50% + 10px);height:16px;"
     "width:1.5px;background:linear-gradient("
-    "rgba(232,176,75,.45),rgba(237,226,209,.10));z-index:1;}"
-    "[data-testid='stPopoverBody']:has(.dna-wrap) [class*='model_row_']:last-child::after{"
+    "rgba(180,83,9,.35),rgba(74,53,89,.12));z-index:1;}"
+    "[data-testid='stPopoverBody']:has(.dna-wrap) [class*='model_row_']:last-child > div::after{"
     "display:none;}"
     # hover: kedua basa menyala
     "[data-testid='stPopoverBody']:has(.dna-wrap) [class*='model_row_']:hover::before{"
     "opacity:1;box-shadow:0 0 8px rgba(232,176,75,.9);}"
     "[data-testid='stPopoverBody']:has(.dna-wrap) [class*='model_row_']:hover > div::before{"
     "opacity:1;box-shadow:0 0 8px rgba(237,226,209,.8);}"
-    # ---- badge Premium versi tema gelap (menimpa gaya terang styles.py) ----
+    # ---- badge Premium selaras tema (menimpa gaya bawaan styles.py) --------
+    # ::after container SEKARANG khusus badge (tulang punggung pindah ke
+    # "> div::after"), jadi label pasti tampil di pojok kanan-atas kartu.
+    "[data-testid='stPopoverBody']:has(.dna-wrap) [class*='_premium']{"
+    "position:relative!important;}"
     "[data-testid='stPopoverBody']:has(.dna-wrap) [class*='_premium']::after{"
-    "content:'\\2726 Premium';"  # ✦ Premium
+    "content:'\\2726 Premium'!important;"  # ✦ Premium
     f"color:{WARNA_AKSEN}!important;"
-    "background:rgba(232,176,75,.12)!important;"
-    "border:1px solid rgba(232,176,75,.45)!important;"
-    "top:4px!important;right:6px!important;height:auto!important;"
-    "width:auto!important;left:auto!important;"
+    "background:rgba(232,176,75,.16)!important;"
+    "border:1px solid rgba(180,83,9,.4)!important;"
+    "top:6px!important;right:8px!important;bottom:auto!important;"
+    "height:auto!important;width:auto!important;left:auto!important;"
     "font-size:0.55rem!important;font-weight:700!important;"
+    "letter-spacing:.03em!important;line-height:1.5!important;"
     "border-radius:999px!important;padding:1px 7px!important;"
-    "position:absolute!important;z-index:3!important;"
-    "background-image:none!important;}"
+    "position:absolute!important;z-index:5!important;"
+    "pointer-events:none!important;"
+    "background-image:none!important;display:block!important;}"
     "</style>"
 )
 
@@ -171,18 +179,38 @@ def dna_header_html(nama_aktif: str, desc_aktif: str = "") -> str:
 
 
 def active_node_css(row_key: str) -> str:
-    """CSS kecil untuk MENYALAKAN pasangan basa model yang sedang aktif."""
+    """Penanda model AKTIF (pengganti tanda ✓):
+    - pasangan basa di kiri menyala & berdenyut,
+    - kartunya diberi GLOW PUTIH BERJALAN perlahan: pita cahaya putih
+      lembut menyapu kartu dari kiri ke kanan terus-menerus."""
     return (
         "<style>"
+        # basa kiri menyala & berdenyut
         f"[data-testid='stPopoverBody']:has(.dna-wrap) .st-key-{row_key}::before{{"
-        "opacity:1!important;box-shadow:0 0 10px rgba(232,176,75,1)!important;"
+        "opacity:1!important;box-shadow:0 0 9px rgba(232,176,75,.95)!important;"
         "animation:basePulse 1.6s ease-in-out infinite;}"
         f"[data-testid='stPopoverBody']:has(.dna-wrap) .st-key-{row_key} > div::before{{"
-        "opacity:1!important;box-shadow:0 0 10px rgba(237,226,209,.9)!important;"
+        "opacity:1!important;box-shadow:0 0 8px rgba(74,53,89,.7)!important;"
         "animation:basePulse 1.6s ease-in-out infinite .8s;}"
+        # kartu aktif: border emas + GLOW PUTIH BERJALAN perlahan.
+        # Pita putih dibuat dari background-image gradient yang posisinya
+        # digeser pelan lewat animasi whiteSweep (4.5 detik per sapuan).
         f"[data-testid='stPopoverBody']:has(.dna-wrap) .st-key-{row_key} button{{"
-        f"border-color:{WARNA_AKSEN}!important;"
-        "background:rgba(232,176,75,.08)!important;}"
+        f"border-color:{WARNA_UNTAI1}!important;"
+        "background-color:#FBF4E7!important;"
+        "background-image:linear-gradient(105deg,"
+        "rgba(255,255,255,0) 38%,"
+        "rgba(255,255,255,.85) 50%,"
+        "rgba(255,255,255,0) 62%)!important;"
+        "background-size:280% 100%!important;"
+        "background-repeat:no-repeat!important;"
+        "animation:whiteSweep 4.5s ease-in-out infinite!important;"
+        "box-shadow:0 0 10px rgba(255,255,255,.55),"
+        "0 0 4px rgba(232,176,75,.35)!important;}"
+        "@keyframes whiteSweep{"
+        "0%{background-position:120% 0;}"
+        "60%{background-position:-60% 0;}"
+        "100%{background-position:-60% 0;}}"
         "@keyframes basePulse{0%,100%{transform:scale(1);}50%{transform:scale(1.4);}}"
         "</style>"
     )
