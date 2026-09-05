@@ -24,7 +24,7 @@ import html
 # ============================================================================
 # PENGATURAN
 # ============================================================================
-WARNA_LATAR = "#1D1426"      # latar popover (ungu ruang angkasa)
+WARNA_LATAR = "#EDE2D1"      # latar popover (ungu ruang angkasa)
 WARNA_GARIS = "#3A2B4A"      # garis tepi popover & node
 WARNA_AKSEN = "#E8B04B"      # emas: untai 1, basa aktif, glow
 WARNA_UNTAI2 = "#EDE2D1"     # krem: untai 2
