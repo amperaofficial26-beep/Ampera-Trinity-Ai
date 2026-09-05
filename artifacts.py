@@ -25,6 +25,12 @@ from datetime import datetime
 import streamlit.components.v1 as components
 import streamlit as st
 
+# ============================================================================
+# PENGATURAN
+# ============================================================================
+MIN_BARIS_JADI_FILE = 3     # blok kode lebih pendek dari ini tetap di chat
+MIN_KARAKTER_JADI_FILE = 40
+BARIS_LANGSUNG_FILE = 5     # sebanyak ini baris ke atas: selalu jadi file
 _EKSTENSI = {
     "python": "py", "py": "py", "javascript": "js", "js": "js",
     "typescript": "ts", "ts": "ts", "html": "html", "css": "css",
