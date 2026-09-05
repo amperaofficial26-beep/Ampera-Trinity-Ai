@@ -39,7 +39,11 @@ Fitur inti:
 | `sidebar.py` | 383 | Sidebar ala Claude: navigasi `go()`, riwayat "Hari ini", dialog Proyek/Artefak/Sesuaikan |
 | `styles.py` | 2.771 | **Seluruh CSS** aplikasi (± 98 KB) sebagai string Python |
 | `page_desain.py` / `page_jadwal.py` | 114/266 | Halaman mode AI Desain & AI Penjadwal (persona ditambahkan ke system prompt) |
+<<<<<<< HEAD
 | `icons.py`, `logo.py`, `trinity_logo.py`, `anim.py`, `loading_params.py` | — | Ikon Material, logo base64, animasi CSS & loading parameter |
+=======
+| `icons.py`, `logo.py`, `trinity_logo.py`, `anim.py`, `loading_code.py` | — | Ikon Material, logo base64, animasi CSS |
+>>>>>>> 171a4430aa3ca0a3f8e2c5962e8ae3bf0fde7c9b
 | `errors.py` | 42 | Pesan error publik + deteksi "model tidak tersedia" (pemicu fallback) |
 
 **Routing halaman** (`st.session_state.page`): `chat` (default) · `artefak` · `pengaturan` · `bahasa` · `bantuan` · `tingkatkan` · `aplikasi` · `kursus` · `pelajari` · `desain` · `jadwal`.
