@@ -21,6 +21,18 @@ from __future__ import annotations
 import json
 import random
 
+# >>> GANTI WARNA GLOW DI SINI (satu tempat untuk semuanya) <<<
+# Format hex "#RRGGBB". Dipakai untuk glow logo DAN glow berjalan di teks.
+#   "#EDE2D1" = krem sidebar (sekarang)
+#   "#E8B04B" = emas   |  "#7C3AED" = ungu violet  |  "#2C1F33" = ungu gelap
+WARNA_GLOW = "#E8B04B"
+
+
+def _rgb(hex_color: str) -> str:
+    """'#E8B04B' -> '237,226,209' (untuk ditanam ke rgba() di CSS)."""
+    h = hex_color.lstrip("#")
+    return f"{int(h[0:2], 16)},{int(h[2:4], 16)},{int(h[4:6], 16)}"
+
 # Logo Trinity (PNG base64) — sama dengan logo tab/sapaan/label Yuki.
 # Kalau modul logo tidak ada / logonya kosong, jatuh ke ikon gerigi.
 try:
@@ -67,15 +79,15 @@ _HTML = """<style>
      48%-72% : PUTAR CEPAT 360 derajat + glow menyala terang
      72%-100%: kembali tenang (denyut kecil), siap siklus berikutnya  */
 @keyframes trinitySpin {
-  0%   { transform: scale(1)    rotate(0deg);   filter: drop-shadow(0 0 3px rgba(237,226,209,.55)); }
-  12%  { transform: scale(1.22) rotate(0deg);   filter: drop-shadow(0 0 8px rgba(237,226,209,.85)); }
-  24%  { transform: scale(1)    rotate(0deg);   filter: drop-shadow(0 0 3px rgba(237,226,209,.55)); }
-  36%  { transform: scale(1.22) rotate(0deg);   filter: drop-shadow(0 0 8px rgba(237,226,209,.85)); }
-  48%  { transform: scale(1)    rotate(0deg);   filter: drop-shadow(0 0 4px rgba(237,226,209,.65)); }
-  60%  { transform: scale(1.15) rotate(180deg); filter: drop-shadow(0 0 14px rgba(237,226,209,1)); }
-  72%  { transform: scale(1)    rotate(360deg); filter: drop-shadow(0 0 4px rgba(237,226,209,.65)); }
-  86%  { transform: scale(1.08) rotate(360deg); filter: drop-shadow(0 0 6px rgba(237,226,209,.75)); }
-  100% { transform: scale(1)    rotate(360deg); filter: drop-shadow(0 0 3px rgba(237,226,209,.55)); }
+  0%   { transform: scale(1)    rotate(0deg);   filter: drop-shadow(0 0 3px rgba(__GLOW__,.55)); }
+  12%  { transform: scale(1.22) rotate(0deg);   filter: drop-shadow(0 0 8px rgba(__GLOW__,.55)); }
+  24%  { transform: scale(1)    rotate(0deg);   filter: drop-shadow(0 0 3px rgba(__GLOW__,.55)); }
+  36%  { transform: scale(1.22) rotate(0deg);   filter: drop-shadow(0 0 8px rgba(__GLOW__,.55)); }
+  48%  { transform: scale(1)    rotate(0deg);   filter: drop-shadow(0 0 4px rgba(__GLOW__,.55)); }
+  60%  { transform: scale(1.15) rotate(180deg); filter: drop-shadow(0 0 14px rgba(__GLOW__,.55)); }
+  72%  { transform: scale(1)    rotate(360deg); filter: drop-shadow(0 0 4px rgba(__GLOW__,.55)); }
+  86%  { transform: scale(1.08) rotate(360deg); filter: drop-shadow(0 0 6px rgba(__GLOW__,.55)); }
+  100% { transform: scale(1)    rotate(360deg); filter: drop-shadow(0 0 3px rgba(__GLOW__,.55)); }
 }
 .param-logo {
   display: inline-block;
@@ -85,7 +97,27 @@ _HTML = """<style>
   will-change: transform, filter;
 }
 .param-logo img { width: 100%; height: 100%; object-fit: contain; display: block; }
-.param-line { transition: opacity .25s ease; }
+/* GLOW BERJALAN pada teks parameter: pita terang menyapu kiri -> kanan
+   terus-menerus (gradient di-clip ke huruf, posisinya digeser CSS). */
+@keyframes glowSweep {
+  0%   { background-position: 130% 0; }
+  100% { background-position: -30% 0; }
+}
+.param-line {
+  transition: opacity .25s ease;
+  background: linear-gradient(
+      100deg,
+      #6B6172 0%, #6B6172 38%,
+      rgba(__GLOW__,1) 50%,
+      #6B6172 62%, #6B6172 100%
+  );
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: glowSweep 2.4s linear infinite;
+}
 </style>
 <div style="display:flex;align-items:center;justify-content:flex-start;padding:1.5rem 0;">
   <div style="display:flex;align-items:center;gap:10px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:13.5px;color:#6B6172;">
@@ -196,5 +228,6 @@ def param_loading_html(indices: list[int] | None = None,
         indices = pilih_parameter()
     return (_HTML
             .replace("__LOGO__", _logo_tag())
+            .replace("__GLOW__", _rgb(WARNA_GLOW))     # ← BARIS BARU
             .replace("__ORDER__", json.dumps(indices))
             .replace("__DUR__", str(durasi_ms)))
