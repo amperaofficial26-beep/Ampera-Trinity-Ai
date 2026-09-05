@@ -35,6 +35,7 @@ from engines.compatible_engine import (
 )
 from artifacts import ambil_artefak
 from loading_params import param_loading_html
+from model_orbit import ORBIT_CSS, orbit_header_html, active_node_css   # ← BARU
 from cards import parse_cards
 from engines.image_engine import generate_image
 from errors import public_error_chat, public_error_image
@@ -578,13 +579,24 @@ def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> Non
 
     with ctrl_model:
         current_key = st.session_state.selected_model_key
-        current_name = MODEL_BY_KEY.get(current_key, MODEL_BY_KEY[DEFAULT_MODEL_KEY])["name"]
+        current_model = MODEL_BY_KEY.get(current_key, MODEL_BY_KEY[DEFAULT_MODEL_KEY])
+        current_name = current_model["name"]
         with st.popover(current_name, use_container_width=False):
+            # Tampilan "AI ORBIT + NEURAL NETWORK" (model_orbit.py):
+            # inti Trinity + cincin orbit di atas, daftar model = node sinaps.
+            st.markdown(ORBIT_CSS, unsafe_allow_html=True)
+            st.markdown(
+                orbit_header_html(current_name, current_model.get("desc", "")),
+                unsafe_allow_html=True,
+            )
             for m in MODEL_CATALOG:
                 is_active = m["key"] == st.session_state.selected_model_key
                 check = " :orange[✓]" if is_active else ""
                 label = f"{m['name']}{check}  \n:gray[{m['desc']}]"
                 row_key = f"{kp}model_row_{m['key']}" + ("_premium" if m.get("premium") else "")
+                if is_active:
+                    # nyalakan titik sinaps node yang aktif
+                    st.markdown(active_node_css(row_key), unsafe_allow_html=True)
                 with st.container(key=row_key):
                     if st.button(label, key=f"{kp}model_{m['key']}", use_container_width=True):
                         st.session_state.selected_model_key = m["key"]
