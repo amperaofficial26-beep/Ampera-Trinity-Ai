@@ -350,11 +350,6 @@ def _set_umum() -> None:
                  "Seperlunya: bertanya hanya kalau permintaan benar-benar kabur. "
                  "Teliti: lebih sering memastikan detail penting dulu.",
         )
-    with c6:
-        min_think = st.slider("Durasi \"berpikir\" minimum (detik)", 0.0, 20.0,
-                              float(s["min_think_seconds"]), 0.5, key="set_think",
-                              help="Animasi berpikir ditahan minimal selama ini "
-                                   "sebelum jawaban ditampilkan.")
     mode = st.radio("Mode bawaan saat membuka aplikasi", ["Chat", "Gambar"],
                     index=_opt_index(["Chat", "Gambar"], s["default_mode"]),
                     key="set_mode", horizontal=True)
@@ -364,7 +359,7 @@ def _set_umum() -> None:
             "theme": theme, "font_size": font, "compact_mode": compact,
             "stream_speed": speed, "personality": persona,
             "clarify_mode": clarify,
-            "min_think_seconds": float(min_think), "default_mode": mode,
+            "default_mode": mode,
         }, "Pengaturan umum disimpan.")
         st.rerun()
 
