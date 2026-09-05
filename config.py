@@ -472,7 +472,6 @@ DEFAULT_SETTINGS: dict = {
     "font_size": "Normal",
     "compact_mode": False,
     "stream_speed": "Sedang",
-    "min_think_seconds": 10.0,
     "personality": "Santai & kocak",
     "clarify_mode": "Seperlunya",
     "default_mode": "Chat",
