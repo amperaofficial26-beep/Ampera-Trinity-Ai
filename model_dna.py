@@ -24,12 +24,12 @@ import html
 # ============================================================================
 # PENGATURAN
 # ============================================================================
-WARNA_LATAR = "#EDE2D1"      # latar popover (ungu ruang angkasa)
-WARNA_GARIS = "#3A2B4A"      # garis tepi popover & node
+WARNA_LATAR = "#000000"      # latar popover (ungu ruang angkasa)
+WARNA_GARIS = "#FFFFFF"      # garis tepi popover & node
 WARNA_AKSEN = "#E8B04B"      # emas: untai 1, basa aktif, glow
 WARNA_UNTAI2 = "#EDE2D1"     # krem: untai 2
-WARNA_TEKS = "#EDE2D1"       # teks utama
-WARNA_REDUP = "#9C8FA6"      # teks deskripsi
+WARNA_TEKS = "#FFFFFF"       # teks utama
+WARNA_REDUP = "#FFFFFF"      # teks deskripsi
 TINGGI_DNA_PX = 130          # tinggi area animasi DNA
 JUMLAH_KOLOM = 11            # jumlah "anak tangga" heliks di header
 PERIODE_S = 2.8              # 1 putaran heliks (detik)
