@@ -172,18 +172,6 @@ def handle_image_request(prompt: str) -> None:
         "id": next_msg_id(), "role": "assistant", "type": "text",
         "content": msg, "time": now_wib(), "error_detail": detail,
     })
-
-def _tebak_nama_file(teks: str) -> str:
-    """Ambil nama file yang disebut Yuki tepat sebelum blok kode, kalau ada.
-    Dipakai sebagai judul pada loader pembuatan kode."""
-    import re
-    m = re.findall(r"([\w./-]+\.[A-Za-z0-9]{1,5})\s*:?\s*\n*```", teks or "")
-    if m:
-        return m[-1]
-    m2 = re.findall(r"```([a-zA-Z0-9_+-]+)", teks or "")
-    if m2:
-        return "Menulis kode " + m2[-1]
-    return "Menyiapkan berkas…"
     
 def _get_model_provider(model_key: str) -> str:
     """Mengambil provider dari model yang dipilih."""
