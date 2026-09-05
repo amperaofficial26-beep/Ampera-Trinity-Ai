@@ -25,11 +25,11 @@ import random
 # Format hex "#RRGGBB". Dipakai untuk glow logo DAN glow berjalan di teks.
 #   "#EDE2D1" = krem sidebar (sekarang)
 #   "#E8B04B" = emas   |  "#7C3AED" = ungu violet  |  "#2C1F33" = ungu gelap
-WARNA_GLOW = "#7C3AED"
+WARNA_GLOW = "#DBCEB9"
 
 
 def _rgb(hex_color: str) -> str:
-    """'#7C3AED' -> '237,226,209' (untuk ditanam ke rgba() di CSS)."""
+    """'#DBCEB9' -> '237,226,209' (untuk ditanam ke rgba() di CSS)."""
     h = hex_color.lstrip("#")
     return f"{int(h[0:2], 16)},{int(h[2:4], 16)},{int(h[4:6], 16)}"
 
