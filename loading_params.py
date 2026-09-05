@@ -67,34 +67,15 @@ _HTML = """<style>
      48%-72% : PUTAR CEPAT 360 derajat + glow menyala terang
      72%-100%: kembali tenang (denyut kecil), siap siklus berikutnya  */
 @keyframes trinitySpin {
-  0%   { transform: scale(1)    rotate(0deg);
-         filter: drop-shadow(0 0 4px rgba(124,58,237,.55))
-                 drop-shadow(0 0 5px rgba(124,58,237,.30)); }
-  12%  { transform: scale(1.22) rotate(0deg);
-         filter: drop-shadow(0 0 6px rgba(155,92,255,.95))
-                 drop-shadow(0 0 7px rgba(124,58,237,.60)); }
-  24%  { transform: scale(1)    rotate(0deg);
-         filter: drop-shadow(0 0 4px rgba(124,58,237,.55))
-                 drop-shadow(0 0 5px rgba(124,58,237,.30)); }
-  36%  { transform: scale(1.22) rotate(0deg);
-         filter: drop-shadow(0 0 6px rgba(155,92,255,.95))
-                 drop-shadow(0 0 7px rgba(124,58,237,.60)); }
-  48%  { transform: scale(1)    rotate(0deg);
-         filter: drop-shadow(0 0 5px rgba(155,92,255,.70))
-                 drop-shadow(0 0 6px rgba(124,58,237,.40)); }
-  60%  { transform: scale(1.15) rotate(180deg);
-         filter: drop-shadow(0 0 6px rgba(255,255,255,.90))
-                 drop-shadow(0 0 7px rgba(155,92,255,1))
-                 drop-shadow(0 0 9px rgba(124,58,237,.85)); }
-  72%  { transform: scale(1)    rotate(360deg);
-         filter: drop-shadow(0 0 5px rgba(155,92,255,.70))
-                 drop-shadow(0 0 6px rgba(124,58,237,.40)); }
-  86%  { transform: scale(1.08) rotate(360deg);
-         filter: drop-shadow(0 0 6px rgba(155,92,255,.80))
-                 drop-shadow(0 0 7px rgba(124,58,237,.45)); }
-  100% { transform: scale(1)    rotate(360deg);
-         filter: drop-shadow(0 0 4px rgba(124,58,237,.55))
-                 drop-shadow(0 0 5px rgba(124,58,237,.30)); }
+  0%   { transform: scale(1)    rotate(0deg);   filter: drop-shadow(0 0 3px rgba(237,226,209,.55)); }
+  12%  { transform: scale(1.22) rotate(0deg);   filter: drop-shadow(0 0 8px rgba(237,226,209,.85)); }
+  24%  { transform: scale(1)    rotate(0deg);   filter: drop-shadow(0 0 3px rgba(237,226,209,.55)); }
+  36%  { transform: scale(1.22) rotate(0deg);   filter: drop-shadow(0 0 8px rgba(237,226,209,.85)); }
+  48%  { transform: scale(1)    rotate(0deg);   filter: drop-shadow(0 0 4px rgba(237,226,209,.65)); }
+  60%  { transform: scale(1.15) rotate(180deg); filter: drop-shadow(0 0 14px rgba(237,226,209,1)); }
+  72%  { transform: scale(1)    rotate(360deg); filter: drop-shadow(0 0 4px rgba(237,226,209,.65)); }
+  86%  { transform: scale(1.08) rotate(360deg); filter: drop-shadow(0 0 6px rgba(237,226,209,.75)); }
+  100% { transform: scale(1)    rotate(360deg); filter: drop-shadow(0 0 3px rgba(237,226,209,.55)); }
 }
 .param-logo {
   display: inline-block;
