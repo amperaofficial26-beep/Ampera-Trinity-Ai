@@ -24,12 +24,15 @@ import html
 # ============================================================================
 # PENGATURAN
 # ============================================================================
-WARNA_LATAR = "#000000"      # latar popover (ungu ruang angkasa)
-WARNA_GARIS = "#FFFFFF"      # garis tepi popover & node
-WARNA_AKSEN = "#E8B04B"      # emas: untai 1, basa aktif, glow
-WARNA_UNTAI2 = "#EDE2D1"     # krem: untai 2
-WARNA_TEKS = "#FFFFFF"       # teks utama
-WARNA_REDUP = "#FFFFFF"      # teks deskripsi
+WARNA_LATAR = "#F2E8D6"      # latar popover = warna kotak input chat
+WARNA_PANGGUNG = "#E2D6C1"   # latar area heliks (krem lebih tua)  ← BARU
+WARNA_GARIS = "#DBCEB9"      # garis tepi popover & kartu (cokelat pasir)
+WARNA_KARTU = "#FFFDF9"      # latar kartu model (putih hangat)     ← BARU
+WARNA_AKSEN = "#B45309"      # karamel: badge premium (kontras di krem)
+WARNA_UNTAI1 = "#E8B04B"     # emas: untai 1
+WARNA_UNTAI2 = "#4A3559"     # ungu: untai 2 (krem tak terlihat di latar krem)
+WARNA_TEKS = "#2C1F33"       # teks utama (ungu gelap tema)
+WARNA_REDUP = "#8A7B8F"      # teks deskripsi
 TINGGI_DNA_PX = 130          # tinggi area animasi DNA
 JUMLAH_KOLOM = 11            # jumlah "anak tangga" heliks di header
 PERIODE_S = 2.8              # 1 putaran heliks (detik)
