@@ -28,11 +28,11 @@ except Exception:
 # ============================================================================
 # PENGATURAN
 # ============================================================================
-WARNA_LATAR = "#F3E5AB"      # latar popover (ungu ruang angkasa)
+WARNA_LATAR = "#DBCEB9"      # latar popover (ungu ruang angkasa)
 WARNA_GARIS = "#A52A2A"      # garis tepi popover & node
 WARNA_AKSEN = "#A52A2A"      # emas: elektron, node aktif, glow
-WARNA_TEKS = "#A52A2A"       # teks utama
-WARNA_REDUP = "#E0D2BB"      # teks deskripsi
+WARNA_TEKS = "#6F4E37"       # teks utama
+WARNA_REDUP = "#6F4E37"      # teks deskripsi
 TINGGI_ORBIT_PX = 150        # tinggi area animasi orbit
 
 
