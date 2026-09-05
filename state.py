@@ -189,7 +189,12 @@ def init_state() -> None:
         st.session_state.conv_counter = 0
     if "active_conv_id" not in st.session_state:
         st.session_state.active_conv_id = None
-
+    # Dok file kecil (panel_file.py)
+    if "file_dock_open" not in st.session_state:
+        st.session_state.file_dock_open = False
+    if "file_dock_seen" not in st.session_state:
+        st.session_state.file_dock_seen = 0  # jumlah file yang sudah dilihat
+        
 def next_msg_id() -> int:
     st.session_state.msg_counter += 1
     return st.session_state.msg_counter
@@ -230,7 +235,8 @@ def reset_conversation() -> None:
     """Chat baru: arsipkan obrolan utama, lalu kosongkan thread utama."""
     _archive_current_conversation()
     st.session_state.active_conv_id = None
-
+    # Chat baru: dok file ditutup dulu biar layar bersih.
+    st.session_state["file_dock_open"] = False
     for key in ("messages", "msg_counter"):
         st.session_state.pop(key, None)
     init_state()
