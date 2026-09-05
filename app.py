@@ -55,6 +55,7 @@ from ui_helpers import (
     logo_img_html, render_message,
 )
 from anim import inject_anim_css, inject_page_anim
+from panel_file import render_file_dock          # ← BARIS BARU
 from page_desain import page_desain
 from page_jadwal import page_jadwal
 from styles import inject_css
@@ -1264,6 +1265,9 @@ def main() -> None:
     render_sidebar()
 
     page = st.session_state.get("page", "chat")
+    # Dok file kecil (panel_file.py): ikon folder melayang + daftar file
+    # buatan Yuki. Tidak buka otomatis — hanya gelembung penanda.
+    render_file_dock()
 
     # Animasi ala iOS untuk perpindahan halaman.
 
