@@ -21,6 +21,13 @@ from __future__ import annotations
 import json
 import random
 
+# Logo Trinity (PNG base64) — sama dengan logo tab/sapaan/label Yuki.
+# Kalau modul logo tidak ada / logonya kosong, jatuh ke ikon gerigi.
+try:
+    from logo import LOGO_B64
+except Exception:
+    LOGO_B64 = ""
+
 JUMLAH_PARAM_PER_LOADING = 5   # 5 x 5 detik = 25 detik total per putaran
 DURASI_PER_PARAM_MS = 5000     # 5 detik per parameter
 
@@ -53,17 +60,36 @@ def pilih_parameter(jumlah: int = JUMLAH_PARAM_PER_LOADING) -> list[int]:
 
 
 _HTML = """<style>
-@keyframes paramPulse {
-  0%   { transform: scale(1);   opacity: .8; }
-  50%  { transform: scale(1.2); opacity: 1; filter: drop-shadow(0 0 4px #3C3489); }
-  100% { transform: scale(1);   opacity: .8; }
+/* LOGO TRINITY: denyut 2x -> putar cepat 360 -> denyut 2x -> putar lagi.
+   Satu siklus 5 detik (pas dengan durasi per parameter):
+     0%-24%  : denyut #1 (membesar-mengecil, glow lembut)
+     24%-48% : denyut #2
+     48%-72% : PUTAR CEPAT 360 derajat + glow menyala terang
+     72%-100%: kembali tenang (denyut kecil), siap siklus berikutnya  */
+@keyframes trinitySpin {
+  0%   { transform: scale(1)    rotate(0deg);   filter: drop-shadow(0 0 3px rgba(60,52,137,.35)); }
+  12%  { transform: scale(1.22) rotate(0deg);   filter: drop-shadow(0 0 8px rgba(60,52,137,.65)); }
+  24%  { transform: scale(1)    rotate(0deg);   filter: drop-shadow(0 0 3px rgba(60,52,137,.35)); }
+  36%  { transform: scale(1.22) rotate(0deg);   filter: drop-shadow(0 0 8px rgba(60,52,137,.65)); }
+  48%  { transform: scale(1)    rotate(0deg);   filter: drop-shadow(0 0 4px rgba(60,52,137,.45)); }
+  60%  { transform: scale(1.15) rotate(180deg); filter: drop-shadow(0 0 14px rgba(124,58,237,.95)); }
+  72%  { transform: scale(1)    rotate(360deg); filter: drop-shadow(0 0 4px rgba(60,52,137,.45)); }
+  86%  { transform: scale(1.08) rotate(360deg); filter: drop-shadow(0 0 6px rgba(60,52,137,.55)); }
+  100% { transform: scale(1)    rotate(360deg); filter: drop-shadow(0 0 3px rgba(60,52,137,.35)); }
 }
-.param-logo { animation: paramPulse 1.5s ease-in-out infinite; }
+.param-logo {
+  display: inline-block;
+  width: 26px; height: 26px;
+  flex-shrink: 0;
+  animation: trinitySpin 5s cubic-bezier(.45,.05,.35,1) infinite;
+  will-change: transform, filter;
+}
+.param-logo img { width: 100%; height: 100%; object-fit: contain; display: block; }
 .param-line { transition: opacity .25s ease; }
 </style>
 <div style="display:flex;align-items:center;justify-content:flex-start;padding:1.5rem 0;">
   <div style="display:flex;align-items:center;gap:10px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:13.5px;color:#6B6172;">
-    <span class="param-logo" style="display:inline-block;flex-shrink:0;font-size:15px;line-height:1;font-weight:bold;color:#2C1F33;">&#9881;</span>
+    <span class="param-logo">__LOGO__</span>
     <span id="pline" class="param-line">menyetel parameter…</span>
   </div>
 </div>
@@ -154,11 +180,21 @@ _HTML = """<style>
 </script>"""
 
 
+def _logo_tag() -> str:
+    """<img> logo Trinity; jatuh ke ikon gerigi bila logo tidak tersedia."""
+    if LOGO_B64:
+        return ('<img src="data:image/png;base64,' + LOGO_B64
+                + '" alt="logo Trinity"/>')
+    return ('<span style="font-size:17px;line-height:26px;font-weight:bold;'
+            'color:#2C1F33;display:block;text-align:center;">&#9881;</span>')
+
+
 def param_loading_html(indices: list[int] | None = None,
                        durasi_ms: int = DURASI_PER_PARAM_MS) -> str:
     """HTML+JS animasi parameter. `indices` None = pilih acak sendiri."""
     if not indices:
         indices = pilih_parameter()
     return (_HTML
+            .replace("__LOGO__", _logo_tag())
             .replace("__ORDER__", json.dumps(indices))
             .replace("__DUR__", str(durasi_ms)))
