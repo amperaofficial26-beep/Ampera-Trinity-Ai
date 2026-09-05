@@ -591,8 +591,9 @@ def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> Non
             )
             for m in MODEL_CATALOG:
                 is_active = m["key"] == st.session_state.selected_model_key
-                check = " :orange[✓]" if is_active else ""
-                label = f"{m['name']}{check}  \n:gray[{m['desc']}]"
+                # Model aktif TIDAK pakai tanda ✓ lagi — ditandai lewat
+                # animasi glow putih berjalan (active_node_css).
+                label = f"{m['name']}  \n:gray[{m['desc']}]"
                 row_key = f"{kp}model_row_{m['key']}" + ("_premium" if m.get("premium") else "")
                 if is_active:
                     # nyalakan titik basa model yang aktif
