@@ -69,32 +69,32 @@ _HTML = """<style>
 @keyframes trinitySpin {
   0%   { transform: scale(1)    rotate(0deg);
          filter: drop-shadow(0 0 4px rgba(124,58,237,.55))
-                 drop-shadow(0 0 8px rgba(124,58,237,.30)); }
+                 drop-shadow(0 0 5px rgba(124,58,237,.30)); }
   12%  { transform: scale(1.22) rotate(0deg);
          filter: drop-shadow(0 0 6px rgba(155,92,255,.95))
-                 drop-shadow(0 0 12px rgba(124,58,237,.60)); }
+                 drop-shadow(0 0 7px rgba(124,58,237,.60)); }
   24%  { transform: scale(1)    rotate(0deg);
          filter: drop-shadow(0 0 4px rgba(124,58,237,.55))
-                 drop-shadow(0 0 8px rgba(124,58,237,.30)); }
+                 drop-shadow(0 0 5px rgba(124,58,237,.30)); }
   36%  { transform: scale(1.22) rotate(0deg);
          filter: drop-shadow(0 0 6px rgba(155,92,255,.95))
-                 drop-shadow(0 0 12px rgba(124,58,237,.60)); }
+                 drop-shadow(0 0 7px rgba(124,58,237,.60)); }
   48%  { transform: scale(1)    rotate(0deg);
          filter: drop-shadow(0 0 5px rgba(155,92,255,.70))
-                 drop-shadow(0 0 10px rgba(124,58,237,.40)); }
+                 drop-shadow(0 0 6px rgba(124,58,237,.40)); }
   60%  { transform: scale(1.15) rotate(180deg);
          filter: drop-shadow(0 0 6px rgba(255,255,255,.90))
-                 drop-shadow(0 0 12px rgba(155,92,255,1))
-                 drop-shadow(0 0 20px rgba(124,58,237,.85)); }
+                 drop-shadow(0 0 7px rgba(155,92,255,1))
+                 drop-shadow(0 0 9px rgba(124,58,237,.85)); }
   72%  { transform: scale(1)    rotate(360deg);
          filter: drop-shadow(0 0 5px rgba(155,92,255,.70))
-                 drop-shadow(0 0 10px rgba(124,58,237,.40)); }
+                 drop-shadow(0 0 6px rgba(124,58,237,.40)); }
   86%  { transform: scale(1.08) rotate(360deg);
          filter: drop-shadow(0 0 6px rgba(155,92,255,.80))
-                 drop-shadow(0 0 12px rgba(124,58,237,.45)); }
+                 drop-shadow(0 0 7px rgba(124,58,237,.45)); }
   100% { transform: scale(1)    rotate(360deg);
          filter: drop-shadow(0 0 4px rgba(124,58,237,.55))
-                 drop-shadow(0 0 8px rgba(124,58,237,.30)); }
+                 drop-shadow(0 0 5px rgba(124,58,237,.30)); }
 }
 .param-logo {
   display: inline-block;
