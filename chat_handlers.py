@@ -234,10 +234,11 @@ def handle_chat_request(answer_slot) -> None:
         )
 
     t0 = time.time()
-    min_think = float(
-        s.get("min_think_seconds", THINKING_MIN_SECONDS)
-    )
-
+    # Durasi loading DIKUNCI mengikuti animasi parameter:
+    # 5 parameter x 5 detik = 25 detik (THINKING_MIN_SECONDS).
+    # Pengaturan manual "min_think_seconds" sudah dihapus.
+    min_think = float(THINKING_MIN_SECONDS)
+    
     try:
         provider = _get_model_provider(model_key)
 
