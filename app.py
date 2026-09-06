@@ -328,16 +328,13 @@ def _set_umum() -> None:
     with c2:
         font = st.selectbox("Ukuran teks", FONT_OPTIONS, index=_opt_index(FONT_OPTIONS, s["font_size"]),
                             key="set_font")
-    c3, c4 = st.columns(2)
+    c3, _ = st.columns(2)
     with c3:
-        compact = st.toggle("Mode ringkas", value=s["compact_mode"], key="set_compact",
-                            help="Jarak antar pesan dipersempit supaya lebih banyak terlihat.")
-    with c4:
         speed = st.selectbox("Kecepatan aliran jawaban", SPEED_OPTIONS,
                              index=_opt_index(SPEED_OPTIONS, s["stream_speed"]), key="set_speed",
                              help="Seberapa cepat kalimat Yuki muncul satu per satu.")
 
-        st.markdown('<div class="set-section">Perilaku Yuki</div>', unsafe_allow_html=True)
+    st.markdown('<div class="set-section">Perilaku Yuki</div>', unsafe_allow_html=True)
     c5, c6 = st.columns(2)
     with c5:
         persona = st.selectbox("Kepribadian", PERSONA_OPTIONS,
@@ -356,7 +353,7 @@ def _set_umum() -> None:
 
     if st.button(":material/save:  Simpan perubahan", key="save_umum", type="primary"):
         _save_settings({
-            "theme": theme, "font_size": font, "compact_mode": compact,
+            "theme": theme, "font_size": font,
             "stream_speed": speed, "personality": persona,
             "clarify_mode": clarify,
             "default_mode": mode,
