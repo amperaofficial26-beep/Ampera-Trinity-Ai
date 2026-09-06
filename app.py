@@ -278,11 +278,14 @@ CAPABILITY_ROWS = [
     ("Pencarian web (Compound)",    ":material/public:",         "cap_web_search"),
     ("Artefak otomatis",            ":material/data_object:",    "cap_artifacts"),
 ]
+
+
 def _save_settings(patch: dict, label: str = "Perubahan disimpan.") -> None:
     merged = dict(st.session_state.get("settings") or {})
     merged.update(patch)
     st.session_state.settings = merged
     st.toast(label, icon=":material/check:")
+
 
 def _baris_aksi_simpan(label: str, key: str, patch: dict, toast: str,
                        sekunder: tuple[str, str, object] | None = None) -> None:
@@ -300,6 +303,7 @@ def _baris_aksi_simpan(label: str, key: str, patch: dict, toast: str,
                      use_container_width=True):
             _save_settings(patch, toast)
             st.rerun()
+
 
 def _capability_state(setting_key: str) -> str:
     if setting_key == "selalu":
@@ -364,7 +368,7 @@ def _set_umum() -> None:
     mode = st.radio("Mode bawaan saat membuka aplikasi", ["Chat", "Gambar"],
                     index=_opt_index(["Chat", "Gambar"], s["default_mode"]),
                     key="set_mode", horizontal=True)
-  
+
     _baris_aksi_simpan(
         "Simpan perubahan", "save_umum",
         {
@@ -459,6 +463,7 @@ def _set_privasi() -> None:
                 del st.session_state[k]
             st.session_state.page = "chat"
             st.rerun()
+
 
 PRO_FEATURES = [
     ("Model Extreme & premium tanpa batas", True, False),
@@ -564,6 +569,7 @@ def _set_kemampuan() -> None:
         },
         "Kemampuan disimpan.",
     )
+
 
 def _set_memori() -> None:
     s = get_settings()
@@ -689,6 +695,51 @@ def _set_waktu_fokus() -> None:
         "Waktu & fokus disimpan.",
     )
 
+
+def _set_trinity_code() -> None:
+    from config import MODEL_CATALOG
+    s = get_settings()
+    st.markdown('<div class="set-section">Kredensial layanan</div>', unsafe_allow_html=True)
+    st.caption("Kosongkan bila pemilik aplikasi sudah mengisinya lewat "
+               "Streamlit Secrets / environment variable.")
+    gk = st.text_input("GROQ_API_KEY", type="password", value=s["groq_key"], key="set_gk",
+                       help="Dipakai untuk chat, transkrip suara, dan vision.")
+    ca = st.text_input("CF_ACCOUNT_ID", value=s["cf_account_id"], key="set_ca")
+    ct = st.text_input("CF_API_TOKEN", type="password", value=s["cf_token"], key="set_ct")
+    chat_state = (
+        mi(":material/check_circle:") + " aktif" if CHAT_READY
+        else mi(":material/error_outline:") + " butuh GROQ_API_KEY"
+    )
+    st.markdown(
+        f'<div class="feat-row"><span>Status chat</span>'
+        f'<span class="chip-{"on" if CHAT_READY else "off"}">'
+        f"{chat_state}"
+        "</span></div>",
+        unsafe_allow_html=True,
+    )
+    img_state = (
+        mi(":material/check_circle:") + " aktif" if IMAGE_READY
+        else mi(":material/error_outline:") + " butuh Cloudflare"
+    )
+    st.markdown(
+        f'<div class="feat-row"><span>Status generate gambar</span>'
+        f'<span class="chip-{"on" if IMAGE_READY else "off"}">'
+        f"{img_state}"
+        "</span></div>",
+        unsafe_allow_html=True,
+    )
+
+    st.markdown('<div class="set-section">Model &amp; perilaku</div>', unsafe_allow_html=True)
+    c1, c2 = st.columns(2)
+    with c1:
+        temp = st.slider("Suhu jawaban (kreativitas)", 0.0, 1.5,
+                         float(s["temperature"]), 0.1, key="set_temp",
+                         help="Rendah = kaku & presisi. Tinggi = liar & kreatif.")
+    with c2:
+        st.selectbox("Model bawaan", [m["name"] for m in MODEL_CATALOG],
+                     index=max(0, next((i for i, m in enumerate(MODEL_CATALOG)
+                                        if m["key"] == st.session_state.selected_model_key), 0)),
+                     key="set_model")
     adv = st.toggle("Tampilkan error teknis apa adanya (mode pengembang)",
                     value=s["advanced_errors"], key="set_adv")
 

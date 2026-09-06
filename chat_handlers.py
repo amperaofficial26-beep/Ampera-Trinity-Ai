@@ -142,7 +142,7 @@ def rapihkan_teks_chat(teks: str) -> str:
         teks = teks.replace(f"\x00RAPIH{i}\x00", terlindung)
 
     return teks.strip()
-    
+
 def handle_image_request(prompt: str) -> None:
     thread = active_thread()
     if not IMAGE_READY:
