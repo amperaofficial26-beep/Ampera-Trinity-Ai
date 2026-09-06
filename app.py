@@ -776,7 +776,7 @@ def page_bahasa() -> None:
         unsafe_allow_html=True,
     )
 
-        st.markdown('<div class="set-section">Pilih bahasa</div>', unsafe_allow_html=True)
+    st.markdown('<div class="set-section">Pilih bahasa</div>', unsafe_allow_html=True)
     c1, c2 = st.columns(2)
     with c1:
         ui_name = st.selectbox(
@@ -802,6 +802,7 @@ def page_bahasa() -> None:
         {"ui_lang": ui_sel["code"], "yuki_lang": yuki_sel["code"]},
         f"Bahasa disimpan — Yuki akan menjawab dalam {yuki_sel['name']}.",
     )
+
     st.markdown('<div class="set-section">Daftar bahasa yang tersedia</div>',
                 unsafe_allow_html=True)
     rows = []
