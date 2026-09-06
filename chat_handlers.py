@@ -80,21 +80,48 @@ def maybe_run_yuki(answer_slot) -> bool:
         handle_chat_request(answer_slot)
     return True
 
-import re
+# Blok kode (``` ... ```), kode inline (` ... `), dan blok kode tak
+# tertutup — isinya TIDAK boleh dirapatkan saat merapikan jawaban Yuki
+# supaya indentasi dan spasi di dalam kode tetap utuh.
+_TEKS_TERLINDUNG_RE = re.compile(r"```.*?```|```.*$|`[^`\n]*`", re.S)
+
 
 def rapihkan_teks_chat(teks: str) -> str:
-    """Merapikan jarak antar baris dan spasi berlebih tanpa merusak format Markdown."""
+    """Merapikan jarak spasi dan enter jawaban Yuki tanpa merusak Markdown."""
     if not teks:
         return ""
-    
-    # Hanya membersihkan spasi berlebih di ujung kanan baris (trailing spaces)
-    # Tanpa merusak indentasi markdown (seperti daftar/poin) di sebelah kiri
-    lines = [line.rstrip() for line in teks.splitlines()]
-    teks = "\n".join(lines)
-    
-    # Merapikan jarak enter yang terlalu renggang (lebih dari 2 baris kosong disusutkan)
+
+    # 1) Sisihkan dulu semua blok/inline kode ke tempat aman.
+    laci: list[str] = []
+
+    def _sisihkan(m: re.Match) -> str:
+        laci.append(m.group(0))
+        return f"\x00RAPIH{len(laci) - 1}\x00"
+
+    teks = _TEKS_TERLINDUNG_RE.sub(_sisihkan, teks)
+
+    # 2) Rapikan tiap baris: spasi menggantung di ujung kanan dibuang,
+    #    spasi/tab ganda di tengah kalimat dirapatkan jadi satu spasi,
+    #    sedangkan indentasi kiri (daftar, kutipan) dibiarkan apa adanya.
+    baris_bersih: list[str] = []
+    for baris in teks.splitlines():
+        baris = baris.rstrip()
+        if not baris.strip():
+            baris_bersih.append("")
+            continue
+        indentasi = baris[: len(baris) - len(baris.lstrip())]
+        isi = re.sub(r"[ \t]{2,}", " ", baris.lstrip())
+        baris_bersih.append(indentasi + isi)
+    teks = "\n".join(baris_bersih)
+
+    # 3) Rapikan jarak enter: baris kosong berlebih (lebih dari satu)
+    #    disusutkan jadi tepat satu baris kosong.
     teks = re.sub(r"\n{3,}", "\n\n", teks)
-    
+
+    # 4) Kembalikan blok kode yang tadi disisihkan.
+    for i, terlindung in enumerate(laci):
+        teks = teks.replace(f"\x00RAPIH{i}\x00", terlindung)
+
     return teks.strip()
     
 def handle_image_request(prompt: str) -> None:
