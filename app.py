@@ -280,12 +280,22 @@ CAPABILITY_ROWS = [
 ]
 
 
-def _save_settings(patch: dict, label: str = "Perubahan disimpan.") -> None:
-    merged = dict(st.session_state.get("settings") or {})
-    merged.update(patch)
-    st.session_state.settings = merged
-    st.toast(label, icon=":material/check:")
-
+def _baris_aksi_simpan(label: str, key: str, patch: dict, toast: str,
+                       sekunder: tuple[str, str, object] | None = None) -> None:
+    """Baris aksi seragam di dasar setiap tab Pengaturan & halaman Bahasa:
+    tombol utama "Simpan" rata kanan, plus satu tombol sekunder opsional
+    (mis. "Uji koneksi") persis di sampingnya — jadi semua tab seragam."""
+    _, kiri, kanan = st.columns([2, 1, 1])
+    if sekunder:
+        label2, key2, fn2 = sekunder
+        with kiri:
+            if st.button(label2, key=key2, use_container_width=True):
+                fn2()
+    with kanan:
+        if st.button(f":material/save:  {label}", key=key, type="primary",
+                     use_container_width=True):
+            _save_settings(patch, toast)
+            st.rerun()
 
 def _capability_state(setting_key: str) -> str:
     if setting_key == "selalu":
