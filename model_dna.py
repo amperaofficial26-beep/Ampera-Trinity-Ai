@@ -216,7 +216,7 @@ def active_node_css(row_key: str) -> str:
         "rgba(255,255,255,0) 100%)!important;"
         "filter:blur(1px);"                                # tepi pita lembut
         "transform:translateX(-130%);"
-        "animation:whiteSweep 4.5s ease-in-out infinite!important;"
+        "animation:whiteSweep 3.5s ease-in-out infinite!important;"
         "pointer-events:none!important;}"                  # tak mengganggu klik
         "@keyframes whiteSweep{"
         "0%{transform:translateX(-130%);}"
