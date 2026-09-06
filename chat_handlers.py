@@ -85,6 +85,9 @@ def maybe_run_yuki(answer_slot) -> bool:
 # supaya indentasi dan spasi di dalam kode tetap utuh.
 _TEKS_TERLINDUNG_RE = re.compile(r"```.*?```|```.*$|`[^`\n]*`", re.S)
 
+# Baris item daftar: "- ", "* ", "+ ", "• ", atau "1. " / "1) " (boleh menjorok)
+_BARIS_DAFTAR_RE = re.compile(r"^\s*(?:[-*+\u2022]\s|\d+[.)]\s)")
+
 
 def rapihkan_teks_chat(teks: str) -> str:
     """Merapikan jarak spasi dan enter jawaban Yuki tanpa merusak Markdown."""
@@ -114,11 +117,27 @@ def rapihkan_teks_chat(teks: str) -> str:
         baris_bersih.append(indentasi + isi)
     teks = "\n".join(baris_bersih)
 
-    # 3) Rapikan jarak enter: baris kosong berlebih (lebih dari satu)
+    # 3) Rapikan daftar: baris kosong di antara dua item daftar (-, *, •,
+    #    1. dst.) dihapus supaya itemnya rapat, bukan berjauhan.
+    baris_list = teks.splitlines()
+    rapat: list[str] = []
+    for i, b in enumerate(baris_list):
+        if (
+            not b.strip()
+            and rapat
+            and _BARIS_DAFTAR_RE.match(rapat[-1])
+            and i + 1 < len(baris_list)
+            and _BARIS_DAFTAR_RE.match(baris_list[i + 1])
+        ):
+            continue
+        rapat.append(b)
+    teks = "\n".join(rapat)
+
+    # 4) Rapikan jarak enter: baris kosong berlebih (lebih dari satu)
     #    disusutkan jadi tepat satu baris kosong.
     teks = re.sub(r"\n{3,}", "\n\n", teks)
 
-    # 4) Kembalikan blok kode yang tadi disisihkan.
+    # 5) Kembalikan blok kode yang tadi disisihkan.
     for i, terlindung in enumerate(laci):
         teks = teks.replace(f"\x00RAPIH{i}\x00", terlindung)
 
