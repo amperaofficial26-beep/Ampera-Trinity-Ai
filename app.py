@@ -365,7 +365,7 @@ def _set_umum() -> None:
                     index=_opt_index(["Chat", "Gambar"], s["default_mode"]),
                     key="set_mode", horizontal=True)
   
-     _baris_aksi_simpan(
+    _baris_aksi_simpan(
         "Simpan perubahan", "save_umum",
         {
             "theme": theme, "font_size": font,
@@ -553,7 +553,7 @@ def _set_kemampuan() -> None:
     st.toggle("Generate gambar", value=s["cap_image"], key="cap_image_t")
     st.toggle("Tangkap artefak otomatis", value=s["cap_artifacts"], key="cap_art_t")
 
-      _baris_aksi_simpan(
+    _baris_aksi_simpan(
         "Simpan kemampuan", "save_kemampuan",
         {
             "cap_web_search": st.session_state.cap_web,
