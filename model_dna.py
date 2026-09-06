@@ -212,7 +212,7 @@ def active_node_css(row_key: str) -> str:
         "width:45%!important;"                             # lebar pita = 45% kartu
         "background:linear-gradient(105deg,"
         "rgba(255,255,255,0) 0%,"
-        "rgba(255,255,255,.95) 50%,"
+        "rgba(255,255,255,.45) 50%,"
         "rgba(255,255,255,0) 100%)!important;"
         "filter:blur(1px);"                                # tepi pita lembut
         "transform:translateX(-130%);"
