@@ -589,6 +589,7 @@ def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> Non
                 dna_header_html(current_name, current_model.get("desc", "")),
                 unsafe_allow_html=True,
             )
+            st.caption("VERSI BARU OK")
             for m in MODEL_CATALOG:
                 is_active = m["key"] == st.session_state.selected_model_key
                 # Model aktif TIDAK pakai tanda ✓ lagi — ditandai lewat
