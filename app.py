@@ -287,6 +287,24 @@ def _save_settings(patch: dict, label: str = "Perubahan disimpan.") -> None:
     st.toast(label, icon=":material/check:")
 
 
+def _baris_aksi_simpan(label: str, key: str, patch: dict, toast: str,
+                       sekunder: tuple[str, str, object] | None = None) -> None:
+    """Baris aksi seragam di dasar setiap tab Pengaturan & halaman Bahasa:
+    tombol utama "Simpan" rata kanan, plus satu tombol sekunder opsional
+    (mis. "Uji koneksi") persis di sampingnya — jadi semua tab seragam."""
+    _, kiri, kanan = st.columns([2, 1, 1])
+    if sekunder:
+        label2, key2, fn2 = sekunder
+        with kiri:
+            if st.button(label2, key=key2, use_container_width=True):
+                fn2()
+    with kanan:
+        if st.button(f":material/save:  {label}", key=key, type="primary",
+                     use_container_width=True):
+            _save_settings(patch, toast)
+            st.rerun()
+
+
 def _capability_state(setting_key: str) -> str:
     if setting_key == "selalu":
         return "aktif" if CHAT_READY else "butuh GROQ_API_KEY"
@@ -351,15 +369,16 @@ def _set_umum() -> None:
                     index=_opt_index(["Chat", "Gambar"], s["default_mode"]),
                     key="set_mode", horizontal=True)
 
-    if st.button(":material/save:  Simpan perubahan", key="save_umum", type="primary"):
-        _save_settings({
+    _baris_aksi_simpan(
+        "Simpan perubahan", "save_umum",
+        {
             "theme": theme, "font_size": font,
             "stream_speed": speed, "personality": persona,
             "clarify_mode": clarify,
             "default_mode": mode,
-        }, "Pengaturan umum disimpan.")
-        st.rerun()
-
+        },
+        "Pengaturan umum disimpan.",
+    )
 
 def _set_akun() -> None:
     s = get_settings()
@@ -394,10 +413,12 @@ def _set_akun() -> None:
             st.toast("Tautan ubah kata sandi akan dikirim ke email kamu.",
                      icon=":material/mail:")
 
-    if st.button(":material/save:  Simpan profil", key="save_akun", type="primary"):
-        _save_settings({"display_name": name.strip() or "User", "username": uname.strip(),
-                        "email": email.strip(), "bio": bio.strip()}, "Profil disimpan.")
-        st.rerun()
+    _baris_aksi_simpan(
+        "Simpan profil", "save_akun",
+        {"display_name": name.strip() or "User", "username": uname.strip(),
+         "email": email.strip(), "bio": bio.strip()},
+        "Profil disimpan.",
+    )
 
 
 def _set_privasi() -> None:
@@ -418,27 +439,30 @@ def _set_privasi() -> None:
     st.toggle("Gunakan memoriku untuk jawaban yang lebih personal",
               value=s["personalization"], key="set_personal")
 
-    st.markdown('<div class="set-section">Hapus data</div>', unsafe_allow_html=True)
-    st.caption("Menghapus seluruh data akan mengosongkan percakapan, artefak, "
-               "memori, dan pengaturan. Tindakan ini tidak bisa dibatalkan.")
-    if st.button(":material/delete_forever:  Hapus seluruh data saya",
-                 key="wipe_data", type="primary"):
-        for k in list(st.session_state.keys()):
-            del st.session_state[k]
-        st.session_state.page = "chat"
-        st.rerun()
-
-    if st.button(":material/save:  Simpan pengaturan privasi", key="save_privasi",
-                 type="primary"):
-        _save_settings({
+    _baris_aksi_simpan(
+        "Simpan privasi", "save_privasi",
+        {
             "save_history": st.session_state.set_hist,
             "keep_voice": st.session_state.set_voice,
             "allow_web_search": st.session_state.set_web,
             "cloud_sync": st.session_state.set_sync,
             "analytics": st.session_state.set_analytics,
             "personalization": st.session_state.set_personal,
-        }, "Pengaturan privasi disimpan.")
-        st.rerun()
+        },
+        "Pengaturan privasi disimpan.",
+    )
+
+    st.markdown('<div class="set-section">Hapus data</div>', unsafe_allow_html=True)
+    st.caption("Menghapus seluruh data akan mengosongkan percakapan, artefak, "
+               "memori, dan pengaturan. Tindakan ini tidak bisa dibatalkan.")
+    _, kolom_hapus = st.columns([3, 1])
+    with kolom_hapus:
+        if st.button(":material/delete_forever:  Hapus seluruh data saya",
+                     key="wipe_data"):
+            for k in list(st.session_state.keys()):
+                del st.session_state[k]
+            st.session_state.page = "chat"
+            st.rerun()
 
 
 PRO_FEATURES = [
@@ -482,12 +506,22 @@ def _plan_col(title: str, price: str, note: str, is_pro: bool, key: str) -> None
 
 def _set_penagihan() -> None:
     s = get_settings()
+    st.markdown('<div class="set-section">Siklus &amp; pembayaran</div>',
+                unsafe_allow_html=True)
     st.radio("Siklus penagihan", ["Bulanan", "Tahunan (hemat 20%)"],
              index=_opt_index(["Bulanan", "Tahunan (hemat 20%)"], s["billing_cycle"]),
              key="set_cycle", horizontal=True)
-    if st.button(":material/credit_card:  Atur metode pembayaran", key="bayar_metode"):
-        st.toast("Metode pembayaran akan dibuka setelah gerbang pembayaran aktif.",
-                 icon=":material/credit_card:")
+    _, kolom_bayar = st.columns([3, 1])
+    with kolom_bayar:
+        if st.button(":material/credit_card:  Atur pembayaran", key="bayar_metode",
+                     use_container_width=True):
+            st.toast("Metode pembayaran akan dibuka setelah gerbang pembayaran aktif.",
+                     icon=":material/credit_card:")
+    st.markdown(
+        '<div class="feat-row"><span>Metode pembayaran</span>'
+        f'<span class="chip-off">{html.escape(s["payment_method"])}</span></div>',
+        unsafe_allow_html=True,
+    )
 
     st.markdown('<div class="set-section">Pemakaian bulan ini</div>', unsafe_allow_html=True)
     st.markdown(
@@ -501,10 +535,11 @@ def _set_penagihan() -> None:
     st.markdown('<div class="set-section">Riwayat tagihan</div>', unsafe_allow_html=True)
     st.caption("Belum ada tagihan. Tagihan muncul di sini setelah kamu "
                "berlangganan Trinity Pro.")
-    st.markdown(
-        '<div class="feat-row"><span>Metode pembayaran</span>'
-        f'<span class="chip-off">{html.escape(s["payment_method"])}</span></div>',
-        unsafe_allow_html=True,
+
+    _baris_aksi_simpan(
+        "Simpan penagihan", "save_tagih",
+        {"billing_cycle": st.session_state.set_cycle},
+        "Penagihan disimpan.",
     )
 
 
@@ -523,19 +558,22 @@ def _set_kemampuan() -> None:
     st.toggle("Generate gambar", value=s["cap_image"], key="cap_image_t")
     st.toggle("Tangkap artefak otomatis", value=s["cap_artifacts"], key="cap_art_t")
 
-    if st.button(":material/save:  Simpan kemampuan", key="save_kemampuan", type="primary"):
-        _save_settings({
+    _baris_aksi_simpan(
+        "Simpan kemampuan", "save_kemampuan",
+        {
             "cap_web_search": st.session_state.cap_web,
             "cap_voice": st.session_state.cap_voice_t,
             "cap_vision": st.session_state.cap_vision_t,
             "cap_image": st.session_state.cap_image_t,
             "cap_artifacts": st.session_state.cap_art_t,
-        }, "Kemampuan disimpan.")
-        st.rerun()
+        },
+        "Kemampuan disimpan.",
+    )
 
 
 def _set_memori() -> None:
     s = get_settings()
+    st.markdown('<div class="set-section">Kemampuan memori</div>', unsafe_allow_html=True)
     st.toggle("Gunakan memori jangka panjang", value=s["memory_on"], key="mem_on",
               help="Bila mati, daftar di bawah tidak dikirim ke Yuki.")
     st.toggle("Biarkan Yuki menambah memori otomatis", value=s["memory_auto"],
@@ -560,35 +598,38 @@ def _set_memori() -> None:
                 st.session_state.settings = new
                 st.rerun()
 
-    new_fact = st.text_input("Tambah memori baru", key="mem_new",
-                             placeholder="mis. Aku lebih suka jawaban singkat & pakai tabel")
-    c1, c2 = st.columns([1, 1])
-    with c1:
-        if st.button(":material/add:  Tambah memori", key="mem_add",
-                     use_container_width=True, type="primary"):
-            if new_fact.strip():
-                merged = dict(st.session_state.get("settings") or {})
-                merged["memories"] = facts + [new_fact.strip()]
-                st.session_state.settings = merged
-                st.toast("Memori ditambahkan.", icon=":material/check:")
-                st.rerun()
-    with c2:
-        if st.button(":material/save:  Simpan toggle memori", key="mem_save",
-                     use_container_width=True):
-            _save_settings({"memory_on": st.session_state.mem_on,
-                            "memory_auto": st.session_state.mem_auto},
-                           "Pengaturan memori disimpan.")
+    st.text_input("Tambah memori baru", key="mem_new",
+                  placeholder="mis. Aku lebih suka jawaban singkat & pakai tabel")
+
+    def _tambah_memori() -> None:
+        baru = (st.session_state.get("mem_new") or "").strip()
+        if baru:
+            merged = dict(st.session_state.get("settings") or {})
+            merged["memories"] = facts + [baru]
+            st.session_state.settings = merged
+            st.toast("Memori ditambahkan.", icon=":material/check:")
             st.rerun()
+
+    _baris_aksi_simpan(
+        "Simpan memori", "mem_save",
+        {"memory_on": st.session_state.mem_on,
+         "memory_auto": st.session_state.mem_auto},
+        "Pengaturan memori disimpan.",
+        sekunder=(":material/add:  Tambah memori", "mem_add", _tambah_memori),
+    )
 
 
 def _set_refleksi() -> None:
     s = get_settings()
+    st.markdown('<div class="set-section">Target &amp; kebiasaan</div>',
+                unsafe_allow_html=True)
     goal = st.text_area("Target yang sedang kamu kejar", value=s["reflection_goal"],
                         key="refl_goal", height=90,
                         placeholder="mis. Menambah 20 pelanggan baru bulan ini")
     habit = st.text_area("Kebiasaan yang ingin dibangun", value=s["reflection_habit"],
                          key="refl_habit", height=90,
                          placeholder="mis. Menulis konten setiap pagi 15 menit")
+    st.markdown('<div class="set-section">Gaya refleksi</div>', unsafe_allow_html=True)
     c1, c2 = st.columns(2)
     with c1:
         freq = st.selectbox("Yuki menanyakan progres", REFL_FREQ_OPTIONS,
@@ -599,23 +640,22 @@ def _set_refleksi() -> None:
                             index=_opt_index(REFL_TONE_OPTIONS, s["reflection_tone"]),
                             key="refl_tone")
 
-    c3, c4 = st.columns(2)
-    with c3:
-        if st.button(":material/save:  Simpan refleksi", key="save_refl",
-                     type="primary", use_container_width=True):
-            _save_settings({"reflection_goal": goal.strip(),
-                            "reflection_habit": habit.strip(),
-                            "reflection_freq": freq, "reflection_tone": tone},
-                           "Refleksi disimpan.")
-            st.rerun()
-    with c4:
-        if st.button(":material/self_improvement:  Minta refleksi sekarang",
-                     key="refl_now", use_container_width=True):
-            go("chat")
-            st.session_state.pending_prompt = (
-                "Ajak aku refleksi singkat: tanyakan progres targetku, "
-                "hambatan hari ini, dan satu langkah kecil untuk besok."
-            )
+    def _minta_refleksi() -> None:
+        go("chat")
+        st.session_state.pending_prompt = (
+            "Ajak aku refleksi singkat: tanyakan progres targetku, "
+            "hambatan hari ini, dan satu langkah kecil untuk besok."
+        )
+
+    _baris_aksi_simpan(
+        "Simpan refleksi", "save_refl",
+        {"reflection_goal": goal.strip(),
+         "reflection_habit": habit.strip(),
+         "reflection_freq": freq, "reflection_tone": tone},
+        "Refleksi disimpan.",
+        sekunder=(":material/self_improvement:  Minta refleksi sekarang",
+                  "refl_now", _minta_refleksi),
+    )
 
 
 def _set_waktu_fokus() -> None:
@@ -646,13 +686,14 @@ def _set_waktu_fokus() -> None:
     remind = st.toggle("Ingatkan aku saat jam fokus selesai", value=s["focus_reminder"],
                        key="set_remind")
 
-    if st.button(":material/save:  Simpan waktu & fokus", key="save_fokus", type="primary"):
-        _save_settings({"focus_minutes": int(focus), "break_minutes": int(brk),
-                        "work_start": start, "work_end": end,
-                        "tz_label": st.session_state.set_tz,
-                        "focus_reminder": remind},
-                       "Waktu & fokus disimpan.")
-        st.rerun()
+    _baris_aksi_simpan(
+        "Simpan waktu & fokus", "save_fokus",
+        {"focus_minutes": int(focus), "break_minutes": int(brk),
+         "work_start": start, "work_end": end,
+         "tz_label": st.session_state.set_tz,
+         "focus_reminder": remind},
+        "Waktu & fokus disimpan.",
+    )
 
 
 def _set_trinity_code() -> None:
@@ -702,32 +743,30 @@ def _set_trinity_code() -> None:
     adv = st.toggle("Tampilkan error teknis apa adanya (mode pengembang)",
                     value=s["advanced_errors"], key="set_adv")
 
-    c3, c4 = st.columns(2)
-    with c3:
-        if st.button(":material/save:  Simpan Trinity Code", key="save_code",
-                     type="primary", use_container_width=True):
-            patch = {"groq_key": gk.strip(), "cf_account_id": ca.strip(),
-                     "cf_token": ct.strip(), "temperature": float(temp),
-                     "advanced_errors": adv}
-            _save_settings(patch, "Trinity Code disimpan.")
-            st.rerun()
-    with c4:
-        if st.button(":material/terminal:  Uji koneksi", key="test_conn",
-                     use_container_width=True):
-            if not (CHAT_READY or gk.strip()):
-                st.toast("Belum ada GROQ_API_KEY untuk diuji.", icon=":material/warning:")
-            else:
-                try:
-                    client = OpenAI(api_key=(gk.strip() or GROQ_API_KEY), base_url=GROQ_BASE_URL)
-                    r = client.chat.completions.create(
-                        model=AVAILABLE_MODELS[DEFAULT_MODEL_KEY],
-                        messages=[{"role": "user", "content": "ping"}],
-                        max_tokens=5,
-                    )
-                    st.toast("Koneksi bagus: " + (r.choices[0].message.content or "pong"),
-                             icon=":material/check_circle:")
-                except Exception as e:
-                    st.toast(f"Gagal terhubung: {str(e)[:120]}", icon=":material/error:")
+    def _uji_koneksi() -> None:
+        if not (CHAT_READY or gk.strip()):
+            st.toast("Belum ada GROQ_API_KEY untuk diuji.", icon=":material/warning:")
+        else:
+            try:
+                client = OpenAI(api_key=(gk.strip() or GROQ_API_KEY), base_url=GROQ_BASE_URL)
+                r = client.chat.completions.create(
+                    model=AVAILABLE_MODELS[DEFAULT_MODEL_KEY],
+                    messages=[{"role": "user", "content": "ping"}],
+                    max_tokens=5,
+                )
+                st.toast("Koneksi bagus: " + (r.choices[0].message.content or "pong"),
+                         icon=":material/check_circle:")
+            except Exception as e:
+                st.toast(f"Gagal terhubung: {str(e)[:120]}", icon=":material/error:")
+
+    _baris_aksi_simpan(
+        "Simpan Trinity Code", "save_code",
+        {"groq_key": gk.strip(), "cf_account_id": ca.strip(),
+         "cf_token": ct.strip(), "temperature": float(temp),
+         "advanced_errors": adv},
+        "Trinity Code disimpan.",
+        sekunder=(":material/terminal:  Uji koneksi", "test_conn", _uji_koneksi),
+    )
 
 
 def page_pengaturan() -> None:
@@ -788,6 +827,7 @@ def page_bahasa() -> None:
         unsafe_allow_html=True,
     )
 
+    st.markdown('<div class="set-section">Pilih bahasa</div>', unsafe_allow_html=True)
     c1, c2 = st.columns(2)
     with c1:
         ui_name = st.selectbox(
@@ -806,12 +846,13 @@ def page_bahasa() -> None:
             key="lang_yuki",
         )
 
-    if st.button(":material/save:  Simpan bahasa", key="lang_save", type="primary"):
-        ui_sel = next(l for l in SUPPORTED_LANGUAGES if l["name"] == ui_name)
-        yuki_sel = next(l for l in SUPPORTED_LANGUAGES if l["name"] == yuki_name)
-        _save_settings({"ui_lang": ui_sel["code"], "yuki_lang": yuki_sel["code"]},
-                       f"Bahasa disimpan — Yuki akan menjawab dalam {yuki_sel['name']}.")
-        st.rerun()
+    ui_sel = next(l for l in SUPPORTED_LANGUAGES if l["name"] == ui_name)
+    yuki_sel = next(l for l in SUPPORTED_LANGUAGES if l["name"] == yuki_name)
+    _baris_aksi_simpan(
+        "Simpan bahasa", "lang_save",
+        {"ui_lang": ui_sel["code"], "yuki_lang": yuki_sel["code"]},
+        f"Bahasa disimpan — Yuki akan menjawab dalam {yuki_sel['name']}.",
+    )
 
     st.markdown('<div class="set-section">Daftar bahasa yang tersedia</div>',
                 unsafe_allow_html=True)
