@@ -416,7 +416,6 @@ DEFAULT_SETTINGS: dict = {
     "yuki_lang": DEFAULT_LANG_CODE,
     "theme": "Beige hangat",
     "font_size": "Normal",
-    "compact_mode": False,
     "stream_speed": "Sedang",
     "personality": "Santai & kocak",
     "clarify_mode": "Seperlunya",
