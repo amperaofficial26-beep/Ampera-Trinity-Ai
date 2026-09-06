@@ -2459,6 +2459,12 @@ div.stButton > button p strong { color: #2C1F33; }
     font-size: 1.06rem; font-weight: 600; color: #2C1F33;
     margin: 22px 0 10px;
 }
+/* judul bagian PERTAMA di sebuah tab/halaman tidak perlu jarak atas besar,
+   supaya ritme jarak antar bagian terasa konsisten */
+[data-testid="stVerticalBlock"] > .element-container:first-child .set-section,
+[data-testid="stVerticalBlock"] > [data-testid="stMarkdownContainer"]:first-child .set-section {
+    margin-top: 2px;
+}
 
 /* --- kartu kemampuan --- */
 .cap-card {
