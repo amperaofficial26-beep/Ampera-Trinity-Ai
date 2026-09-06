@@ -175,10 +175,40 @@ def image_progress_html(labels: list[str] | None = None,
 # ============================================================================
 # BUBBLE CHAT
 # ============================================================================
+def _body_html(content: str) -> str:
+    """Ubah teks jawaban jadi HTML yang jaraknya rapat & terkontrol.
+
+    Masalah lama: bubble memakai white-space:pre-wrap, jadi TIAP baris
+    kosong di teks jadi satu baris kosong penuh (setinggi line-height)
+    — paragraf terlihat berjauhan. Sekarang:
+      - baris kosong pemisah paragraf -> <div class="para-gap"> (spacer
+        kecil ~0.6em, jarak pas seperti Claude)
+      - baris biasa di dalam paragraf -> <br>
+      - blok kode (``` ... ```) dibiarkan utuh per baris (jangan dirapatkan)
+    """
+    teks = content or ""
+    if not teks:
+        return ""
+    elemen: list[str] = []
+    # pisahkan dulu blok kode agar tidak ikut dirapatkan
+    for potong in re.split(r"(```.*?```|```.*$)", teks, flags=re.S):
+        if not potong:
+            continue
+        if potong.startswith("```"):
+            elemen.append(html.escape(potong).replace("\n", "<br>"))
+            continue
+        for p in re.split(r"\n{2,}", potong):
+            p = p.strip("\n")
+            if not p.strip():
+                continue
+            elemen.append(html.escape(p).replace("\n", "<br>"))
+    return '<div class="para-gap"></div>'.join(elemen)
+
+
 def bubble_html(role: str, content: str, timestamp: str = "",
                 images_html: str = "", meta_note: str = "",
                 icon_html: str = "") -> str:
-    body = html.escape(content or "")
+    body = _body_html(content)
     css = "user" if role == "user" else "ai"
     if role == "user":
         # User: bubble krem membulat di kanan (gaya Claude)

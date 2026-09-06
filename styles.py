@@ -395,10 +395,13 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 }
 
 .bubble {
-    font-size: 0.965rem; line-height: 1.65;
+    font-size: 0.965rem; line-height: 1.6;
     word-break: break-word; overflow-wrap: anywhere;
     white-space: pre-wrap;
 }
+/* jarak antar paragraf di dalam bubble: spacer kecil terkontrol
+   (menggantikan baris kosong penuh yang dulu setinggi 1 baris) */
+.bubble .para-gap { height: 0.6em; }
 .bubble.user {
     max-width: 78%;
     background: #E0D2BB;
