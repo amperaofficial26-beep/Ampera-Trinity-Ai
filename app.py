@@ -689,7 +689,7 @@ def _set_waktu_fokus() -> None:
         "Waktu & fokus disimpan.",
     )
 
-d    adv = st.toggle("Tampilkan error teknis apa adanya (mode pengembang)",
+    adv = st.toggle("Tampilkan error teknis apa adanya (mode pengembang)",
                     value=s["advanced_errors"], key="set_adv")
 
     def _uji_koneksi() -> None:
