@@ -193,25 +193,35 @@ def active_node_css(row_key: str) -> str:
         "opacity:1!important;box-shadow:0 0 8px rgba(74,53,89,.7)!important;"
         "animation:basePulse 1.6s ease-in-out infinite .8s;}"
         # digeser pelan lewat animasi whiteSweep (4.5 detik per sapuan).
-        # kartu aktif: border emas + GLOW PUTIH BERJALAN perlahan.
-        # Latar kartu aktif dibuat EMAS KARAMEL (bukan krem terang) supaya
-        # pita putih yang menyapu benar-benar terlihat kontras.
+        # kartu aktif: border karamel + latar emas. Glow-nya BUKAN di
+        # samping (halo dikecilkan) — pita cahayanya berjalan DI ATAS
+        # kolom modelnya sendiri (lihat button::after di bawah).
         f"[data-testid='stPopoverBody']:has(.dna-wrap) .st-key-{row_key} button{{"
         f"border-color:{WARNA_AKSEN}!important;"
         "background-color:#E2AE55!important;"
-        "background-image:linear-gradient(105deg,"
-        "rgba(255,255,255,0) 35%,"
+        "position:relative!important;"
+        "overflow:hidden!important;"                       # pita tak bocor keluar kartu
+        "box-shadow:0 0 6px rgba(180,83,9,.30)!important;}"  # halo samping kecil saja
+        # PITA GLOW PUTIH BERJALAN: lapisan cahaya tersendiri (::after)
+        # yang menyapu permukaan kolom model dari kiri ke kanan,
+        # perlahan (4.5 detik per sapuan), terus berulang.
+        f"[data-testid='stPopoverBody']:has(.dna-wrap) .st-key-{row_key} button::after{{"
+        "content:''!important;"
+        "position:absolute!important;"
+        "top:0!important;bottom:0!important;left:0!important;"
+        "width:45%!important;"                             # lebar pita = 45% kartu
+        "background:linear-gradient(105deg,"
+        "rgba(255,255,255,0) 0%,"
         "rgba(255,255,255,.95) 50%,"
-        "rgba(255,255,255,0) 65%)!important;"
-        "background-size:280% 100%!important;"
-        "background-repeat:no-repeat!important;"
+        "rgba(255,255,255,0) 100%)!important;"
+        "filter:blur(1px);"                                # tepi pita lembut
+        "transform:translateX(-130%);"
         "animation:whiteSweep 4.5s ease-in-out infinite!important;"
-        "box-shadow:0 0 14px rgba(255,255,255,.75),"
-        "0 0 6px rgba(180,83,9,.35)!important;}"
+        "pointer-events:none!important;}"                  # tak mengganggu klik
         "@keyframes whiteSweep{"
-        "0%{background-position:120% 0;}"
-        "60%{background-position:-60% 0;}"
-        "100%{background-position:-60% 0;}}"
+        "0%{transform:translateX(-130%);}"
+        "60%{transform:translateX(340%);}"                 # sapu kiri → kanan 2.7 dtk
+        "100%{transform:translateX(340%);}}"               # jeda sisa 1.8 dtk
         "@keyframes basePulse{0%,100%{transform:scale(1);}50%{transform:scale(1.4);}}"
         "</style>"
     )
