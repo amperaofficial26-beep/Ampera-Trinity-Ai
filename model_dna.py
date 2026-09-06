@@ -192,21 +192,22 @@ def active_node_css(row_key: str) -> str:
         f"[data-testid='stPopoverBody']:has(.dna-wrap) .st-key-{row_key} > div::before{{"
         "opacity:1!important;box-shadow:0 0 8px rgba(74,53,89,.7)!important;"
         "animation:basePulse 1.6s ease-in-out infinite .8s;}"
-        # kartu aktif: border emas + GLOW PUTIH BERJALAN perlahan.
-        # Pita putih dibuat dari background-image gradient yang posisinya
         # digeser pelan lewat animasi whiteSweep (4.5 detik per sapuan).
+        # kartu aktif: border emas + GLOW PUTIH BERJALAN perlahan.
+        # Latar kartu aktif dibuat EMAS KARAMEL (bukan krem terang) supaya
+        # pita putih yang menyapu benar-benar terlihat kontras.
         f"[data-testid='stPopoverBody']:has(.dna-wrap) .st-key-{row_key} button{{"
-        f"border-color:{WARNA_UNTAI1}!important;"
-        "background-color:#FBF4E7!important;"
+        f"border-color:{WARNA_AKSEN}!important;"
+        "background-color:#E2AE55!important;"
         "background-image:linear-gradient(105deg,"
-        "rgba(255,255,255,0) 38%,"
-        "rgba(255,255,255,.85) 50%,"
-        "rgba(255,255,255,0) 62%)!important;"
+        "rgba(255,255,255,0) 35%,"
+        "rgba(255,255,255,.95) 50%,"
+        "rgba(255,255,255,0) 65%)!important;"
         "background-size:280% 100%!important;"
         "background-repeat:no-repeat!important;"
         "animation:whiteSweep 4.5s ease-in-out infinite!important;"
-        "box-shadow:0 0 10px rgba(255,255,255,.55),"
-        "0 0 4px rgba(232,176,75,.35)!important;}"
+        "box-shadow:0 0 14px rgba(255,255,255,.75),"
+        "0 0 6px rgba(180,83,9,.35)!important;}"
         "@keyframes whiteSweep{"
         "0%{background-position:120% 0;}"
         "60%{background-position:-60% 0;}"
