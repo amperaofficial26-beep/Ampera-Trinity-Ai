@@ -1027,12 +1027,11 @@ TIPS_LIST = [
 
 
 def page_pelajari() -> None:
-    
     st.markdown(
-        f'<div class="trinity-hero">{logo_img_html("logo-greeting")}'
-        '<div class="hero-text"><h1>Ampera Trinity AI</h1>'
-        "<p>Tiga mesin AI dalam satu tempat: mengobrol dengan Yuki, membuat "
-        "gambar, dan menganalisis gambar atau suara yang kamu kirim. "
+        f'<div class="page-head"><div class="page-head-icon">{mi(":material/menu_book:")}</div>'
+        '<div><h2 class="page-title">Pelajari lebih lanjut</h2>'
+        "<p class=\"page-sub\">Tiga mesin AI dalam satu tempat: mengobrol dengan Yuki, "
+        "membuat gambar, ...</p></div></div>",
         "Dibuat oleh Ampera Official.</p></div></div>",
         unsafe_allow_html=True,
     )
