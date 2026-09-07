@@ -1506,6 +1506,11 @@ def main() -> None:
     # Dok file kecil (panel_file.py): ikon folder melayang + daftar file
     # buatan Yuki. Tidak buka otomatis — hanya gelembung penanda.
     render_file_dock()
+  # ============================================================
+# TES SYSTEM
+# ============================================================
+
+    render_system_diagnostic()
 
     # Animasi ala iOS untuk perpindahan halaman.
 
