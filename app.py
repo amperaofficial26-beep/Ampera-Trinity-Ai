@@ -63,6 +63,31 @@ from chat_handlers import (
     process_user_input, render_input_controls, render_pending_preview,
     maybe_run_yuki,
 )
+import os
+import shutil
+import psutil
+
+def system_info():
+    # RAM
+    ram = psutil.virtual_memory()
+
+    # Storage
+    total, used, free = shutil.disk_usage("/")
+
+    st.subheader("📊 Status Server")
+
+    st.write("### RAM")
+    st.write(f"Total : {ram.total / (1024**3):.2f} GB")
+    st.write(f"Dipakai : {ram.used / (1024**3):.2f} GB")
+    st.write(f"Tersedia : {ram.available / (1024**3):.2f} GB")
+
+    st.write("### Storage")
+    st.write(f"Total : {total / (1024**3):.2f} GB")
+    st.write(f"Dipakai : {used / (1024**3):.2f} GB")
+    st.write(f"Tersedia : {free / (1024**3):.2f} GB")
+
+# Panggil fungsi
+system_info()
 
 # ============================================================================
 # KONFIGURASI HALAMAN
