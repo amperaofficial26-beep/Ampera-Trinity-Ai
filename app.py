@@ -1090,18 +1090,15 @@ def page_pelajari() -> None:
 # HALAMAN: TINGKATKAN PAKET
 # ============================================================================
 def page_tingkatkan() -> None:
-    
     s = get_settings()
     st.markdown(
-        '<div class="trinity-hero"><div class="hero-text">'
-        '<h1>Trinity Pro</h1>'
-        "<p>Semua kemampuan Trinity dibuka penuh: model tertinggi tanpa batas, "
-        "gambar resolusi tinggi, memori tak terbatas, artefak & Trinity Code, "
-        "serta seluruh Trinity kursus dengan Yuki sebagai mentor pribadi.</p>"
-        "</div></div>",
+        f'<div class="page-head"><div class="page-head-icon">{mi(":material/workspace_premium:")}</div>'
+        '<div><h2 class="page-title">Trinity Pro</h2>'
+        "<p class=\"page-sub\">Semua kemampuan Trinity dibuka penuh: model tertinggi tanpa "
+        "batas, gambar resolusi tinggi, memori tak terbatas, artefak & Trinity Code, "
+        "serta seluruh Trinity kursus dengan Yuki sebagai mentor pribadi.</p></div></div>",
         unsafe_allow_html=True,
     )
-
     c1, c2 = st.columns(2)
     with c1:
         _plan_col("Free", "Rp 0", "Selamanya gratis · untuk mencoba", False, "plan_free")
@@ -1136,57 +1133,115 @@ def page_tingkatkan() -> None:
 # HALAMAN: DAPATKAN APLIKASI
 # ============================================================================
 def page_aplikasi() -> None:
-    
     st.markdown(
-        f'<div class="trinity-hero">{logo_img_html("logo-greeting")}'
-        '<div class="hero-text"><h1>Trinity di genggaman</h1>'
-        "<p>Ampera Trinity AI sedang disiapkan menjadi aplikasi Android & iOS. "
-        "Semua fitur yang ada di sini — Yuki, gambar, suara, artefak, dan "
+        f'<div class="page-head"><div class="page-head-icon">{mi(":material/phone_iphone:")}</div>'
+        '<div><h2 class="page-title">Dapatkan aplikasi</h2>'
+        "<p class=\"page-sub\">Ampera Trinity AI sedang disiapkan menjadi aplikasi Android "
+        "& iOS. Semua fitur yang ada di sini — Yuki, gambar, suara, artefak, dan "
         "kursus — ikut terbawa.</p></div></div>",
         unsafe_allow_html=True,
     )
 
-    c1, c2 = st.columns([1, 1.35])
-    with c1:
+    # ================= KIRI: pratinjau ponsel =================
+    # Ponsel tiruan (mockup) yang menampilkan "layar aplikasi": logo,
+    # sapaan, gelembung chat, dan bilah input — alih-alih kartu kosong.
+    c_phone, c_info = st.columns([1, 1.55], gap="large")
+
+    with c_phone:
         st.markdown(
-            f'<div class="phone-card">{logo_img_html("logo-greeting")}'
-            '<div class="phone-name">Ampera Trinity AI</div>'
-            '<div class="phone-tag">pratinjau aplikasi</div></div>',
+            f'<div class="app-phone-wrap">'
+            '<div class="app-tag">' + mi(":material/phone_iphone:")
+            + '<span>Pratinjau aplikasi</span></div>'
+            f'<div class="app-phone"><div class="app-phone-screen">'
+            '<div class="ap-status"><span>09:41</span>'
+            '<span class="ap-status-dots"><i></i><i></i><i></i></span></div>'
+            '<div class="ap-brand">' + logo_img_html("logo-phone")
+            + '<div class="ap-brand-text">'
+            '<div class="ap-brand-name">Ampera Trinity AI</div>'
+            '<div class="ap-brand-sub">Tanya apa saja</div></div></div>'
+            '<div class="ap-chat">'
+            '<div class="ap-bubble ai">Halo! Selamat datang di '
+            'Ampera Trinity AI.</div>'
+            '<div class="ap-bubble user">Halo Yuki!</div>'
+            '<div class="ap-bubble ai">Ada yang bisa kubantu hari ini? '
+            'Aku bisa mengobrol, membuatkan gambar, atau menyusun '
+            'jadwalmu.</div>'
+            '<div class="ap-bubble user">Buatkan jadwal belajarku ya</div>'
+            '<div class="ap-typing"><i></i><i></i><i></i></div>'
+            '</div>'
+            '<div class="ap-input"><span>Tulis pesan…</span>'
+            '<span class="ap-send">' + mi(":material/arrow_upward:")
+            + '</span></div></div></div>'
+            '<div class="app-phone-home"></div></div></div>',
             unsafe_allow_html=True,
         )
-    with c2:
-        st.markdown('<div class="set-section">Unduh</div>', unsafe_allow_html=True)
-        b1, b2 = st.columns(2)
-        with b1:
-            if st.button(":material/android:  Android", key="app_android",
-                         use_container_width=True):
-                st.toast("Versi Android belum dirilis. Daftar beta di bawah ya!",
-                         icon=":material/android:")
-        with b2:
-            if st.button(":material/smartphone:  iOS", key="app_ios", use_container_width=True):
-                st.toast("Versi iOS belum dirilis. Daftar beta di bawah ya!",
-                         icon=":material/smartphone:")
-        st.markdown('<div class="set-section">Rencana rilis</div>', unsafe_allow_html=True)
-        st.markdown(
-            '<div class="feat-row"><span>Android (APK & Play Store)</span>'
-            '<span class="chip-off">Tahap 1</span></div>'
-            '<div class="feat-row"><span>iOS (App Store)</span>'
-            '<span class="chip-off">Tahap 2</span></div>'
-            '<div class="feat-row"><span>Desktop (Windows & macOS)</span>'
-            '<span class="chip-off">Tahap 3</span></div>'
-            '<div class="feat-row"><span>Sinkronisasi antar perangkat</span>'
-            '<span class="chip-off">Menyusul</span></div>',
-            unsafe_allow_html=True,
-        )
-        email = st.text_input("Email untuk kabar rilis", key="app_email",
-                              placeholder="nama@email.com")
-        if st.button(":material/notifications_active:  Kabari saya saat rilis",
-                     key="app_notify", type="primary", use_container_width=True):
-            if email.strip():
-                st.toast("Terima kasih! Kami kabari begitu aplikasi siap.",
-                         icon=":material/check_circle:")
-            else:
-                st.toast("Isi dulu email kamu ya.", icon=":material/warning:")
+
+    # ================= KANAN: unduh · rilis · kabar =================
+    with c_info:
+        with st.container(key="app_dl_card"):
+            st.markdown(
+                '<div class="app-card-title">' + mi(":material/download:")
+                + '<span>Unduh aplikasinya</span></div>'
+                '<div class="app-card-desc">Segera hadir di toko aplikasi '
+                'resmi. Semua kemampuan Trinity ikut terbawa di genggaman.</div>',
+                unsafe_allow_html=True,
+            )
+            b1, b2 = st.columns(2)
+            with b1:
+                if st.button(":material/android:  Android", key="app_android",
+                             use_container_width=True):
+                    st.toast("Versi Android belum dirilis. Daftar beta di bawah ya!",
+                             icon=":material/android:")
+            with b2:
+                if st.button(":material/smartphone:  iOS", key="app_ios",
+                             use_container_width=True):
+                    st.toast("Versi iOS belum dirilis. Daftar beta di bawah ya!",
+                             icon=":material/smartphone:")
+            st.markdown(
+                '<div class="app-pills"><span>Yuki</span><span>Gambar</span>'
+                '<span>Suara</span><span>Analisis foto</span>'
+                '<span>Artefak</span><span>Kursus</span></div>'
+                '<div class="app-card-caption">Tombol unduh aktif begitu '
+                'aplikasi resmi dirilis.</div>',
+                unsafe_allow_html=True,
+            )
+
+        with st.container(key="app_plan_card"):
+            st.markdown(
+                '<div class="app-card-title">' + mi(":material/calendar_month:")
+                + '<span>Rencana rilis</span></div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                '<div class="feat-row"><span>Android (APK & Play Store)</span>'
+                '<span class="chip-off">Tahap 1</span></div>'
+                '<div class="feat-row"><span>iOS (App Store)</span>'
+                '<span class="chip-off">Tahap 2</span></div>'
+                '<div class="feat-row"><span>Desktop (Windows & macOS)</span>'
+                '<span class="chip-off">Tahap 3</span></div>'
+                '<div class="feat-row"><span>Sinkronisasi antar perangkat</span>'
+                '<span class="chip-off">Menyusul</span></div>',
+                unsafe_allow_html=True,
+            )
+
+        with st.container(key="app_mail_card"):
+            st.markdown(
+                '<div class="app-card-title">' + mi(":material/notifications_active:")
+                + '<span>Kabar rilis pertama</span></div>'
+                '<div class="app-card-desc">Isi emailmu, nanti kami kabari '
+                'begitu aplikasi siap diunduh.</div>',
+                unsafe_allow_html=True,
+            )
+            email = st.text_input("Email untuk kabar rilis", key="app_email",
+                                  placeholder="nama@email.com",
+                                  label_visibility="collapsed")
+            if st.button(":material/notifications_active:  Kabari saya saat rilis",
+                         key="app_notify", type="primary", use_container_width=True):
+                if email.strip():
+                    st.toast("Terima kasih! Kami kabari begitu aplikasi siap.",
+                             icon=":material/check_circle:")
+                else:
+                    st.toast("Isi dulu email kamu ya.", icon=":material/warning:")
     _page_footer()
 
 
