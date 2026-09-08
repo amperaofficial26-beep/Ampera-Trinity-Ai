@@ -856,19 +856,11 @@ def page_bahasa() -> None:
 
     st.markdown('<div class="set-section">Daftar bahasa yang tersedia</div>',
                 unsafe_allow_html=True)
-    head = (
-        '<div class="lang-row lang-row-head">'
-        '<span class="lang-col-flag"></span>'
-        '<span class="lang-col-name">Bahasa</span>'
-        '<span class="lang-col-level">Level</span>'
-        '<span class="lang-col-status">Status</span>'
-        '</div>'
-    )
-    rows = [head]
+    rows = []
     for l in SUPPORTED_LANGUAGES:
         active_ui = l["code"] == ui_code
         active_yuki = l["code"] == yuki_code
-        badge = '<span class="chip-off">—</span>'
+        badge = ""
         if active_ui and active_yuki:
             badge = '<span class="chip-on">Antarmuka + Yuki</span>'
         elif active_ui:
@@ -878,11 +870,11 @@ def page_bahasa() -> None:
         level_cls = "chip-on" if l["level"] == "Penuh" else "chip-off"
         rows.append(
             f'<div class="lang-row">'
-            f'<span class="lang-col-flag flag">{l["flag"]}</span>'
-            f'<span class="lang-col-name lang-name">{html.escape(l["name"])}'
+            f'<span class="flag">{l["flag"]}</span>'
+            f'<span class="lang-name">{html.escape(l["name"])}'
             f'<span class="lang-native">{html.escape(l["native"])}</span></span>'
-            f'<span class="lang-col-level"><span class="{level_cls}">{l["level"]}</span></span>'
-            f'<span class="lang-col-status">{badge}</span>'
+            f'<span class="lang-level"><span class="{level_cls}">{l["level"]}</span>'
+            f"{badge}</span>"
             "</div>"
         )
     st.markdown(f'<div class="lang-card">{"".join(rows)}</div>', unsafe_allow_html=True)
@@ -1157,39 +1149,9 @@ def page_aplikasi() -> None:
     c1, c2 = st.columns([1, 1.35])
     with c1:
         st.markdown(
-            '<div class="phone-mockup">'
-              '<div class="phone-mockup-frame">'
-                '<div class="phone-mockup-notch"></div>'
-                '<div class="phone-mockup-screen">'
-                  '<div class="phone-mockup-status">'
-                    '<span>9:41</span>'
-                    f'<span class="phone-mockup-status-icons">{mi(":material/signal_cellular_alt:")}'
-                    f'{mi(":material/wifi:")}{mi(":material/battery_full:")}</span>'
-                  '</div>'
-                  '<div class="phone-mockup-topbar">'
-                    f'{logo_img_html("logo-greeting")}'
-                    '<span class="phone-mockup-appname">Ampera Trinity AI</span>'
-                  '</div>'
-                  '<div class="phone-mockup-chat">'
-                    '<div class="phone-mockup-bubble phone-mockup-bubble-bot">'
-                    'Halo! Ada yang bisa Yuki bantu hari ini?</div>'
-                    '<div class="phone-mockup-bubble phone-mockup-bubble-user">'
-                    'Buatkan gambar pemandangan sore</div>'
-                    '<div class="phone-mockup-bubble phone-mockup-bubble-bot phone-mockup-bubble-loading">'
-                    '<span></span><span></span><span></span></div>'
-                  '</div>'
-                  '<div class="phone-mockup-inputbar">'
-                    f'{mi(":material/add:")}'
-                    '<span class="phone-mockup-input-placeholder">Tanya apa saja&hellip;</span>'
-                    f'{mi(":material/arrow_upward:")}'
-                  '</div>'
-                '</div>'
-                '<div class="phone-mockup-home"></div>'
-              '</div>'
-              '<div class="phone-mockup-caption">'
-              '<span class="phone-name">Ampera Trinity AI</span>'
-              '<span class="phone-tag">pratinjau aplikasi</span></div>'
-            '</div>',
+            f'<div class="phone-card">{logo_img_html("logo-greeting")}'
+            '<div class="phone-name">Ampera Trinity AI</div>'
+            '<div class="phone-tag">pratinjau aplikasi</div></div>',
             unsafe_allow_html=True,
         )
     with c2:
