@@ -2530,24 +2530,17 @@ div.stButton > button p strong { color: #2C1F33; }
     padding: 4px 14px;
 }
 .lang-row {
-    display: grid;
-    grid-template-columns: 28px 1fr 76px 150px;
-    align-items: center; gap: 12px;
+    display: flex; align-items: center; gap: 12px;
     padding: 10px 0; border-bottom: 1px solid #E7D9C1; font-size: 0.9rem;
 }
 .lang-row:last-child { border-bottom: none; }
-.lang-row-head {
-    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.03em;
-    text-transform: uppercase; color: #7E7387; padding-top: 8px;
-}
-.lang-col-flag.flag { font-size: 1.15rem; line-height: 1; }
-.lang-col-name.lang-name {
-    color: #2C1F33; font-weight: 500;
+.lang-row .flag { font-size: 1.15rem; line-height: 1; }
+.lang-row .lang-name {
+    flex: 1; color: #2C1F33; font-weight: 500;
     display: flex; flex-direction: column;
 }
-.lang-native { font-size: 0.76rem; color: #7E7387; font-weight: 400; }
-.lang-col-level { display: inline-flex; align-items: center; }
-.lang-col-status { display: inline-flex; align-items: center; }
+.lang-row .lang-native { font-size: 0.76rem; color: #7E7387; font-weight: 400; }
+.lang-row .lang-level { display: inline-flex; align-items: center; gap: 6px; }
 
 /* --- langkah bantuan & tips --- */
 .help-step {
@@ -2580,77 +2573,14 @@ div.stButton > button p strong { color: #2C1F33; }
 .mini-card .mini-title { font-weight: 600; color: #2C1F33; margin-bottom: 4px; }
 .mini-card .mini-desc { font-size: 0.84rem; color: #6B6172; line-height: 1.5; }
 
-/* --- mockup ponsel (halaman Dapatkan aplikasi) --- */
-.phone-mockup {
-    display: flex; flex-direction: column; align-items: center;
+/* --- kartu ponsel (halaman Dapatkan aplikasi) --- */
+.phone-card {
+    background: #F2E8D6; border: 1px solid #DBCEB9; border-radius: 22px;
+    padding: 30px 20px; text-align: center;
 }
-.phone-mockup-frame {
-    position: relative; width: 232px; height: 470px;
-    background: #1B1220; border-radius: 34px; padding: 10px;
-    box-shadow: 0 18px 40px rgba(27,18,32,0.28), inset 0 0 0 2px #3A2C42;
-    box-sizing: border-box;
-}
-.phone-mockup-notch {
-    position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
-    width: 84px; height: 20px; background: #1B1220; border-radius: 0 0 14px 14px;
-    z-index: 3;
-}
-.phone-mockup-screen {
-    position: relative; width: 100%; height: 100%;
-    background: #FBF4E4; border-radius: 24px; overflow: hidden;
-    display: flex; flex-direction: column; box-sizing: border-box;
-}
-.phone-mockup-status {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 14px 16px 2px; font-size: 0.68rem; font-weight: 600; color: #2C1F33;
-}
-.phone-mockup-status-icons { display: inline-flex; gap: 4px; }
-.phone-mockup-status-icons .mi { font-size: 0.8rem !important; }
-.phone-mockup-topbar {
-    display: flex; align-items: center; gap: 8px;
-    padding: 6px 14px 10px; border-bottom: 1px solid #E7D9C1;
-}
-.phone-mockup-topbar .logo-greeting { width: 22px; height: 22px; }
-.phone-mockup-appname { font-size: 0.78rem; font-weight: 600; color: #2C1F33; }
-.phone-mockup-chat {
-    flex: 1; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px;
-    overflow: hidden;
-}
-.phone-mockup-bubble {
-    max-width: 82%; padding: 7px 11px; border-radius: 14px;
-    font-size: 0.68rem; line-height: 1.35;
-}
-.phone-mockup-bubble-bot {
-    align-self: flex-start; background: #F2E8D6; color: #2C1F33;
-    border-bottom-left-radius: 4px;
-}
-.phone-mockup-bubble-user {
-    align-self: flex-end; background: #2C1F33; color: #F7EFDD;
-    border-bottom-right-radius: 4px;
-}
-.phone-mockup-bubble-loading { display: flex; gap: 3px; padding: 10px 12px; }
-.phone-mockup-bubble-loading span {
-    width: 5px; height: 5px; border-radius: 50%; background: #A99BB0;
-    animation: phoneDotBlink 1.1s infinite ease-in-out;
-}
-.phone-mockup-bubble-loading span:nth-child(2) { animation-delay: 0.15s; }
-.phone-mockup-bubble-loading span:nth-child(3) { animation-delay: 0.3s; }
-@keyframes phoneDotBlink { 0%, 80%, 100% { opacity: 0.25; } 40% { opacity: 1; } }
-.phone-mockup-inputbar {
-    display: flex; align-items: center; gap: 8px;
-    margin: 8px 10px 12px; padding: 7px 10px;
-    background: #FFFFFF; border: 1px solid #DBCEB9; border-radius: 16px;
-    color: #7E7387; font-size: 0.7rem;
-}
-.phone-mockup-inputbar .mi { font-size: 0.95rem !important; }
-.phone-mockup-input-placeholder { flex: 1; }
-.phone-mockup-home {
-    position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%);
-    width: 90px; height: 4px; border-radius: 3px; background: #3A2C42;
-}
-.phone-mockup-caption { margin-top: 14px; text-align: center; }
-.phone-mockup-caption .phone-name { display: block; font-weight: 600; color: #2C1F33; }
-.phone-mockup-caption .phone-tag { font-size: 0.78rem; color: #7E7387; margin-top: 2px; }
+.phone-card .logo-greeting { width: 54px; height: 54px; margin: 0 auto 12px; }
+.phone-card .phone-name { font-weight: 600; color: #2C1F33; }
+.phone-card .phone-tag { font-size: 0.78rem; color: #7E7387; margin-top: 2px; }
 
 /* --- baris modul kursus --- */
 .mod-row {
@@ -2792,9 +2722,8 @@ button[class*="st-key-pel_pro"]::after {
 .set-section,
 .plan-card,
 .mini-card,
-.phone-mockup,
+.phone-card,
 .lang-card,
-.lang-table-head,
 .cap-card,
 .mem-item,
 .mod-row,
