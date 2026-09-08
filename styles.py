@@ -2078,11 +2078,11 @@ div.stDownloadButton > button:hover {
     }
     .rc-itin-row { grid-template-columns: 48px 16px 1fr; 
     }
-/* ====================================================================*/
+/* ====================================================================
    KARTU PILIHAN INTERAKTIF (quick reply)
    Muncul di bawah jawaban Yuki saat dia perlu memastikan sesuatu.
    Tata letak: grid 2 kolom bila label pendek, vertikal di layar sempit.
-*/==================================================================== */
+==================================================================== */
 [class*="st-key-qr_card_"] {
     background: #FBF6EC !important;              /* sedikit lebih terang dari kanvas */
     border: 1px solid #E0D2BB !important;
@@ -2540,26 +2540,8 @@ div.stButton > button p strong { color: #2C1F33; }
     display: flex; flex-direction: column;
 }
 .lang-row .lang-native { font-size: 0.76rem; color: #7E7387; font-weight: 400; }
-.lang-row .lang-level { display: inline-flex; align-items: center; gap: 6px; 
-}
-.lang-tile {
-    background: #F2E8D6; border: 1px solid #DBCEB9; border-radius: 14px;
-    padding: 14px 12px 12px; margin-bottom: 10px;
-    min-height: 118px; box-sizing: border-box;
-    display: flex; flex-direction: column;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
-}
-.lang-tile .lang-flag { font-size: 1.5rem; line-height: 1; margin-bottom: 8px; }
-.lang-tile .lang-names { display: flex; flex-direction: column; line-height: 1.25; }
-.lang-tile .lang-names b { color: #2C1F33; font-weight: 600; font-size: 0.92rem; }
-.lang-tile .lang-names span { color: #8E8398; font-size: 0.72rem; }
-.lang-tile .lang-meta {
-    display: flex; flex-wrap: wrap; gap: 4px; align-items: center;
-    margin-top: auto; padding-top: 8px;
-}
-.lang-tile .lang-meta .chip-on, .lang-tile .lang-meta .chip-off {
-    font-size: 0.68rem; padding: 1px 7px;
-}
+.lang-row .lang-level { display: inline-flex; align-items: center; gap: 6px; }
+
 /* --- langkah bantuan & tips --- */
 .help-step {
     display: flex; align-items: flex-start; gap: 12px;
@@ -2592,150 +2574,14 @@ div.stButton > button p strong { color: #2C1F33; }
 .mini-card .mini-desc { font-size: 0.84rem; color: #6B6172; line-height: 1.5; }
 
 /* --- kartu ponsel (halaman Dapatkan aplikasi) --- */
-/* Pratinjau aplikasi versi baru: ponsel tiruan (mockup) berisi layar
-   aplikasi — logo, sapaan, gelembung chat, dan bilah input — supaya
-   terasa seperti melihat aplikasi sungguhan, bukan sekadar kartu kosong.
-   Warna mengikuti tema Trinity (beige hangat + ungu tua). */
-.app-phone-wrap {
-    display: flex; flex-direction: column; align-items: center;
-    text-align: center;
+.phone-card {
+    background: #F2E8D6; border: 1px solid #DBCEB9; border-radius: 22px;
+    padding: 30px 20px; text-align: center;
 }
-.app-tag {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: #2C1F33; color: #F7EBD6;
-    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.05em;
-    padding: 5px 12px; border-radius: 99px; margin: 0 0 13px;
-    box-shadow: 0 4px 12px rgba(44,31,51,0.16);
-}
-.app-tag .mi { font-size: 14px; color: #E3C9A0; }
-.app-phone {
-    width: 246px; max-width: 100%;
-    background: linear-gradient(160deg, #FFFFFF 0%, #F3E7D2 55%, #E7D9ED 100%);
-    border: 1px solid #CFC0A4; border-radius: 36px;
-    padding: 10px 9px 13px;
-    box-shadow: 0 22px 46px rgba(44,31,51,0.20), 0 3px 10px rgba(44,31,51,0.08);
-}
-.app-phone-screen {
-    position: relative; border-radius: 26px; overflow: hidden;
-    background: linear-gradient(180deg, #F8F1E3 0%, #F2E7E4 55%, #EBE1F1 100%);
-    border: 1px solid rgba(44,31,51,0.10);
-    padding: 36px 13px 13px;
-}
-/* poni/lubang kamera ponsel */
-.app-phone-screen::before {
-    content: ""; position: absolute; top: 12px; left: 50%;
-    transform: translateX(-50%);
-    width: 92px; height: 19px; background: #241B2E; border-radius: 12px;
-}
-.ap-status {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 10px;
-}
-.ap-status > span:first-child {
-    font-size: 10px; font-weight: 600; color: #5C5266; letter-spacing: 0.02em;
-}
-.ap-status-dots { display: inline-flex; gap: 3px; align-items: center; }
-.ap-status-dots i {
-    width: 5px; height: 5px; border-radius: 50%;
-    background: #A79DB3; display: block;
-}
-.ap-status-dots i:last-child { background: #6B6172; }
-.ap-brand { display: flex; align-items: center; gap: 9px; margin: 2px 0 13px; }
-.ap-brand-text { display: flex; flex-direction: column; line-height: 1.2; text-align: left; }
-.ap-brand-name {
-    font-family: 'Source Serif 4', Georgia, serif;
-    font-size: 0.93rem; font-weight: 700; color: #241B2E;
-}
-.ap-brand-sub { font-size: 0.62rem; color: #8E8398; letter-spacing: 0.03em; }
-.ap-chat { display: flex; flex-direction: column; gap: 7px; }
-.ap-bubble {
-    max-width: 88%; padding: 7px 11px;
-    font-size: 0.72rem; line-height: 1.45; border-radius: 14px;
-    text-align: left;
-}
-.ap-bubble.ai {
-    align-self: flex-start; background: #FFFFFF; color: #2F2438;
-    border: 1px solid #E8DCC7; border-bottom-left-radius: 5px;
-}
-.ap-bubble.user {
-    align-self: flex-end; background: #33263F; color: #FFF6E7;
-    border-bottom-right-radius: 5px;
-}
-.ap-typing {
-    align-self: flex-start; display: inline-flex; gap: 4px;
-    background: #FFFFFF; border: 1px solid #E8DCC7;
-    border-radius: 14px; border-bottom-left-radius: 5px; padding: 9px 11px;
-}
-.ap-typing i {
-    width: 5px; height: 5px; border-radius: 50%; background: #B7AEC2;
-    display: block; animation: apBlink 1.2s infinite ease-in-out;
-}
-.ap-typing i:nth-child(2) { animation-delay: 0.18s; }
-.ap-typing i:nth-child(3) { animation-delay: 0.36s; }
-@keyframes apBlink {
-    0%, 70%, 100% { opacity: 0.35; transform: translateY(0); }
-    35%           { opacity: 1;    transform: translateY(-2px); }
-}
-.ap-input {
-    display: flex; align-items: center; justify-content: space-between; gap: 8px;
-    margin-top: 11px; background: #FFFFFF; border: 1px solid #E2D6C2;
-    border-radius: 99px; padding: 4px 4px 4px 12px;
-    color: #B3A9BE; font-size: 0.66rem; text-align: left;
-}
-.ap-send {
-    width: 22px; height: 22px; flex: 0 0 auto; border-radius: 50%;
-    background: #2C1F33; color: #F7EBD6;
-    display: grid; place-items: center;
-}
-.ap-send .mi { font-size: 13px; }
-.app-phone-home {
-    width: 82px; height: 5px; border-radius: 99px;
-    background: rgba(44,31,51,0.28); margin: 9px auto 0;
-}
+.phone-card .logo-greeting { width: 54px; height: 54px; margin: 0 auto 12px; }
+.phone-card .phone-name { font-weight: 600; color: #2C1F33; }
+.phone-card .phone-tag { font-size: 0.78rem; color: #7E7387; margin-top: 2px; }
 
-/* kartu informasi kanan (halaman Dapatkan aplikasi) */
-[class*="st-key-app_dl_card"],
-[class*="st-key-app_plan_card"],
-[class*="st-key-app_mail_card"] {
-    background: #F7F0E3;
-    border: 1px solid #DBCEB9; border-radius: 16px;
-    padding: 15px 16px 16px !important;
-    margin: 0 0 14px !important;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.65);
-}
-[class*="st-key-app_dl_card"] [data-testid="stVerticalBlock"],
-[class*="st-key-app_plan_card"] [data-testid="stVerticalBlock"],
-[class*="st-key-app_mail_card"] [data-testid="stVerticalBlock"] {
-    gap: 10px !important;
-}
-.app-card-title {
-    display: flex; align-items: center; gap: 9px;
-    font-weight: 700; color: #241B2E; font-size: 0.98rem;
-    margin: 0 0 2px;
-}
-.app-card-title .mi { color: #4A3559; font-size: 20px; }
-.app-card-desc {
-    font-size: 0.84rem; color: #6B6172; line-height: 1.5;
-    margin: 0 0 2px;
-}
-.app-card-caption {
-    font-size: 0.76rem; color: #8E8398; line-height: 1.45; margin-top: 6px;
-}
-.app-pills {
-    display: flex; flex-wrap: wrap; gap: 6px;
-    margin: 2px 0 4px;
-}
-.app-pills span {
-    background: #EAE0CE; color: #4A3559;
-    font-size: 0.72rem; font-weight: 600;
-    border-radius: 99px; padding: 3px 10px;
-    border: 1px solid rgba(44,31,51,0.07);
-}
-/* beri ruang napas pada baris fitur di dalam kartu rencana rilis */
-[class*="st-key-app_plan_card"] .feat-row { padding: 8px 2px; }
-[class*="st-key-app_plan_card"] .feat-row span:first-child {
-    flex: 1; min-width: 0;
-}
 /* --- baris modul kursus --- */
 .mod-row {
     background: #F2E8D6; border: 1px solid #DBCEB9; border-radius: 10px;
