@@ -2078,11 +2078,11 @@ div.stDownloadButton > button:hover {
     }
     .rc-itin-row { grid-template-columns: 48px 16px 1fr; 
     }
-/* ====================================================================
+/* ====================================================================*/
    KARTU PILIHAN INTERAKTIF (quick reply)
    Muncul di bawah jawaban Yuki saat dia perlu memastikan sesuatu.
    Tata letak: grid 2 kolom bila label pendek, vertikal di layar sempit.
-==================================================================== */
+*/==================================================================== */
 [class*="st-key-qr_card_"] {
     background: #FBF6EC !important;              /* sedikit lebih terang dari kanvas */
     border: 1px solid #E0D2BB !important;
