@@ -857,28 +857,33 @@ def page_bahasa() -> None:
 
     st.markdown('<div class="set-section">Daftar bahasa yang tersedia</div>',
                 unsafe_allow_html=True)
-    rows = []
-    for l in SUPPORTED_LANGUAGES:
-        active_ui = l["code"] == ui_code
-        active_yuki = l["code"] == yuki_code
-        badge = ""
-        if active_ui and active_yuki:
-            badge = '<span class="chip-on">Antarmuka + Yuki</span>'
-        elif active_ui:
-            badge = '<span class="chip-on">Antarmuka</span>'
-        elif active_yuki:
-            badge = '<span class="chip-on">Yuki</span>'
-        level_cls = "chip-on" if l["level"] == "Penuh" else "chip-off"
-        rows.append(
-            f'<div class="lang-row">'
-            f'<span class="flag">{l["flag"]}</span>'
-            f'<span class="lang-name">{html.escape(l["name"])}'
-            f'<span class="lang-native">{html.escape(l["native"])}</span></span>'
-            f'<span class="lang-level"><span class="{level_cls}">{l["level"]}</span>'
-            f"{badge}</span>"
-            "</div>"
-        )
-    st.markdown(f'<div class="lang-card">{"".join(rows)}</div>', unsafe_allow_html=True)
+
+    # Disusun sebagai KOLOM-KOLOM (grid 3) berisi kartu kecil per bahasa,
+    # bukan lagi deretan baris memanjang — lebih rapi & mudah dipindai.
+    for i in range(0, len(SUPPORTED_LANGUAGES), 3):
+        cols = st.columns(3)
+        for j, l in enumerate(SUPPORTED_LANGUAGES[i:i + 3]):
+            active_ui = l["code"] == ui_code
+            active_yuki = l["code"] == yuki_code
+            badges = ""
+            if active_ui and active_yuki:
+                badges = '<span class="chip-on">Antarmuka + Yuki</span>'
+            elif active_ui:
+                badges = '<span class="chip-on">Antarmuka</span>'
+            elif active_yuki:
+                badges = '<span class="chip-on">Yuki</span>'
+            level_cls = "chip-on" if l["level"] == "Penuh" else "chip-off"
+            with cols[j]:
+                st.markdown(
+                    '<div class="lang-tile">'
+                    '<div class="lang-flag">' + html.escape(l["flag"]) + '</div>'
+                    '<div class="lang-names"><b>' + html.escape(l["name"]) + '</b>'
+                    '<span>' + html.escape(l["native"]) + '</span></div>'
+                    '<div class="lang-meta"><span class="' + level_cls + '">'
+                    + html.escape(l["level"]) + '</span>' + badges + '</div>'
+                    '</div>',
+                    unsafe_allow_html=True,
+                )
 
     st.caption("Level \"Beta\" berarti terjemahan masih disempurnakan. Bahasa "
                "yang dipilih untuk Yuki langsung dipakai pada jawaban "
@@ -1028,11 +1033,12 @@ TIPS_LIST = [
 
 def page_pelajari() -> None:
     st.markdown(
-        f'<div class="page-head"><div class="page-head-icon">{mi(":material/menu_book:")}</div>'
-        '<div><h2 class="page-title">Pelajari lebih lanjut</h2>'
-        "<p class=\"page-sub\">Tiga mesin AI dalam satu tempat: mengobrol dengan Yuki, "
-        "membuat gambar, ...</p></div></div>",
-        "Dibuat oleh Ampera Official.</p></div></div>",
+        '<div class="page-head"><div class="page-head-icon">'
+        + mi(":material/menu_book:")
+        + '</div><div><h2 class="page-title">Pelajari lebih lanjut</h2>'
+        + '<p class="page-sub">Tiga mesin AI dalam satu tempat: mengobrol dengan Yuki, '
+        'membuat gambar, dan menganalisis gambar atau suara yang kamu kirim. '
+        'Dibuat oleh Ampera Official.</p></div></div>',
         unsafe_allow_html=True,
     )
 
@@ -1092,11 +1098,13 @@ def page_pelajari() -> None:
 def page_tingkatkan() -> None:
     s = get_settings()
     st.markdown(
-        f'<div class="page-head"><div class="page-head-icon">{mi(":material/workspace_premium:")}</div>'
-        '<div><h2 class="page-title">Trinity Pro</h2>'
-        "<p class=\"page-sub\">Semua kemampuan Trinity dibuka penuh: model tertinggi tanpa "
-        "batas, gambar resolusi tinggi, memori tak terbatas, artefak & Trinity Code, "
-        "serta seluruh Trinity kursus dengan Yuki sebagai mentor pribadi.</p></div></div>",
+        '<div class="page-head"><div class="page-head-icon">'
+        + mi(":material/workspace_premium:")
+        + '</div><div><h2 class="page-title">Trinity Pro</h2>'
+        + '<p class="page-sub">Semua kemampuan Trinity dibuka penuh: model tertinggi '
+        'tanpa batas, gambar resolusi tinggi, memori tak terbatas, artefak & Trinity '
+        'Code, serta seluruh Trinity kursus dengan Yuki sebagai mentor pribadi.'
+        '</p></div></div>',
         unsafe_allow_html=True,
     )
     c1, c2 = st.columns(2)
@@ -1134,11 +1142,12 @@ def page_tingkatkan() -> None:
 # ============================================================================
 def page_aplikasi() -> None:
     st.markdown(
-        f'<div class="page-head"><div class="page-head-icon">{mi(":material/phone_iphone:")}</div>'
-        '<div><h2 class="page-title">Dapatkan aplikasi</h2>'
-        "<p class=\"page-sub\">Ampera Trinity AI sedang disiapkan menjadi aplikasi Android "
-        "& iOS. Semua fitur yang ada di sini — Yuki, gambar, suara, artefak, dan "
-        "kursus — ikut terbawa.</p></div></div>",
+        '<div class="page-head"><div class="page-head-icon">'
+        + mi(":material/phone_iphone:")
+        + '</div><div><h2 class="page-title">Dapatkan aplikasi</h2>'
+        + '<p class="page-sub">Ampera Trinity AI sedang disiapkan menjadi aplikasi '
+        'Android &amp; iOS. Semua fitur yang ada di sini — Yuki, gambar, suara, '
+        'artefak, dan kursus — ikut terbawa.</p></div></div>',
         unsafe_allow_html=True,
     )
 
@@ -1243,7 +1252,6 @@ def page_aplikasi() -> None:
                 else:
                     st.toast("Isi dulu email kamu ya.", icon=":material/warning:")
     _page_footer()
-
 
 # ============================================================================
 # HALAMAN: TRINITY KURSUS
