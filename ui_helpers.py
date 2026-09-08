@@ -64,7 +64,7 @@ _LOGO_SIZES = {
     "logo-label":    "24px",   # logo kecil di label "Yuki" pada bubble jawaban
     "logo-progress": "18px",   # logo di progress bar generate gambar
     "logo-foot":     "18px",   # logo di footer halaman
-    "logo-inline":   "30px",   # default umum
+    "logo-inline":   "18px",   # default umum
     "logo-shimmer":  "25px",   # logo di indikator "berpikir"
 }
 
