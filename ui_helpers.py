@@ -61,7 +61,7 @@ SENTENCE_STREAM_DELAY = 0.15
 # ----------------------------------------------------------------------
 _LOGO_SIZES = {
     "logo-greeting": "70px",   # logo di sebelah "Selamat pagi" — SEBELUMNYA kegedean
-    "logo-label":    "20px",   # logo kecil di label "Yuki" pada bubble jawaban
+    "logo-label":    "24px",   # logo kecil di label "Yuki" pada bubble jawaban
     "logo-progress": "18px",   # logo di progress bar generate gambar
     "logo-foot":     "18px",   # logo di footer halaman
     "logo-inline":   "18px",   # default umum
