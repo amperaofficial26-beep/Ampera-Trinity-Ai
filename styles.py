@@ -2540,8 +2540,26 @@ div.stButton > button p strong { color: #2C1F33; }
     display: flex; flex-direction: column;
 }
 .lang-row .lang-native { font-size: 0.76rem; color: #7E7387; font-weight: 400; }
-.lang-row .lang-level { display: inline-flex; align-items: center; gap: 6px; }
-
+.lang-row .lang-level { display: inline-flex; align-items: center; gap: 6px; 
+}
+.lang-tile {
+    background: #F2E8D6; border: 1px solid #DBCEB9; border-radius: 14px;
+    padding: 14px 12px 12px; margin-bottom: 10px;
+    min-height: 118px; box-sizing: border-box;
+    display: flex; flex-direction: column;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+}
+.lang-tile .lang-flag { font-size: 1.5rem; line-height: 1; margin-bottom: 8px; }
+.lang-tile .lang-names { display: flex; flex-direction: column; line-height: 1.25; }
+.lang-tile .lang-names b { color: #2C1F33; font-weight: 600; font-size: 0.92rem; }
+.lang-tile .lang-names span { color: #8E8398; font-size: 0.72rem; }
+.lang-tile .lang-meta {
+    display: flex; flex-wrap: wrap; gap: 4px; align-items: center;
+    margin-top: auto; padding-top: 8px;
+}
+.lang-tile .lang-meta .chip-on, .lang-tile .lang-meta .chip-off {
+    font-size: 0.68rem; padding: 1px 7px;
+}
 /* --- langkah bantuan & tips --- */
 .help-step {
     display: flex; align-items: flex-start; gap: 12px;
