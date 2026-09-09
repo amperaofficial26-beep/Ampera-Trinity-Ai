@@ -78,6 +78,27 @@ st.set_page_config(
 # ============================================================================
 # HALAMAN: CHAT UTAMA
 # ============================================================================
+def _render_chat_starters() -> None:
+    starters = [
+        ("💡  Analisis & Riset", "Bahas konsep & penalaran mendalam",
+         "Bantu saya menganalisis kelebihan dan kelemahan arsitektur AI reasoning modern."),
+        ("💻  Solusi Koding", "Tulis kode atau pecahkan error",
+         "Buatkan kode Python asinkron untuk mengambil data REST API dengan retry logic."),
+        ("🎨  Konsep Desain", "Eksplorasi UI/UX & palet warna",
+         "Bantu buatkan konsep desain UI dashboard dengan palet warna bernuansa hangat."),
+        ("📝  Penulisan Naskah", "Draf proposal & susun tulisan",
+         "Bantu saya menyusun draf proposal peluncuran produk yang profesional dan persuasif."),
+    ]
+    with st.container(key="chat_starters_box"):
+        c1, c2 = st.columns(2)
+        for i, (title, desc, prompt) in enumerate(starters):
+            with (c1 if i % 2 == 0 else c2):
+                with st.container(key=f"st_card_{i}"):
+                    if st.button(f"{title}  \n:gray[{desc}]", key=f"starter_btn_{i}", use_container_width=True):
+                        st.session_state.pending_prompt = prompt
+                        st.rerun()
+
+
 def render_chat_page() -> None:
     is_fresh = len(main_thread()) == 0
 
@@ -85,11 +106,12 @@ def render_chat_page() -> None:
         # ---------- HALAMAN AWAL ala Claude ----------
         st.markdown(_FRESH_BOTTOM_CSS, unsafe_allow_html=True)
         st.markdown(
-            '<div class="trinity-greeting" style="margin-top:18vh;">'
+            '<div class="trinity-greeting" style="margin-top:14vh;">'
             f'{logo_img_html("logo-greeting")} {get_greeting()}'
             "</div>",
             unsafe_allow_html=True,
         )
+        _render_chat_starters()
 
     for msg in main_thread():
         render_message(msg)
@@ -110,11 +132,6 @@ def render_chat_page() -> None:
     if CHAT_INPUT_SUPPORTS_AUDIO:
         chat_kwargs["accept_audio"] = True
 
-    # ====== URUTAN AREA INPUT ala Claude: preview lampiran di atas, lalu
-    # kotak teks, lalu baris "+" & pilihan model di paling bawah. Urutan ini
-    # ditentukan MURNI oleh urutan pemanggilan widget di sini (bukan CSS) —
-    # st.chat_input() SENGAJA dipanggil di antara pending_preview dan
-    # chat_controls, bukan sesudahnya. ======
     bottom_dock = getattr(st, "bottom", None) or st._bottom
     with bottom_dock:
         with st.container(key="pending_preview"):
