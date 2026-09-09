@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-SIDEBAR ELEGAN & TERSTRUKTUR — AMPERA TRINITY AI
-  Brand Serif · Aksi Cepat · Menu Terkategori (Utama, Workspace, Riwayat) · Akun di Bawah
+SIDEBAR ALA CLAUDE
+  Brand serif · + Baru · menu · riwayat "Hari ini" · akun di bawah
 
-Navigasi antar-halaman (go()) dan dialog/popover (Proyek, Artefak lama, Sesuaikan).
+Berisi juga navigasi antar-halaman (go()) dan tiga dialog kecil (Proyek,
+Artefak lama, Sesuaikan) yang dipicu dari menu sidebar.
 """
 
 from __future__ import annotations
@@ -18,27 +19,41 @@ from ui_helpers import get_chat_export_text
 HAS_DIALOG = hasattr(st, "dialog")
 
 # ============================================================================
-# POSISI TOMBOL TITIK TIGA (menu akun)
-# ============================================================================
+# >>> ATUR POSISI TOMBOL TITIK TIGA (menu akun) DI SINI <<<
+#   Ditulis langsung sebagai <style> di dekat tombolnya, jadi PASTI menang
+#   melawan aturan lain. Perbesar Y = tombol naik.
+# ----------------------------------------------------------------------------
 ACCT_MENU_X_PX = 190   # jarak dari tepi KIRI layar
-ACCT_MENU_Y_PX = 4     # jarak dari DASAR layar
+ACCT_MENU_Y_PX = 4    # jarak dari DASAR layar
 
-ACCT_MENU_BG = "transparent"
-ACCT_MENU_BG_HOVER = "#E0D2BB"
-ACCT_MENU_FG = "#6B6172"
-ACCT_MENU_BORDER = "transparent"
+# Warna tombol ⋯ . Pakai "transparent" agar menyatu dengan latar sidebar,
+# atau tulis kode warna (mis. "#EDE2D1" = warna sidebar, "#E8DCC8" = warna
+# kanvas aplikasi).
+ACCT_MENU_BG = "transparent"        # latar tombol saat diam
+ACCT_MENU_BG_HOVER = "#E0D2BB"      # latar saat disentuh kursor
+ACCT_MENU_FG = "#6B6172"            # warna ikon titik tiga
+ACCT_MENU_BORDER = "transparent"    # garis tepi; "transparent" = tanpa garis
+# ============================================================================
+
 
 # ============================================================================
-# PANEL PROYEK POPOVER
-# ============================================================================
-PROYEK_LEBAR_PX = 300
-PROYEK_PADDING_PX = 14
-PROYEK_JARAK_PX = 10
-PROYEK_CARI_ALIGN = "left"
-PROYEK_KOSONG_ALIGN = "center"
-PROYEK_KOSONG_PADDING_PX = 10
-PROYEK_TOMBOL_ALIGN = "left"
+# >>> ATUR POSISI TULISAN DI PANEL PROYEK DI SINI <<<
+#   Mengatur 3 tulisan: kotak "Cari proyek", teks "Belum ada proyek.",
+#   dan tombol "Mulai proyek baru".
+#   Nilai perataan: "left" | "center" | "right"
+# ----------------------------------------------------------------------------
+PROYEK_LEBAR_PX = 300         # lebar panel popover Proyek
+PROYEK_PADDING_PX = 14        # jarak isi dari tepi panel
+PROYEK_JARAK_PX = 10          # jarak antar elemen (kotak cari, teks, tombol)
 
+PROYEK_CARI_ALIGN = "left"    # perataan teks di dalam kotak "Cari proyek"
+PROYEK_KOSONG_ALIGN = "center"  # perataan teks "Belum ada proyek."
+PROYEK_KOSONG_PADDING_PX = 10   # jarak atas-bawah teks "Belum ada proyek."
+PROYEK_TOMBOL_ALIGN = "left"  # perataan label tombol "Mulai proyek baru"
+# ============================================================================
+
+# Gaya agar tombol pemicu popover di sidebar tampak identik dengan tombol
+# menu biasa (rata kiri, tanpa kotak), dan panel popovernya cukup lebar.
 _GAYA_MENU_POPOVER = (
     "<style>"
     ".st-key-sb_menu_proyek [data-testid='stPopover'] button,"
@@ -49,33 +64,37 @@ _GAYA_MENU_POPOVER = (
     "color:#2C1F33 !important;"
     "text-align:left !important;"
     "justify-content:flex-start !important;"
-    "padding:0.35rem 0.6rem !important;"
+    "padding:0.45rem 0.6rem !important;"
     "width:100% !important;"
     "}"
     ".st-key-sb_menu_proyek button:hover{"
     "background:#E0D2BB !important;"
-    "border-radius:8px !important;"
+    "border-radius:9px !important;"
     "}"
     ".st-key-sb_menu_proyek [data-testid='stPopover'] button p{"
-    "text-align:left !important;font-size:1.02rem !important;"
+    "text-align:left !important;font-size:1.06rem !important;"
     "line-height:1.25 !important;color:#2C1F33 !important;margin:0 !important;"
     "}"
     ".st-key-sb_menu_proyek [data-testid='stIconMaterial']{"
-    "font-size:1.3rem !important;width:1.3rem !important;height:1.3rem !important;"
+    "font-size:1.35rem !important;width:1.35rem !important;height:1.35rem !important;"
     "}"
+    # ---- panel popover Proyek ----
     "[data-testid='stPopoverBody']:has([class*='st-key-proj_']){"
     "min-width:" + str(PROYEK_LEBAR_PX) + "px !important;"
     "max-width:" + str(PROYEK_LEBAR_PX + 40) + "px !important;"
     "padding:" + str(PROYEK_PADDING_PX) + "px !important;"
     "}"
+    # jarak antar elemen di dalam panel
     "[data-testid='stPopoverBody']:has([class*='st-key-proj_']) "
     "[data-testid='stVerticalBlock']{"
     "gap:" + str(PROYEK_JARAK_PX) + "px !important;"
     "}"
+    # 1) kotak "Cari proyek"
     ".st-key-proj_search input,.st-key-proj_new_name input{"
     "text-align:" + PROYEK_CARI_ALIGN + " !important;"
     "font-size:0.9rem !important;"
     "}"
+    # 2) teks "Belum ada proyek."
     "[data-testid='stPopoverBody'] [data-testid='stCaptionContainer'],"
     "[data-testid='stPopoverBody'] [data-testid='stCaptionContainer'] p{"
     "text-align:" + PROYEK_KOSONG_ALIGN + " !important;"
@@ -85,6 +104,7 @@ _GAYA_MENU_POPOVER = (
     "font-size:0.85rem !important;"
     "color:#8E8398 !important;"
     "}"
+    # 3) tombol "Mulai proyek baru" + tombol pilih proyek
     "[data-testid='stPopoverBody'] div.stButton > button{"
     "justify-content:" + ("flex-start" if PROYEK_TOMBOL_ALIGN == "left"
                           else "center" if PROYEK_TOMBOL_ALIGN == "center"
@@ -97,8 +117,7 @@ _GAYA_MENU_POPOVER = (
     "}"
     "</style>"
 )
-
-
+      
 def go(page: str, **extra) -> None:
     """Pindah halaman internal (chat / artefak / pengaturan / …)."""
     for k, v in extra.items():
@@ -106,16 +125,22 @@ def go(page: str, **extra) -> None:
     st.session_state.page = page
     st.rerun()
 
-
 def go_cb(page: str, **extra) -> None:
-    """Versi go() untuk dipakai sebagai on_click=... pada st.button."""
+    """Versi go() untuk dipakai sebagai on_click=... pada st.button.
+
+    Bedanya: TIDAK memanggil st.rerun(). Streamlit sudah otomatis
+    menjalankan ulang halaman setelah callback selesai. Cara ini lebih
+    andal daripada pola "if st.button(): go(...)" — pada halaman yang
+    juga memanggil st.rerun() di tempat lain (mis. maybe_run_yuki atau
+    process_user_input), klik tombol bisa "hilang" sebelum sempat
+    diproses."""
     for k, v in extra.items():
         st.session_state[k] = v
     st.session_state.page = page
-
-
+  
 def _register_dialog(title: str, func):
-    """Bungkus fungsi jadi @st.dialog kalau tersedia."""
+    """Bungkus fungsi jadi @st.dialog kalau tersedia; kalau versi Streamlit
+    lama tidak mendukung, tampilkan pesan singkat sebagai fallback."""
     if HAS_DIALOG:
         return st.dialog(title)(func)
 
@@ -177,7 +202,7 @@ def _sesuaikan_dialog_body() -> None:
         placeholder="mis. Jawab selalu singkat & pakai bahasa santai.",
         height=120,
     )
-    if st.button("Simpan Pengaturan", type="primary", use_container_width=True):
+    if st.button("Simpan", type="primary", use_container_width=True):
         st.session_state.custom_nickname = st.session_state.get("custom_nickname_input", "")
         st.session_state.custom_instruction = st.session_state.get("custom_instruction_input", "")
         st.rerun()
@@ -189,80 +214,61 @@ show_sesuaikan_dialog = _register_dialog("Sesuaikan", _sesuaikan_dialog_body)
 
 
 def render_sidebar() -> None:
-    cur_page = st.session_state.get("page", "chat")
-    is_img = st.session_state.get("image_mode", False)
-
     with st.sidebar:
-        # Header Brand Elegan
-        st.markdown(
-            '<div class="sb-brand-wrap">'
-            '<div class="sb-brand">Trinity</div>'
-            '<span class="sb-brand-pill">AI 3.5</span>'
-            '</div>',
-            unsafe_allow_html=True,
-        )
+        # Brand serif ala "Claude"
+        st.markdown('<div class="sb-brand">Trinity</div>', unsafe_allow_html=True)
 
-        # Tombol Aksi Utama: + Baru
+        # + Baru (latar krem menonjol seperti Claude)
         with st.container(key="sb_new"):
-            if st.button(":material/add: &nbsp;Obrolan Baru", use_container_width=True):
+            if st.button(":material/add: &nbsp;Baru", use_container_width=True):
                 reset_conversation()
-                st.session_state.page = "chat"
-                st.session_state.image_mode = False
                 st.rerun()
 
-        # ====================================================================
-        # GRUP 1: UTAMA
-        # ====================================================================
-        st.markdown('<div class="sb-section-label">Utama</div>', unsafe_allow_html=True)
-
-        chat_active = (cur_page == "chat" and not is_img)
-        with st.container(key="sb_menu_chat" + (" sb-active-item" if chat_active else "")):
-            if st.button(":material/chat_bubble: &nbsp;Chat AI", use_container_width=True):
+        # Menu ala Claude (ikon garis tipis + teks rata kiri)
+        with st.container(key="sb_menu_chat"):
+            if st.button(":material/chat_bubble: &nbsp;Chat", use_container_width=True):
                 st.session_state.image_mode = False
-                go("chat")
+                st.rerun()
+        with st.container(key="sb_menu_img"):
+            if st.button(":material/palette: &nbsp;Gambar", use_container_width=True):
+                st.session_state.image_mode = True
+                st.rerun()
 
-        desain_active = (cur_page == "desain")
-        with st.container(key="sb_menu_desain" + (" sb-active-item" if desain_active else "")):
+        st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
+
+        with st.container(key="sb_menu_proyek"):
+            # Proyek tampil sebagai POPOVER (muncul di samping tombolnya),
+            # bukan dialog yang melayang di tengah halaman. Gaya tombolnya
+            # disamakan dengan menu sidebar lain lewat <style> di bawah.
+            st.markdown(_GAYA_MENU_POPOVER, unsafe_allow_html=True)
+            with st.popover(":material/deployed_code: &nbsp;Proyek",
+                            use_container_width=True):
+                _proyek_dialog_body()
+        with st.container(key="sb_menu_artefak"):
+            n_art = len(st.session_state.get("artifacts", []))
+            art_label = ":material/data_object: &nbsp;Artefak" + (f"  ({n_art})" if n_art else "")
+            if st.button(art_label, use_container_width=True):
+                # buka HALAMAN Artefak (bukan popup lagi)
+                go("artefak")
+        with st.container(key="sb_menu_sesuaikan"):
+            if st.button(":material/tune: &nbsp;Sesuaikan", use_container_width=True):
+                show_sesuaikan_dialog()
+
+                st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
+
+        # ---- Kelompok AI khusus ----
+        with st.container(key="sb_menu_desain"):
             if st.button(":material/palette: &nbsp;AI Desain", use_container_width=True):
                 go("desain")
-
-        jadwal_active = (cur_page == "jadwal")
-        n_tugas = len([t for t in st.session_state.get("tasks", []) if not t.get("selesai")])
-        label_jd = ":material/calendar_month: &nbsp;AI Penjadwal" + (f"  ({n_tugas})" if n_tugas else "")
-        with st.container(key="sb_menu_jadwal" + (" sb-active-item" if jadwal_active else "")):
+        with st.container(key="sb_menu_jadwal"):
+            n_tugas = len([t for t in st.session_state.get("tasks", [])
+                           if not t.get("selesai")])
+            label_jd = (":material/calendar_month: &nbsp;AI Penjadwal"
+                        + (f"  ({n_tugas})" if n_tugas else ""))
             if st.button(label_jd, use_container_width=True):
                 go("jadwal")
 
-        # ====================================================================
-        # GRUP 2: WORKSPACE & KONTEN
-        # ====================================================================
-        st.markdown('<div class="sb-section-label">Workspace</div>', unsafe_allow_html=True)
-
-        art_active = (cur_page == "artefak")
-        n_art = len(st.session_state.get("artifacts", []))
-        art_label = ":material/data_object: &nbsp;Artefak" + (f"  ({n_art})" if n_art else "")
-        with st.container(key="sb_menu_artefak" + (" sb-active-item" if art_active else "")):
-            if st.button(art_label, use_container_width=True):
-                go("artefak")
-
-        kursus_active = (cur_page == "kursus")
-        with st.container(key="sb_menu_kursus" + (" sb-active-item" if kursus_active else "")):
-            if st.button(":material/school: &nbsp;Trinity Kursus", use_container_width=True):
-                go("kursus")
-
-        with st.container(key="sb_menu_proyek"):
-            st.markdown(_GAYA_MENU_POPOVER, unsafe_allow_html=True)
-            with st.popover(":material/folder_open: &nbsp;Proyek", use_container_width=True):
-                _proyek_dialog_body()
-
-        # ====================================================================
-        # GRUP 3: AKSI & ALAT
-        # ====================================================================
-        st.markdown('<div class="sb-section-label">Aksi & Alat</div>', unsafe_allow_html=True)
-
-        with st.container(key="sb_menu_sesuaikan"):
-            if st.button(":material/tune: &nbsp;Sesuaikan Yuki", use_container_width=True):
-                show_sesuaikan_dialog()
+        st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
 
         with st.container(key="sb_download"):
             st.download_button(
@@ -273,23 +279,19 @@ def render_sidebar() -> None:
                 use_container_width=True,
             )
 
-        # ====================================================================
-        # GRUP 4: RIWAYAT PERCAKAPAN
-        # ====================================================================
+        # Riwayat percakapan (grup "Hari ini" seperti Claude)
         convs = st.session_state.get("conversations", [])
         if convs:
-            st.markdown('<div class="sb-section-label">Riwayat Percakapan</div>', unsafe_allow_html=True)
+            st.markdown('<div class="sb-group">Hari ini</div>', unsafe_allow_html=True)
             for c in convs[:15]:
                 key = f"sb_hist_{c['id']}"
                 with st.container(key=key):
                     if st.button(c["title"], key=f"btn_{key}", use_container_width=True):
                         open_conversation(c["id"])
-                        st.session_state.page = "chat"
                         st.rerun()
 
-        # ====================================================================
-        # FOOTER: AKUN DI DASAR LAYAR
-        # ====================================================================
+        # ---- Baris akun di dasar sidebar ala Claude ----
+        # (U) Nama · Paket   [⋮ menu akun]
         s = get_settings()
         name = (s.get("display_name") or "User").strip() or "User"
         plan = s.get("plan") or "Free"
@@ -297,6 +299,10 @@ def render_sidebar() -> None:
         with st.container(key="sb_account"):
             acc_col, menu_col = st.columns([5, 1.05], gap="small")
             with acc_col:
+                # Baris akun. Disusun dari potongan string biasa (bukan
+                # f-string tiga kutip) supaya aman saat kode ini di-copy
+                # paste ke editor lain, dan bebas karakter non-ASCII di
+                # luar string.
                 acc_html = (
                     '<div class="sb-account">'
                     '<div class="ava">' + html.escape(initial) + '</div>'
@@ -307,6 +313,9 @@ def render_sidebar() -> None:
                 )
                 st.markdown(acc_html, unsafe_allow_html=True)
             with menu_col:
+                # Gaya tombol titik tiga disusun sebagai string biasa
+                # (bukan f-string) supaya kurung kurawal CSS tidak bentrok
+                # dengan sintaks f-string Python.
                 gaya_acct = (
                     "<style>"
                     ".st-key-acct_menu{"
