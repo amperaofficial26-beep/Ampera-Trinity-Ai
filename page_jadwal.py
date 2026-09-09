@@ -25,11 +25,11 @@ from state import (
 from ui_helpers import _page_footer, render_message
 
 TOMBOL_CEPAT = [
-    ("📅  Rencana Belajar 7 Hari", "Panduan bertahap & terstruktur",
+    (":material/calendar_today:", "Rencana Belajar 7 Hari", "Panduan bertahap & terstruktur",
      "Buatkan rencana belajar Python selama 7 hari untuk pemula, 1-2 jam sehari. Masukkan langsung ke daftar tugasku."),
-    ("🎯  Prioritas Pekan Ini", "Fokus pada hal yang paling berdampak",
+    (":material/center_focus_strong:", "Prioritas Pekan Ini", "Fokus pada hal yang paling berdampak",
      "Bantu aku menyusun prioritas pekerjaan minggu ini. Tanyakan dulu apa saja proyek atau tanggung jawabku."),
-    ("🔨  Pecah Tugas Besar", "Ubah proyek intimidatif jadi langkah terukur",
+    (":material/checklist:", "Pecah Tugas Besar", "Ubah proyek intimidatif jadi langkah terukur",
      "Aku punya satu proyek besar yang sering kutunda. Bantu pecah menjadi 4-5 langkah kecil yang mudah diselesaikan."),
 ]
 
@@ -149,7 +149,7 @@ def _render_panel_tugas() -> None:
 
     if not daftar:
         st.markdown(
-            '<div class="empty-card">📝 Belum ada tugas terdaftar. '
+            '<div class="empty-card">Belum ada tugas terdaftar. '
             "Minta Yuki menyusun rencana lewat percakapan di bawah, atau tambahkan tugas manual.</div>",
             unsafe_allow_html=True,
         )
@@ -208,10 +208,10 @@ def page_jadwal() -> None:
         st.markdown('<div class="set-section">Mulai Cepat &amp; Konsultasi Fokus</div>', unsafe_allow_html=True)
         with st.container(key="jadwal_quick"):
             cols = st.columns(len(TOMBOL_CEPAT))
-            for i, (title, desc, prompt) in enumerate(TOMBOL_CEPAT):
+            for i, (icon, title, desc, prompt) in enumerate(TOMBOL_CEPAT):
                 with cols[i]:
                     with st.container(key=f"jadwal_card_{i}"):
-                        if st.button(f"**{title}**  \n:gray[{desc}]",
+                        if st.button(f"{icon}  **{title}**  \n:gray[{desc}]",
                                      key=f"jadwal_q_{i}", use_container_width=True,
                                      on_click=_kirim, args=(prompt,)):
                             pass
@@ -240,6 +240,7 @@ def page_jadwal() -> None:
         user_input = st.chat_input("Minta Yuki menyusun jadwal atau memecah target…", **chat_kwargs)
         with st.container(key="chat_controls"):
             render_input_controls("jadwal", show_mode=False)
+        _page_footer(in_chat=bool(thread))
 
     antre = (st.session_state.pop("pending_prompt_mode", "") or "").strip()
     if antre and user_input is None:
@@ -247,5 +248,3 @@ def page_jadwal() -> None:
 
     if process_user_input(user_input, st.empty()):
         st.rerun()
-
-    _page_footer(in_chat=bool(thread))
