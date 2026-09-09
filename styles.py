@@ -2359,40 +2359,41 @@ div.stDownloadButton > button:hover {
     --foot-y: 0px;
 }
 
+/* ==========================================================================
+   FOOTER POSITIONING (Selalu di bawah chat input / dock)
+   ========================================================================== */
 .trinity-foot,
 p.trinity-foot,
 [data-testid="stMarkdownContainer"] p.trinity-foot,
-[data-testid="stMainBlockContainer"] [data-testid="stMarkdownContainer"] p.trinity-foot {
-    /* display:block + lebar penuh -> text-align:center benar-benar bekerja.
-       Tanpa ini footer bisa terlihat menempel ke kiri. */
+[data-testid="stMainBlockContainer"] [data-testid="stMarkdownContainer"] p.trinity-foot,
+[data-testid="stBottom"] p.trinity-foot {
     display: block !important;
     width: 100% !important;
-    transform: translate(var(--foot-x), var(--foot-y));
+    transform: none !important;
     text-align: center !important;
-    color: #7E7387 !important;
-    font-size: 12px !important;      /* halaman awal (sebelum mulai chat) */
-    line-height: 1.5 !important;
-    margin-top: 9px !important;
-    margin-bottom: 0 !important;
-    font-family: 'Inter', sans-serif !important;
-    -webkit-text-size-adjust: 100%;  /* cegah browser HP membesarkan teks kecil */
+    color: #8E8398 !important;
+    font-size: 11px !important;
+    line-height: 1.4 !important;
+    margin: 6px auto 0 !important;
+    padding-bottom: 2px !important;
+    font-family: 'Inter', -apple-system, sans-serif !important;
+    letter-spacing: 0.01em;
+    -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
+    pointer-events: none;
 }
 
-/* versi saat chat berjalan: lebih kecil lagi dari versi halaman awal */
-.trinity-foot.in-chat,
-p.trinity-foot.in-chat,
-[data-testid="stMarkdownContainer"] p.trinity-foot.in-chat,
-[data-testid="stMainBlockContainer"] [data-testid="stMarkdownContainer"] p.trinity-foot.in-chat {
-    font-size: 11px !important;       /* saat chat sudah berjalan */
-    color: #827788 !important;
-    margin-top: 22px !important;
-}
-
-/* logo kecil di dalam footer ikut menyesuaikan */
-.trinity-foot .logo-foot {
-    width: 1.2em !important;
-    height: 1.2em !important;
+/* ==========================================================================
+   MATERIAL ICONS PADA BENTO CARDS
+   ========================================================================== */
+[class*="st-key-st_card_"] button [data-testid="stIconMaterial"],
+[class*="st-key-desain_card_"] button [data-testid="stIconMaterial"],
+[class*="st-key-jadwal_card_"] button [data-testid="stIconMaterial"] {
+    font-size: 1.35rem !important;
+    width: 1.35rem !important;
+    height: 1.35rem !important;
+    color: #4A3559 !important;
+    flex-shrink: 0 !important;
 }
 
 /* ============ HALAMAN BARU (Artefak · Pengaturan · Bahasa ·
