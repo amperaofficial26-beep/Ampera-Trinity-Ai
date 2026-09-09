@@ -61,7 +61,7 @@ SENTENCE_STREAM_DELAY = 0.15
 # ----------------------------------------------------------------------
 _LOGO_SIZES = {
     "logo-greeting": "70px",   # logo di sebelah "Selamat pagi" — SEBELUMNYA kegedean
-    "logo-label":    "24px",   # logo kecil di label "Yuki" pada bubble jawaban
+    "logo-label":    "20px",   # logo kecil di label "Yuki" pada bubble jawaban
     "logo-progress": "18px",   # logo di progress bar generate gambar
     "logo-foot":     "18px",   # logo di footer halaman
     "logo-inline":   "18px",   # default umum
@@ -737,8 +737,42 @@ FOOTER_TEXT = "© 2026 Ampera Trinity AI · by Ampera Official"
 
 
 def _page_footer(in_chat: bool = False) -> None:
-    """Footer halaman di bawah kolom chat atau di dasar halaman."""
+    """Footer halaman.
+
+    PENTING: gaya dikirim lewat tag <style>, BUKAN atribut style="..."
+    inline. Streamlit membuang setiap deklarasi inline yang memakai
+    !important (dibuktikan lewat Inspect: hanya properti tanpa !important
+    yang selamat), sehingga inline style tidak pernah berpengaruh.
+    Lewat <style> yang disuntik di sini — setelah CSS utama — aturan ini
+    pasti menang.
+    """
+       # --- penjaga: footer hanya untuk halaman awal ---
+    if in_chat:
+        return
+    if st.session_state.get("page", "chat") != "chat":
+        return
+    if st.session_state.get("messages"):
+        return
+
+    foot_class = "trinity-foot"
+    ukuran = FOOTER_SIZE_PX
+    jarak = FOOTER_TOP_GAP_PX
+    sel = "p.trinity-foot"
+
     st.markdown(
-        f'<p class="trinity-foot">{FOOTER_TEXT}</p>',
+        "<style>"
+        f"{sel}, [data-testid='stMarkdownContainer'] {sel} {{"
+        "display:block !important;"
+        "width:100% !important;"
+        "text-align:center !important;"
+        f"font-size:{ukuran}px !important;"
+        "line-height:1.5 !important;"
+        f"color:{FOOTER_COLOR} !important;"
+        f"margin:{jarak}px 0 0 !important;"
+        f"transform:translate({FOOTER_X_PX}px,{FOOTER_Y_PX}px) !important;"
+        "font-family:'Inter',sans-serif !important;"
+        "-webkit-text-size-adjust:100%;text-size-adjust:100%;"
+        "}</style>"
+        f'<p class="{foot_class}">{FOOTER_TEXT}</p>',
         unsafe_allow_html=True,
     )
