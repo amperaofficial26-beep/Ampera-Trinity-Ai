@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 """
-HALAMAN: AI PENJADWAL (SMART AGENDA & FOCUS)
+HALAMAN: AI PENJADWAL
 
-Persona perencana (JADWAL_PROMPT di config.py) + daftar tugas cerdas.
-Tata letak bento:
-    1. Header Halaman
-    2. Panel Kemajuan & Daftar Tugas (Hari ini / Besok / Minggu ini / Nanti)
-    3. Tambah Tugas Cepat
-    4. Tombol Mulai Cepat / Obrolan Interaktif
+Persona perencana (JADWAL_PROMPT di config.py) + daftar tugas tersimpan.
+
+Tata letak SATU LAJUR dari atas ke bawah supaya tidak berdesakan:
+    1. Judul halaman
+    2. Ringkasan kemajuan  (hanya bila ada tugas)
+    3. Panel daftar tugas  (dikelompokkan: Hari ini / Besok / Minggu ini / Nanti)
+    4. Tambah tugas sendiri (terlipat)
+    5. Tombol mulai cepat  (hanya saat obrolan masih kosong)
+    6. Obrolan dengan Yuki
 """
 
 from __future__ import annotations
@@ -24,13 +27,19 @@ from state import (
 )
 from ui_helpers import _page_footer, render_message
 
+# ============================================================================
+# >>> ATUR TOMBOL CEPAT, KELOMPOK AGENDA & WARNA PRIORITAS DI SINI <<<
+# ============================================================================
 TOMBOL_CEPAT = [
-    (":material/calendar_today:", "Rencana Belajar 7 Hari", "Panduan bertahap & terstruktur",
-     "Buatkan rencana belajar Python selama 7 hari untuk pemula, 1-2 jam sehari. Masukkan langsung ke daftar tugasku."),
-    (":material/center_focus_strong:", "Prioritas Pekan Ini", "Fokus pada hal yang paling berdampak",
-     "Bantu aku menyusun prioritas pekerjaan minggu ini. Tanyakan dulu apa saja proyek atau tanggung jawabku."),
-    (":material/checklist:", "Pecah Tugas Besar", "Ubah proyek intimidatif jadi langkah terukur",
-     "Aku punya satu proyek besar yang sering kutunda. Bantu pecah menjadi 4-5 langkah kecil yang mudah diselesaikan."),
+    ("Rencana belajar",
+     "Buatkan rencana belajar Python selama 7 hari untuk pemula, "
+     "1-2 jam sehari. Masukkan ke daftar tugasku."),
+    ("Rapikan minggu ini",
+     "Bantu aku menyusun prioritas minggu ini. Tanyakan dulu apa saja "
+     "yang harus kukerjakan."),
+    ("Pecah tugas besar",
+     "Aku punya satu tugas besar yang bikin menunda terus. Bantu pecah "
+     "jadi langkah kecil yang jelas selesainya."),
 ]
 
 KELOMPOK = [
@@ -48,7 +57,10 @@ _TUGAS_RE = re.compile(
 
 
 def serap_blok_tugas(teks: str) -> tuple[str, int]:
-    """Ambil blok [[TUGAS]] dari jawaban Yuki -> masukkan ke daftar tugas."""
+    """Ambil blok [[TUGAS]] dari jawaban Yuki -> masukkan ke daftar tugas.
+
+    Mengembalikan (teks_tanpa_blok, jumlah_tugas_baru).
+    """
     raw = teks or ""
     if "TUGAS" not in raw.upper():
         return raw, 0
@@ -106,8 +118,8 @@ def _render_ringkasan(daftar: list[dict]) -> None:
     persen = int(selesai / len(daftar) * 100) if daftar else 0
     st.markdown(
         '<div class="jd-progress-wrap">'
-        '<div class="jd-progress-text"><b>' + str(selesai) + ' dari '
-        + str(len(daftar)) + ' tugas selesai</b> (' + str(persen) + '%)</div>'
+        '<div class="jd-progress-text">' + str(selesai) + " dari "
+        + str(len(daftar)) + " tugas selesai</div>"
         '<div class="jd-progress-bar"><div class="jd-progress-fill" '
         'style="width:' + str(persen) + '%"></div></div></div>',
         unsafe_allow_html=True,
@@ -145,12 +157,13 @@ def _render_baris_tugas(t: dict) -> None:
 def _render_panel_tugas() -> None:
     daftar = tasks()
 
-    st.markdown('<div class="set-section">Agenda &amp; Daftar Tugas</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sec-label">Daftar tugas</div>',
+                unsafe_allow_html=True)
 
     if not daftar:
         st.markdown(
-            '<div class="empty-card">Belum ada tugas terdaftar. '
-            "Minta Yuki menyusun rencana lewat percakapan di bawah, atau tambahkan tugas manual.</div>",
+            '<div class="empty-card">Belum ada tugas. Minta Yuki menyusun '
+            "rencana lewat kotak chat di bawah, atau tambah sendiri.</div>",
             unsafe_allow_html=True,
         )
     else:
@@ -168,21 +181,21 @@ def _render_panel_tugas() -> None:
         selesai = sum(1 for t in daftar if t["selesai"])
         if selesai:
             with st.container(key="jd_clear_wrap"):
-                st.button(f":material/delete_sweep:  Bersihkan {selesai} tugas yang sudah selesai",
+                st.button(f":material/delete_sweep:  Bersihkan {selesai} tugas selesai",
                           key="jd_clear", use_container_width=True,
                           on_click=clear_done_tasks)
 
-    with st.expander(":material/add_circle_outline:  Tambah tugas baru secara manual"):
+    with st.expander(":material/add:  Tambah tugas sendiri"):
         st.text_input("Judul tugas", key="jd_new_title",
-                      placeholder="mis. Review draf desain & kirim ke klien")
+                      placeholder="mis. Selesaikan laporan")
         c1, c2 = st.columns(2)
         with c1:
-            st.text_input("Waktu / Tenggat", key="jd_new_when",
-                          placeholder="Hari ini / Besok / Jumat jam 15:00")
+            st.text_input("Kapan", key="jd_new_when",
+                          placeholder="Hari ini / Senin / 12 Sep")
         with c2:
             st.selectbox("Prioritas", ["tinggi", "sedang", "rendah"],
                          index=1, key="jd_new_prio")
-        st.button(":material/add:  Tambahkan ke Daftar", key="jd_add", type="primary",
+        st.button("Tambahkan", key="jd_add", type="primary",
                   use_container_width=True, on_click=_tambah_manual)
 
 
@@ -195,28 +208,30 @@ def page_jadwal() -> None:
     thread = mode_thread("jadwal")
 
     st.markdown(
-        f'<div class="page-head"><div class="page-head-icon">{mi("calendar_month")}</div>'
-        '<div><h2 class="page-title">AI Penjadwal · Agenda Cerdas</h2>'
-        '<p class="page-sub">Pecah sasaran besar jadi rencana harian yang jelas, '
-        'terukur, dan mudah dieksekusi.</p></div></div>',
+        '<div class="page-head"><div class="page-head-icon">'
+        + mi("calendar_month")
+        + '</div><div><h2 class="page-title">AI Penjadwal</h2>'
+        '<p class="page-sub">Pecah tujuan besar jadi langkah kecil, lalu '
+        'susun jadi jadwal yang masuk akal.</p></div></div>',
         unsafe_allow_html=True,
     )
 
     _render_panel_tugas()
 
+    st.markdown('<div class="sec-divider"></div>', unsafe_allow_html=True)
+
     if not thread:
-        st.markdown('<div class="set-section">Mulai Cepat &amp; Konsultasi Fokus</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sec-label">Mulai cepat</div>',
+                    unsafe_allow_html=True)
         with st.container(key="jadwal_quick"):
             cols = st.columns(len(TOMBOL_CEPAT))
-            for i, (icon, title, desc, prompt) in enumerate(TOMBOL_CEPAT):
+            for i, (label, prompt) in enumerate(TOMBOL_CEPAT):
                 with cols[i]:
-                    with st.container(key=f"jadwal_card_{i}"):
-                        if st.button(f"{icon}  **{title}**  \n:gray[{desc}]",
-                                     key=f"jadwal_q_{i}", use_container_width=True,
-                                     on_click=_kirim, args=(prompt,)):
-                            pass
+                    st.button(label, key=f"jadwal_q_{i}", use_container_width=True,
+                              on_click=_kirim, args=(prompt,))
     else:
-        st.markdown('<div class="set-section">Konsultasi Rencana dengan Yuki</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sec-label">Obrolan</div>',
+                    unsafe_allow_html=True)
 
     for msg in thread:
         render_message(msg)
@@ -237,10 +252,9 @@ def page_jadwal() -> None:
     with bottom_dock:
         with st.container(key="pending_preview"):
             render_pending_preview("jadwal")
-        user_input = st.chat_input("Minta Yuki menyusun jadwal atau memecah target…", **chat_kwargs)
+        user_input = st.chat_input("Minta dibuatkan jadwal…", **chat_kwargs)
         with st.container(key="chat_controls"):
             render_input_controls("jadwal", show_mode=False)
-        _page_footer(in_chat=bool(thread))
 
     antre = (st.session_state.pop("pending_prompt_mode", "") or "").strip()
     if antre and user_input is None:
@@ -248,3 +262,5 @@ def page_jadwal() -> None:
 
     if process_user_input(user_input, st.empty()):
         st.rerun()
+
+    _page_footer(in_chat=bool(thread))
