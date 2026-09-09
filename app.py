@@ -80,13 +80,13 @@ st.set_page_config(
 # ============================================================================
 def _render_chat_starters() -> None:
     starters = [
-        (":material/psychology:", "Analisis & Riset", "Bahas konsep & penalaran mendalam",
+        (":material/lightbulb:", "Analisis & Riset", "Bahas konsep & penalaran mendalam",
          "Bantu saya menganalisis kelebihan dan kelemahan arsitektur AI reasoning modern."),
-        (":material/code:", "Solusi Koding", "Tulis kode atau pecahkan error",
+        (":material/terminal:", "Solusi Koding", "Tulis kode atau pecahkan error",
          "Buatkan kode Python asinkron untuk mengambil data REST API dengan retry logic."),
         (":material/palette:", "Konsep Desain", "Eksplorasi UI/UX & palet warna",
          "Bantu buatkan konsep desain UI dashboard dengan palet warna bernuansa hangat."),
-        (":material/edit_document:", "Penulisan Naskah", "Draf proposal & susun tulisan",
+        (":material/description:", "Penulisan Naskah", "Draf proposal & susun tulisan",
          "Bantu saya menyusun draf proposal peluncuran produk yang profesional dan persuasif."),
     ]
     with st.container(key="chat_starters_box"):
@@ -141,7 +141,6 @@ def render_chat_page() -> None:
         user_input = st.chat_input(placeholder_text, **chat_kwargs)
         with st.container(key="chat_controls"):
             render_input_controls("chat", show_mode=True)
-        # Footer diletakkan tepat di bawah chat dock
         _page_footer(in_chat=not is_fresh)
 
     if maybe_run_yuki(st.empty()):
@@ -151,7 +150,6 @@ def render_chat_page() -> None:
         user_input = pending_prompt
     if process_user_input(user_input, st.empty(), is_fresh=is_fresh):
         st.rerun()
-
 # ============================================================================
 # HALAMAN: ARTEFAK
 # ============================================================================
