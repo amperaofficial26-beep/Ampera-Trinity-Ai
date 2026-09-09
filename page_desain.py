@@ -16,13 +16,13 @@ from state import mode_thread
 from ui_helpers import _page_footer, render_message
 
 TOMBOL_CEPAT = [
-    ("🎨  Palet Warna", "Rekomendasi palet warna & kode HEX harmonis",
+    (":material/palette:", "Palet Warna", "Rekomendasi palet warna & kode HEX harmonis",
      "Buatkan satu palet warna yang enak dipandang untuk aplikasi ini, lengkap dengan peran tiap warna dan kode HEX-nya."),
-    ("🔤  Pasangan Font", "Kombinasi font judul & isi yang serasi",
+    (":material/font_download:", "Pasangan Font", "Kombinasi font judul & isi yang serasi",
      "Sarankan 2 pasangan font (judul + isi) yang cocok untuk aplikasi AI bernuansa hangat dan elegan, beserta alasannya."),
-    ("🔍  Kritik Tampilan / UI", "Evaluasi hierarki, spasi, dan kontras",
+    (":material/rate_review:", "Kritik Tampilan / UI", "Evaluasi hierarki, spasi, dan kontras",
      "Aku akan mengirimkan rancangan desainku. Tolong evaluasi hierarki visual, spasi, warna, tipografi, dan konsistensinya."),
-    ("🖼️  Moodboard Visual", "Eksplorasi konsep atmosfer & estetika",
+    (":material/image:", "Moodboard Visual", "Eksplorasi konsep atmosfer & estetika",
      "Buatkan konsep moodboard bernuansa hangat minimalis dan mewah untuk produk digital."),
 ]
 
@@ -55,17 +55,17 @@ def page_desain() -> None:
             for i in range(0, len(TOMBOL_CEPAT), 2):
                 pasangan = TOMBOL_CEPAT[i:i + 2]
                 cols = st.columns(len(pasangan))
-                for j, (title, desc, prompt) in enumerate(pasangan):
+                for j, (icon, title, desc, prompt) in enumerate(pasangan):
                     with cols[j]:
                         with st.container(key=f"desain_card_{i+j}"):
-                            if st.button(f"**{title}**  \n:gray[{desc}]",
+                            if st.button(f"{icon}  **{title}**  \n:gray[{desc}]",
                                          key=f"desain_q_{i + j}",
                                          use_container_width=True,
                                          on_click=_kirim, args=(prompt,)):
                                 pass
 
         st.markdown(
-            '<div class="empty-card">💡 Ceritakan apa yang sedang kamu rancang, '
+            '<div class="empty-card">Ceritakan apa yang sedang kamu rancang, '
             "atau unggah tangkapan layar desainmu lewat tombol <b>+</b> di bawah. "
             "Yuki akan menilainya dengan ketajaman seorang art director profesional.</div>",
             unsafe_allow_html=True,
@@ -93,6 +93,7 @@ def page_desain() -> None:
         user_input = st.chat_input("Konsultasikan konsep desainmu dengan Yuki…", **chat_kwargs)
         with st.container(key="chat_controls"):
             render_input_controls("desain", show_mode=False)
+        _page_footer(in_chat=bool(thread))
 
     antre = (st.session_state.pop("pending_prompt_mode", "") or "").strip()
     if antre and user_input is None:
@@ -100,5 +101,3 @@ def page_desain() -> None:
 
     if process_user_input(user_input, st.empty()):
         st.rerun()
-
-    _page_footer(in_chat=bool(thread))
