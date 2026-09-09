@@ -34,138 +34,6 @@ html, body, [data-testid="stAppViewContainer"], .stApp {
 #MainMenu, footer, [data-testid="stToolbar"], [data-testid="stDecoration"] { visibility: hidden; }
 
 /* ---------- SIDEBAR ala Claude ---------- */
-/* ==========================================================================
-   SIDEBAR & BRAND STYLING
-   ========================================================================== */
-.sb-brand-wrap {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 2px 4px 10px;
-    margin-top: 0;
-    border-bottom: 1px solid #E2D6C1;
-    margin-bottom: 8px;
-}
-.sb-brand {
-    font-family: 'Source Serif 4', Georgia, serif;
-    font-size: 1.42rem;
-    font-weight: 700;
-    color: #1B1220;
-    letter-spacing: -0.02em;
-    padding: 0;
-    margin: 0;
-    line-height: 1.1;
-}
-.sb-brand-pill {
-    font-size: 0.62rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    background: #E0D2BB;
-    color: #4A3559;
-    padding: 2px 7px;
-    border-radius: 999px;
-    border: 1px solid #D1C3AD;
-}
-.sb-section-label {
-    font-size: 0.70rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #8E8398;
-    padding: 9px 8px 3px;
-    margin-top: 2px;
-}
-[class*="sb-active-item"] button {
-    background: #E2D5BE !important;
-    font-weight: 600 !important;
-    color: #1B1220 !important;
-}
-
-/* ==========================================================================
-   BENTO STARTER CARDS (Chat Utama, AI Desain, AI Penjadwal)
-   ========================================================================== */
-.st-key-chat_starters_box {
-    max-width: 660px;
-    margin: 18px auto 0 !important;
-}
-[class*="st-key-st_card_"] button,
-[class*="st-key-desain_card_"] button,
-[class*="st-key-jadwal_card_"] button {
-    background: #F4ECE0 !important;
-    border: 1px solid #DFCFC0 !important;
-    border-radius: 14px !important;
-    padding: 12px 16px !important;
-    min-height: 64px !important;
-    text-align: left !important;
-    justify-content: flex-start !important;
-    align-items: flex-start !important;
-    transition: all 0.2s ease !important;
-    box-shadow: 0 2px 6px rgba(44, 31, 51, 0.02) !important;
-}
-[class*="st-key-st_card_"] button:hover,
-[class*="st-key-desain_card_"] button:hover,
-[class*="st-key-jadwal_card_"] button:hover {
-    background: #EBE0CF !important;
-    border-color: #C6B69E !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 6px 14px rgba(44, 31, 51, 0.06) !important;
-}
-[class*="st-key-st_card_"] button p,
-[class*="st-key-desain_card_"] button p,
-[class*="st-key-jadwal_card_"] button p {
-    text-align: left !important;
-    font-size: 0.88rem !important;
-    line-height: 1.35 !important;
-    margin: 0 !important;
-    color: #2C1F33 !important;
-}
-
-/* ==========================================================================
-   HEADER HALAMAN STANDAR (.page-head)
-   ========================================================================== */
-.page-head {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin: 4px 0 22px;
-    padding: 16px 20px;
-    background: #F2E8D6;
-    border: 1px solid #DBCEB9;
-    border-radius: 16px;
-    box-shadow: 0 2px 8px rgba(44, 31, 51, 0.02);
-}
-.page-head-icon {
-    width: 44px;
-    height: 44px;
-    flex-shrink: 0;
-    border-radius: 12px;
-    background: #E5D7C2;
-    border: 1px solid #CDBFA8;
-    display: grid;
-    place-items: center;
-    color: #3B244F;
-}
-.page-head-icon [data-testid="stIconMaterial"],
-.page-head-icon span[data-testid="stIconMaterial"],
-.page-head-icon .mi {
-    font-size: 22px !important;
-}
-.page-head h2.page-title {
-    font-family: 'Source Serif 4', Georgia, serif;
-    font-size: 1.55rem;
-    font-weight: 700;
-    color: #1B1220;
-    margin: 0 0 2px;
-    line-height: 1.2;
-    letter-spacing: -0.015em;
-}
-.page-head p.page-sub {
-    margin: 0;
-    font-size: 0.90rem;
-    color: #63586C;
-    line-height: 1.45;
-}
 section[data-testid="stSidebar"] {
     background: #EDE2D1 !important;
     border-right: 1px solid #DBCEB9 !important;
@@ -2359,63 +2227,40 @@ div.stDownloadButton > button:hover {
     --foot-y: 0px;
 }
 
-/* ==========================================================================
-   FOOTER POSITIONING (Selalu di bawah chat input / dock)
-   ========================================================================== */
-/* Pastikan wadah kartu memiliki position: relative */
-[data-testid="stBottomBlockContainer"] {
-    position: relative !important;
-    background: #F2E8D6 !important;
-    border: 1px solid #DBCEB9 !important;
-    border-radius: 22px !important;
-    box-shadow: 0 4px 14px rgba(44,31,51,0.07) !important;
-    padding: 6px 6px 4px !important;
-    transition: border-color .18s ease, box-shadow .18s ease !important;
-}
-
-/* FOOTER KELUAR DARI KARTU & POSISI TEPAT DI BAWAH DOCK CHAT */
-[data-testid="stBottomBlockContainer"] .trinity-foot,
-[data-testid="stBottomBlockContainer"] p.trinity-foot,
-[data-testid="stBottom"] .trinity-foot,
-[data-testid="stBottom"] p.trinity-foot {
-    position: absolute !important;
-    bottom: -24px !important;
-    left: 0 !important;
-    right: 0 !important;
+.trinity-foot,
+p.trinity-foot,
+[data-testid="stMarkdownContainer"] p.trinity-foot,
+[data-testid="stMainBlockContainer"] [data-testid="stMarkdownContainer"] p.trinity-foot {
+    /* display:block + lebar penuh -> text-align:center benar-benar bekerja.
+       Tanpa ini footer bisa terlihat menempel ke kiri. */
+    display: block !important;
     width: 100% !important;
-    transform: none !important;
+    transform: translate(var(--foot-x), var(--foot-y));
     text-align: center !important;
-    color: #8E8398 !important;
-    font-size: 10.5px !important;
-    line-height: 1.3 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    pointer-events: none !important;
-    z-index: 99 !important;
+    color: #7E7387 !important;
+    font-size: 12px !important;      /* halaman awal (sebelum mulai chat) */
+    line-height: 1.5 !important;
+    margin-top: -7px !important;
+    margin-bottom: 0 !important;
+    font-family: 'Inter', sans-serif !important;
+    -webkit-text-size-adjust: 100%;  /* cegah browser HP membesarkan teks kecil */
+    text-size-adjust: 100%;
 }
 
-/* Hilangkan tinggi wadah container pembungkus footer di dalam kartu */
-[data-testid="stBottomBlockContainer"] > [data-testid="stVerticalBlock"] > [data-testid="stElementContainer"]:has(.trinity-foot),
-[data-testid="stBottomBlockContainer"] > [data-testid="stVerticalBlock"] > .element-container:has(.trinity-foot) {
-    height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
+/* versi saat chat berjalan: lebih kecil lagi dari versi halaman awal */
+.trinity-foot.in-chat,
+p.trinity-foot.in-chat,
+[data-testid="stMarkdownContainer"] p.trinity-foot.in-chat,
+[data-testid="stMainBlockContainer"] [data-testid="stMarkdownContainer"] p.trinity-foot.in-chat {
+    font-size: 11px !important;       /* saat chat sudah berjalan */
+    color: #827788 !important;
+    margin-top: 22px !important;
 }
 
-/* ==========================================================================
-   MATERIAL ICONS PADA BENTO CARDS
-   ========================================================================== */
-[class*="st-key-st_card_"] button [data-testid="stIconMaterial"],
-[class*="st-key-desain_card_"] button [data-testid="stIconMaterial"],
-[class*="st-key-jadwal_card_"] button [data-testid="stIconMaterial"] {
-    font-size: 1.35rem !important;
-    width: 1.35rem !important;
-    height: 1.35rem !important;
-    color: #4A3559 !important;
-    flex-shrink: 0 !important;
+/* logo kecil di dalam footer ikut menyesuaikan */
+.trinity-foot .logo-foot {
+    width: 1.2em !important;
+    height: 1.2em !important;
 }
 
 /* ============ HALAMAN BARU (Artefak · Pengaturan · Bahasa ·
