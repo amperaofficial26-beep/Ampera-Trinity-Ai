@@ -34,6 +34,138 @@ html, body, [data-testid="stAppViewContainer"], .stApp {
 #MainMenu, footer, [data-testid="stToolbar"], [data-testid="stDecoration"] { visibility: hidden; }
 
 /* ---------- SIDEBAR ala Claude ---------- */
+/* ==========================================================================
+   SIDEBAR & BRAND STYLING
+   ========================================================================== */
+.sb-brand-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2px 4px 10px;
+    margin-top: 0;
+    border-bottom: 1px solid #E2D6C1;
+    margin-bottom: 8px;
+}
+.sb-brand {
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 1.42rem;
+    font-weight: 700;
+    color: #1B1220;
+    letter-spacing: -0.02em;
+    padding: 0;
+    margin: 0;
+    line-height: 1.1;
+}
+.sb-brand-pill {
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: #E0D2BB;
+    color: #4A3559;
+    padding: 2px 7px;
+    border-radius: 999px;
+    border: 1px solid #D1C3AD;
+}
+.sb-section-label {
+    font-size: 0.70rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #8E8398;
+    padding: 9px 8px 3px;
+    margin-top: 2px;
+}
+[class*="sb-active-item"] button {
+    background: #E2D5BE !important;
+    font-weight: 600 !important;
+    color: #1B1220 !important;
+}
+
+/* ==========================================================================
+   BENTO STARTER CARDS (Chat Utama, AI Desain, AI Penjadwal)
+   ========================================================================== */
+.st-key-chat_starters_box {
+    max-width: 660px;
+    margin: 18px auto 0 !important;
+}
+[class*="st-key-st_card_"] button,
+[class*="st-key-desain_card_"] button,
+[class*="st-key-jadwal_card_"] button {
+    background: #F4ECE0 !important;
+    border: 1px solid #DFCFC0 !important;
+    border-radius: 14px !important;
+    padding: 12px 16px !important;
+    min-height: 64px !important;
+    text-align: left !important;
+    justify-content: flex-start !important;
+    align-items: flex-start !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 2px 6px rgba(44, 31, 51, 0.02) !important;
+}
+[class*="st-key-st_card_"] button:hover,
+[class*="st-key-desain_card_"] button:hover,
+[class*="st-key-jadwal_card_"] button:hover {
+    background: #EBE0CF !important;
+    border-color: #C6B69E !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 14px rgba(44, 31, 51, 0.06) !important;
+}
+[class*="st-key-st_card_"] button p,
+[class*="st-key-desain_card_"] button p,
+[class*="st-key-jadwal_card_"] button p {
+    text-align: left !important;
+    font-size: 0.88rem !important;
+    line-height: 1.35 !important;
+    margin: 0 !important;
+    color: #2C1F33 !important;
+}
+
+/* ==========================================================================
+   HEADER HALAMAN STANDAR (.page-head)
+   ========================================================================== */
+.page-head {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 4px 0 22px;
+    padding: 16px 20px;
+    background: #F2E8D6;
+    border: 1px solid #DBCEB9;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(44, 31, 51, 0.02);
+}
+.page-head-icon {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    background: #E5D7C2;
+    border: 1px solid #CDBFA8;
+    display: grid;
+    place-items: center;
+    color: #3B244F;
+}
+.page-head-icon [data-testid="stIconMaterial"],
+.page-head-icon span[data-testid="stIconMaterial"],
+.page-head-icon .mi {
+    font-size: 22px !important;
+}
+.page-head h2.page-title {
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 1.55rem;
+    font-weight: 700;
+    color: #1B1220;
+    margin: 0 0 2px;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+}
+.page-head p.page-sub {
+    margin: 0;
+    font-size: 0.90rem;
+    color: #63586C;
+    line-height: 1.45;
+}
 section[data-testid="stSidebar"] {
     background: #EDE2D1 !important;
     border-right: 1px solid #DBCEB9 !important;
