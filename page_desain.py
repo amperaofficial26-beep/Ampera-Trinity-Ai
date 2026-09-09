@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-HALAMAN: AI DESAIN
+HALAMAN: AI DESAIN (CREATIVE STUDIO)
 
 Mode chat khusus dengan persona art director (DESAIN_PROMPT di config.py),
-tombol mulai cepat, dan kartu palet warna (cards.py).
-
-Tata letak sengaja SATU LAJUR penuh, sama seperti halaman chat lain, supaya
-gelembung jawaban dan kartu palet punya ruang yang cukup.
+tombol mulai cepat bergaya bento, dan kartu palet warna (cards.py).
 """
 
 from __future__ import annotations
@@ -18,23 +15,15 @@ from icons import mi
 from state import mode_thread
 from ui_helpers import _page_footer, render_message
 
-# ============================================================================
-# >>> ATUR TOMBOL MULAI CEPAT DI SINI <<<
-#   (label tombol, kalimat yang dikirim ke Yuki)
-#   Disusun 2 kolom; tambah/kurangi bebas, tata letaknya menyesuaikan.
-# ============================================================================
 TOMBOL_CEPAT = [
-    ("Buat palet warna",
-     "Buatkan satu palet warna yang enak dipandang untuk aplikasi ini, "
-     "lengkap dengan peran tiap warna."),
-    ("Saran pasangan font",
-     "Sarankan 2 pasangan font (judul + isi) yang cocok untuk aplikasi AI "
-     "bernuansa hangat, beserta alasannya."),
-    ("Kritik desain saya",
-     "Aku akan kirim tangkapan layar desainku. Tolong kritik: hierarki, "
-     "spasi, warna, tipografi, dan konsistensinya."),
-    ("Buat moodboard",
-     "Buatkan gambar moodboard suasana hangat minimalis untuk aplikasi ini."),
+    ("🎨  Palet Warna", "Rekomendasi palet warna & kode HEX harmonis",
+     "Buatkan satu palet warna yang enak dipandang untuk aplikasi ini, lengkap dengan peran tiap warna dan kode HEX-nya."),
+    ("🔤  Pasangan Font", "Kombinasi font judul & isi yang serasi",
+     "Sarankan 2 pasangan font (judul + isi) yang cocok untuk aplikasi AI bernuansa hangat dan elegan, beserta alasannya."),
+    ("🔍  Kritik Tampilan / UI", "Evaluasi hierarki, spasi, dan kontras",
+     "Aku akan mengirimkan rancangan desainku. Tolong evaluasi hierarki visual, spasi, warna, tipografi, dan konsistensinya."),
+    ("🖼️  Moodboard Visual", "Eksplorasi konsep atmosfer & estetika",
+     "Buatkan konsep moodboard bernuansa hangat minimalis dan mewah untuk produk digital."),
 ]
 
 
@@ -52,31 +41,33 @@ def page_desain() -> None:
     thread = mode_thread("desain")
 
     st.markdown(
-        '<div class="page-head"><div class="page-head-icon">' + mi("palette")
-        + '</div><div><h2 class="page-title">AI Desain</h2>'
+        f'<div class="page-head"><div class="page-head-icon">{mi("palette")}</div>'
+        '<div><h2 class="page-title">AI Desain · Creative Studio</h2>'
         '<p class="page-sub">Art director pribadimu: palet warna, tipografi, '
-        'kritik tampilan, sampai moodboard.</p></div></div>',
+        'evaluasi antarmuka, sampai konsep moodboard visual.</p></div></div>',
         unsafe_allow_html=True,
     )
 
     # ---- Mulai cepat: hanya tampil saat percakapan masih kosong ----
     if not thread:
-        st.markdown('<div class="sec-label">Mulai cepat</div>',
-                    unsafe_allow_html=True)
+        st.markdown('<div class="set-section">Inspirasi &amp; Mulai Cepat</div>', unsafe_allow_html=True)
         with st.container(key="desain_quick"):
             for i in range(0, len(TOMBOL_CEPAT), 2):
                 pasangan = TOMBOL_CEPAT[i:i + 2]
                 cols = st.columns(len(pasangan))
-                for j, (label, prompt) in enumerate(pasangan):
+                for j, (title, desc, prompt) in enumerate(pasangan):
                     with cols[j]:
-                        st.button(label, key=f"desain_q_{i + j}",
-                                  use_container_width=True,
-                                  on_click=_kirim, args=(prompt,))
+                        with st.container(key=f"desain_card_{i+j}"):
+                            if st.button(f"**{title}**  \n:gray[{desc}]",
+                                         key=f"desain_q_{i + j}",
+                                         use_container_width=True,
+                                         on_click=_kirim, args=(prompt,)):
+                                pass
 
         st.markdown(
-            '<div class="empty-card">Ceritakan apa yang sedang kamu rancang, '
-            "atau unggah tangkapan layar desainmu lewat tombol + di bawah. "
-            "Yuki akan menilainya seperti art director sungguhan.</div>",
+            '<div class="empty-card">💡 Ceritakan apa yang sedang kamu rancang, '
+            "atau unggah tangkapan layar desainmu lewat tombol <b>+</b> di bawah. "
+            "Yuki akan menilainya dengan ketajaman seorang art director profesional.</div>",
             unsafe_allow_html=True,
         )
 
@@ -86,7 +77,6 @@ def page_desain() -> None:
     if maybe_run_yuki(st.empty()):
         st.rerun()
 
-    # ruang kosong supaya isi terakhir tidak tertutup kotak input
     st.markdown('<div class="dock-spacer"></div>', unsafe_allow_html=True)
 
     chat_kwargs: dict = {}
@@ -100,7 +90,7 @@ def page_desain() -> None:
     with bottom_dock:
         with st.container(key="pending_preview"):
             render_pending_preview("desain")
-        user_input = st.chat_input("Tanya soal desain…", **chat_kwargs)
+        user_input = st.chat_input("Konsultasikan konsep desainmu dengan Yuki…", **chat_kwargs)
         with st.container(key="chat_controls"):
             render_input_controls("desain", show_mode=False)
 
