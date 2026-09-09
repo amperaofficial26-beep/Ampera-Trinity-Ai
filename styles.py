@@ -2362,25 +2362,47 @@ div.stDownloadButton > button:hover {
 /* ==========================================================================
    FOOTER POSITIONING (Selalu di bawah chat input / dock)
    ========================================================================== */
-.trinity-foot,
-p.trinity-foot,
-[data-testid="stMarkdownContainer"] p.trinity-foot,
-[data-testid="stMainBlockContainer"] [data-testid="stMarkdownContainer"] p.trinity-foot,
+/* Pastikan wadah kartu memiliki position: relative */
+[data-testid="stBottomBlockContainer"] {
+    position: relative !important;
+    background: #F2E8D6 !important;
+    border: 1px solid #DBCEB9 !important;
+    border-radius: 22px !important;
+    box-shadow: 0 4px 14px rgba(44,31,51,0.07) !important;
+    padding: 6px 6px 4px !important;
+    transition: border-color .18s ease, box-shadow .18s ease !important;
+}
+
+/* FOOTER KELUAR DARI KARTU & POSISI TEPAT DI BAWAH DOCK CHAT */
+[data-testid="stBottomBlockContainer"] .trinity-foot,
+[data-testid="stBottomBlockContainer"] p.trinity-foot,
+[data-testid="stBottom"] .trinity-foot,
 [data-testid="stBottom"] p.trinity-foot {
-    display: block !important;
+    position: absolute !important;
+    bottom: -24px !important;
+    left: 0 !important;
+    right: 0 !important;
     width: 100% !important;
     transform: none !important;
     text-align: center !important;
     color: #8E8398 !important;
-    font-size: 11px !important;
-    line-height: 1.4 !important;
-    margin: 6px auto 0 !important;
-    padding-bottom: 2px !important;
-    font-family: 'Inter', -apple-system, sans-serif !important;
-    letter-spacing: 0.01em;
-    -webkit-text-size-adjust: 100%;
-    text-size-adjust: 100%;
-    pointer-events: none;
+    font-size: 10.5px !important;
+    line-height: 1.3 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    pointer-events: none !important;
+    z-index: 99 !important;
+}
+
+/* Hilangkan tinggi wadah container pembungkus footer di dalam kartu */
+[data-testid="stBottomBlockContainer"] > [data-testid="stVerticalBlock"] > [data-testid="stElementContainer"]:has(.trinity-foot),
+[data-testid="stBottomBlockContainer"] > [data-testid="stVerticalBlock"] > .element-container:has(.trinity-foot) {
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 /* ==========================================================================
