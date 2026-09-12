@@ -23,7 +23,7 @@ Dibuat oleh **Ampera Official — Palembang, Indonesia**. Punya produk lain juga
 | Tahunan | **Rp 49.000** / tahun | Paling hemat — setara Rp 4.083/bulan |
 | Selamanya | **Rp 435.000** sekali bayar | Bayar sekali, pakai selamanya |
 
-Untuk berlangganan, hubungi **amperaofficial26@gmail.com** — pembayaran diatur langsung di sana. Rencana login dengan akun Google sedang disiapkan (lihat `PANDUAN_LOGIN_GOOGLE.md`).
+Untuk berlangganan, hubungi **amperaofficial26@gmail.com** — pembayaran diatur langsung di sana.
 
 ## 🚀 Menjalankan Secara Lokal
 
