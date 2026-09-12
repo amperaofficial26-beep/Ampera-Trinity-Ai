@@ -451,11 +451,10 @@ DEFAULT_SETTINGS: dict = {
     "work_end": "18:00",
     "tz_label": "Asia/Jakarta (WIB)",
     "focus_reminder": True,
-    "groq_key": "",
-    "cf_account_id": "",
-    "cf_token": "",
+    # Kredensial layanan (GROQ_API_KEY, CF_ACCOUNT_ID, CF_API_TOKEN) tidak
+    # lagi diatur dari halaman Pengaturan (tab "Trinity Code" sudah dihapus);
+    # cukup lewat Streamlit Secrets / environment variable.
     "temperature": 0.7,
-    "advanced_errors": False,
 }
 
 PAGE_TITLES = {
