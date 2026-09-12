@@ -477,10 +477,10 @@ def _set_privasi() -> None:
 
 
 PRO_FEATURES = [
-    ("Model Extreme & premium tanpa batas", True, False),
+    ("Model premium tertinggi tanpa batas", True, False),
     ("Generate gambar resolusi tinggi", True, False),
     ("Memori jangka panjang tak terbatas", True, False),
-    ("Artefak penuh tanpa batas", True, True),
+    ("Artefak penuh tanpa batas", True, False),
     ("Trinity kursus lengkap + mentor Yuki", True, False),
     ("Refleksi harian otomatis", True, False),
     ("Akses lebih awal fitur baru", True, False),
@@ -837,9 +837,9 @@ HELP_STEPS = [
     (":material/public:", "Nyalakan pencarian web",
      "Ikon ⋯ → Pencarian web. Trinity otomatis pindah ke model Compound "
      "yang bisa membuka internet."),
-    (":material/memory:", "Ganti model AI",
+    (":material/swap_horiz:", "Ganti model AI",
      "Klik nama model di kanan kotak chat, pilih tingkat yang kamu mau "
-     "(Easy sampai Extreme)."),
+     "(Trinity Seed sampai Trinity Sovereign)."),
     (":material/image:", "Membuat gambar",
      "Nyalakan toggle Gambar, lalu tulis deskripsi gambar yang kamu mau."),
     (":material/data_object:", "Membuat artefak",
@@ -925,9 +925,9 @@ def page_bantuan() -> None:
 # ============================================================================
 ABOUT_CARDS = [
     (":material/chat_bubble:", "Multi AI",
-     "Pilih tingkat model Groq dari Easy sampai Extreme lewat nama model di "
-     "kotak chat, lengkap dengan fallback otomatis bila satu model sedang "
-     "tidak tersedia."),
+     "Pilih tingkat model dari Trinity Seed sampai Trinity Sovereign lewat "
+     "nama model di kotak chat, lengkap dengan fallback otomatis bila satu "
+     "model sedang tidak tersedia."),
     (":material/image:", "Generate Foto",
      "Nyalakan toggle Gambar lalu tulis deskripsi. Gambar dibuat dengan "
      "model FLUX di Cloudflare, ada progress bar bergaya Trinity."),

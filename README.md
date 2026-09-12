@@ -6,7 +6,7 @@ Aplikasi web AI berbasis [Streamlit](https://streamlit.io) dengan asisten AI **Y
 
 ## ✨ Fitur Utama
 
-- 💬 **Multi AI (Groq)** — beberapa tingkat model: Trinity Easy, Normal, Hard, sampai Extreme untuk reasoning berat
+- 💬 **Multi AI** — 14 tingkat model (Trinity Seed sampai Trinity Sovereign) dari berbagai provider, dengan fallback otomatis
 - 🖼️ **Analisis & generate gambar** — model bervision + image engine
 - 🗂️ **Artefak** — jawaban dengan kategori ala Claude
 - 🎓 **Trinity Kursus** — Yuki jadi mentor di thread khusus
