@@ -12,8 +12,8 @@ dan CSS di styles.py.
 HALAMAN (routing internal lewat st.session_state.page):
   - chat        → halaman utama (default)
   - artefak     → kotak kategori ala Claude, Yuki menjawab di halaman itu
-  - pengaturan  → 9 tab: Umum · Akun · Privasi · Penagihan · Kemampuan ·
-                  Memori · Refleksi · Waktu dan fokus · Trinity Code
+  - pengaturan  → 8 tab: Umum · Akun · Privasi · Penagihan · Kemampuan ·
+                  Memori · Refleksi · Waktu dan fokus
   - bahasa      → 14 bahasa (antarmuka + bahasa jawaban Yuki)
   - bantuan     → petunjuk detail pemakaian aplikasi + FAQ + kontak
   - tingkatkan  → promosi paket "Trinity Pro"
@@ -33,16 +33,24 @@ WIB = ZoneInfo("Asia/Jakarta")
 def now_wib() -> str:
     return datetime.now(WIB).strftime("%H:%M")
 
+
+def _waktu_lokal(zona: str) -> str:
+    """Jam saat ini menurut zona waktu terpilih (fallback: WIB)."""
+    try:
+        return datetime.now(ZoneInfo(zona)).strftime("%H:%M")
+    except Exception:
+        return now_wib()
+
 import streamlit as st
-from openai import OpenAI
 
 from config import (
-    AVAILABLE_MODELS, CHAT_INPUT_SUPPORTS_AUDIO, CHAT_INPUT_SUPPORTS_FILE,
-    CHAT_READY, COURSE_BY_KEY, COURSE_CATALOG, DEFAULT_MODEL_KEY,
-    GROQ_API_KEY, GROQ_BASE_URL, IMAGE_INPUT_TYPES, IMAGE_READY,
+    CHAT_INPUT_SUPPORTS_AUDIO, CHAT_INPUT_SUPPORTS_FILE,
+    CHAT_READY, COURSE_BY_KEY, COURSE_CATALOG,
+    IMAGE_INPUT_TYPES, IMAGE_READY,
     ARTIFACT_BY_KEY, ARTIFACT_CATEGORIES, DEFAULT_LANG_CODE, LANG_BY_CODE,
     SUPPORTED_LANGUAGES, course_curriculum, CLARIFY_OPTIONS,
 )
+
 from icons import mi
 from logo import LOGO_B64
 from state import (
@@ -339,14 +347,13 @@ def _cap_rows_html() -> str:
 def _set_umum() -> None:
     s = get_settings()
     st.markdown('<div class="set-section">Tampilan</div>', unsafe_allow_html=True)
-    c1, c2 = st.columns(2)
+    c1, c2, c3 = st.columns(3)
     with c1:
         theme = st.selectbox("Tema", THEME_OPTIONS, index=_opt_index(THEME_OPTIONS, s["theme"]),
                              key="set_theme", help="Tema beige hangat adalah tampilan bawaan Trinity.")
     with c2:
         font = st.selectbox("Ukuran teks", FONT_OPTIONS, index=_opt_index(FONT_OPTIONS, s["font_size"]),
                             key="set_font")
-    c3, _ = st.columns(2)
     with c3:
         speed = st.selectbox("Kecepatan aliran jawaban", SPEED_OPTIONS,
                              index=_opt_index(SPEED_OPTIONS, s["stream_speed"]), key="set_speed",
@@ -452,9 +459,14 @@ def _set_privasi() -> None:
         "Pengaturan privasi disimpan.",
     )
 
-    st.markdown('<div class="set-section">Hapus data</div>', unsafe_allow_html=True)
-    st.caption("Menghapus seluruh data akan mengosongkan percakapan, artefak, "
-               "memori, dan pengaturan. Tindakan ini tidak bisa dibatalkan.")
+    st.markdown('<div class="set-section danger">Hapus data</div>',
+                unsafe_allow_html=True)
+    st.markdown(
+        '<div class="danger-box">Menghapus seluruh data akan mengosongkan '
+        "percakapan, artefak, memori, dan pengaturan. Tindakan ini tidak bisa "
+        "dibatalkan.</div>",
+        unsafe_allow_html=True,
+    )
     _, kolom_hapus = st.columns([3, 1])
     with kolom_hapus:
         if st.button(":material/delete_forever:  Hapus seluruh data saya",
@@ -469,7 +481,7 @@ PRO_FEATURES = [
     ("Model Extreme & premium tanpa batas", True, False),
     ("Generate gambar resolusi tinggi", True, False),
     ("Memori jangka panjang tak terbatas", True, False),
-    ("Artefak & Trinity Code penuh", True, True),
+    ("Artefak penuh tanpa batas", True, True),
     ("Trinity kursus lengkap + mentor Yuki", True, False),
     ("Refleksi harian otomatis", True, False),
     ("Akses lebih awal fitur baru", True, False),
@@ -548,7 +560,7 @@ def _set_kemampuan() -> None:
     st.markdown('<div class="set-section">Status kemampuan</div>', unsafe_allow_html=True)
     st.markdown(_cap_rows_html(), unsafe_allow_html=True)
     st.caption("Kemampuan bertanda \"butuh …\" hanya menunggu kredensial diisi "
-               "pemilik aplikasi di tab Trinity Code.")
+               "pemilik aplikasi lewat Streamlit Secrets / environment variable.")
 
     st.markdown('<div class="set-section">Nyalakan / matikan</div>', unsafe_allow_html=True)
     st.toggle("Pencarian web", value=s["cap_web_search"], key="cap_web",
@@ -674,14 +686,14 @@ def _set_waktu_fokus() -> None:
                      key="set_tz")
 
     st.markdown('<div class="set-section">Jam kerja</div>', unsafe_allow_html=True)
-    c4, c5, c6 = st.columns(3)
+    c4, c5 = st.columns(2)
     with c4:
         start = st.text_input("Mulai", value=s["work_start"], key="set_start")
     with c5:
         end = st.text_input("Selesai", value=s["work_end"], key="set_end")
-    with c6:
-        st.text_input("Waktu lokal sekarang", value=now_wib(),
-                      key="set_now", disabled=True)
+    zona = (st.session_state.get("set_tz") or s["tz_label"]).split(" (")[0]
+    st.caption(f"⏰ Waktu lokal sekarang: **{_waktu_lokal(zona)}** ({zona}). "
+               "Zona waktu bisa diganti di bagian Sesi fokus di atas.")
 
     remind = st.toggle("Ingatkan aku saat jam fokus selesai", value=s["focus_reminder"],
                        key="set_remind")
@@ -694,54 +706,7 @@ def _set_waktu_fokus() -> None:
          "focus_reminder": remind},
         "Waktu & fokus disimpan.",
     )
-
-
-def _set_trinity_code() -> None:
-    from config import MODEL_CATALOG
-    s = get_settings()
-    st.markdown('<div class="set-section">Kredensial layanan</div>', unsafe_allow_html=True)
-    st.caption("Kosongkan bila pemilik aplikasi sudah mengisinya lewat "
-               "Streamlit Secrets / environment variable.")
-    gk = st.text_input("GROQ_API_KEY", type="password", value=s["groq_key"], key="set_gk",
-                       help="Dipakai untuk chat, transkrip suara, dan vision.")
-    ca = st.text_input("CF_ACCOUNT_ID", value=s["cf_account_id"], key="set_ca")
-    ct = st.text_input("CF_API_TOKEN", type="password", value=s["cf_token"], key="set_ct")
-    chat_state = (
-        mi(":material/check_circle:") + " aktif" if CHAT_READY
-        else mi(":material/error_outline:") + " butuh GROQ_API_KEY"
-    )
-    st.markdown(
-        f'<div class="feat-row"><span>Status chat</span>'
-        f'<span class="chip-{"on" if CHAT_READY else "off"}">'
-        f"{chat_state}"
-        "</span></div>",
-        unsafe_allow_html=True,
-    )
-    img_state = (
-        mi(":material/check_circle:") + " aktif" if IMAGE_READY
-        else mi(":material/error_outline:") + " butuh Cloudflare"
-    )
-    st.markdown(
-        f'<div class="feat-row"><span>Status generate gambar</span>'
-        f'<span class="chip-{"on" if IMAGE_READY else "off"}">'
-        f"{img_state}"
-        "</span></div>",
-        unsafe_allow_html=True,
-    )
-
-    st.markdown('<div class="set-section">Model &amp; perilaku</div>', unsafe_allow_html=True)
-    c1, c2 = st.columns(2)
-    with c1:
-        temp = st.slider("Suhu jawaban (kreativitas)", 0.0, 1.5,
-                         float(s["temperature"]), 0.1, key="set_temp",
-                         help="Rendah = kaku & presisi. Tinggi = liar & kreatif.")
-    with c2:
-        st.selectbox("Model bawaan", [m["name"] for m in MODEL_CATALOG],
-                     index=max(0, next((i for i, m in enumerate(MODEL_CATALOG)
-                                        if m["key"] == st.session_state.selected_model_key), 0)),
-                     key="set_model")
-    adv = st.toggle("Tampilkan error teknis apa adanya (mode pengembang)",
-                    value=s["advanced_errors"], key="set_adv")
+  
 
     def _uji_koneksi() -> None:
         if not (CHAT_READY or gk.strip()):
@@ -774,7 +739,7 @@ def page_pengaturan() -> None:
     st.markdown(
         f'<div class="page-head"><div class="page-head-icon">{mi(":material/settings:")}</div>'
         '<div><h2 class="page-title">Pengaturan</h2>'
-        "<p class=\"page-sub\">Sembilan bagian pengaturan Trinity. Perubahan "
+        "<p class=\"page-sub\">Delapan bagian pengaturan Trinity. Perubahan "
         "disimpan per bagian lewat tombol simpan.</p></div></div>",
         unsafe_allow_html=True,
     )
@@ -788,7 +753,6 @@ def page_pengaturan() -> None:
         ":material/history_edu:  Memori",
         ":material/self_improvement:  Refleksi",
         ":material/schedule:  Waktu dan fokus",
-        ":material/terminal:  Trinity Code",
     ])
     with tabs[0]:
         _set_umum()
@@ -806,8 +770,6 @@ def page_pengaturan() -> None:
         _set_refleksi()
     with tabs[7]:
         _set_waktu_fokus()
-    with tabs[8]:
-        _set_trinity_code()
 
     _page_footer()
   # ============================================================================
@@ -922,9 +884,9 @@ HELP_STEPS = [
 
 HELP_FAQ = [
     ("Kenapa Yuki tidak menjawab?",
-     "Periksa koneksi internet, lalu buka Pengaturan → Trinity Code dan "
-     "lakukan \"Uji koneksi\". Bila statusnya \"butuh GROQ_API_KEY\", "
-     "kredensial belum diisi pemilik aplikasi."),
+     "Periksa koneksi internet, lalu kirim ulang pesannya. Bila masih gagal, "
+     "cek status \"Chat AI (Yuki)\" di Pengaturan → Kemampuan — bila tertulis "
+     "\"butuh GROQ_API_KEY\", kredensial belum diisi pemilik aplikasi."),
     ("Kenapa generate gambar gagal?",
      "Generate gambar butuh CF_ACCOUNT_ID dan CF_API_TOKEN (Cloudflare). "
      "Statusnya terlihat di Pengaturan → Kemampuan."),
@@ -1018,12 +980,11 @@ TIPS_LIST = [
     "tidak perlu mengulang-ulang.",
     "Pakai halaman Artefak untuk pekerjaan besar supaya chat utama tetap "
     "rapi.",
-    "Turunkan suhu (Pengaturan → Trinity Code) bila butuh jawaban presisi "
-    "seperti kode atau hitungan.",
+    "Pilih kepribadian \"Serius & ringkas\" di Pengaturan → Umum bila butuh "
+    "jawaban presisi seperti kode atau hitungan.",
     "Nyalakan Pencarian web hanya saat benar-benar butuh data terbaru.",
     "Unduh Chat secara berkala sebagai arsip pekerjaanmu.",
 ]
-
 
 def page_pelajari() -> None:
     
@@ -1096,7 +1057,7 @@ def page_tingkatkan() -> None:
         '<div class="trinity-hero"><div class="hero-text">'
         '<h1>Trinity Pro</h1>'
         "<p>Semua kemampuan Trinity dibuka penuh: model tertinggi tanpa batas, "
-        "gambar resolusi tinggi, memori tak terbatas, artefak & Trinity Code, "
+        "gambar resolusi tinggi, memori tak terbatas, artefak penuh, "
         "serta seluruh Trinity kursus dengan Yuki sebagai mentor pribadi.</p>"
         "</div></div>",
         unsafe_allow_html=True,
@@ -1130,7 +1091,6 @@ def page_tingkatkan() -> None:
                "pemilik aplikasi. Status paket kamu saat ini: "
                f"{s.get('plan', 'Free')}.")
     _page_footer()
-
 
 # ============================================================================
 # HALAMAN: DAPATKAN APLIKASI
