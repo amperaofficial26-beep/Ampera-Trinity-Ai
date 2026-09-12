@@ -2078,6 +2078,7 @@ div.stDownloadButton > button:hover {
     }
     .rc-itin-row { grid-template-columns: 48px 16px 1fr; 
     }
+}
 /* ====================================================================
    KARTU PILIHAN INTERAKTIF (quick reply)
    Muncul di bawah jawaban Yuki saat dia perlu memastikan sesuatu.
