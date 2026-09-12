@@ -178,7 +178,6 @@ def stream_chat_reply(client: OpenAI, model: str, history: list[dict]):
         except Exception:
             continue
 
-
 def stream_chat_with_fallback(client: OpenAI, preferred_model: str, history: list[dict],
                               vision: bool = False):
     """Coba model pilihan user; kalau sudah dihapus provider, pakai fallback.

@@ -49,6 +49,7 @@ from config import (
     ARTIFACT_BY_KEY, ARTIFACT_CATEGORIES, DEFAULT_LANG_CODE, LANG_BY_CODE,
     SUPPORTED_LANGUAGES, course_curriculum, CLARIFY_OPTIONS,
 )
+
 from icons import mi
 from logo import LOGO_B64
 from state import (
@@ -958,7 +959,6 @@ TIPS_LIST = [
     "Unduh Chat secara berkala sebagai arsip pekerjaanmu.",
 ]
 
-
 def page_pelajari() -> None:
     
     st.markdown(
@@ -1064,7 +1064,6 @@ def page_tingkatkan() -> None:
                "pemilik aplikasi. Status paket kamu saat ini: "
                f"{s.get('plan', 'Free')}.")
     _page_footer()
-
 
 # ============================================================================
 # HALAMAN: DAPATKAN APLIKASI
