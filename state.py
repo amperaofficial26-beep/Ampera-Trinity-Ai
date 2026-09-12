@@ -128,6 +128,7 @@ def init_state() -> None:
     if "page" not in st.session_state:
         st.session_state.page = "chat"
     # Pengaturan lengkap (halaman Pengaturan, 9 tab)
+    # Pengaturan lengkap (halaman Pengaturan, 8 tab)
     if "settings" not in st.session_state:
         st.session_state.settings = dict(DEFAULT_SETTINGS)
     # Artefak yang sedang dikerjakan (halaman Artefak) + thread kursusnya
