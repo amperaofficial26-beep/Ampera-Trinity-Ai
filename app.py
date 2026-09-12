@@ -876,7 +876,6 @@ HELP_FAQ = [
      "Bisa. Buka menu akun (⋯) → Bahasa, lalu pilih bahasa untuk Yuki."),
 ]
 
-
 def page_bantuan() -> None:
     
     st.markdown(
@@ -945,7 +944,6 @@ ABOUT_CARDS = [
      "Delapan bagian: Umum, Akun, Privasi, Penagihan, Kemampuan, Memori, "
      "Refleksi, Waktu dan fokus."),
 ]
-
 TIPS_LIST = [
     "Beri konteks di awal: siapa kamu, untuk apa, dan batasannya. Jawaban "
     "Yuki langsung lebih tepat sasaran.",
@@ -1064,7 +1062,6 @@ def page_tingkatkan() -> None:
                "pemilik aplikasi. Status paket kamu saat ini: "
                f"{s.get('plan', 'Free')}.")
     _page_footer()
-
 # ============================================================================
 # HALAMAN: DAPATKAN APLIKASI
 # ============================================================================
