@@ -2243,7 +2243,7 @@ p.trinity-foot,
     line-height: 1.5 !important;
     /* margin besar (vh) = footer turun mendekati bawah layar, DI ATAS
        kotak input — tidak lagi menempel ke sapaan. */
-    margin-top: 24vh !important;
+    margin-top: 15vh !important;
     margin-bottom: 0 !important;
     font-family: 'Inter', sans-serif !important;
     -webkit-text-size-adjust: 100%;  /* cegah browser HP membesarkan teks kecil */
