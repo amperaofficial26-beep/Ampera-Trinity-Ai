@@ -725,15 +725,14 @@ _BOTTOM_RESET_CSS = """
 #   Ubah angka-angka ini saja. Nilainya dikirim lewat tag <style>, bukan
 #   atribut style="..." inline — lihat catatan di dalam fungsi.
 # ----------------------------------------------------------------------------
-FOOTER_SIZE_PX = 12        # ukuran teks di halaman awal (sebelum mulai chat)
-FOOTER_SIZE_CHAT_PX = 9    # ukuran teks saat chat sudah berjalan
-FOOTER_X_PX = 7            # geser mendatar: minus = kiri, plus = kanan
-FOOTER_Y_PX = -42            # geser tegak   : minus = naik, plus = turun
-FOOTER_TOP_GAP_PX = 34     # jarak dari elemen di atasnya (halaman awal)
-FOOTER_TOP_GAP_CHAT_PX = 22  # jarak saat chat berjalan
+FOOTER_SIZE_PX = 12        # ukuran teks footer (halaman awal)
+FOOTER_X_PX = 0            # geser mendatar: minus = kiri, plus = kanan (0 = tengah)
+FOOTER_Y_PX = 0            # geser tegak   : minus = naik, plus = turun
+FOOTER_TOP_GAP = "24vh"    # jarak dari sapaan di atasnya. Sengaja besar (satuan
+                           # vh) supaya footer turun mendekati bawah layar dan
+                           # berhenti di atas kotak input — tidak menempel sapaan.
 FOOTER_COLOR = "#7E7387"   # warna teks
 FOOTER_TEXT = "© 2026 Ampera Trinity AI · by Ampera Official"
-# ============================================================================
 
 
 def _page_footer(in_chat: bool = False) -> None:
@@ -756,7 +755,7 @@ def _page_footer(in_chat: bool = False) -> None:
 
     foot_class = "trinity-foot"
     ukuran = FOOTER_SIZE_PX
-    jarak = FOOTER_TOP_GAP_PX
+    jarak = FOOTER_TOP_GAP
     sel = "p.trinity-foot"
 
     st.markdown(
@@ -768,7 +767,7 @@ def _page_footer(in_chat: bool = False) -> None:
         f"font-size:{ukuran}px !important;"
         "line-height:1.5 !important;"
         f"color:{FOOTER_COLOR} !important;"
-        f"margin:{jarak}px 0 0 !important;"
+        f"margin:{jarak} 0 0 !important;"
         f"transform:translate({FOOTER_X_PX}px,{FOOTER_Y_PX}px) !important;"
         "font-family:'Inter',sans-serif !important;"
         "-webkit-text-size-adjust:100%;text-size-adjust:100%;"
