@@ -2221,10 +2221,10 @@ div.stDownloadButton > button:hover {
    (elemen p + wadah markdown) dan diberi !important.
    >>> UBAH ANGKA DI SINI untuk mengatur ukuran footer <<< */
 /* >>> ATUR POSISI FOOTER DI SINI <<<
-   --foot-x : geser mendatar. Minus = ke kiri, plus = ke kanan.
+   --foot-x : geser mendatar. Minus = ke kiri, plus = ke kanan (0 = tengah).
    --foot-y : geser tegak.    Minus = ke atas, plus = ke bawah. */
 :root {
-    --foot-x: 100px;
+    --foot-x: 0px;
     --foot-y: 0px;
 }
 
@@ -2241,7 +2241,9 @@ p.trinity-foot,
     color: #7E7387 !important;
     font-size: 12px !important;      /* halaman awal (sebelum mulai chat) */
     line-height: 1.5 !important;
-    margin-top: -7px !important;
+    /* margin besar (vh) = footer turun mendekati bawah layar, DI ATAS
+       kotak input — tidak lagi menempel ke sapaan. */
+    margin-top: 24vh !important;
     margin-bottom: 0 !important;
     font-family: 'Inter', sans-serif !important;
     -webkit-text-size-adjust: 100%;  /* cegah browser HP membesarkan teks kecil */
@@ -2275,27 +2277,12 @@ p.trinity-foot.in-chat,
 }
 .st-key-sb_account [data-testid="stVerticalBlock"] { gap: 0 !important; }
 .st-key-sb_account [data-testid="stColumn"]:first-child { padding-right: 0 !important; }
-/* >>> ATUR POSISI TOMBOL TITIK TIGA (menu akun) DI SINI <<<
-   --acct-x : jarak dari tepi KIRI layar.
-   --acct-y : jarak dari DASAR layar. Perbesar = naik.
-   Catatan: dipakai position: fixed !important supaya tidak ikut hanyut
-   mengikuti daftar menu sidebar (itu penyebab tombolnya tadi nyangkut
-   di bawah "Unduh Chat"). */
-:root {
-    --acct-x: 190px;
-    --acct-y: -60px;
-}
-
-.st-key-acct_menu {
-    position: fixed !important;
-    left: var(--acct-x) !important;
-    bottom: var(--acct-y) !important;
-    top: auto !important;
-    right: auto !important;
-    width: 32px !important;
-    margin: 0 !important;
-    z-index: 999996 !important;
-}
+/* >>> PENTING: POSISI TOMBOL TITIK TIGA (menu akun) TIDAK diatur di sini.
+   Posisinya diatur di sidebar.py (ACCT_MENU_X_PX / ACCT_MENU_Y_PX), yang
+   disuntik sebagai <style> tepat di dekat tombolnya. Kalau posisinya juga
+   ditulis di sini, dua aturan saling bertabrakan dan yang menang tidak
+   terduga — pernah membuat tombolnya terlempar 60px ke bawah layar dan
+   seolah "hilang". Aturan di bawah hanya gaya visualnya saja. */
 /* Sembunyikan baris kartu nama user saat sidebar tertutup */
 section[data-testid="stSidebar"][aria-expanded="false"] .sb-account,
 section[data-testid="stSidebar"][aria-expanded="false"] .st-key-acct_menu,
