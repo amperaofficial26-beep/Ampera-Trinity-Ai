@@ -2225,7 +2225,7 @@ div.stDownloadButton > button:hover {
    --foot-y : geser tegak.    Minus = ke atas, plus = ke bawah. */
 :root {
     --foot-x: 0px;
-    --foot-y: 0px;
+    --foot-y: -30px;
 }
 
 .trinity-foot,
