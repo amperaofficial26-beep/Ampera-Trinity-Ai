@@ -2078,6 +2078,7 @@ div.stDownloadButton > button:hover {
     }
     .rc-itin-row { grid-template-columns: 48px 16px 1fr; 
     }
+}
 /* ====================================================================
    KARTU PILIHAN INTERAKTIF (quick reply)
    Muncul di bawah jawaban Yuki saat dia perlu memastikan sesuatu.
@@ -2464,6 +2465,7 @@ div.stButton > button p strong { color: #2C1F33; }
 [data-testid="stVerticalBlock"] > [data-testid="stMarkdownContainer"]:first-child .set-section {
     margin-top: 2px;
 }
+
 /* --- bagian berbahaya (hapus data) di tab Privasi --- */
 .set-section.danger { color: #A63D3D; }
 .danger-box {
@@ -2471,6 +2473,7 @@ div.stButton > button p strong { color: #2C1F33; }
     padding: 10px 14px; font-size: 0.85rem; color: #6B4A4A;
     line-height: 1.5; margin-bottom: 10px;
 }
+
 /* --- kartu kemampuan --- */
 .cap-card {
     background: #F2E8D6; border: 1px solid #DBCEB9; border-radius: 14px;

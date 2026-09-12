@@ -33,7 +33,6 @@ WIB = ZoneInfo("Asia/Jakarta")
 def now_wib() -> str:
     return datetime.now(WIB).strftime("%H:%M")
 
-
 def _waktu_lokal(zona: str) -> str:
     """Jam saat ini menurut zona waktu terpilih (fallback: WIB)."""
     try:
@@ -49,6 +48,7 @@ from config import (
     IMAGE_INPUT_TYPES, IMAGE_READY,
     ARTIFACT_BY_KEY, ARTIFACT_CATEGORIES, DEFAULT_LANG_CODE, LANG_BY_CODE,
     SUPPORTED_LANGUAGES, course_curriculum, CLARIFY_OPTIONS,
+    AMPERA_BRAND, AMPERA_EMAIL, AMPERA_LOKASI, AMPERA_PRODUK_LAIN, PRO_HARGA,
 )
 
 from icons import mi
@@ -398,8 +398,11 @@ def _set_akun() -> None:
     with c2:
         email = st.text_input("Email", value=s["email"], key="set_email",
                               placeholder="nama@email.com")
-        st.selectbox("Wilayah", ["Indonesia", "Malaysia", "Singapura", "Lainnya"],
-                     key="set_region")
+        pilihan_wilayah = ["Indonesia", "Malaysia", "Singapura", "Lainnya"]
+        region = st.selectbox(
+            "Wilayah", pilihan_wilayah,
+            index=pilihan_wilayah.index(s.get("region")) if s.get("region") in pilihan_wilayah else 0,
+            key="set_region")
     bio = st.text_area("Tentang kamu (dibaca Yuki)", value=s["bio"], key="set_bio",
                        height=90, placeholder="mis. Aku pemilik UMKM kopi di Lampung…")
 
@@ -423,7 +426,7 @@ def _set_akun() -> None:
     _baris_aksi_simpan(
         "Simpan profil", "save_akun",
         {"display_name": name.strip() or "User", "username": uname.strip(),
-         "email": email.strip(), "bio": bio.strip()},
+         "email": email.strip(), "bio": bio.strip(), "region": region},
         "Profil disimpan.",
     )
 
@@ -436,8 +439,6 @@ def _set_privasi() -> None:
               key="set_hist")
     st.toggle("Simpan rekaman suara setelah ditranskrip", value=s["keep_voice"],
               key="set_voice")
-    st.toggle("Izinkan Yuki memakai pencarian web", value=s["allow_web_search"],
-              key="set_web")
     st.toggle("Cadangkan data ke cloud", value=s["cloud_sync"], key="set_sync")
 
     st.markdown('<div class="set-section">Personalisasi</div>', unsafe_allow_html=True)
@@ -451,7 +452,6 @@ def _set_privasi() -> None:
         {
             "save_history": st.session_state.set_hist,
             "keep_voice": st.session_state.set_voice,
-            "allow_web_search": st.session_state.set_web,
             "cloud_sync": st.session_state.set_sync,
             "analytics": st.session_state.set_analytics,
             "personalization": st.session_state.set_personal,
@@ -478,10 +478,10 @@ def _set_privasi() -> None:
 
 
 PRO_FEATURES = [
-    ("Model Extreme & premium tanpa batas", True, False),
+    ("Model premium tertinggi tanpa batas", True, False),
     ("Generate gambar resolusi tinggi", True, False),
     ("Memori jangka panjang tak terbatas", True, False),
-    ("Artefak penuh tanpa batas", True, True),
+    ("Artefak penuh tanpa batas", True, False),
     ("Trinity kursus lengkap + mentor Yuki", True, False),
     ("Refleksi harian otomatis", True, False),
     ("Akses lebih awal fitur baru", True, False),
@@ -489,49 +489,46 @@ PRO_FEATURES = [
 ]
 
 
-def _plan_col(title: str, price: str, note: str, is_pro: bool, key: str) -> None:
-    rows = []
-    for label, _pro, free in PRO_FEATURES:
-        if is_pro:
-            mark, cls = mi(":material/check_circle:"), "chip-on"
-        else:
-            mark, cls = (mi(":material/check_circle:"), "chip-on") if free else (
-                mi(":material/remove_circle_outline:"), "chip-off")
-        rows.append(f'<div class="feat-row"><span>{label}</span>'
-                    f'<span class="{cls}">{mark}</span></div>')
+def _harga_col(paket: dict, key: str) -> None:
     st.markdown(
-        f'<div class="plan-card{" is-pro" if is_pro else ""}">'
-        f'<div class="plan-name">{title}</div>'
-        f'<div class="plan-price">{price}</div>'
-        f'<div class="plan-note">{note}</div>'
-        f'<div class="feat-list">{"".join(rows)}</div>'
+        f'<div class="plan-card{" is-pro" if paket.get("unggul") else ""}">'
+        f'<div class="plan-name">{html.escape(paket["nama"])}</div>'
+        f'<div class="plan-price">{html.escape(paket["harga"])}</div>'
+        f'<div class="plan-note">{html.escape(paket["satuan"])} · '
+        f'{html.escape(paket["catatan"])}</div>'
         "</div>",
         unsafe_allow_html=True,
     )
-    label = ":material/workspace_premium:  Pilih Trinity Pro" if is_pro else "Paket aktif"
-    if st.button(label, key=key, use_container_width=True,
-                 type="primary" if is_pro else "secondary", disabled=not is_pro):
-        if is_pro:
-            _save_settings({"plan": "Trinity Pro"}, "Paket diperbarui ke Trinity Pro.")
-            st.rerun()
+    if st.button(":material/workspace_premium:  Pilih paket ini", key=key,
+                 use_container_width=True,
+                 type="primary" if paket.get("unggul") else "secondary"):
+        st.toast(
+            f"Untuk berlangganan, hubungi Ampera Official lewat email: "
+            f"{AMPERA_EMAIL}",
+            icon=":material/mail:",
+        )
 
 
 def _set_penagihan() -> None:
     s = get_settings()
     st.markdown('<div class="set-section">Siklus &amp; pembayaran</div>',
                 unsafe_allow_html=True)
-    st.radio("Siklus penagihan", ["Bulanan", "Tahunan (hemat 20%)"],
-             index=_opt_index(["Bulanan", "Tahunan (hemat 20%)"], s["billing_cycle"]),
+    opsi_siklus = [f"{p['nama']} — {p['harga']}" for p in PRO_HARGA]
+    st.radio("Siklus penagihan", opsi_siklus,
+             index=_opt_index(opsi_siklus, s.get("billing_cycle")),
              key="set_cycle", horizontal=True)
     _, kolom_bayar = st.columns([3, 1])
     with kolom_bayar:
         if st.button(":material/credit_card:  Atur pembayaran", key="bayar_metode",
                      use_container_width=True):
-            st.toast("Metode pembayaran akan dibuka setelah gerbang pembayaran aktif.",
-                     icon=":material/credit_card:")
+            st.toast(
+                f"Untuk berlangganan Trinity Pro, hubungi Ampera Official "
+                f"lewat email: {AMPERA_EMAIL}",
+                icon=":material/mail:",
+            )
     st.markdown(
-        '<div class="feat-row"><span>Metode pembayaran</span>'
-        f'<span class="chip-off">{html.escape(s["payment_method"])}</span></div>',
+        f'<div class="feat-row"><span>Info berlangganan</span>'
+        f'<span class="chip-off">{html.escape(AMPERA_EMAIL)}</span></div>',
         unsafe_allow_html=True,
     )
 
@@ -838,9 +835,9 @@ HELP_STEPS = [
     (":material/public:", "Nyalakan pencarian web",
      "Ikon ⋯ → Pencarian web. Trinity otomatis pindah ke model Compound "
      "yang bisa membuka internet."),
-    (":material/memory:", "Ganti model AI",
+    (":material/swap_horiz:", "Ganti model AI",
      "Klik nama model di kanan kotak chat, pilih tingkat yang kamu mau "
-     "(Easy sampai Extreme)."),
+     "(Trinity Seed sampai Trinity Sovereign)."),
     (":material/image:", "Membuat gambar",
      "Nyalakan toggle Gambar, lalu tulis deskripsi gambar yang kamu mau."),
     (":material/data_object:", "Membuat artefak",
@@ -909,7 +906,7 @@ def page_bantuan() -> None:
     with c1:
         if st.button(":material/mail:  Email dukungan", key="help_mail",
                      use_container_width=True):
-            st.toast("Kirim email ke dukungan@amperaofficial.id", icon=":material/mail:")
+            st.toast(f"Kirim email ke {AMPERA_EMAIL}", icon=":material/mail:")
     with c2:
         if st.button(":material/forum:  Grup komunitas", key="help_group",
                      use_container_width=True):
@@ -926,9 +923,9 @@ def page_bantuan() -> None:
 # ============================================================================
 ABOUT_CARDS = [
     (":material/chat_bubble:", "Multi AI",
-     "Pilih tingkat model Groq dari Easy sampai Extreme lewat nama model di "
-     "kotak chat, lengkap dengan fallback otomatis bila satu model sedang "
-     "tidak tersedia."),
+     "Pilih tingkat model dari Trinity Seed sampai Trinity Sovereign lewat "
+     "nama model di kotak chat, lengkap dengan fallback otomatis bila satu "
+     "model sedang tidak tersedia."),
     (":material/image:", "Generate Foto",
      "Nyalakan toggle Gambar lalu tulis deskripsi. Gambar dibuat dengan "
      "model FLUX di Cloudflare, ada progress bar bergaya Trinity."),
@@ -1023,34 +1020,58 @@ def page_pelajari() -> None:
 # HALAMAN: TINGKATKAN PAKET
 # ============================================================================
 def page_tingkatkan() -> None:
-    
+
     s = get_settings()
     st.markdown(
         '<div class="trinity-hero"><div class="hero-text">'
-        '<h1>Trinity Pro</h1>'
-        "<p>Semua kemampuan Trinity dibuka penuh: model tertinggi tanpa batas, "
-        "gambar resolusi tinggi, memori tak terbatas, artefak penuh, "
-        "serta seluruh Trinity kursus dengan Yuki sebagai mentor pribadi.</p>"
+        f'<h1>{html.escape(AMPERA_BRAND)}</h1>'
+        f"<p>Trinity Pro kini bergabung ke keluarga {html.escape(AMPERA_BRAND)} — "
+        f"{html.escape(AMPERA_LOKASI)}. Semua kemampuan dibuka penuh: model "
+        "tertinggi tanpa batas, gambar resolusi tinggi, memori tak terbatas, "
+        "artefak penuh, serta seluruh Trinity kursus dengan Yuki sebagai "
+        "mentor pribadi.</p>"
         "</div></div>",
         unsafe_allow_html=True,
     )
 
-    c1, c2 = st.columns(2)
-    with c1:
-        _plan_col("Free", "Rp 0", "Selamanya gratis · untuk mencoba", False, "plan_free")
-    with c2:
-        _plan_col("Trinity Pro", "Rp …", "Harga menyusul · batal kapan saja", True, "plan_pro")
+    st.markdown('<div class="set-section">Pilih paket Trinity Pro</div>',
+                unsafe_allow_html=True)
+    kolom_harga = st.columns(3)
+    for i, paket in enumerate(PRO_HARGA):
+        with kolom_harga[i]:
+            _harga_col(paket, f"plan_pro_{i}")
 
-    st.markdown('<div class="set-section">Cara berlangganan</div>', unsafe_allow_html=True)
+    st.markdown('<div class="set-section">Semua paket Pro mendapat</div>',
+                unsafe_allow_html=True)
+    for label, _pro, _free in PRO_FEATURES:
+        st.markdown(
+            f'<div class="feat-row"><span>{label}</span>'
+            f'<span class="chip-on">{mi(":material/check_circle:")}</span></div>',
+            unsafe_allow_html=True,
+        )
+
+    st.markdown('<div class="set-section">Keluarga produk Ampera</div>',
+                unsafe_allow_html=True)
+    for produk in AMPERA_PRODUK_LAIN:
+        st.markdown(
+            f'<div class="help-step"><span class="step-icon">'
+            f'{mi(":material/auto_awesome:")}</span>'
+            f'<span class="step-text"><b>{html.escape(produk["nama"])}</b><br>'
+            f'{html.escape(produk["desc"])}</span></div>',
+            unsafe_allow_html=True,
+        )
+
+    st.markdown('<div class="set-section">Cara berlangganan</div>',
+                unsafe_allow_html=True)
     for i, (icon, title, desc) in enumerate([
         (":material/tap_and_play:", "Pilih paket",
-         "Tentukan siklus bulanan atau tahunan di tab Pengaturan → Penagihan."),
-        (":material/credit_card:", "Atur pembayaran",
-         "Kartu, transfer bank, atau e-wallet. Gerbang pembayaran akan "
-         "diaktifkan pemilik aplikasi."),
+         "Bulanan, tahunan (paling hemat), atau sekali bayar untuk selamanya."),
+        (":material/mail:", "Hubungi Ampera",
+         f"Kirim email ke {AMPERA_EMAIL} dan sebutkan paket pilihanmu — "
+         "lanjutan pembayaran diatur langsung di sana."),
         (":material/bolt:", "Langsung aktif",
-         "Paket berubah menjadi Trinity Pro dan semua kemampuan terbuka "
-         "saat itu juga."),
+         "Setelah pembayaran dikonfirmasi, paket berubah menjadi Trinity Pro "
+         "dan semua kemampuan terbuka saat itu juga."),
     ]):
         st.markdown(
             f'<div class="help-step"><span class="step-no">{i + 1}</span>'
@@ -1059,9 +1080,11 @@ def page_tingkatkan() -> None:
             unsafe_allow_html=True,
         )
 
-    st.caption("Harga resmi Trinity Pro belum ditetapkan — akan diumumkan "
-               "pemilik aplikasi. Status paket kamu saat ini: "
-               f"{s.get('plan', 'Free')}.")
+    st.caption(
+        f"Info berlangganan &amp; pembayaran: **[{AMPERA_EMAIL}]"
+        f"(mailto:{AMPERA_EMAIL})** — {AMPERA_BRAND}, {AMPERA_LOKASI}. "
+        f"Status paket kamu saat ini: {s.get('plan', 'Free')}."
+    )
     _page_footer()
 # ============================================================================
 # HALAMAN: DAPATKAN APLIKASI

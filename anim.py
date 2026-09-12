@@ -55,7 +55,12 @@ def inject_anim_css() -> None:
         "}"
         "@keyframes iosPageIn{"
         "0%{opacity:0;transform:scale(0.94) translateY(12px);}"
-        "100%{opacity:1;transform:scale(1) translateY(0);}"
+        # 100% HARUS "transform:none", bukan "scale(1) translateY(0)":
+        # transform apa pun (walau scale(1)) yang menempel pada
+        # stMainBlockContainer membuat position:fixed elemen di dalamnya
+        # (mis. ikon dok file) jadi relatif ke kolom konten, bukan layar —
+        # akibatnya ikon tidak mentok di kanan. "none" = bersih total.
+        "100%{opacity:1;transform:none;}"
         "}"
         "@keyframes iosFadeIn{0%{opacity:0;}100%{opacity:1;}}"
 
