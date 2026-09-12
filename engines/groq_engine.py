@@ -164,8 +164,8 @@ def stream_chat_reply(client: OpenAI, model: str, history: list[dict]):
     stream = client.chat.completions.create(
         model=model,
         messages=messages_for_api(history),
-        # Suhu bisa diatur user di Pengaturan → Trinity Code (0,3 = kaku,
-        # 1,2 = liar). Dibaca tiap request supaya perubahan langsung terasa.
+        # Suhu jawaban (0,3 = kaku, 1,2 = liar); default 0,7 dari
+        # DEFAULT_SETTINGS. Dibaca tiap request supaya perubahan langsung terasa.
         temperature=float(get_settings().get("temperature", 0.7)),
         stream=True,
     )
