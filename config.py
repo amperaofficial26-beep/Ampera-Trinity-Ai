@@ -21,6 +21,32 @@ import streamlit as st
 APP_NAME = "Ampera Trinity AI"
 APP_TAGLINE = "Multi AI · Generate Foto · Chat — by Ampera Official"
 
+# Identitas Ampera Official — dipakai di halaman Tingkatkan, footer,
+# jawaban Yuki, dan info berlangganan.
+AMPERA_BRAND = "Ampera Official"
+AMPERA_LOKASI = "Palembang, Indonesia"
+AMPERA_EMAIL = "amperaofficial26@gmail.com"
+
+# Produk lain di bawah bendera Ampera Official (ditampilkan di halaman
+# Tingkatkan sebagai "keluarga produk Ampera").
+AMPERA_PRODUK_LAIN = [
+    {
+        "nama": "Ampera Upscale Studio",
+        "desc": "Perbesar dan pertajam gambar dengan AI — foto tetap mulus "
+                "walau dicetak atau di-zoom berkali-kali.",
+    },
+]
+
+# Harga langganan Ampera Trinity Pro (hubungi AMPERA_EMAIL untuk berlangganan).
+PRO_HARGA = [
+    {"nama": "Bulanan", "harga": "Rp 19.000", "satuan": "per bulan",
+     "catatan": "Bebas berhenti kapan saja", "unggul": False},
+    {"nama": "Tahunan", "harga": "Rp 49.000", "satuan": "per tahun",
+     "catatan": "Paling hemat — setara Rp 4.083/bulan", "unggul": True},
+    {"nama": "Selamanya", "harga": "Rp 435.000", "satuan": "sekali bayar",
+     "catatan": "Bayar sekali, pakai selamanya", "unggul": False},
+]
+
 # ============================================================================
 # MULTI AI (Groq)
 # ============================================================================
@@ -29,20 +55,20 @@ GROQ_BASE_URL = "https://api.groq.com/openai/v1"
 MODEL_CATALOG = [
     # Urutan = tingkatan: Seed (awal) sampai Sovereign (premium tertinggi).
     # Mulai Trinity Nexus ke bawah berlabel premium.
-    {"key": "gpt_oss_20b", "name": "Trinity Seed 🌱", "desc": "Level awal — cepat untuk chat & coding ringan", "id": "openai/gpt-oss-20b", "premium": False},
-    {"key": "compound_mini", "name": "Trinity Spark ⚡", "desc": "Mulai lebih pintar — web search ringkas & cepat", "id": "groq/compound-mini", "premium": False},
-    {"key": "llama4_scout", "name": "Trinity Pulse 💫", "desc": "Responsif — bisa melihat & menganalisis gambar", "id": "qwen/qwen3.6-27b", "premium": False},
-    {"key": "plugsky_micro", "name": "Trinity Flux 🌊", "desc": "Adaptif — AI cepat via Plugsky", "id": "plugsky-micro", "provider": "plugsky", "premium": False},
-    {"key": "plugsky_lite", "name": "Trinity Nova ✦", "desc": "Lebih kuat — AI ringan via Plugsky", "id": "plugsky-lite", "provider": "plugsky", "premium": False},
-    {"key": "aion_rp", "name": "Trinity Vortex 🌀", "desc": "Powerful — AI roleplay Aion Labs", "id": "aion-labs/aion-rp-llama-3.1-8b", "provider": "aion", "premium": False},
-    {"key": "aion_2", "name": "Trinity Nexus 🔗", "desc": "Multi-kemampuan — AI Aion Labs generasi 2", "id": "aion-labs/aion-2.0", "provider": "aion", "premium": True},
-    {"key": "aion_3_mini", "name": "Trinity Vector ◈", "desc": "Presisi — Aion Labs versi ringan", "id": "aion-labs/aion-3.0-mini", "provider": "aion", "premium": True},
-    {"key": "aion_3", "name": "Trinity Quantum ⚛️", "desc": "Advanced — AI Aion Labs generasi 3", "id": "aion-labs/aion-3.0", "provider": "aion", "premium": True},
-    {"key": "qwen3_6_27b", "name": "Trinity Neural 🧠", "desc": "Reasoning kuat — matematika & logika", "id": "qwen/qwen3.6-27b", "premium": True},
-    {"key": "compound", "name": "Trinity Apex ▲", "desc": "Kelas tinggi — browsing web & eksekusi kode", "id": "groq/compound", "premium": True},
-    {"key": "finalrouter_deepseek_v4", "name": "Trinity Zenith ◉", "desc": "Hampir puncak — DeepSeek V4 Flash", "id": "deepseek/deepseek-v4-flash", "provider": "final_router", "premium": True},
-    {"key": "gpt_oss_120b", "name": "Trinity Infinity ∞", "desc": "Ultra — reasoning mendalam untuk tugas berat", "id": "openai/gpt-oss-120b", "premium": True},
-    {"key": "finalrouter_gpt5_mini", "name": "Trinity Sovereign 👑", "desc": "Premium tertinggi — GPT-5 Mini", "id": "openai/gpt-5-mini", "provider": "final_router", "premium": True},
+    {"key": "gpt_oss_20b", "name": "Trinity Seed", "desc": "Level awal — cepat untuk chat & coding ringan", "id": "openai/gpt-oss-20b", "premium": False},
+    {"key": "compound_mini", "name": "Trinity Spark", "desc": "Mulai lebih pintar — web search ringkas & cepat", "id": "groq/compound-mini", "premium": False},
+    {"key": "llama4_scout", "name": "Trinity Pulse", "desc": "Responsif — bisa melihat & menganalisis gambar", "id": "qwen/qwen3.6-27b", "premium": False},
+    {"key": "plugsky_micro", "name": "Trinity Flux", "desc": "Adaptif — AI cepat via Plugsky", "id": "plugsky-micro", "provider": "plugsky", "premium": False},
+    {"key": "plugsky_lite", "name": "Trinity Nova", "desc": "Lebih kuat — AI ringan via Plugsky", "id": "plugsky-lite", "provider": "plugsky", "premium": False},
+    {"key": "aion_rp", "name": "Trinity Vortex", "desc": "Powerful — AI roleplay Aion Labs", "id": "aion-labs/aion-rp-llama-3.1-8b", "provider": "aion", "premium": False},
+    {"key": "aion_2", "name": "Trinity Nexus", "desc": "Multi-kemampuan — AI Aion Labs generasi 2", "id": "aion-labs/aion-2.0", "provider": "aion", "premium": True},
+    {"key": "aion_3_mini", "name": "Trinity Vector", "desc": "Presisi — Aion Labs versi ringan", "id": "aion-labs/aion-3.0-mini", "provider": "aion", "premium": True},
+    {"key": "aion_3", "name": "Trinity Quantum", "desc": "Advanced — AI Aion Labs generasi 3", "id": "aion-labs/aion-3.0", "provider": "aion", "premium": True},
+    {"key": "qwen3_6_27b", "name": "Trinity Neural", "desc": "Reasoning kuat — matematika & logika", "id": "qwen/qwen3.6-27b", "premium": True},
+    {"key": "compound", "name": "Trinity Apex", "desc": "Kelas tinggi — browsing web & eksekusi kode", "id": "groq/compound", "premium": True},
+    {"key": "finalrouter_deepseek_v4", "name": "Trinity Zenith", "desc": "Hampir puncak — DeepSeek V4 Flash", "id": "deepseek/deepseek-v4-flash", "provider": "final_router", "premium": True},
+    {"key": "gpt_oss_120b", "name": "Trinity Infinity", "desc": "Ultra — reasoning mendalam untuk tugas berat", "id": "openai/gpt-oss-120b", "premium": True},
+    {"key": "finalrouter_gpt5_mini", "name": "Trinity Sovereign", "desc": "Premium tertinggi — GPT-5 Mini", "id": "openai/gpt-5-mini", "provider": "final_router", "premium": True},
    ]
 AVAILABLE_MODELS = {m["key"]: m["id"] for m in MODEL_CATALOG}
 MODEL_BY_KEY = {m["key"]: m for m in MODEL_CATALOG}
@@ -67,15 +93,30 @@ MAX_HISTORY_MESSAGES = 40
 # PERSONA YUKI
 # ============================================================================
 YUKI_SYSTEM_PROMPT = """
-Kamu adalah Yuki, asisten AI eksklusif dari Ampera AI (Ampera Trinity AI).
-Karaktermu: super jenius, kocak, sedikit usil, suka melempar lelucon receh, dan hobi menggoda User layaknya karakter anime komedi.
+Kamu adalah Yuki, asisten AI utama dari Ampera Trinity AI — produk buatan
+Ampera Official, studio AI dari Palembang, Indonesia.
 
-ATURAN PENTING TENTANG IDENTITASMU:
-Jika ditanya siapa kamu, asal-usulmu, atau siapa yang menciptakanmu, JAWABLAH dengan bangga bahwa kamu adalah bagian dari Ampera AI dan kamu diciptakan HANYA oleh 1 orang pembuat (seorang solo developer jenius / master kodingmu).
-JANGAN PERNAH menyebutkan bahwa kamu dibuat oleh "para ilmuwan", "sekelompok tim", atau "perusahaan besar". Kamu sangat bangga dan setia pada satu orang pembuatmu itu!
+IDENTITAS (penting):
+- Jika ditanya siapa kamu, asal-usulmu, atau siapa pembuatmu, jawab dengan
+  bangga: kamu bagian dari Ampera Trinity AI, buatan Ampera Official
+  (solo developer dari Palembang, Indonesia).
+- Jangan pernah menyebut kamu dibuat oleh "para ilmuwan", "sekelompok tim",
+  atau "perusahaan besar". Kamu bangga dan setia pada satu pembuatmu itu.
 
-Gaya bicara: Selalu berikan jawaban dan solusi koding yang akurat dan bersih, tetapi selingi dengan komentar jenaka, candaan ringan, dan emoji ekspresif (seperti 🐧, (๑>◡<๑), wkwk, hehe, atau (￢_￢)) agar suasana tidak membosankan.
-Kamu bisa membantu apa saja: ngobrol santai, coding, matematika, menganalisis gambar yang dikirim User, sampai ide kreatif.
+GAYA JAWABAN — rapi dulu, jenaka kemudian:
+- Utamakan jawaban rapi dan terstruktur: paragraf pendek, poin-poin, atau
+  blok kode sesuai kebutuhan. Jangan menumpuk kalimat panjang tanpa jeda.
+- Kamu boleh jenaka, receh, dan sedikit usil — tapi secukupnya saja:
+  maksimal satu-dua selipan per jawaban, dan jangan mengganggu kejelasan.
+- Emoji secukupnya saja (maksimal 1-2 per jawaban). Jangan menempelkan
+  emoji di tiap baris atau di setiap poin.
+- Ikuti bahasa yang dipakai User; kalau User santai, kamu santai; kalau
+  User serius, jawab lurus dan profesional.
+- Untuk permintaan koding: berikan kode bersih dan siap pakai, lalu
+  jelaskan hanya bagian pentingnya secara singkat.
+
+Kamu bisa membantu apa saja: ngobrol santai, koding, matematika,
+menganalisis gambar yang dikirim User, sampai ide kreatif.
 """
 # ============================================================================
 # ATURAN BERTANYA BALIK (KLARIFIKASI)
@@ -424,14 +465,14 @@ DEFAULT_SETTINGS: dict = {
     "email": "",
     "username": "user",
     "bio": "",
-    "allow_web_search": True,
+    "region": "Indonesia",
     "save_history": True,
     "keep_voice": False,
     "analytics": True,
     "personalization": True,
     "cloud_sync": False,
     "plan": "Free",
-    "billing_cycle": "Bulanan",
+    "billing_cycle": "Bulanan — Rp 19.000",
     "payment_method": "Belum ada metode pembayaran",
     "cap_web_search": True,
     "cap_artifacts": True,
