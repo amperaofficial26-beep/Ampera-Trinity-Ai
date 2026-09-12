@@ -11,8 +11,8 @@ Aplikasi web AI berbasis [Streamlit](https://streamlit.io) dengan asisten AI **Y
 - 🗂️ **Artefak** — jawaban dengan kategori ala Claude
 - 🎓 **Trinity Kursus** — Yuki jadi mentor di thread khusus
 - 🌐 **14 bahasa** — antarmuka + bahasa jawaban bisa diganti
-- ⚙️ **Pengaturan lengkap** — 9 tab: Umum, Akun, Privasi, Penagihan, Kemampuan, Memori, Refleksi, Waktu & Fokus, Trinity Code
-
+- ⚙️ **Pengaturan lengkap** — 8 tab: Umum, Akun, Privasi, Penagihan, Kemampuan, Memori, Refleksi, Waktu & Fokus
+- 
 ## 🚀 Menjalankan Secara Lokal
 
 1. Clone repo ini:
