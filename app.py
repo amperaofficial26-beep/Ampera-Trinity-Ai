@@ -706,32 +706,6 @@ def _set_waktu_fokus() -> None:
          "focus_reminder": remind},
         "Waktu & fokus disimpan.",
     )
-  
-
-    def _uji_koneksi() -> None:
-        if not (CHAT_READY or gk.strip()):
-            st.toast("Belum ada GROQ_API_KEY untuk diuji.", icon=":material/warning:")
-        else:
-            try:
-                client = OpenAI(api_key=(gk.strip() or GROQ_API_KEY), base_url=GROQ_BASE_URL)
-                r = client.chat.completions.create(
-                    model=AVAILABLE_MODELS[DEFAULT_MODEL_KEY],
-                    messages=[{"role": "user", "content": "ping"}],
-                    max_tokens=5,
-                )
-                st.toast("Koneksi bagus: " + (r.choices[0].message.content or "pong"),
-                         icon=":material/check_circle:")
-            except Exception as e:
-                st.toast(f"Gagal terhubung: {str(e)[:120]}", icon=":material/error:")
-
-    _baris_aksi_simpan(
-        "Simpan Trinity Code", "save_code",
-        {"groq_key": gk.strip(), "cf_account_id": ca.strip(),
-         "cf_token": ct.strip(), "temperature": float(temp),
-         "advanced_errors": adv},
-        "Trinity Code disimpan.",
-        sekunder=(":material/terminal:  Uji koneksi", "test_conn", _uji_koneksi),
-    )
 
 
 def page_pengaturan() -> None:
@@ -903,7 +877,6 @@ HELP_FAQ = [
      "Bisa. Buka menu akun (⋯) → Bahasa, lalu pilih bahasa untuk Yuki."),
 ]
 
-
 def page_bantuan() -> None:
     
     st.markdown(
@@ -969,10 +942,9 @@ ABOUT_CARDS = [
      "Sepuluh topik belajar dengan Yuki sebagai mentor: pemasaran, "
      "penjualan, desain, copywriting, dan lainnya."),
     (":material/tune:", "Pengaturan dalam",
-     "Sembilan bagian: Umum, Akun, Privasi, Penagihan, Kemampuan, Memori, "
-     "Refleksi, Waktu dan fokus, Trinity Code."),
+     "Delapan bagian: Umum, Akun, Privasi, Penagihan, Kemampuan, Memori, "
+     "Refleksi, Waktu dan fokus."),
 ]
-
 TIPS_LIST = [
     "Beri konteks di awal: siapa kamu, untuk apa, dan batasannya. Jawaban "
     "Yuki langsung lebih tepat sasaran.",
@@ -1091,7 +1063,6 @@ def page_tingkatkan() -> None:
                "pemilik aplikasi. Status paket kamu saat ini: "
                f"{s.get('plan', 'Free')}.")
     _page_footer()
-
 # ============================================================================
 # HALAMAN: DAPATKAN APLIKASI
 # ============================================================================
