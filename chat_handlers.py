@@ -349,22 +349,28 @@ def _hentikan_dan_finalisasi_stream_lama() -> None:
     st.session_state.pop("_yuki_stop", None)
     st.session_state.pop("_yuki_thread", None)
     st.session_state.pop("_yuki_t0", None)
+    st.session_state.pop("_yuki_loader_tampil", None)
     _finalisasi_stream_yuki(lama)
 
 @st.fragment(run_every=0.4)
 def fragmen_jawaban_yuki() -> None:
-    """Animasi "berpikir" + teks jawaban Yuki yang mengalir.
+    """Teks jawaban Yuki yang mengalir (fase setelah animasi berpikir).
 
     Dipanggil di tiap halaman chat, setelah daftar pesan. Selama stream
     berjalan di thread belakang, fragmen ini menyegarkan dirinya sendiri
     tiap 0,4 detik.
 
-    Urutan tampilan:
-    1. Animasi "Yuki sedang berpikir" TAMPIL PENUH dulu minimal
-       THINKING_MIN_SECONDS detik (durasi animasinya tidak dipotong).
-    2. Setelah itu, teks jawaban mengalir apa adanya.
-    Tombol untuk menghentikan ada di KOTAK INPUT (chat_input_atau_
-    hentikan): tombol kirim berubah jadi tombol "Hentikan respons".
+    Pembagian tugas:
+    - Fase ANIMASI BERPIKIR (minimal THINKING_MIN_SECONDS): fragmen ini
+      TIDAK merender apa pun. Animasinya dirender SEKALI oleh script
+      utama lewat render_loader_yuki() — kalau dirender di sini,
+      iframe-nya dibuat ulang tiap 0,4 detik dan animasinya jadi
+      patah-patah/acak.
+    - Fase TEKS MENGALIR: setelah durasi animasi terpenuhi, fragmen
+      memicu satu rerun penuh (untuk menghapus loader statis), lalu
+      menampilkan teks jawaban yang terus diperbarui.
+    - Tombol "Hentikan respons" ada di KOTAK INPUT (chat_input_atau_
+      hentikan): tombol kirim berubah jadi tombol berhenti.
     """
     stream_state = st.session_state.get("_yuki_stream")
     if not stream_state:
@@ -377,17 +383,19 @@ def fragmen_jawaban_yuki() -> None:
     if hidup:
         t0 = st.session_state.get("_yuki_t0") or 0
         animasi_wajib = (time.time() - t0) < float(THINKING_MIN_SECONDS)
-        if teks and not animasi_wajib:
-            # Durasi animasi sudah terpenuhi: teks jawaban mengalir.
-            st.markdown(bubble_html("assistant", teks + " ▍"),
-                        unsafe_allow_html=True)
-        else:
-            # Animasi "berpikir" tampil penuh sesuai durasinya.
-            components.html(
-                param_loading_html(),
-                height=90,
-                scrolling=False,
-            )
+        if not teks or animasi_wajib:
+            # Masih fase animasi berpikir — biarkan loader statis dari
+            # script utama yang tampil. Jangan sentuh apa pun di sini.
+            return
+
+        # Pindah ke fase teks: satu rerun penuh supaya loader statis
+        # dari script utama ikut terhapus.
+        if st.session_state.pop("_yuki_loader_tampil", None):
+            st.rerun()
+
+        # Teks jawaban mengalir + kursor mengetik.
+        st.markdown(bubble_html("assistant", teks + " ▍"),
+                    unsafe_allow_html=True)
         return
 
     # Thread sudah selesai (atau baru saja dihentikan): susun balasannya
@@ -396,34 +404,33 @@ def fragmen_jawaban_yuki() -> None:
     st.session_state.pop("_yuki_stop", None)
     st.session_state.pop("_yuki_thread", None)
     st.session_state.pop("_yuki_t0", None)
+    st.session_state.pop("_yuki_loader_tampil", None)
     _finalisasi_stream_yuki(stream_state)
     st.rerun()
 
 
-def stream_yuki_aktif() -> bool:
-    """True bila Yuki sedang menulis jawaban (stream masih berjalan)."""
-    if not st.session_state.get("_yuki_stream"):
-        return False
-    pekerja = st.session_state.get("_yuki_thread")
-    return bool(pekerja and pekerja.is_alive())
+def render_loader_yuki() -> None:
+    """Animasi "Yuki sedang berpikir" — dirender oleh SCRIPT UTAMA.
 
-
-def chat_input_atau_hentikan(placeholder: str, **kwargs):
-    """Kotak kirim pesan yang BERUBAH jadi tombol "Hentikan respons".
-
-    Selama Yuki sedang menjawab, tombol kirim di kotak input digantikan
-    tombol "Hentikan respons" — menekannya menghentikan jawaban Yuki dan
-    potongan teks yang sudah muncul tetap disimpan. Setelah selesai,
-    kotak kirim kembali seperti biasa.
+    Harus dipanggil dari halaman (bukan dari dalam fragmen), tepat
+    setelah fragmen_jawaban_yuki(). Dengan begitu iframe animasinya
+    hanya dibuat SEKALI per jawaban dan berjalan halus sampai selesai —
+    persis seperti sebelum ada fitur tombol Hentikan.
     """
-    if stream_yuki_aktif():
-        if st.button(":material/stop_circle:  Hentikan respons",
-                     key="yuki_stop_dok", use_container_width=True):
-            stop = st.session_state.get("_yuki_stop")
-            if stop:
-                stop.set()
-        return None
-    return st.chat_input(placeholder, **kwargs)
+    if not stream_yuki_aktif():
+        return
+    t0 = st.session_state.get("_yuki_t0") or 0
+    teks = "".join((st.session_state.get("_yuki_stream") or {}).get("buf") or [])
+    animasi_wajib = (time.time() - t0) < float(THINKING_MIN_SECONDS)
+    if teks and not animasi_wajib:
+        return  # sudah fase teks — loader tidak perlu dirender
+    st.session_state["_yuki_loader_tampil"] = True
+    components.html(
+        param_loading_html(),
+        height=90,
+        scrolling=False,
+    )
+
 
 def handle_chat_request(answer_slot) -> None:
     thread = active_thread()
