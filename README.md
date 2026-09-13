@@ -23,7 +23,7 @@ Dibuat oleh **Ampera Official — Palembang, Indonesia**. Punya produk lain juga
 | Tahunan | **Rp 49.000** / tahun | Paling hemat — setara Rp 4.083/bulan |
 | Selamanya | **Rp 435.000** sekali bayar | Bayar sekali, pakai selamanya |
 
-Untuk berlangganan, hubungi **amperaofficial26@gmail.com** — pembayaran diatur langsung di sana.
+Untuk berlangganan, hubungi **amperaofficialgroup@gmail.com** — pembayaran diatur langsung di sana.
 
 ## 🚀 Menjalankan Secara Lokal
 
@@ -68,4 +68,4 @@ GROQ_API_KEY = "gsk_..."
 
 ---
 
-© Ampera Official — Palembang, Indonesia · amperaofficial26@gmail.com
+© Ampera Official — Palembang, Indonesia · amperaofficialgroup@gmail.com
