@@ -24,6 +24,7 @@ HALAMAN (routing internal lewat st.session_state.page):
 
 from __future__ import annotations
 
+import base64
 import html
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -75,9 +76,18 @@ from chat_handlers import (
 # ============================================================================
 # KONFIGURASI HALAMAN
 # ============================================================================
+# Ikon tab (favicon) memakai file assets/logo_tab.png — versi logo yang
+# margin transparannya sudah dibuang supaya tampil sebesar mungkin di tab.
+# Kalau filenya tidak ada, kembali ke logo biasa (LOGO_B64) / emoji.
+try:
+    with open("assets/logo_tab.png", "rb") as _f:
+        _TAB_ICON = "data:image/png;base64," + base64.b64encode(_f.read()).decode("ascii")
+except OSError:
+    _TAB_ICON = (f"data:image/png;base64,{LOGO_B64}" if LOGO_B64 else "🔱")
+
 st.set_page_config(
     page_title="Ampera Trinity AI",
-    page_icon=(f"data:image/png;base64,{LOGO_B64}" if LOGO_B64 else "🔱"),
+    page_icon=_TAB_ICON,
     layout="centered",
     initial_sidebar_state="expanded",
 )
