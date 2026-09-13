@@ -25,6 +25,7 @@ from config import (
 )
 from engines.groq_engine import (
     build_chat_client,
+    build_system_prompt,
     collect_images,
     stream_chat_with_fallback,
     transcribe_audio,
@@ -43,7 +44,7 @@ from icons import ICON_MIC
 from state import active_thread, get_settings, next_msg_id
 from ui_helpers import (
     _BOTTOM_RESET_CSS, _capture_artifacts_from_reply,
-    bubble_html, image_progress_html, images_bubble_html, stream_sentences,
+    bubble_html, image_progress_html, images_bubble_html,
     parse_quick_replies,
 )
 from datetime import datetime
@@ -224,7 +225,177 @@ def _get_model_provider(model_key: str) -> str:
     """Mengambil provider dari model yang dipilih."""
     model = MODEL_BY_KEY.get(model_key, {})
     return model.get("provider", "groq")
-    
+
+def _susun_balasan_yuki(full: str, thread: list[dict]) -> None:
+    """Pascaproses teks jawaban Yuki lalu simpan sebagai pesan assistant.
+
+    Dipakai baik saat jawaban selesai normal maupun saat dihentikan
+    lewat tombol "Hentikan respons" (teksnya berupa potongan parsial).
+    """
+    # Pisahkan blok [[PILIHAN]]
+    hasil = parse_quick_replies(full)
+
+    if isinstance(hasil, (tuple, list)) and len(hasil) == 2:
+        full, kartu = hasil
+        kartu = kartu if isinstance(kartu, dict) else {}
+    else:
+        kartu = {}
+
+    if not full:
+        full = kartu.get("question") or "…"
+
+    # Blok [[TUGAS]] di halaman AI Penjadwal
+    if st.session_state.get("page") == "jadwal":
+        try:
+            from page_jadwal import serap_blok_tugas
+
+            full, jml = serap_blok_tugas(full)
+
+            if jml:
+                st.toast(
+                    f"{jml} tugas ditambahkan ke daftar.",
+                    icon=":material/task_alt:",
+                )
+        except Exception:
+            pass
+
+    # Blok [[KARTU:...]]
+    hasil_kartu = parse_cards(full)
+
+    if isinstance(hasil_kartu, (tuple, list)) and len(hasil_kartu) == 2:
+        full, kartu_kaya = hasil_kartu
+        kartu_kaya = (
+            kartu_kaya
+            if isinstance(kartu_kaya, list)
+            else []
+        )
+    else:
+        kartu_kaya = []
+
+    if not full:
+        full = "Ini hasilnya ya!"
+
+    # Blok kode -> file
+    full, file_ids = ambil_artefak(full)
+    full = rapihkan_teks_chat(full)
+
+    if not full:
+        full = (
+            "Selesai! Filenya sudah kubuat ya."
+            if file_ids
+            else "…"
+        )
+
+    reply = {
+        "id": next_msg_id(),
+        "role": "assistant",
+        "type": "text",
+        "content": full,
+        "time": now_wib(),
+    }
+
+    if file_ids:
+        reply["artifact_ids"] = file_ids
+
+    if kartu:
+        reply["quick_replies"] = kartu
+
+    if kartu_kaya:
+        reply["cards"] = kartu_kaya
+
+    thread.append(reply)
+
+
+def _finalisasi_stream_yuki(stream_state: dict) -> None:
+    """Ubah hasil stream (selesai / dihentikan / error) jadi pesan Yuki."""
+    thread = active_thread()
+    err = stream_state.get("err")
+
+    if err is not None:
+        thread.append({
+            "id": next_msg_id(),
+            "role": "assistant",
+            "type": "text",
+            "content": public_error_chat(err),
+            "time": now_wib(),
+            "error_detail": f"{type(err).__name__}: {err}",
+        })
+        return
+
+    full = "".join(stream_state.get("buf") or [])
+    _susun_balasan_yuki(full, thread)
+
+
+def _hentikan_dan_finalisasi_stream_lama() -> None:
+    """Hentikan stream yang masih berjalan (kalau ada) lalu finalisasi.
+
+    Dipanggil saat pengguna mengirim pesan baru di tengah jawaban Yuki
+    yang sedang mengalir: jawaban lama dihentikan, potongannya disimpan,
+    lalu pekerjaan baru dimulai.
+    """
+    lama = st.session_state.get("_yuki_stream")
+    if not lama:
+        return
+
+    stop = st.session_state.get("_yuki_stop")
+    if stop:
+        stop.set()
+
+    pekerja = st.session_state.get("_yuki_thread")
+    if pekerja and pekerja.is_alive():
+        pekerja.join(timeout=2.0)
+
+    st.session_state.pop("_yuki_stream", None)
+    st.session_state.pop("_yuki_stop", None)
+    st.session_state.pop("_yuki_thread", None)
+    _finalisasi_stream_yuki(lama)
+
+
+@st.fragment(run_every=0.4)
+def fragmen_jawaban_yuki() -> None:
+    """Gelembung jawaban Yuki yang mengalir + tombol "Hentikan respons".
+
+    Dipanggil di tiap halaman chat, setelah daftar pesan. Selama stream
+    berjalan di thread belakang, fragmen ini menyegarkan dirinya sendiri
+    tiap 0,4 detik — karena itu tombol "Hentikan respons" selalu bisa
+    diklik, tanpa menunggu jawaban selesai.
+    """
+    stream_state = st.session_state.get("_yuki_stream")
+    if not stream_state:
+        return
+
+    stop_event = st.session_state.get("_yuki_stop")
+    pekerja = st.session_state.get("_yuki_thread")
+    hidup = bool(pekerja and pekerja.is_alive())
+    teks = "".join(stream_state.get("buf") or [])
+
+    if hidup:
+        if teks:
+            # Teks jawaban mengalir apa adanya + kursor mengetik.
+            st.markdown(bubble_html("assistant", teks + " ▍"),
+                        unsafe_allow_html=True)
+        else:
+            # Token pertama belum datang: animasi "Yuki sedang berpikir".
+            components.html(
+                param_loading_html(),
+                height=90,
+                scrolling=False,
+            )
+        if st.button(":material/stop_circle:  Hentikan respons",
+                     key="yuki_stop_btn"):
+            if stop_event:
+                stop_event.set()
+        return
+
+    # Thread sudah selesai (atau baru saja dihentikan): susun balasannya
+    # jadi pesan biasa, lalu muat ulang halaman.
+    st.session_state.pop("_yuki_stream", None)
+    st.session_state.pop("_yuki_stop", None)
+    st.session_state.pop("_yuki_thread", None)
+    _finalisasi_stream_yuki(stream_state)
+    st.rerun()
+
+
 def handle_chat_request(answer_slot) -> None:
     thread = active_thread()
 
@@ -269,23 +440,16 @@ def handle_chat_request(answer_slot) -> None:
 
     from ui_helpers import THINKING_MIN_SECONDS
 
-    think_slot = st.empty()
-    # Animasi loading BARU: 5 parameter acak x 5 detik = 25 detik per
-    # putaran (loop kalau API belum selesai). Diacak di sisi Python
-    # supaya tiap chat kombinasinya beda.
-    with think_slot:
-        components.html(
-            param_loading_html(),
-            height=90,
-            scrolling=False,
-        )
+    # Kalau masih ada jawaban yang mengalir (pengguna kirim pesan baru di
+    # tengah jawaban sebelumnya), hentikan dulu yang lama lalu simpan
+    # potongannya sebagai pesan.
+    _hentikan_dan_finalisasi_stream_lama()
 
     t0 = time.time()
-    # Durasi loading DIKUNCI mengikuti animasi parameter:
-    # 5 parameter x 5 detik = 25 detik (THINKING_MIN_SECONDS).
+    # Durasi tampil animasi "berpikir" minimal = THINKING_MIN_SECONDS.
     # Pengaturan manual "min_think_seconds" sudah dihapus.
     min_think = float(THINKING_MIN_SECONDS)
-    
+
     try:
         provider = _get_model_provider(model_key)
 
@@ -302,6 +466,7 @@ def handle_chat_request(answer_slot) -> None:
                 client,
                 thread,
                 model=model_id,
+                system_prompt=build_system_prompt(),
             )
         else:
             client = build_chat_client()
@@ -313,115 +478,42 @@ def handle_chat_request(answer_slot) -> None:
                 vision=has_images,
             )
 
-        potongan: list[str] = []
-        mode_kode = False
+        # Stream dijalankan di THREAD BELAKANG. Tampilannya — animasi
+        # "berpikir", teks jawaban yang mengalir, dan tombol "Hentikan
+        # respons" — ditangani fragmen_jawaban_yuki() yang menyegarkan
+        # dirinya sendiri tiap 0,4 detik. Dengan begitu tombolnya bisa
+        # diklik kapan saja tanpa menunggu jawaban selesai.
+        stream_state = {"buf": [], "err": None, "done": False, "stopped": False}
+        stop_event = threading.Event()
 
-        for piece in stream:
-            potongan.append(piece or "")
-
-            if not mode_kode and "```" in "".join(potongan):
-                mode_kode = True
-
-        full = "".join(potongan)
-
-        elapsed = time.time() - t0
-
-        if elapsed < min_think:
-            time.sleep(min_think - elapsed)
-
-        think_slot.empty()
-
-        if not full:
-            full = "…"
-
-        # Pisahkan blok [[PILIHAN]]
-        hasil = parse_quick_replies(full)
-
-        if isinstance(hasil, (tuple, list)) and len(hasil) == 2:
-            full, kartu = hasil
-            kartu = kartu if isinstance(kartu, dict) else {}
-        else:
-            kartu = {}
-
-        if not full:
-            full = kartu.get("question") or "…"
-
-        # Blok [[TUGAS]] di halaman AI Penjadwal
-        if st.session_state.get("page") == "jadwal":
+        def _kerja() -> None:
             try:
-                from page_jadwal import serap_blok_tugas
+                for piece in stream:
+                    if stop_event.is_set():
+                        stream_state["stopped"] = True
+                        break
+                    stream_state["buf"].append(piece or "")
+            except Exception as e:
+                stream_state["err"] = e
+            # Animasi "berpikir" minimal tampil selama min_think detik,
+            # kecuali pengguna menekan tombol Hentikan.
+            sisa = min_think - (time.time() - t0)
+            if sisa > 0 and not stop_event.is_set():
+                time.sleep(sisa)
+            stream_state["done"] = True
 
-                full, jml = serap_blok_tugas(full)
+        pekerja = threading.Thread(target=_kerja, daemon=True)
+        st.session_state["_yuki_stream"] = stream_state
+        st.session_state["_yuki_stop"] = stop_event
+        st.session_state["_yuki_thread"] = pekerja
+        pekerja.start()
 
-                if jml:
-                    st.toast(
-                        f"{jml} tugas ditambahkan ke daftar.",
-                        icon=":material/task_alt:",
-                    )
-            except Exception:
-                pass
-
-        # Blok [[KARTU:...]]
-        hasil_kartu = parse_cards(full)
-
-        if isinstance(hasil_kartu, (tuple, list)) and len(hasil_kartu) == 2:
-            full, kartu_kaya = hasil_kartu
-            kartu_kaya = (
-                kartu_kaya
-                if isinstance(kartu_kaya, list)
-                else []
-            )
-        else:
-            kartu_kaya = []
-
-        if not full:
-            full = "Ini hasilnya ya!"
-
-        # Blok kode -> file
-        full, file_ids = ambil_artefak(full)
-        full = rapihkan_teks_chat(full)
-
-        if file_ids and mode_kode:
-            think_slot.empty()
-
-        if not full:
-            full = (
-                "Selesai! Filenya sudah kubuat ya."
-                if file_ids
-                else "…"
-            )
-
-        stream_sentences(answer_slot, full)
-
-        reply = {
-            "id": next_msg_id(),
-            "role": "assistant",
-            "type": "text",
-            "content": full,
-            "time": now_wib(),
-        }
-
-        if file_ids:
-            reply["artifact_ids"] = file_ids
-
-        if kartu:
-            reply["quick_replies"] = kartu
-
-        if kartu_kaya:
-            reply["cards"] = kartu_kaya
-
-        thread.append(reply)
-            
     except Exception as e:
-        think_slot.empty()
-
-        err = public_error_chat(e)
-
         thread.append({
             "id": next_msg_id(),
             "role": "assistant",
             "type": "text",
-            "content": err,
+            "content": public_error_chat(e),
             "time": now_wib(),
             "error_detail": f"{type(e).__name__}: {e}",
         })
