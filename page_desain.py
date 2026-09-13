@@ -46,7 +46,7 @@ def _kirim(teks: str) -> None:
 def page_desain() -> None:
     from chat_handlers import (
         maybe_run_yuki, process_user_input, render_input_controls,
-        render_pending_preview,
+        render_pending_preview, fragmen_jawaban_yuki,
     )
 
     thread = mode_thread("desain")
@@ -85,7 +85,8 @@ def page_desain() -> None:
 
     if maybe_run_yuki(st.empty()):
         st.rerun()
-
+    fragmen_jawaban_yuki()
+    
     # ruang kosong supaya isi terakhir tidak tertutup kotak input
     st.markdown('<div class="dock-spacer"></div>', unsafe_allow_html=True)
 
