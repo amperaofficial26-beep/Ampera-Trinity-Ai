@@ -200,7 +200,7 @@ def _render_panel_tugas() -> None:
 
 
 def page_jadwal() -> None:
-     from chat_handlers import (
+    from chat_handlers import (
         maybe_run_yuki, process_user_input, render_input_controls,
         render_pending_preview, fragmen_jawaban_yuki, chat_input_atau_hentikan,
     )
@@ -238,8 +238,10 @@ def page_jadwal() -> None:
 
     if maybe_run_yuki(st.empty()):
         st.rerun()
+
+    # Jawaban yang sedang mengalir + tombol "Hentikan respons".
     fragmen_jawaban_yuki()
-    
+
     st.markdown('<div class="dock-spacer"></div>', unsafe_allow_html=True)
 
     chat_kwargs: dict = {}
