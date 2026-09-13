@@ -44,7 +44,7 @@ PRO_HARGA = [
     {"nama": "Tahunan", "harga": "Rp 49.000", "satuan": "per tahun",
      "catatan": "Paling hemat — setara Rp 4.083/bulan", "unggul": True},
     {"nama": "Selamanya", "harga": "Rp 435.000", "satuan": "sekali bayar",
-     "catatan": "Bayar sekali, pakai selamanya", "unggul": False},
+     "catatan": "Bayar sekali, Dan nikmati semua produk Ampera Official Selamanya", "unggul": False},
 ]
 
 # ============================================================================
@@ -70,6 +70,12 @@ MODEL_CATALOG = [
     {"key": "gpt_oss_120b", "name": "Trinity Infinity", "desc": "Ultra — reasoning mendalam untuk tugas berat", "id": "openai/gpt-oss-120b", "premium": True},
     {"key": "finalrouter_gpt5_mini", "name": "Trinity Sovereign", "desc": "Premium tertinggi — GPT-5 Mini", "id": "openai/gpt-5-mini", "provider": "final_router", "premium": True},
    ]
+MODEL_ID_TANPA_TEMPERATURE = {
+    # GPT-5 Mini (Trinity Sovereign) menolak temperature selain 1:
+    # "Unsupported value: 'temperature' does not support 0.7 with this
+    # model. Only the default (1) value is supported."
+    "openai/gpt-5-mini",
+}
 AVAILABLE_MODELS = {m["key"]: m["id"] for m in MODEL_CATALOG}
 MODEL_BY_KEY = {m["key"]: m for m in MODEL_CATALOG}
 DEFAULT_MODEL_KEY = "gpt_oss_20b"
