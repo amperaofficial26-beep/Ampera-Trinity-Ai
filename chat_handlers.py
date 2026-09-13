@@ -45,7 +45,7 @@ from state import active_thread, get_settings, next_msg_id
 from ui_helpers import (
     _BOTTOM_RESET_CSS, _capture_artifacts_from_reply,
     bubble_html, image_progress_html, images_bubble_html,
-    parse_quick_replies,
+    parse_quick_replies, THINKING_MIN_SECONDS,
 )
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -348,43 +348,46 @@ def _hentikan_dan_finalisasi_stream_lama() -> None:
     st.session_state.pop("_yuki_stream", None)
     st.session_state.pop("_yuki_stop", None)
     st.session_state.pop("_yuki_thread", None)
+    st.session_state.pop("_yuki_t0", None)
     _finalisasi_stream_yuki(lama)
-
 
 @st.fragment(run_every=0.4)
 def fragmen_jawaban_yuki() -> None:
-    """Gelembung jawaban Yuki yang mengalir + tombol "Hentikan respons".
+    """Animasi "berpikir" + teks jawaban Yuki yang mengalir.
 
     Dipanggil di tiap halaman chat, setelah daftar pesan. Selama stream
     berjalan di thread belakang, fragmen ini menyegarkan dirinya sendiri
-    tiap 0,4 detik — karena itu tombol "Hentikan respons" selalu bisa
-    diklik, tanpa menunggu jawaban selesai.
+    tiap 0,4 detik.
+
+    Urutan tampilan:
+    1. Animasi "Yuki sedang berpikir" TAMPIL PENUH dulu minimal
+       THINKING_MIN_SECONDS detik (durasi animasinya tidak dipotong).
+    2. Setelah itu, teks jawaban mengalir apa adanya.
+    Tombol untuk menghentikan ada di KOTAK INPUT (chat_input_atau_
+    hentikan): tombol kirim berubah jadi tombol "Hentikan respons".
     """
     stream_state = st.session_state.get("_yuki_stream")
     if not stream_state:
         return
 
-    stop_event = st.session_state.get("_yuki_stop")
     pekerja = st.session_state.get("_yuki_thread")
     hidup = bool(pekerja and pekerja.is_alive())
     teks = "".join(stream_state.get("buf") or [])
 
     if hidup:
-        if teks:
-            # Teks jawaban mengalir apa adanya + kursor mengetik.
+        t0 = st.session_state.get("_yuki_t0") or 0
+        animasi_wajib = (time.time() - t0) < float(THINKING_MIN_SECONDS)
+        if teks and not animasi_wajib:
+            # Durasi animasi sudah terpenuhi: teks jawaban mengalir.
             st.markdown(bubble_html("assistant", teks + " ▍"),
                         unsafe_allow_html=True)
         else:
-            # Token pertama belum datang: animasi "Yuki sedang berpikir".
+            # Animasi "berpikir" tampil penuh sesuai durasinya.
             components.html(
                 param_loading_html(),
                 height=90,
                 scrolling=False,
             )
-        if st.button(":material/stop_circle:  Hentikan respons",
-                     key="yuki_stop_btn"):
-            if stop_event:
-                stop_event.set()
         return
 
     # Thread sudah selesai (atau baru saja dihentikan): susun balasannya
@@ -392,9 +395,35 @@ def fragmen_jawaban_yuki() -> None:
     st.session_state.pop("_yuki_stream", None)
     st.session_state.pop("_yuki_stop", None)
     st.session_state.pop("_yuki_thread", None)
+    st.session_state.pop("_yuki_t0", None)
     _finalisasi_stream_yuki(stream_state)
     st.rerun()
 
+
+def stream_yuki_aktif() -> bool:
+    """True bila Yuki sedang menulis jawaban (stream masih berjalan)."""
+    if not st.session_state.get("_yuki_stream"):
+        return False
+    pekerja = st.session_state.get("_yuki_thread")
+    return bool(pekerja and pekerja.is_alive())
+
+
+def chat_input_atau_hentikan(placeholder: str, **kwargs):
+    """Kotak kirim pesan yang BERUBAH jadi tombol "Hentikan respons".
+
+    Selama Yuki sedang menjawab, tombol kirim di kotak input digantikan
+    tombol "Hentikan respons" — menekannya menghentikan jawaban Yuki dan
+    potongan teks yang sudah muncul tetap disimpan. Setelah selesai,
+    kotak kirim kembali seperti biasa.
+    """
+    if stream_yuki_aktif():
+        if st.button(":material/stop_circle:  Hentikan respons",
+                     key="yuki_stop_dok", use_container_width=True):
+            stop = st.session_state.get("_yuki_stop")
+            if stop:
+                stop.set()
+        return None
+    return st.chat_input(placeholder, **kwargs)
 
 def handle_chat_request(answer_slot) -> None:
     thread = active_thread()
@@ -440,7 +469,7 @@ def handle_chat_request(answer_slot) -> None:
 
     from ui_helpers import THINKING_MIN_SECONDS
 
-    # Kalau masih ada jawaban yang mengalir (pengguna kirim pesan baru di
+       # Kalau masih ada jawaban yang mengalir (pengguna kirim pesan baru di
     # tengah jawaban sebelumnya), hentikan dulu yang lama lalu simpan
     # potongannya sebagai pesan.
     _hentikan_dan_finalisasi_stream_lama()
@@ -449,6 +478,9 @@ def handle_chat_request(answer_slot) -> None:
     # Durasi tampil animasi "berpikir" minimal = THINKING_MIN_SECONDS.
     # Pengaturan manual "min_think_seconds" sudah dihapus.
     min_think = float(THINKING_MIN_SECONDS)
+    # Dicatat supaya fragmen tahu sampai kapan animasi "berpikir" wajib
+    # tampil sebelum teks jawaban boleh mengalir.
+    st.session_state["_yuki_t0"] = t0
 
     try:
         provider = _get_model_provider(model_key)
