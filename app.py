@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import base64
 import html
+import io
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -85,14 +86,51 @@ try:
 except OSError:
     _TAB_ICON = (f"data:image/png;base64,{LOGO_B64}" if LOGO_B64 else "🔱")
 
+# Ikon tab (favicon) = logo_thinking_small.png yang otomatis di-CROP saat
+# aplikasi jalan: margin transparannya dibuang supaya ikon tampil sebesar
+# mungkin di tab browser. Kalau Pillow / file logonya tidak ada, kembali ke
+# logo biasa (LOGO_B64) lalu emoji — aplikasi tetap jalan.
+try:
+    from PIL import Image as _PILImage
+except ImportError:                        # Pillow ada di requirements.txt,
+    _PILImage = None                       # ini cuma jaga-jaga.
+
+
+@st.cache_data
+def _buat_ikon_tab() -> str | None:
+    """Ikon tab versi persegi rapat (tanpa margin transparan)."""
+    if _PILImage is None:
+        return None
+    try:
+        img = _PILImage.open("assets/logo_thinking_small.png").convert("RGBA")
+        bbox = img.getchannel("A").getbbox()
+        if not bbox:
+            return None
+        potong = img.crop(bbox)                  # buang margin transparan
+        sisi = max(potong.size)
+        bantalan = round(sisi * 0.03)            # tepi tipis biar tidak nempel
+        kanvas = sisi + 2 * bantalan
+        persegi = _PILImage.new("RGBA", (kanvas, kanvas), (0, 0, 0, 0))
+        persegi.paste(potong, ((kanvas - potong.width) // 2,
+                               (kanvas - potong.height) // 2), potong)
+        buf = io.BytesIO()
+        persegi.resize((256, 256),
+                       _PILImage.Resampling.LANCZOS).save(buf, "PNG", optimize=True)
+        return ("data:image/png;base64,"
+                + base64.b64encode(buf.getvalue()).decode("ascii"))
+    except Exception:
+        return None
+
+
+_TAB_ICON = _buat_ikon_tab() or (
+    f"data:image/png;base64,{LOGO_B64}" if LOGO_B64 else "🔱")
+
 st.set_page_config(
     page_title="Ampera Trinity AI",
     page_icon=_TAB_ICON,
     layout="centered",
     initial_sidebar_state="expanded",
 )
-
-
 # ============================================================================
 # HALAMAN: CHAT UTAMA
 # ============================================================================
