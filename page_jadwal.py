@@ -200,9 +200,9 @@ def _render_panel_tugas() -> None:
 
 
 def page_jadwal() -> None:
-    from chat_handlers import (
+     from chat_handlers import (
         maybe_run_yuki, process_user_input, render_input_controls,
-        render_pending_preview, fragmen_jawaban_yuki,
+        render_pending_preview, fragmen_jawaban_yuki, chat_input_atau_hentikan,
     )
 
     thread = mode_thread("jadwal")
@@ -253,7 +253,7 @@ def page_jadwal() -> None:
     with bottom_dock:
         with st.container(key="pending_preview"):
             render_pending_preview("jadwal")
-        user_input = st.chat_input("Minta dibuatkan jadwal…", **chat_kwargs)
+        user_input = chat_input_atau_hentikan("Minta dibuatkan jadwal…", **chat_kwargs)
         with st.container(key="chat_controls"):
             render_input_controls("jadwal", show_mode=False)
 
