@@ -203,6 +203,7 @@ def page_jadwal() -> None:
     from chat_handlers import (
         maybe_run_yuki, process_user_input, render_input_controls,
         render_pending_preview, fragmen_jawaban_yuki, chat_input_atau_hentikan,
+        render_loader_yuki,
     )
 
     thread = mode_thread("jadwal")
@@ -241,6 +242,7 @@ def page_jadwal() -> None:
 
     # Jawaban yang sedang mengalir + tombol "Hentikan respons".
     fragmen_jawaban_yuki()
+    render_loader_yuki()
 
     st.markdown('<div class="dock-spacer"></div>', unsafe_allow_html=True)
 
