@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from typing import Iterator
 
-from openai import OpenAI
+from openai import OpenAI, BadRequestError
 
 from config import (
     PLUGSKY_API_KEY,
@@ -21,8 +21,8 @@ from config import (
     AION_BASE_URL,
     FINAL_ROUTER_API_KEY,
     FINAL_ROUTER_BASE_URL,
+    MODEL_ID_TANPA_TEMPERATURE,
 )
-
 
 PROVIDER_CONFIG = {
     "plugsky": {
@@ -62,7 +62,6 @@ def build_compatible_client(provider: str) -> OpenAI:
         api_key=api_key,
         base_url=base_url,
     )
-
 
 def stream_compatible_reply(
     client: OpenAI,
@@ -105,12 +104,28 @@ def stream_compatible_reply(
     if not messages:
         return
 
-    response = client.chat.completions.create(
-        model=model,
-        messages=messages,
-        temperature=0.7,
-        stream=True,
-    )
+    # Sebagian model (mis. GPT-5 Mini / Trinity Sovereign) hanya menerima
+    # temperature DEFAULT dari API — parameter temperature apa pun (walau
+    # 1) ditolak dengan error 400. Jadi kirim temperature hanya ke model
+    # yang mendukungnya.
+    params: dict = {
+        "model": model,
+        "messages": messages,
+        "stream": True,
+    }
+    if model not in MODEL_ID_TANPA_TEMPERATURE:
+        params["temperature"] = 0.7
+
+    try:
+        response = client.chat.completions.create(**params)
+    except BadRequestError as e:
+        # Jaga-jaga kalau nanti ada model lain yang juga menolak
+        # temperature: ulangi sekali tanpa parameter itu.
+        if "temperature" in str(e) and "temperature" in params:
+            params.pop("temperature")
+            response = client.chat.completions.create(**params)
+        else:
+            raise
 
     for chunk in response:
         try:
