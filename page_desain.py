@@ -46,7 +46,7 @@ def _kirim(teks: str) -> None:
 def page_desain() -> None:
     from chat_handlers import (
         maybe_run_yuki, process_user_input, render_input_controls,
-        render_pending_preview, fragmen_jawaban_yuki,
+        render_pending_preview, fragmen_jawaban_yuki, chat_input_atau_hentikan,
     )
 
     thread = mode_thread("desain")
@@ -101,7 +101,7 @@ def page_desain() -> None:
     with bottom_dock:
         with st.container(key="pending_preview"):
             render_pending_preview("desain")
-        user_input = st.chat_input("Tanya soal desain…", **chat_kwargs)
+        user_input = chat_input_atau_hentikan("Tanya soal desain…", **chat_kwargs)
         with st.container(key="chat_controls"):
             render_input_controls("desain", show_mode=False)
 
