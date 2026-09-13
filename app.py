@@ -71,7 +71,7 @@ from page_jadwal import page_jadwal
 from styles import inject_css
 from chat_handlers import (
     process_user_input, render_input_controls, render_pending_preview,
-    maybe_run_yuki,
+    maybe_run_yuki, fragmen_jawaban_yuki,
 )
 
 # ============================================================================
@@ -181,7 +181,8 @@ def render_chat_page() -> None:
 
     if maybe_run_yuki(st.empty()):
         st.rerun()
-
+    fragmen_jawaban_yuki()
+  
     if pending_prompt and user_input is None:
         user_input = pending_prompt
     if process_user_input(user_input, st.empty(), is_fresh=is_fresh):
@@ -251,7 +252,8 @@ def _artifact_workspace(aid: int) -> None:
 
     if maybe_run_yuki(st.empty()):
         st.rerun()
-
+    fragmen_jawaban_yuki()
+  
     chat_kwargs: dict = {}
     if CHAT_INPUT_SUPPORTS_FILE:
         chat_kwargs["accept_file"] = True
@@ -1243,7 +1245,8 @@ def _course_workspace(key: str) -> None:
 
     if maybe_run_yuki(st.empty()):
         st.rerun()
-
+    fragmen_jawaban_yuki()
+  
     chat_kwargs: dict = {}
     if CHAT_INPUT_SUPPORTS_FILE:
         chat_kwargs["accept_file"] = True
