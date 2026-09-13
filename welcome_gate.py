@@ -85,14 +85,16 @@ _CSS_LAYAR_PENUH = """<style>
   [data-testid="collapsedControl"],
   [data-testid="stToolbar"], [data-testid="stDecoration"],
   [data-testid="stStatusWidget"] { display:none !important; }
-  html, body, .stApp { background:#070504 !important; }
+  html, body, .stApp {
+    background:radial-gradient(120vmax 90vmax at 50% 36%,
+      #FFFFFF 0%, #F7F1E3 46%, #E8DCC8 100%) !important; }
   /* Jadikan iframe animasi splash = LAYAR PENUH */
   .stApp iframe, .stCustomComponentContainer iframe,
   .element-container iframe {
     position:fixed !important; inset:0 !important;
     width:100vw !important; height:100vh !important;
     border:0 !important; z-index:99999 !important;
-    background:#070504 !important;
+    background:#F7F1E3 !important;
   }
 </style>"""
 
@@ -105,30 +107,30 @@ _HTML_SPLASH = """<!DOCTYPE html>
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&family=Manrope:wght@500;700&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;height:100%;overflow:hidden}
-body{background:radial-gradient(120vmax 90vmax at 50% 36%, #1E1610 0%, #120D09 46%, #070504 100%)}
+body{background:radial-gradient(120vmax 90vmax at 50% 36%, #FFFFFF 0%, #F7F1E3 46%, #E8DCC8 100%)}
 #root{position:fixed;inset:0;font-family:'Manrope',system-ui,sans-serif}
 #cv{position:fixed;inset:0;z-index:1;pointer-events:none}
 #aura{position:fixed;z-index:0;pointer-events:none;opacity:0;border-radius:50%;
-  background:radial-gradient(closest-side, rgba(238,217,182,.20), rgba(238,217,182,.06) 55%, transparent 78%)}
+  background:radial-gradient(closest-side, rgba(203,164,108,.22), rgba(203,164,108,.07) 55%, transparent 78%)}
 #panggung{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;
   align-items:center;justify-content:center;padding-bottom:7vh;pointer-events:none}
 #logoWrap{position:relative;width:min(34vmin,300px);height:min(34vmin,300px)}
 #logoImg{display:block;width:100%;height:100%;object-fit:contain;opacity:0;
-  filter:drop-shadow(0 10px 34px rgba(0,0,0,.55))}
+  filter:drop-shadow(0 10px 30px rgba(108,84,58,.30))}
 #glowWrap{position:absolute;inset:0;overflow:hidden;
   -webkit-mask-image:url("__LOGO__");mask-image:url("__LOGO__");
   -webkit-mask-size:100% 100%;mask-size:100% 100%}
 #glowBand{position:absolute;top:-12%;height:124%;width:40%;left:0;opacity:0;
-  background:linear-gradient(100deg, rgba(255,233,199,0) 0%, rgba(255,233,199,.75) 42%,
-    rgba(255,248,228,1) 50%, rgba(255,233,199,.75) 58%, rgba(255,233,199,0) 100%);
+  background:linear-gradient(100deg, rgba(210,170,110,0) 0%, rgba(210,170,110,.75) 42%,
+    rgba(250,232,196,1) 50%, rgba(210,170,110,.75) 58%, rgba(210,170,110,0) 100%);
   filter:blur(1px)}
 #judul{margin-top:5.5vmin;opacity:0;
   font-family:'Cormorant Garamond',Georgia,serif;font-weight:700;
   font-size:clamp(2.2rem,8.5vmin,3.8rem);letter-spacing:.13em;
-  background:linear-gradient(93deg,#F8EFDF 10%,#E9C891 55%,#C0955E 92%);
+  background:linear-gradient(93deg,#6B4F35 8%,#A5814F 52%,#6B4F35 92%);
   -webkit-background-clip:text;background-clip:text;color:transparent}
 #sub{margin-top:1.6vmin;opacity:0;font-weight:500;
-  font-size:clamp(.78rem,2.7vmin,1.02rem);letter-spacing:.34em;color:#A8977E}
+  font-size:clamp(.78rem,2.7vmin,1.02rem);letter-spacing:.34em;color:#8A7960}
 #colokWrap{margin-top:5vmin;opacity:0;width:clamp(150px,26vmin,225px)}
 #colokWrap svg{width:100%;height:auto;display:block}
 </style>
@@ -151,30 +153,30 @@ body{background:radial-gradient(120vmax 90vmax at 50% 36%, #1E1610 0%, #120D09 4
         <!-- stop kontak -->
         <g id="kontak">
           <rect x="178" y="34" width="56" height="88" rx="14"
-                fill="#1E1712" stroke="#3E2F22" stroke-width="2"/>
-          <rect x="186" y="42" width="40" height="72" rx="10" fill="#241B14"/>
-          <circle cx="206" cy="63" r="4.6" fill="#0A0705"
-                  stroke="#55432F" stroke-width="1.5"/>
-          <circle cx="206" cy="89" r="4.6" fill="#0A0705"
-                  stroke="#55432F" stroke-width="1.5"/>
+                fill="#FFFDF8" stroke="#D6C4A4" stroke-width="2"/>
+          <rect x="186" y="42" width="40" height="72" rx="10" fill="#F3EAD8"/>
+          <circle cx="206" cy="63" r="4.6" fill="#3E2F22"
+                  stroke="#8A7357" stroke-width="1.5"/>
+          <circle cx="206" cy="89" r="4.6" fill="#3E2F22"
+                  stroke="#8A7357" stroke-width="1.5"/>
           <circle id="ledHalo" cx="206" cy="47" r="9" fill="#7BE495" opacity="0"/>
-          <circle id="led" cx="206" cy="47" r="3.2" fill="#4A3A2B"/>
+          <circle id="led" cx="206" cy="47" r="3.2" fill="#B9AA8D"/>
         </g>
         <!-- steker (digeser oleh JS) -->
         <g id="steker">
           <rect x="-36" y="-15" width="40" height="56" rx="11"
-                fill="#E8DCC8" stroke="#C9B896" stroke-width="2"/>
-          <rect x="-31" y="4" width="10" height="18" rx="4" fill="#D7C9AF"/>
-          <rect x="0" y="-2.4" width="30" height="4.8" rx="2.4" fill="#CDBFA5"/>
-          <rect x="0" y="23.6" width="30" height="4.8" rx="2.4" fill="#CDBFA5"/>
+                fill="#F8F1E2" stroke="#B8A180" stroke-width="2"/>
+          <rect x="-31" y="4" width="10" height="18" rx="4" fill="#E9DEC7"/>
+          <rect x="0" y="-2.4" width="30" height="4.8" rx="2.4" fill="#A89878"/>
+          <rect x="0" y="23.6" width="30" height="4.8" rx="2.4" fill="#A89878"/>
         </g>
         <!-- percikan saat mencolok -->
         <g id="percik" opacity="0">
-          <circle class="pk" cx="206" cy="63" r="2"   fill="#FFE9BE"/>
-          <circle class="pk" cx="206" cy="63" r="1.5" fill="#FFD98F"/>
-          <circle class="pk" cx="206" cy="89" r="2"   fill="#FFE9BE"/>
-          <circle class="pk" cx="206" cy="89" r="1.5" fill="#FFD98F"/>
-          <circle class="pk" cx="206" cy="76" r="1.8" fill="#FFF4DC"/>
+          <circle class="pk" cx="206" cy="63" r="2"   fill="#E39A3B"/>
+          <circle class="pk" cx="206" cy="63" r="1.5" fill="#C77E22"/>
+          <circle class="pk" cx="206" cy="89" r="2"   fill="#E39A3B"/>
+          <circle class="pk" cx="206" cy="89" r="1.5" fill="#C77E22"/>
+          <circle class="pk" cx="206" cy="76" r="1.8" fill="#A65E14"/>
         </g>
       </svg>
     </div>
@@ -250,7 +252,7 @@ body{background:radial-gradient(120vmax 90vmax at 50% 36%, #1E1610 0%, #120D09 4
     if(!data){
       o.clearRect(0,0,S,S);
       o.font='240px serif'; o.textAlign='center'; o.textBaseline='middle';
-      o.fillStyle='#E8DCC8';
+      o.fillStyle='#6F4E37';
       try{ o.fillText('\\u2693', S/2, S/2); }catch(e){}
       try{ data=o.getImageData(0,0,S,S).data; }catch(e){ data=null; }
     }
@@ -262,10 +264,11 @@ body{background:radial-gradient(120vmax 90vmax at 50% 36%, #1E1610 0%, #120D09 4
         var i=(y*S+x)*4;
         if(data[i+3]<120) continue;
         if(Math.random()<0.16) continue;
-        // warna logo dicerahkan sedikit ke emas supaya hidup di latar gelap
-        var r=Math.min(255, data[i]  *0.72+255*0.28)|0;
-        var g=Math.min(255, data[i+1]*0.72+240*0.28)|0;
-        var b=Math.min(255, data[i+2]*0.72+205*0.28)|0;
+        // warna logo diperdalam sedikit ke coklat kopi supaya kontras
+        // dan tetap terbaca di latar putih-cream yang terang
+        var r=(data[i]  *0.85+59*0.15)|0;
+        var g=(data[i+1]*0.85+42*0.15)|0;
+        var b=(data[i+2]*0.85+30*0.15)|0;
         pts.push({fx:x/S, fy:y/S, r:r, g:g, b:b,
           sx:Math.random()*W, sy:Math.random()*H,
           d:Math.random()*500, rad:1.2+Math.random()*1.4,
@@ -289,8 +292,8 @@ body{background:radial-gradient(120vmax 90vmax at 50% 36%, #1E1610 0%, #120D09 4
       var m=dust[k];
       var y=m.y - t*0.007*m.sp; y=((y%H)+H)%H;
       var x=m.x + Math.sin(t/1400+m.ph)*10;
-      var a=0.08+0.10*(0.5+0.5*Math.sin(t/650+m.ph));
-      ctx.fillStyle='rgba(216,199,168,'+a.toFixed(3)+')';
+      var a=0.07+0.11*(0.5+0.5*Math.sin(t/650+m.ph));
+      ctx.fillStyle='rgba(150,122,86,'+a.toFixed(3)+')';
       ctx.beginPath(); ctx.arc(x,y,m.r,0,6.2832); ctx.fill();
     }
   }
@@ -298,7 +301,8 @@ body{background:radial-gradient(120vmax 90vmax at 50% 36%, #1E1610 0%, #120D09 4
   function gambarPartikel(t){
     var pFade=imgOk?1-clamp01((t-T_IMG)/300):1;
     if(pFade<=0) return;
-    ctx.globalCompositeOperation='lighter';
+    // latar terang: gambar partikel normal ('lighter' akan memutihkan warna)
+    ctx.globalCompositeOperation='source-over';
     for(var k=0;k<pts.length;k++){
       var p=pts[k];
       var lt=t-p.d;
@@ -480,59 +484,66 @@ _CSS_LOGIN = """<style>
   [data-testid="stToolbar"], [data-testid="stDecoration"],
   [data-testid="stStatusWidget"] { display:none !important; }
   .stApp { background:
-      radial-gradient(1100px 700px at 50% 26%, #20170F 0%, #120D09 48%, #070504 100%)
+      radial-gradient(1100px 700px at 50% 26%, #FFFFFF 0%, #F7F1E3 48%, #E8DCC8 100%)
       !important; }
-  .block-container { max-width: 620px !important;
-      padding-top: 12vh !important; padding-bottom: 8vh !important; }
+  /* KARTU LOGIN sederhana: kolom konten menjadi kartu putih-krem */
+  .block-container { max-width: 470px !important;
+      margin: 10vh auto 8vh !important;
+      padding: 2.2rem 1.8rem 2rem !important;
+      background: #FFFDF8 !important;
+      border: 1px solid #DBCEB9 !important;
+      border-radius: 24px !important;
+      box-shadow: 0 18px 50px rgba(108,84,58,.14) !important; }
   .login-wrap { text-align: center; animation: gerbangMuncul .8s ease both; }
   @keyframes gerbangMuncul {
     from { opacity:0; transform:translateY(14px); }
     to   { opacity:1; transform:none; } }
   .login-logo-ring { width:96px; height:96px; margin:0 auto 18px;
      border-radius:50%; display:flex; align-items:center; justify-content:center;
-     background:radial-gradient(closest-side, rgba(238,217,182,.14), transparent 75%);
-     box-shadow:0 0 0 1px rgba(232,220,200,.22), 0 12px 44px rgba(0,0,0,.5); }
+     background:radial-gradient(closest-side, rgba(203,164,108,.25), transparent 75%);
+     box-shadow:0 0 0 1px #DBCEB9, 0 12px 32px rgba(108,84,58,.14); }
   .login-logo-ring img { width:64px; height:64px; object-fit:contain; }
   .login-judul { font-family:'Cormorant Garamond',Georgia,serif;
      font-weight:700; font-size:2.7rem; letter-spacing:.12em; margin:0;
-     background:linear-gradient(93deg,#F8EFDF 10%,#E9C891 55%,#C0955E 92%);
+     background:linear-gradient(93deg,#5C4632 10%,#A5814F 55%,#5C4632 92%);
      -webkit-background-clip:text; background-clip:text; color:transparent; }
   .login-sub { margin-top:6px; font-size:.92rem; letter-spacing:.34em;
-     color:#A8977E; }
+     color:#8A7960; }
   .login-garis { width:150px; height:1px; margin:22px auto 14px;
-     background:linear-gradient(90deg,transparent,rgba(232,200,150,.55),transparent); }
-  .login-ajakan { font-size:.82rem; color:#8A7B67; letter-spacing:.06em; }
+     background:linear-gradient(90deg,transparent,rgba(165,129,79,.55),transparent); }
+  .login-ajakan { font-size:.82rem; color:#6F6154; letter-spacing:.06em; }
   .login-led { display:inline-block; width:7px; height:7px; border-radius:50%;
-     background:#7BE495; margin-right:8px; vertical-align:middle;
-     box-shadow:0 0 10px rgba(123,228,149,.8);
+     background:#4CAF6D; margin-right:8px; vertical-align:middle;
+     box-shadow:0 0 10px rgba(76,175,109,.7);
      animation: ledDenyut 1.6s ease-in-out infinite; }
   @keyframes ledDenyut { 0%,100%{opacity:.45;} 50%{opacity:1;} }
-  .login-note { margin-top:14px; font-size:.78rem; color:#8A7B67;
-     line-height:1.6; background:rgba(232,220,200,.05);
-     border:1px solid rgba(232,220,200,.12); border-radius:12px;
+  .login-note { margin-top:14px; font-size:.78rem; color:#6F6154;
+     line-height:1.6; background:#F6EFE0;
+     border:1px solid #E3D5BC; border-radius:12px;
      padding:10px 14px; }
   .st-key-btn_google_masuk button, button.st-key-btn_google_masuk {
-     background:#FFFFFF !important; color:#1F1F1F !important;
-     border:0 !important; border-radius:999px !important;
+     background:#FFFFFF !important; color:#3F3F46 !important;
+     border:1px solid #DBCEB9 !important; border-radius:999px !important;
      font-weight:600 !important; padding:.6rem 1.5rem !important;
-     box-shadow:0 10px 30px rgba(0,0,0,.45) !important;
+     box-shadow:0 8px 24px rgba(108,84,58,.15) !important;
      transition:transform .15s ease, box-shadow .15s ease !important; }
   .st-key-btn_google_masuk button:hover, button.st-key-btn_google_masuk:hover {
      transform:translateY(-1px);
-     box-shadow:0 14px 36px rgba(0,0,0,.55) !important; }
+     box-shadow:0 12px 32px rgba(108,84,58,.22) !important;
+     border-color:#C9B896 !important; }
   .st-key-btn_google_masuk button::before,
   button.st-key-btn_google_masuk::before {
      content:""; display:inline-block; width:20px; height:20px;
      margin-right:10px; vertical-align:middle;
      background:url("__GICON__") center/contain no-repeat; }
   .st-key-btn_tamu button, button.st-key-btn_tamu {
-     background:transparent !important; color:#CDBFA9 !important;
-     border:1px solid rgba(232,220,200,.25) !important;
+     background:transparent !important; color:#6F6154 !important;
+     border:1px solid #C9B896 !important;
      border-radius:999px !important; font-weight:500 !important;
      padding:.45rem 1.2rem !important; }
   .st-key-btn_tamu button:hover, button.st-key-btn_tamu:hover {
-     border-color:rgba(232,220,200,.5) !important;
-     color:#EFE4CE !important; }
+     border-color:#A5814F !important;
+     color:#4A3A28 !important; }
 </style>"""
 
 
