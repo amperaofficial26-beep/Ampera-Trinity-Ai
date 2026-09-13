@@ -56,6 +56,30 @@ def now_wib() -> str:
     return datetime.now(WIB).strftime("%H:%M")
 
 
+# Catatan kecil di bawah jawaban, tampil setelah pengguna menekan tombol
+# "Hentikan" — teksnya persis seperti yang diminta pengguna.
+_CATATAN_DIHENTIKAN_HTML = (
+    '<div style="text-align:center;font-size:12.5px;font-style:italic;'
+    'color:#98a0ab;padding:0 6px 10px 2px;">'
+    "anda menghentikan respon yuki...</div>"
+)
+
+# CSS tombol "Hentikan" yang mungil: font, tinggi, dan padding
+# dirampingkan (pola .st-key-* sama seperti tombol sidebar di styles.py).
+_STOP_BTN_CSS = (
+    "<style>"
+    ".st-key-yuki_stop_dok button, button.st-key-yuki_stop_dok {"
+    "font-size:13px !important;"
+    "min-height:30px !important;"
+    "height:30px !important;"
+    "padding:0.05rem 0.95rem !important;"
+    "border-radius:999px !important;"
+    "gap:6px !important;"
+    "}"
+    "</style>"
+)
+
+
 # --- Durasi tampilan kotak loading pembuatan gambar (detik) ---------------
 # IMAGE_MIN_SECONDS : kotak minimal tampil selama ini walau API sudah selesai,
 #                     supaya animasi shimmer sempat terlihat.
@@ -327,31 +351,49 @@ def _finalisasi_stream_yuki(stream_state: dict) -> None:
     _susun_balasan_yuki(full, thread)
 
 
-def _hentikan_dan_finalisasi_stream_lama() -> None:
-    """Hentikan stream yang masih berjalan (kalau ada) lalu finalisasi.
+def _hentikan_stream_saat_ini(tampilkan_catatan: bool) -> None:
+    """Hentikan stream SEKARANG — dipanggil dari script utama, bukan thread.
 
-    Dipanggil saat pengguna mengirim pesan baru di tengah jawaban Yuki
-    yang sedang mengalir: jawaban lama dihentikan, potongannya disimpan,
-    lalu pekerjaan baru dimulai.
+    Tidak menunggu thread pekerja bangun dari tidurnya: event stop tetap
+    diset (supaya pekerja berhenti sendiri secepatnya), tapi session
+    state langsung dibersihkan sehingga proses terasa berhenti SEKETIKA
+    saat tombol Hentikan ditekan.
+
+    Yang disimpan hanya potongan teks yang benar-benar SUDAH TAMPIL di
+    layar (panjangnya dicatat fragmen di kunci "tampil"). Kalau Yuki
+    masih fase animasi berpikir (belum ada teks yang tampil), jawaban
+    dibuang dan hanya muncul catatan "anda menghentikan respon yuki...".
     """
-    lama = st.session_state.get("_yuki_stream")
-    if not lama:
-        return
-
-    stop = st.session_state.get("_yuki_stop")
-    if stop:
-        stop.set()
-
-    pekerja = st.session_state.get("_yuki_thread")
-    if pekerja and pekerja.is_alive():
-        pekerja.join(timeout=2.0)
-
-    st.session_state.pop("_yuki_stream", None)
-    st.session_state.pop("_yuki_stop", None)
+    lama = st.session_state.pop("_yuki_stream", None)
+    stop = st.session_state.pop("_yuki_stop", None)
     st.session_state.pop("_yuki_thread", None)
     st.session_state.pop("_yuki_t0", None)
     st.session_state.pop("_yuki_loader_tampil", None)
-    _finalisasi_stream_yuki(lama)
+
+    if stop:
+        stop.set()
+
+    if not lama:
+        return
+
+    tampil = int(lama.get("tampil") or 0)
+    if tampil > 0:
+        potongan = "".join(lama.get("buf") or [])[:tampil]
+        if potongan.strip():
+            _finalisasi_stream_yuki({"buf": [potongan], "err": None})
+
+    if tampilkan_catatan:
+        st.session_state["_yuki_dihentikan"] = True
+
+
+def _hentikan_dan_finalisasi_stream_lama() -> None:
+    """Hentikan stream lama (kalau ada) lalu finalisasi potongannya.
+
+    Dipanggil saat pengguna mengirim pesan baru di tengah jawaban Yuki
+    yang sedang mengalir: jawaban lama dihentikan, potongan yang sudah
+    tampil di layar disimpan, lalu pekerjaan baru dimulai.
+    """
+    _hentikan_stream_saat_ini(tampilkan_catatan=False)
 
 
 @st.fragment(run_every=0.4)
@@ -395,9 +437,13 @@ def fragmen_jawaban_yuki() -> None:
         if st.session_state.pop("_yuki_loader_tampil", None):
             st.rerun()
 
-        # Teks jawaban mengalir + kursor mengetik.
+        # Teks jawaban mengalir + kursor mengetik. Panjang teks yang
+        # sudah tampil dicatat di "tampil" — dipakai saat tombol
+        # Hentikan ditekan supaya yang disimpan persis teks yang
+        # terlihat di layar saat itu.
         st.markdown(bubble_html("assistant", teks + " ▍"),
                     unsafe_allow_html=True)
+        stream_state["tampil"] = len(teks)
         return
 
     # Thread sudah selesai (atau baru saja dihentikan): susun balasannya
@@ -419,6 +465,8 @@ def render_loader_yuki() -> None:
     hanya dibuat SEKALI per jawaban dan berjalan halus sampai selesai —
     persis seperti sebelum ada fitur tombol Hentikan.
     """
+    if st.session_state.get("_yuki_dihentikan"):
+        st.markdown(_CATATAN_DIHENTIKAN_HTML, unsafe_allow_html=True)
     if not stream_yuki_aktif():
         return
     t0 = st.session_state.get("_yuki_t0") or 0
@@ -451,11 +499,19 @@ def chat_input_atau_hentikan(placeholder: str, **kwargs):
     kotak kirim kembali seperti biasa.
     """
     if stream_yuki_aktif():
-        if st.button(":material/stop_circle:  Hentikan respons",
-                     key="yuki_stop_dok", use_container_width=True):
-            stop = st.session_state.get("_yuki_stop")
-            if stop:
-                stop.set()
+        # Tombol MUNGIL di tengah area input (pengganti kotak ketik
+        # selama Yuki menjawab): tidak melebar penuh lagi, dan font +
+        # padding-nya dirampingkan lewat _STOP_BTN_CSS.
+        st.markdown(_STOP_BTN_CSS, unsafe_allow_html=True)
+        _kiri, _tombol, _kanan = st.columns([1, 0.8, 1])
+        with _tombol:
+            if st.button(":material/stop_circle:  Hentikan",
+                         key="yuki_stop_dok"):
+                # Berhenti SEKETIKA: bersihkan state stream, simpan
+                # potongan teks yang sudah tampil, tampilkan catatan
+                # "anda menghentikan respon yuki...", lalu muat ulang.
+                _hentikan_stream_saat_ini(tampilkan_catatan=True)
+                st.rerun()
         return None
     return st.chat_input(placeholder, **kwargs)
 
@@ -558,11 +614,17 @@ def handle_chat_request(answer_slot) -> None:
                     stream_state["buf"].append(piece or "")
             except Exception as e:
                 stream_state["err"] = e
-            # Animasi "berpikir" minimal tampil selama min_think detik,
-            # kecuali pengguna menekan tombol Hentikan.
-            sisa = min_think - (time.time() - t0)
-            if sisa > 0 and not stop_event.is_set():
-                time.sleep(sisa)
+            # Animasi "berpikir" minimal tampil selama min_think detik —
+            # tapi tidurnya dipecah potongan 0,2 detik dan dicek tiap
+            # potong. (Dulu: time.sleep(sisa) sekali jalan — walau tombol
+            # Hentikan sudah ditekan, thread tetap tidur sampai 25 detik
+            # penuh sehingga proses terasa "tidak mau berhenti".)
+            batas = t0 + min_think
+            while not stop_event.is_set():
+                sisa = batas - time.time()
+                if sisa <= 0:
+                    break
+                time.sleep(min(0.2, sisa))
             stream_state["done"] = True
 
         pekerja = threading.Thread(target=_kerja, daemon=True)
@@ -855,6 +917,11 @@ def process_user_input(user_input, answer_slot, is_fresh: bool = False) -> bool:
 
     if not (text or images):
         return False
+
+    # Ada kiriman baru → catatan "anda menghentikan respon yuki..."
+    # dari jawaban sebelumnya tidak perlu tampil lagi.
+    st.session_state.pop("_yuki_dihentikan", None)
+
     now = now_wib()
 
     if is_fresh:
