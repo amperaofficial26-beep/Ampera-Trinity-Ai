@@ -78,15 +78,6 @@ from chat_handlers import (
 # ============================================================================
 # KONFIGURASI HALAMAN
 # ============================================================================
-# Ikon tab (favicon) memakai file assets/logo_tab.png — versi logo yang
-# margin transparannya sudah dibuang supaya tampil sebesar mungkin di tab.
-# Kalau filenya tidak ada, kembali ke logo biasa (LOGO_B64) / emoji.
-try:
-    with open("assets/logo_tab.png", "rb") as _f:
-        _TAB_ICON = "data:image/png;base64," + base64.b64encode(_f.read()).decode("ascii")
-except OSError:
-    _TAB_ICON = (f"data:image/png;base64,{LOGO_B64}" if LOGO_B64 else "🔱")
-
 # Ikon tab (favicon) = logo_thinking_small.png yang otomatis di-CROP saat
 # aplikasi jalan: margin transparannya dibuang supaya ikon tampil sebesar
 # mungkin di tab browser. Kalau Pillow / file logonya tidak ada, kembali ke
@@ -132,6 +123,8 @@ st.set_page_config(
     layout="centered",
     initial_sidebar_state="expanded",
 )
+
+
 # ============================================================================
 # HALAMAN: CHAT UTAMA
 # ============================================================================
@@ -256,9 +249,11 @@ def _artifact_workspace(aid: int) -> None:
 
     if maybe_run_yuki(st.empty()):
         st.rerun()
+
+    # Jawaban yang sedang mengalir + animasi berpikir + tombol Hentikan.
     fragmen_jawaban_yuki()
     render_loader_yuki()
-  
+
     chat_kwargs: dict = {}
     if CHAT_INPUT_SUPPORTS_FILE:
         chat_kwargs["accept_file"] = True
@@ -271,7 +266,7 @@ def _artifact_workspace(aid: int) -> None:
     with bottom_dock:
         with st.container(key="pending_preview"):
             render_pending_preview("artefak")
-        user_input = st.chat_input("Jelaskan apa yang mau dibuat…", **chat_kwargs)
+        user_input = chat_input_atau_hentikan("Jelaskan apa yang mau dibuat…", **chat_kwargs)
         with st.container(key="chat_controls"):
             render_input_controls("artefak", show_mode=False)
 
@@ -1250,9 +1245,11 @@ def _course_workspace(key: str) -> None:
 
     if maybe_run_yuki(st.empty()):
         st.rerun()
+
+    # Jawaban yang sedang mengalir + animasi berpikir + tombol Hentikan.
     fragmen_jawaban_yuki()
     render_loader_yuki()
-  
+
     chat_kwargs: dict = {}
     if CHAT_INPUT_SUPPORTS_FILE:
         chat_kwargs["accept_file"] = True
@@ -1265,7 +1262,7 @@ def _course_workspace(key: str) -> None:
     with bottom_dock:
         with st.container(key="pending_preview"):
             render_pending_preview(f"kursus_{key}")
-        user_input = st.chat_input(f"Tanya apa saja tentang {course['title']}…", **chat_kwargs)
+        user_input = chat_input_atau_hentikan(f"Tanya apa saja tentang {course['title']}…", **chat_kwargs)
         with st.container(key="chat_controls"):
             render_input_controls(f"kursus_{key}", show_mode=False)
 
@@ -1295,7 +1292,7 @@ def page_kursus() -> None:
 # ============================================================================
 # MAIN — pengalih halaman
 # ============================================================================
-  def main() -> None:
+def main() -> None:
     init_state()
     inject_css()
     inject_anim_css()
@@ -1305,13 +1302,14 @@ def page_kursus() -> None:
         for k in list(st.session_state.keys()):
             del st.session_state[k]
         st.rerun()
+
     # ===== GERBANG PEMBUKA (welcome_gate.py): splash animasi Trinity +
     # halaman login Google. Sekali per sesi; setelah masuk, gerbang ini
     # tidak melakukan apa-apa lagi. =====
     from welcome_gate import tampilkan_gerbang
     if tampilkan_gerbang():
         st.stop()
-      
+
     render_sidebar()
 
     page = st.session_state.get("page", "chat")
