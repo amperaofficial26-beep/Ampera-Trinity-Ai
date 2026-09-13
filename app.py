@@ -1295,7 +1295,7 @@ def page_kursus() -> None:
 # ============================================================================
 # MAIN — pengalih halaman
 # ============================================================================
-def main() -> None:
+  def main() -> None:
     init_state()
     inject_css()
     inject_anim_css()
@@ -1305,7 +1305,13 @@ def main() -> None:
         for k in list(st.session_state.keys()):
             del st.session_state[k]
         st.rerun()
-
+    # ===== GERBANG PEMBUKA (welcome_gate.py): splash animasi Trinity +
+    # halaman login Google. Sekali per sesi; setelah masuk, gerbang ini
+    # tidak melakukan apa-apa lagi. =====
+    from welcome_gate import tampilkan_gerbang
+    if tampilkan_gerbang():
+        st.stop()
+      
     render_sidebar()
 
     page = st.session_state.get("page", "chat")
