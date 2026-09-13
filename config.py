@@ -25,7 +25,7 @@ APP_TAGLINE = "Multi AI · Generate Foto · Chat — by Ampera Official"
 # jawaban Yuki, dan info berlangganan.
 AMPERA_BRAND = "Ampera Official"
 AMPERA_LOKASI = "Palembang, Indonesia"
-AMPERA_EMAIL = "amperaofficial26@gmail.com"
+AMPERA_EMAIL = "amperaofficialgroup@gmail.com"
 
 # Produk lain di bawah bendera Ampera Official (ditampilkan di halaman
 # Tingkatkan sebagai "keluarga produk Ampera").
