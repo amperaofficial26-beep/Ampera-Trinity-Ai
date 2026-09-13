@@ -225,6 +225,7 @@ def _get_model_provider(model_key: str) -> str:
     """Mengambil provider dari model yang dipilih."""
     model = MODEL_BY_KEY.get(model_key, {})
     return model.get("provider", "groq")
+    
 
 def _susun_balasan_yuki(full: str, thread: list[dict]) -> None:
     """Pascaproses teks jawaban Yuki lalu simpan sebagai pesan assistant.
@@ -352,6 +353,7 @@ def _hentikan_dan_finalisasi_stream_lama() -> None:
     st.session_state.pop("_yuki_loader_tampil", None)
     _finalisasi_stream_yuki(lama)
 
+
 @st.fragment(run_every=0.4)
 def fragmen_jawaban_yuki() -> None:
     """Teks jawaban Yuki yang mengalir (fase setelah animasi berpikir).
@@ -432,6 +434,31 @@ def render_loader_yuki() -> None:
     )
 
 
+def stream_yuki_aktif() -> bool:
+    """True bila Yuki sedang menulis jawaban (stream masih berjalan)."""
+    if not st.session_state.get("_yuki_stream"):
+        return False
+    pekerja = st.session_state.get("_yuki_thread")
+    return bool(pekerja and pekerja.is_alive())
+
+
+def chat_input_atau_hentikan(placeholder: str, **kwargs):
+    """Kotak kirim pesan yang BERUBAH jadi tombol "Hentikan respons".
+
+    Selama Yuki sedang menjawab, tombol kirim di kotak input digantikan
+    tombol "Hentikan respons" — menekannya menghentikan jawaban Yuki dan
+    potongan teks yang sudah muncul tetap disimpan. Setelah selesai,
+    kotak kirim kembali seperti biasa.
+    """
+    if stream_yuki_aktif():
+        if st.button(":material/stop_circle:  Hentikan respons",
+                     key="yuki_stop_dok", use_container_width=True):
+            stop = st.session_state.get("_yuki_stop")
+            if stop:
+                stop.set()
+        return None
+    return st.chat_input(placeholder, **kwargs)
+
 def handle_chat_request(answer_slot) -> None:
     thread = active_thread()
 
@@ -474,9 +501,7 @@ def handle_chat_request(answer_slot) -> None:
     elif web_search_active:
         model_id = AVAILABLE_MODELS["compound"]
 
-    from ui_helpers import THINKING_MIN_SECONDS
-
-       # Kalau masih ada jawaban yang mengalir (pengguna kirim pesan baru di
+    # Kalau masih ada jawaban yang mengalir (pengguna kirim pesan baru di
     # tengah jawaban sebelumnya), hentikan dulu yang lama lalu simpan
     # potongannya sebagai pesan.
     _hentikan_dan_finalisasi_stream_lama()
@@ -488,7 +513,6 @@ def handle_chat_request(answer_slot) -> None:
     # Dicatat supaya fragmen tahu sampai kapan animasi "berpikir" wajib
     # tampil sebelum teks jawaban boleh mengalir.
     st.session_state["_yuki_t0"] = t0
-
     try:
         provider = _get_model_provider(model_key)
 
