@@ -13,6 +13,14 @@ def public_error_image(status: int | None, body: str, exc: Exception | None = No
         return "Kuota gambar harian sedang penuh. Coba lagi nanti."
     if "timeout" in text:
         return "Server terlalu lama merespons. Coba lagi."
+    # FLUX (Cloudflare) menolak prompt yang melebihi ±256 token (HTTP 400).
+    if "prompt" in text and any(
+        k in text for k in ("too long", "token", "exceed", "maximum", "length", "limit")
+    ):
+        return (
+            "Prompt terlalu panjang untuk model gambar (batas ±256 token / "
+            "±1.000 karakter). Pendekkan prompt lalu coba lagi."
+        )
     return "Gagal membuat gambar. Coba prompt lain atau ulangi sebentar lagi."
 
 
