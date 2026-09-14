@@ -78,7 +78,7 @@ from chat_handlers import (
 # Room chat Ampera = app Streamlit terpisah (repo ampera-official-group).
 # Tombol "ke Room Chat Ampera" di halaman Tingkatkan mengarah ke sini;
 # pesan user di room itu diteruskan ke inbox amperaofficialgroup@gmail.com.
-ROOM_CHAT_URL = "https://ampera-official-group.streamlit.app"
+ROOM_CHAT_URL = "https://room-chat-ampera-group.streamlit.app/"
 
 # ============================================================================
 # KONFIGURASI HALAMAN
