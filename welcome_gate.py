@@ -548,6 +548,20 @@ _CSS_LOGIN = """<style>
   .st-key-btn_tamu button:hover, button.st-key-btn_tamu:hover {
      border-color:#A5814F !important;
      color:#4A3A28 !important; }
+  /* Tombol Google versi TAUTAN (aktif saat kunci sudah terpasang) */
+  .login-btn-wrap { text-align:center; margin:.4rem 0 .2rem; }
+  .login-btn-google { display:inline-flex; align-items:center;
+     background:#FFFFFF; color:#3F3F46 !important; text-decoration:none;
+     border:1px solid #DBCEB9; border-radius:999px;
+     font-weight:600; font-size:.9rem; line-height:1.1;
+     padding:.62rem 1.5rem;
+     box-shadow:0 8px 24px rgba(108,84,58,.15);
+     transition:transform .15s ease, box-shadow .15s ease; }
+  .login-btn-google:hover { transform:translateY(-1px);
+     box-shadow:0 12px 32px rgba(108,84,58,.22); border-color:#C9B896; }
+  .login-btn-google::before { content:""; display:inline-block; width:20px;
+     height:20px; margin-right:10px; vertical-align:middle;
+     background:url("__GICON__") center/contain no-repeat; }
 </style>"""
 
 
@@ -591,28 +605,15 @@ def _google_terkonfigurasi() -> bool:
     return bool(_client_id() and _client_secret())
 
 
-def _mulai_login_google() -> None:
-    """Arahkan browser ke halaman persetujuan Google (pilih akun)."""
-    url = _AUTH_URL + "?" + urllib.parse.urlencode({
+def _url_otorisasi_google() -> str:
+    """URL halaman persetujuan Google (pilih akun + izin)."""
+    return _AUTH_URL + "?" + urllib.parse.urlencode({
         "client_id": _client_id(),
         "redirect_uri": _redirect_uri(),
         "response_type": "code",
         "scope": "openid email profile",
         "prompt": "select_account",
     })
-    # Script di iframe berpindah ke halaman Google (seluruh jendela) ...
-    components.html(
-        "<script>window.top.location.href="
-        + json.dumps(url) + ";</script>",
-        height=0,
-    )
-    # ... dan tautan cadangan kalau browser memblokir script di atas.
-    st.markdown(
-        '<div style="text-align:center;margin-top:10px;font-size:.8rem;">'
-        'Mengarahkan ke Google... kalau tidak berpindah, '
-        f'<a href="{html.escape(url, quote=True)}" target="_top">klik di sini</a>.</div>',
-        unsafe_allow_html=True,
-    )
 
 
 def _tukar_kode(kode: str) -> dict:
@@ -713,14 +714,16 @@ def _proses_balasan_google() -> None:
 
 
 def _klik_google() -> None:
-    if _google_terkonfigurasi():
-        _mulai_login_google()
-    else:
-        st.toast(
-            "Login Google belum dikonfigurasi: pemilik belum mendaftarkan "
-            "aplikasi ke Google Cloud Console.",
-            icon="🔐",
-        )
+    # Hanya dipakai saat kunci belum terpasang. Bila kunci sudah ada,
+    # tombol Google dirender sebagai TAUTAN di _render_login() — sekali
+    # klik langsung pindah ke Google (script iframe Streamlit diblokir
+    # sandbox browser, jadi tautan di dokumen utama adalah satu-satunya
+    # cara perpindahan halaman yang selalu berhasil).
+    st.toast(
+        "Login Google belum dikonfigurasi: pemilik belum mendaftarkan "
+        "aplikasi ke Google Cloud Console.",
+        icon="🔐",
+    )
 
 
 def _render_login() -> None:
@@ -747,10 +750,22 @@ def _render_login() -> None:
 
     _kiri, _tengah, _kanan = st.columns([1, 1.15, 1])
     with _tengah:
-        if st.button("Masuk dengan Google", key="btn_google_masuk"):
-            _klik_google()
+        if _google_terkonfigurasi():
+            # Tombol Google = TAUTAN sungguhan (bukan st.button): sekali
+            # klik, browser langsung membuka halaman Google. Tanpa ini,
+            # perpindahan halaman dari dalam iframe Streamlit diblokir
+            # sandbox browser.
+            st.markdown(
+                '<div class="login-btn-wrap">'
+                '<a class="login-btn-google" target="_top" '
+                'href="' + html.escape(_url_otorisasi_google(), quote=True) + '">'
+                "Masuk dengan Google</a></div>",
+                unsafe_allow_html=True,
+            )
+        else:
+            if st.button("Masuk dengan Google", key="btn_google_masuk"):
+                _klik_google()
 
-        if not _google_terkonfigurasi():
             st.markdown(
                 '<div class="login-note">🔐 Login Google akan aktif otomatis '
                 "setelah pemilik mendaftarkan aplikasi ke "
