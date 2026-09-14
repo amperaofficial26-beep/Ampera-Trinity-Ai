@@ -3,8 +3,9 @@
 Sinkronisasi riwayat chat utama ke database cloud (Supabase).
 
 Fitur "riwayat chat tersimpan": setiap pesan baru di halaman Chat dikirim
-ke tabel `chat_messages` di Supabase, lalu seluruh percakapan dimuat
-kembali otomatis saat user login dengan akun Google. Riwayat tidak hilang
+ke tabel `chat_messages` di Supabase. Saat user login dengan akun Google,
+SEMUA percakapan lamanya dimuat ke menu "Riwayat" di sidebar, dan user
+selalu mulai dengan PERCAKAPAN BARU yang bersih. Riwayat tidak hilang
 walau aplikasi di-refresh, tab ditutup, atau dibuka dari HP/laptop lain.
 
 CARA MENGAKTIFKAN:
@@ -27,6 +28,7 @@ from __future__ import annotations
 import json
 import threading
 import urllib.parse
+import uuid
 
 import requests
 import streamlit as st
@@ -205,13 +207,15 @@ def muat_riwayat_setelah_login() -> None:
                 "conv_key": key,
             })
 
-        aktif = convs[-1]          # percakapan terakhir = paling baru
-        arsip = convs[:-1]
-        st.session_state.messages = aktif["messages"]
-        st.session_state.active_conv_id = aktif["id"]
-        st.session_state.conv_key = aktif["conv_key"]
-        # Sidebar menampilkan yang terbaru di atas → daftar dibalik.
-        st.session_state.conversations = list(reversed(arsip))
+        # Setelah login, user selalu mulai dengan PERCAKAPAN BARU yang
+        # bersih (bukan lanjut di percakapan terakhir). Semua percakapan
+        # lama dari database masuk ke menu "Riwayat" di sidebar —
+        # urutannya yang terbaru di atas. Klik salah satunya untuk
+        # membukanya kembali.
+        st.session_state.messages = []
+        st.session_state.active_conv_id = None
+        st.session_state.conv_key = uuid.uuid4().hex
+        st.session_state.conversations = list(reversed(convs))
         st.session_state.conv_counter = len(convs)
         st.session_state.msg_counter = nomor_id
         # Tandai semua pesan yang dimuat sebagai "sudah tersimpan" supaya
