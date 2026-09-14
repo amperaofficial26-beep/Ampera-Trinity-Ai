@@ -11,10 +11,11 @@ Gerbang pembuka aplikasi (dipisah dari app.py supaya mudah dirawat):
      ke stop kontak (menyalakan "daya") — lalu masuk ke halaman login.
 
 2. LOGIN — halaman masuk dengan akun Google (logo + judul app tampil).
-   Tombol Google sudah disiapkan; alur OAuth betulan menyusul setelah
-   pemilik mendaftarkan aplikasi ke Google Cloud Console. Selama belum
-   didaftarkan, tersedia tombol "Lanjut tanpa masuk (sementara)" supaya
-   aplikasi tetap bisa dipakai/diuji.
+   Jika GOOGLE_CLIENT_ID + GOOGLE_CLIENT_SECRET sudah terpasang di
+   Streamlit Secrets, tombol Google menjalankan alur OAuth sungguhan:
+   pengguna diarahkan ke Google, memilih akun, lalu kembali ke app dan
+   langsung masuk. Jika belum terpasang, tersedia tombol
+   "Lanjut tanpa masuk (sementara)" supaya aplikasi tetap bisa dipakai.
 
 Dipanggil dari app.py, di dalam main(), TEPAT DI ATAS render_sidebar():
 
@@ -30,9 +31,12 @@ Tahapan disimpan di st.session_state["_tahap"]:
 from __future__ import annotations
 
 import base64
+import html
+import json
 import os
 import time
 import urllib.parse
+import urllib.request
 
 import streamlit as st
 import streamlit.components.v1 as components
@@ -547,24 +551,170 @@ _CSS_LOGIN = """<style>
 </style>"""
 
 
-def _google_terkonfigurasi() -> bool:
-    """True bila pemilik sudah menaruh GOOGLE_CLIENT_ID (secrets/env)."""
+# ---------------------------------------------------------------------------
+# OAUTH GOOGLE — alur sungguhan (authorization code)
+# ---------------------------------------------------------------------------
+# URL app di Streamlit Cloud. Harus PERSIS sama dengan "Authorized redirect
+# URI" yang didaftarkan di Google Cloud Console (tanpa garis miring akhir).
+# Bisa ditimpa lewat secrets/env APP_URL bila app pindah alamat.
+APP_URL_BAWAAN = "https://ampera-trinity-ai.streamlit.app"
+_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
+_TOKEN_URL = "https://oauth2.googleapis.com/token"
+
+
+def _secrets_atau_env(nama: str) -> str:
+    """Ambil nilai dari Streamlit Secrets, kalau tidak ada cek env var."""
     try:
-        if st.secrets.get("GOOGLE_CLIENT_ID"):
-            return True
+        v = st.secrets.get(nama)
+        if v:
+            return str(v)
     except Exception:
         pass
-    return bool(os.environ.get("GOOGLE_CLIENT_ID"))
+    return os.environ.get(nama, "")
+
+
+def _client_id() -> str:
+    return _secrets_atau_env("GOOGLE_CLIENT_ID")
+
+
+def _client_secret() -> str:
+    return _secrets_atau_env("GOOGLE_CLIENT_SECRET")
+
+
+def _redirect_uri() -> str:
+    url = _secrets_atau_env("APP_URL") or APP_URL_BAWAAN
+    return url.rstrip("/")
+
+
+def _google_terkonfigurasi() -> bool:
+    """True bila Client ID dan Client Secret Google sudah terpasang."""
+    return bool(_client_id() and _client_secret())
+
+
+def _mulai_login_google() -> None:
+    """Arahkan browser ke halaman persetujuan Google (pilih akun)."""
+    url = _AUTH_URL + "?" + urllib.parse.urlencode({
+        "client_id": _client_id(),
+        "redirect_uri": _redirect_uri(),
+        "response_type": "code",
+        "scope": "openid email profile",
+        "prompt": "select_account",
+    })
+    # Script di iframe berpindah ke halaman Google (seluruh jendela) ...
+    components.html(
+        "<script>window.top.location.href="
+        + json.dumps(url) + ";</script>",
+        height=0,
+    )
+    # ... dan tautan cadangan kalau browser memblokir script di atas.
+    st.markdown(
+        '<div style="text-align:center;margin-top:10px;font-size:.8rem;">'
+        'Mengarahkan ke Google... kalau tidak berpindah, '
+        f'<a href="{html.escape(url, quote=True)}" target="_top">klik di sini</a>.</div>',
+        unsafe_allow_html=True,
+    )
+
+
+def _tukar_kode(kode: str) -> dict:
+    """Tukar kode otorisasi menjadi token (id_token) lewat server Google."""
+    data = urllib.parse.urlencode({
+        "code": kode,
+        "client_id": _client_id(),
+        "client_secret": _client_secret(),
+        "redirect_uri": _redirect_uri(),
+        "grant_type": "authorization_code",
+    }).encode("utf-8")
+    try:
+        with urllib.request.urlopen(_TOKEN_URL, data=data, timeout=15) as resp:
+            return json.loads(resp.read().decode("utf-8"))
+    except Exception:
+        return {}
+
+
+def _baca_id_token(id_token: str) -> dict:
+    """Baca isi id_token (JWT) dari Google: nama, email, foto.
+
+    Token diterima langsung dari server token Google lewat koneksi HTTPS,
+    jadi cukup dibaca (tanpa verifikasi tanda tangan tambahan).
+    """
+    try:
+        payload = id_token.split(".")[1]
+        payload += "=" * (-len(payload) % 4)
+        info = json.loads(base64.urlsafe_b64decode(payload.encode()))
+        if info.get("aud") != _client_id():
+            return {}
+        return info
+    except Exception:
+        return {}
+
+
+def _prefill_identitas(nama: str, email: str) -> None:
+    """Isi otomatis nama & email di Pengaturan bila masih bernilai bawaan
+    ("" / "User" / "user") — nilai yang sudah diisi user tidak ditimpa."""
+    try:
+        s = dict(st.session_state.get("settings") or {})
+        if nama and (s.get("display_name") or "") in ("", "User"):
+            s["display_name"] = nama
+        if email and not s.get("email"):
+            s["email"] = email
+        if email and (s.get("username") or "") in ("", "user"):
+            s["username"] = email.split("@")[0]
+        st.session_state.settings = s
+    except Exception:
+        pass
+
+
+def _proses_balasan_google() -> None:
+    """Tangani balasan OAuth di URL (?code=... atau ?error=...).
+
+    Dipanggil paling awal di tampilkan_gerbang() — sesi baru setelah
+    kembali dari Google tidak punya session state, jadi kode di URL ini
+    yang memutuskan pengguna langsung masuk app atau kembali ke login.
+    """
+    try:
+        qp = st.query_params
+    except Exception:
+        return
+    if "error" in qp:
+        st.query_params.clear()
+        st.session_state["_tahap"] = "login"
+        st.session_state["_catatan_login"] = "Login Google dibatalkan."
+        st.rerun()
+        return
+    if "code" not in qp:
+        return
+    kode = qp["code"]
+    st.query_params.clear()
+    if not _google_terkonfigurasi():
+        st.session_state["_tahap"] = "login"
+        st.session_state["_catatan_login"] = (
+            "Login Google belum dikonfigurasi: kunci Google belum "
+            "dipasang di secrets aplikasi."
+        )
+        st.rerun()
+        return
+    info = _baca_id_token(_tukar_kode(kode).get("id_token", ""))
+    if info.get("email"):
+        st.session_state["_tahap"] = "app"
+        st.session_state["_user_google"] = {
+            "nama": info.get("name") or info.get("email", ""),
+            "email": info.get("email", ""),
+            "foto": info.get("picture", ""),
+        }
+        st.session_state["_google_baru_masuk"] = True
+        _prefill_identitas(info.get("name", ""), info.get("email", ""))
+        st.rerun()
+        return
+    st.session_state["_tahap"] = "login"
+    st.session_state["_catatan_login"] = (
+        "Gagal masuk dengan Google — coba lagi sebentar."
+    )
+    st.rerun()
 
 
 def _klik_google() -> None:
     if _google_terkonfigurasi():
-        # TODO(pemilik): alur OAuth Google ditambahkan setelah aplikasi
-        # didaftarkan ke Google Cloud Console (client id + secret).
-        st.info(
-            "Konfigurasi Google terdeteksi — alur masuk OAuth "
-            "akan diaktifkan pada tahap berikutnya."
-        )
+        _mulai_login_google()
     else:
         st.toast(
             "Login Google belum dikonfigurasi: pemilik belum mendaftarkan "
@@ -575,6 +725,9 @@ def _klik_google() -> None:
 
 def _render_login() -> None:
     """Halaman login: logo + judul app + tombol Masuk dengan Google."""
+    pesan = st.session_state.pop("_catatan_login", None)
+    if pesan:
+        st.toast(pesan, icon="ℹ️")
     st.markdown(
         _CSS_LOGIN.replace("__GICON__", _G_ICON),
         unsafe_allow_html=True,
@@ -619,8 +772,16 @@ def tampilkan_gerbang() -> bool:
     Return True berarti app.py harus st.stop() (gerbang masih menguasai
     layar). Return False bila pengguna sudah masuk -> aplikasi jalan normal.
     """
+    # Balasan OAuth dari Google (?code=/?error=) diproses paling awal —
+    # bisa terjadi pada sesi baru tanpa session state sama sekali.
+    _proses_balasan_google()
+
     tahap = st.session_state.get("_tahap") or "splash"
     if tahap == "app":
+        if st.session_state.pop("_google_baru_masuk", False):
+            u = st.session_state.get("_user_google") or {}
+            if u.get("email"):
+                st.toast(f"Masuk sebagai {u['email']}", icon="✅")
         return False
     if tahap == "splash":
         render_splash()
