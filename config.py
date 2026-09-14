@@ -477,7 +477,7 @@ DEFAULT_SETTINGS: dict = {
     "analytics": True,
     "personalization": True,
     "cloud_sync": False,
-    "plan": "Free",
+    "plan": "Trinity Pro",
     "billing_cycle": "Bulanan — Rp 19.000",
     "payment_method": "Belum ada metode pembayaran",
     "cap_web_search": True,
