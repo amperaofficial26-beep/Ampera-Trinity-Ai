@@ -770,6 +770,39 @@ def render_pending_preview(page_key: str = "chat") -> None:
                 )
 
 
+# ============================================================================
+# MODEL PREMIUM — hanya email developer/pemilik app yang boleh memakainya.
+# ============================================================================
+def _boleh_premium() -> bool:
+    """True bila user yang login sekarang berhak memakai model premium
+    (email developer/pemilik app — daftarnya di welcome_gate.py, bisa
+    ditambah lewat secrets/env OWNER_EMAIL)."""
+    try:
+        from welcome_gate import _email_developer
+        user = st.session_state.get("_user_google") or {}
+        email = (user.get("email") or "").strip().lower()
+        return bool(email) and email in _email_developer()
+    except Exception:
+        return False
+
+
+@st.dialog("Model Premium 🔒")
+def _dialog_premium() -> None:
+    """Popup kecil saat user biasa mencoba memilih model premium."""
+    st.markdown(
+        "**Waduh maaf ya...** 😔  \n"
+        "Tingkatkan dulu untuk menikmati produk Ampera Official"
+    )
+    c_kiri, c_kanan = st.columns(2)
+    with c_kiri:
+        if st.button("🚀 Tingkatkan", use_container_width=True, type="primary"):
+            st.session_state.page = "tingkatkan"
+            st.rerun()
+    with c_kanan:
+        if st.button("Nanti saja", use_container_width=True):
+            st.rerun()
+
+
 def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> None:
     """Baris di bawah kotak ketik: [+] ........... [Nama Model]."""
     kp = "" if page_key == "chat" else f"{page_key}_"
@@ -881,6 +914,13 @@ def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> Non
             )
 
     with ctrl_model:
+        # Pengaman: kalau model terpilih ternyata premium tapi user ini
+        # tidak berhak (misal terpilih sebelum aturan berlaku), kembalikan
+        # ke model bawaan supaya chat tetap jalan normal.
+        _terpilih = MODEL_BY_KEY.get(st.session_state.selected_model_key)
+        if _terpilih and _terpilih.get("premium") and not _boleh_premium():
+            st.session_state.selected_model_key = DEFAULT_MODEL_KEY
+
         current_key = st.session_state.selected_model_key
         current_model = MODEL_BY_KEY.get(current_key, MODEL_BY_KEY[DEFAULT_MODEL_KEY])
         current_name = current_model["name"]
@@ -903,8 +943,14 @@ def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> Non
                     st.markdown(active_node_css(row_key), unsafe_allow_html=True)
                 with st.container(key=row_key):
                     if st.button(label, key=f"{kp}model_{m['key']}", use_container_width=True):
-                        st.session_state.selected_model_key = m["key"]
-                        st.rerun()
+                        if m.get("premium") and not _boleh_premium():
+                            # User biasa: model premium TIDAK dipilih —
+                            # tampilkan popup ajakan tingkatkan paket.
+                            _dialog_premium()
+                        else:
+                            st.session_state.selected_model_key = m["key"]
+                            st.rerun()
+                            
                         
 def process_user_input(user_input, answer_slot, is_fresh: bool = False) -> bool:
     """Simpan kiriman user ke thread aktif, lalu antri Yuki.
