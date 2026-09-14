@@ -75,6 +75,11 @@ from chat_handlers import (
     render_loader_yuki,
 )
 
+# Room chat Ampera = app Streamlit terpisah (repo ampera-official-group).
+# Tombol "ke Room Chat Ampera" di halaman Tingkatkan mengarah ke sini;
+# pesan user di room itu diteruskan ke inbox amperaofficialgroup@gmail.com.
+ROOM_CHAT_URL = "https://ampera-official-group.streamlit.app"
+
 # ============================================================================
 # KONFIGURASI HALAMAN
 # ============================================================================
@@ -553,9 +558,9 @@ def _harga_col(paket: dict, key: str) -> None:
                  use_container_width=True,
                  type="primary" if paket.get("unggul") else "secondary"):
         st.toast(
-            f"Untuk berlangganan, hubungi Ampera Official lewat email: "
-            f"{AMPERA_EMAIL}",
-            icon=":material/mail:",
+            "Untuk berlangganan, tekan tombol ke Room Chat Ampera "
+            "di bagian bawah halaman ini 👇",
+            icon=":material/forum:",
         )
 
 
@@ -1116,9 +1121,11 @@ def page_tingkatkan() -> None:
     for i, (icon, title, desc) in enumerate([
         (":material/tap_and_play:", "Pilih paket",
          "Bulanan, tahunan (paling hemat), atau sekali bayar untuk selamanya."),
-        (":material/mail:", "Hubungi Ampera",
-         f"Kirim email ke {AMPERA_EMAIL} dan sebutkan paket pilihanmu — "
-         "lanjutan pembayaran diatur langsung di sana."),
+        (":material/forum:", "Chat di Room Ampera",
+         'Tekan tombol "ke Room Chat Ampera" di bawah — kamu langsung '
+         "diarahkan ke room chat resmi Ampera Official. Tulis pesanmu "
+         "(sebutkan paket pilihanmu) dan pesan itu langsung sampai "
+         "ke admin."),
         (":material/bolt:", "Langsung aktif",
          "Setelah pembayaran dikonfirmasi, paket berubah menjadi Trinity Pro "
          "dan semua kemampuan terbuka saat itu juga."),
@@ -1130,10 +1137,11 @@ def page_tingkatkan() -> None:
             unsafe_allow_html=True,
         )
 
+    st.link_button("💬 ke Room Chat Ampera", ROOM_CHAT_URL,
+                   use_container_width=True, type="primary")
     st.caption(
-        f"Info berlangganan &amp; pembayaran: **[{AMPERA_EMAIL}]"
-        f"(mailto:{AMPERA_EMAIL})** — {AMPERA_BRAND}, {AMPERA_LOKASI}. "
-        f"Status paket kamu saat ini: {s.get('plan', 'Free')}."
+        f"Pesanmu di room chat langsung masuk ke admin {AMPERA_BRAND} — "
+        f"{AMPERA_LOKASI}. Status paket kamu saat ini: {s.get('plan', 'Free')}."
     )
     _page_footer()
 # ============================================================================
