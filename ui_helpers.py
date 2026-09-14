@@ -515,6 +515,9 @@ def render_message(msg: dict) -> None:
         wadah = st.container(key=f"img_pop_{mid}") if baru else st.container()
         with wadah:
             st.image(msg["image_bytes"], use_container_width=True)
+            # Catatan kecil kalau prompt panjang tadi diringkas otomatis.
+            if msg.get("catatan_prompt"):
+                st.caption(f"✂️ {msg['catatan_prompt']}")
             ts = datetime.now().strftime("%Y%m%d_%H%M%S")
             st.download_button(
                 label=":material/download:  Unduh PNG",
@@ -549,7 +552,8 @@ def render_message(msg: dict) -> None:
                 thread = active_thread()
                 terakhir = bool(thread) and thread[-1] is msg
                 render_quick_replies(msg, aktif=terakhir)
-                
+
+
 def _copy_button_html(text: str, key: str) -> str:
     """Tombol salin ala Claude (ikon polos) — teks disisipkan sebagai
     base64 di atribut data-* supaya aman dari karakter kutip/baris baru,
