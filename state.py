@@ -9,6 +9,7 @@ fungsi-fungsi di modul ini supaya struktur data tetap konsisten.
 
 from __future__ import annotations
 
+import uuid
 from datetime import datetime
 
 import streamlit as st
@@ -175,6 +176,11 @@ def init_state() -> None:
         st.session_state.conv_counter = 0
     if "active_conv_id" not in st.session_state:
         st.session_state.active_conv_id = None
+    # Kunci percakapan untuk sinkronisasi database (db_sync.py): tiap
+    # percakapan punya kunci acak yang tetap sama selama percakapan itu
+    # aktif, supaya pesannya tersimpan berkelompok di database.
+    if "conv_key" not in st.session_state:
+        st.session_state.conv_key = uuid.uuid4().hex
     # Dok file kecil (panel_file.py)
     if "file_dock_open" not in st.session_state:
         st.session_state.file_dock_open = False
@@ -208,12 +214,17 @@ def _archive_current_conversation() -> None:
             if c["id"] == conv_id:
                 c["messages"] = msgs
                 c["title"] = _conversation_title(msgs)
+                # ingat kunci database percakapan ini (dipakai lagi bila
+                # percakapan dibuka ulang)
+                if not c.get("conv_key"):
+                    c["conv_key"] = st.session_state.get("conv_key")
                 return
     st.session_state.conv_counter += 1
     st.session_state.conversations.insert(0, {
         "id": st.session_state.conv_counter,
         "title": _conversation_title(msgs),
         "messages": msgs,
+        "conv_key": st.session_state.get("conv_key") or uuid.uuid4().hex,
     })
 
 
@@ -226,6 +237,9 @@ def reset_conversation() -> None:
     for key in ("messages", "msg_counter"):
         st.session_state.pop(key, None)
     init_state()
+    # Percakapan baru = kunci database baru (riwayat lama sudah terarsip
+    # dengan kunci lamanya, jadi tidak ikut tertukar).
+    st.session_state.conv_key = uuid.uuid4().hex
     st.session_state.page = "chat"
 
 
@@ -237,6 +251,9 @@ def open_conversation(conv_id: int) -> None:
             st.session_state.messages = c["messages"]
             st.session_state.page = "chat"
             st.session_state.active_conv_id = conv_id
+            # Pakai kembali kunci database percakapan ini supaya pesan
+            # baru masuk ke kelompok yang sama di database.
+            st.session_state.conv_key = c.get("conv_key") or uuid.uuid4().hex
             st.session_state.msg_counter = max(
                 (m.get("id", 0) for m in c["messages"]), default=1
             )
