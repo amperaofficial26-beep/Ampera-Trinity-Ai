@@ -665,26 +665,35 @@ def _prefill_identitas(nama: str, email: str) -> None:
         pass
 
 
-def _email_pemilik() -> str:
-    """Email pemilik app (bisa ditimpa lewat secrets/env OWNER_EMAIL;
-    bawaannya memakai AMPERA_EMAIL dari config.py)."""
-    kustom = _secrets_atau_env("OWNER_EMAIL").strip().lower()
-    if kustom:
-        return kustom
-    try:
-        from config import AMPERA_EMAIL
-        return (AMPERA_EMAIL or "").strip().lower()
-    except Exception:
-        return ""
+# Login dengan email berikut mendapat status khusus "Developer"
+# (pengguna lain otomatis berstatus "Trinity Pro").
+_EMAIL_DEVELOPER = (
+    "saputraampera26@gmail.com",
+    "amperaofficialgroup@gmail.com",
+)
 
 
-def _jadikan_pemilik_pro(email: str) -> None:
-    """Pemilik app otomatis berstatus paket Trinity Pro (bukan "Free")."""
+def _email_developer() -> tuple[str, ...]:
+    """Daftar email developer/pemilik app (bisa ditambah lewat
+    secrets/env OWNER_EMAIL)."""
+    tambahan = _secrets_atau_env("OWNER_EMAIL").strip().lower()
+    daftar = tuple(e.strip().lower() for e in _EMAIL_DEVELOPER if e.strip())
+    if tambahan and tambahan not in daftar:
+        daftar = daftar + (tambahan,)
+    return daftar
+
+
+def _tandai_status_login(email: str) -> None:
+    """Semua pengguna berstatus Trinity Pro; login dengan email developer
+    mendapat status khusus "Developer" supaya mudah dibedakan."""
     try:
-        if not email or email.strip().lower() != _email_pemilik():
+        if not email:
             return
         s = dict(st.session_state.get("settings") or {})
-        s["plan"] = "Trinity Pro"
+        if email.strip().lower() in _email_developer():
+            s["plan"] = "Developer"
+        else:
+            s["plan"] = "Trinity Pro"
         st.session_state.settings = s
     except Exception:
         pass
@@ -729,7 +738,15 @@ def _proses_balasan_google() -> None:
         }
         st.session_state["_google_baru_masuk"] = True
         _prefill_identitas(info.get("name", ""), info.get("email", ""))
-        _jadikan_pemilik_pro(info.get("email", ""))
+        _tandai_status_login(info.get("email", ""))
+        # Muat riwayat chat user dari database cloud (db_sync.py). Aktif
+        # otomatis bila kunci Supabase terpasang di secrets; kalau tidak,
+        # fungsi tersebut diam saja dan aplikasi mulai dengan chat bersih.
+        try:
+            from db_sync import muat_riwayat_setelah_login
+            muat_riwayat_setelah_login()
+        except Exception:
+            pass
         st.rerun()
         return
     st.session_state["_tahap"] = "login"
@@ -737,7 +754,7 @@ def _proses_balasan_google() -> None:
         "Gagal masuk dengan Google — coba lagi sebentar."
     )
     st.rerun()
-   
+
 
 def _klik_google() -> None:
     # Hanya dipakai saat kunci belum terpasang. Bila kunci sudah ada,
