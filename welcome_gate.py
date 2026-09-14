@@ -757,7 +757,7 @@ def _render_login() -> None:
             # sandbox browser.
             st.markdown(
                 '<div class="login-btn-wrap">'
-                '<a class="login-btn-google" target="_top" '
+                '<a class="login-btn-google" '
                 'href="' + html.escape(_url_otorisasi_google(), quote=True) + '">'
                 "Masuk dengan Google</a></div>",
                 unsafe_allow_html=True,
