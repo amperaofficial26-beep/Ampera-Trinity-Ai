@@ -167,6 +167,7 @@ def rapihkan_teks_chat(teks: str) -> str:
         teks = teks.replace(f"\x00RAPIH{i}\x00", terlindung)
 
     return teks.strip()
+    
 
 def handle_image_request(prompt: str) -> None:
     thread = active_thread()
@@ -179,11 +180,17 @@ def handle_image_request(prompt: str) -> None:
         return
 
     progress_slot = st.empty()
-    result: dict = {"data": None, "error": None}
+    result: dict = {"data": None, "error": None, "catatan": ""}
 
     def _worker() -> None:
         try:
-            result["data"] = generate_image(prompt)
+            # FLUX hanya mampu membaca ±256 token; prompt yang lebih panjang
+            # ditolak Cloudflare (HTTP 400). Ringkas/potong dulu di sini
+            # supaya animasi loading tetap tampil selama proses berjalan.
+            from engines.image_engine import ringkas_prompt_panjang
+            prompt_siap, catatan = ringkas_prompt_panjang(prompt)
+            result["catatan"] = catatan
+            result["data"] = generate_image(prompt_siap)
         except Exception as exc:
             result["error"] = exc
 
@@ -219,6 +226,7 @@ def handle_image_request(prompt: str) -> None:
         thread.append({
             "id": next_msg_id(), "role": "assistant", "type": "image",
             "image_bytes": result["data"], "prompt": prompt,
+            "catatan_prompt": result.get("catatan") or None,
             "time": now_wib(),
         })
         return
@@ -244,7 +252,8 @@ def handle_image_request(prompt: str) -> None:
         "id": next_msg_id(), "role": "assistant", "type": "text",
         "content": msg, "time": now_wib(), "error_detail": detail,
     })
-    
+
+
 def _get_model_provider(model_key: str) -> str:
     """Mengambil provider dari model yang dipilih."""
     model = MODEL_BY_KEY.get(model_key, {})
