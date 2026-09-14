@@ -665,6 +665,31 @@ def _prefill_identitas(nama: str, email: str) -> None:
         pass
 
 
+def _email_pemilik() -> str:
+    """Email pemilik app (bisa ditimpa lewat secrets/env OWNER_EMAIL;
+    bawaannya memakai AMPERA_EMAIL dari config.py)."""
+    kustom = _secrets_atau_env("OWNER_EMAIL").strip().lower()
+    if kustom:
+        return kustom
+    try:
+        from config import AMPERA_EMAIL
+        return (AMPERA_EMAIL or "").strip().lower()
+    except Exception:
+        return ""
+
+
+def _jadikan_pemilik_pro(email: str) -> None:
+    """Pemilik app otomatis berstatus paket Trinity Pro (bukan "Free")."""
+    try:
+        if not email or email.strip().lower() != _email_pemilik():
+            return
+        s = dict(st.session_state.get("settings") or {})
+        s["plan"] = "Trinity Pro"
+        st.session_state.settings = s
+    except Exception:
+        pass
+
+
 def _proses_balasan_google() -> None:
     """Tangani balasan OAuth di URL (?code=... atau ?error=...).
 
@@ -704,6 +729,7 @@ def _proses_balasan_google() -> None:
         }
         st.session_state["_google_baru_masuk"] = True
         _prefill_identitas(info.get("name", ""), info.get("email", ""))
+        _jadikan_pemilik_pro(info.get("email", ""))
         st.rerun()
         return
     st.session_state["_tahap"] = "login"
@@ -711,7 +737,7 @@ def _proses_balasan_google() -> None:
         "Gagal masuk dengan Google — coba lagi sebentar."
     )
     st.rerun()
-
+   
 
 def _klik_google() -> None:
     # Hanya dipakai saat kunci belum terpasang. Bila kunci sudah ada,
