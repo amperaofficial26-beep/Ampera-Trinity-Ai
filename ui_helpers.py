@@ -500,6 +500,16 @@ def render_quick_replies(msg: dict, aktif: bool = True) -> None:
 
 def render_message(msg: dict) -> None:
     """Render 1 pesan: teks (bubble, bisa + gambar lampiran/suara) atau gambar."""
+    # Sinkronisasi otomatis ke database cloud (db_sync.py): pesan baru di
+    # CHAT UTAMA dikirim ke Supabase supaya riwayat tidak hilang. Halaman
+    # lain (artefak/kursus/mode) tidak ikut. Tanpa kunci Supabase, ini
+    # no-op yang murah — chat tidak pernah terganggu.
+    try:
+        if active_thread() is st.session_state.get("messages"):
+            from db_sync import kirim_pesan_baru
+            kirim_pesan_baru(msg)
+    except Exception:
+        pass
     if msg.get("type") == "image" and msg.get("image_bytes"):
         st.markdown(
             bubble_html("assistant", f"Hasil gambar untuk: {msg.get('prompt', '')}",
@@ -515,6 +525,9 @@ def render_message(msg: dict) -> None:
         wadah = st.container(key=f"img_pop_{mid}") if baru else st.container()
         with wadah:
             st.image(msg["image_bytes"], use_container_width=True)
+            # Catatan kecil kalau prompt panjang tadi diringkas otomatis.
+            if msg.get("catatan_prompt"):
+                st.caption(f"✂️ {msg['catatan_prompt']}")
             ts = datetime.now().strftime("%Y%m%d_%H%M%S")
             st.download_button(
                 label=":material/download:  Unduh PNG",
@@ -549,7 +562,8 @@ def render_message(msg: dict) -> None:
                 thread = active_thread()
                 terakhir = bool(thread) and thread[-1] is msg
                 render_quick_replies(msg, aktif=terakhir)
-                
+
+
 def _copy_button_html(text: str, key: str) -> str:
     """Tombol salin ala Claude (ikon polos) — teks disisipkan sebagai
     base64 di atribut data-* supaya aman dari karakter kutip/baris baru,
