@@ -771,17 +771,60 @@ def render_pending_preview(page_key: str = "chat") -> None:
 
 
 # ============================================================================
-# MODEL PREMIUM — hanya email developer/pemilik app yang boleh memakainya.
+# MODEL PREMIUM — email developer/pemilik app + user berbayar.
+# User berbayar didaftarkan lewat Supabase: tabel premium_users
+# (Supabase → Table Editor → Insert row → isi emailnya). Tidak perlu
+# edit kode setiap ada pelanggan baru.
 # ============================================================================
+@st.cache_data(ttl=60)
+def _email_premium_db() -> tuple[str, ...]:
+    """Daftar email user berbayar dari tabel Supabase premium_users.
+    Cache 60 detik supaya tidak request terus-menerus."""
+    try:
+        import os
+        import requests
+
+        def _secret(nama: str) -> str:
+            try:
+                nilai = st.secrets.get(nama)
+                if nilai:
+                    return str(nilai).strip()
+            except Exception:
+                pass
+            return (os.environ.get(nama) or "").strip()
+
+        url = _secret("SUPABASE_URL")
+        key = _secret("SUPABASE_ANON_KEY")
+        if not url or not key:
+            return ()
+        r = requests.get(
+            url.rstrip("/") + "/rest/v1/premium_users?select=email",
+            headers={"apikey": key, "Authorization": "Bearer " + key},
+            timeout=8,
+        )
+        if r.status_code != 200:
+            return ()
+        return tuple(
+            str(b.get("email") or "").strip().lower()
+            for b in (r.json() or []) if b.get("email")
+        )
+    except Exception:
+        return ()
+
+
 def _boleh_premium() -> bool:
-    """True bila user yang login sekarang berhak memakai model premium
-    (email developer/pemilik app — daftarnya di welcome_gate.py, bisa
-    ditambah lewat secrets/env OWNER_EMAIL)."""
+    """True bila user yang login sekarang berhak memakai model premium:
+    email developer/pemilik app (welcome_gate.py, plus OWNER_EMAIL) ATAU
+    email yang terdaftar di tabel Supabase premium_users (user berbayar)."""
     try:
         from welcome_gate import _email_developer
         user = st.session_state.get("_user_google") or {}
         email = (user.get("email") or "").strip().lower()
-        return bool(email) and email in _email_developer()
+        if not email:
+            return False
+        if email in _email_developer():
+            return True
+        return email in _email_premium_db()
     except Exception:
         return False
 
