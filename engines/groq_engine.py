@@ -27,7 +27,7 @@ else:
 from config import (
     GROQ_API_KEY, GROQ_BASE_URL, GROQ_MODEL_FALLBACKS, MAX_HISTORY_MESSAGES,
     MAX_IMAGES_PER_MESSAGE, STT_MODEL, VISION_MODEL_FALLBACKS,
-    VISION_MAX_TOKENS,                                          # ← BARIS BARU
+    VISION_MAX_TOKENS,
     VISION_RECENT_MESSAGES, YUKI_SYSTEM_PROMPT, LANG_BY_CODE, DEFAULT_LANG_CODE,
     CLARIFY_RULES, CLARIFY_MODE_RULES, QUICK_REPLY_RULES, CARD_RULES,
     DESAIN_PROMPT, JADWAL_PROMPT,
@@ -161,7 +161,6 @@ def resolve_model_chain(preferred: str, vision: bool = False) -> list[str]:
     return chain
 
 
-# ✅ BARU
 def stream_chat_reply(client: OpenAI, model: str, history: list[dict],
                       vision: bool = False):
     kwargs: dict = {
@@ -178,8 +177,7 @@ def stream_chat_reply(client: OpenAI, model: str, history: list[dict],
     # jawabannya sendiri belum tentu sepanjang itu.
     if vision:
         kwargs["max_tokens"] = VISION_MAX_TOKENS
-    stream = client.chat.completions.create(**kwargs)=True,
-    )
+    stream = client.chat.completions.create(**kwargs)
     for chunk in stream:
         try:
             delta = chunk.choices[0].delta
@@ -188,6 +186,7 @@ def stream_chat_reply(client: OpenAI, model: str, history: list[dict],
                 yield piece
         except Exception:
             continue
+                  
 
 def stream_chat_with_fallback(client: OpenAI, preferred_model: str, history: list[dict],
                               vision: bool = False):
