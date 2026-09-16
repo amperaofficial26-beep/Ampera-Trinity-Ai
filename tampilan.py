@@ -435,20 +435,45 @@ small, .stCaption { color: var(--tr-text2) !important; }
   color: var(--tr-text) !important;
 }
 
-/* DOK INPUT CHAT bawah — kartu, disclaimer, dan tombol di dalamnya */
-[data-testid="stBottom"], [data-testid="stBottom"] > div {
+/* DOK INPUT CHAT bawah
+   Struktur aslinya di styles.py:
+     stBottom              -> batang dok, HARUS transparan
+       stBottomBlockContainer -> KARTU gabungan (yang diberi warna+border)
+         stChatInput          -> kotak teks, transparan (menumpang kartu)
+         st-key-chat_controls -> baris +/model, transparan
+
+   Versi sebelumnya keliru: kartunya dibuat transparan, lalu warna
+   dipasang di stChatInput > div dan chat_controls. Akibatnya muncul
+   DUA kotak bertumpuk — balok krem besar dengan kotak lebih terang di
+   dalamnya. Sekarang warnanya dikembalikan ke kartu yang benar saja. */
+[data-testid="stBottom"],
+[data-testid="stBottom"] > div {
   background: transparent !important;
 }
 [data-testid="stBottomBlockContainer"] {
-  background: transparent !important;
-}
-.st-key-chat_controls,
-.st-key-chat_controls > div,
-[data-testid="stChatInput"] > div {
   background: var(--tr-surface) !important;
   border-color: var(--tr-border) !important;
+  border-radius: var(--tr-radius) !important;
 }
-.chat-disclaimer, .chat-note, .st-key-chat_controls p {
+[data-testid="stBottomBlockContainer"]:focus-within {
+  border-color: var(--tr-accent) !important;
+}
+/* semua lapisan di dalam kartu wajib transparan */
+[data-testid="stChatInput"],
+[data-testid="stChatInput"] > div,
+[data-testid="stChatInput"] div,
+[data-testid="stChatInput"] [data-baseweb="base-input"],
+[data-testid="stChatInput"] [data-baseweb="textarea"],
+.st-key-chat_controls,
+.st-key-chat_controls > div,
+.st-key-chat_controls [data-testid="stHorizontalBlock"],
+.st-key-chat_controls [data-testid="stColumn"] {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+.chat-disclaimer, .chat-note, .input-disclaimer,
+.st-key-chat_controls p {
   color: var(--tr-text2) !important;
 }
 .st-key-chat_controls [data-testid="stPopover"] button,
@@ -457,14 +482,34 @@ small, .stCaption { color: var(--tr-text2) !important; }
   color: var(--tr-text2) !important;
   border-color: var(--tr-border) !important;
 }
-/* tombol kirim (panah) memakai warna aksen */
-[data-testid="stChatInputSubmitButton"] {
-  background: var(--tr-bubble) !important;
-  color: var(--tr-text) !important;
-}
-[data-testid="stChatInputSubmitButton"]:hover {
+/* TOMBOL KIRIM (panah) & mikrofon di dalam kotak teks.
+   styles.py menargetkan '[data-testid="stChatInput"] button' — bukan
+   stChatInputSubmitButton — jadi selektor itu harus ditiru persis,
+   kalau tidak warnanya kalah spesifisitas dan panahnya tetap ungu. */
+[data-testid="stChatInput"] button {
   background: var(--tr-accent) !important;
   color: var(--tr-on-accent) !important;
+  border-radius: var(--tr-radius) !important;
+}
+[data-testid="stChatInput"] button svg {
+  fill: var(--tr-on-accent) !important;
+  color: var(--tr-on-accent) !important;
+}
+[data-testid="stChatInput"] button:hover { filter: brightness(1.12); }
+[data-testid="stChatInput"] button:disabled {
+  background: var(--tr-bubble) !important;
+}
+[data-testid="stChatInput"] button:disabled svg {
+  fill: var(--tr-text2) !important;
+  color: var(--tr-text2) !important;
+}
+/* mikrofon: ikon telanjang, bukan tombol berwarna */
+[data-testid="stChatInput"] [data-testid="stChatInputMicButton"] {
+  background: transparent !important;
+}
+[data-testid="stChatInput"] [data-testid="stChatInputMicButton"] svg {
+  fill: var(--tr-text2) !important;
+  color: var(--tr-text2) !important;
 }
 
 /* tab & pemisah */
@@ -487,7 +532,14 @@ a { color: var(--tr-accent) !important; }
         bagian.append("""
 /* permukaan krem bawaan -> permukaan tema */
 [style*="#F2E8D6"], [style*="#EDE2D1"], [style*="#FBF6EC"],
-[style*="#F5EFE6"], [style*="#FFFBF2"], [style*="#F7F1E6"] {
+[style*="#F5EFE6"], [style*="#FFFBF2"], [style*="#F7F1E6"],
+[style*="#E5D8C3"], [style*="#E0D2BB"] {
+  background-color: var(--tr-surface) !important;
+  border-color: var(--tr-border) !important;
+}
+/* sisa permukaan krem yang ditulis lewat class di styles.py */
+.cap-card, .set-card, .price-card, .art-card, .course-card,
+.rc-card, .plus-menu, .dna-card {
   background-color: var(--tr-surface) !important;
   border-color: var(--tr-border) !important;
 }
