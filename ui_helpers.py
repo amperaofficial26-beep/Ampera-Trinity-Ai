@@ -591,16 +591,30 @@ def render_message_actions(msg: dict) -> None:
         with cols[1]:
             up_active = feedback == "up"
             if st.button(":material/thumb_up:", key=f"fb_up_{mid}",
-                         help="Jawaban membantu",
+                         help="Batalkan penilaian" if up_active
+                              else "Jawaban ini membantu",
                          type="primary" if up_active else "secondary"):
+                # msg adalah dict milik thread di session_state, jadi
+                # perubahan di sini langsung tersimpan.
                 msg["feedback"] = None if up_active else "up"
+                st.toast(
+                    "Penilaian dibatalkan." if up_active
+                    else "Terima kasih atas masukanmu!",
+                    icon=":material/check:",
+                )
                 st.rerun()
         with cols[2]:
             down_active = feedback == "down"
             if st.button(":material/thumb_down:", key=f"fb_down_{mid}",
-                         help="Jawaban kurang membantu",
+                         help="Batalkan penilaian" if down_active
+                              else "Jawaban ini kurang membantu",
                          type="primary" if down_active else "secondary"):
                 msg["feedback"] = None if down_active else "down"
+                st.toast(
+                    "Penilaian dibatalkan." if down_active
+                    else "Masukan dicatat — Yuki akan berusaha lebih baik.",
+                    icon=":material/check:",
+                )
                 st.rerun()
         with cols[3]:
             if msg.get("time"):
