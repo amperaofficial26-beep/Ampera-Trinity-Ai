@@ -437,37 +437,55 @@ small, .stCaption { color: var(--tr-text2) !important; }
 
 /* DOK INPUT CHAT bawah
    Struktur aslinya di styles.py:
-     stBottom              -> batang dok, HARUS transparan
-       stBottomBlockContainer -> KARTU gabungan (yang diberi warna+border)
-         stChatInput          -> kotak teks, transparan (menumpang kartu)
-         st-key-chat_controls -> baris +/model, transparan
+     stBottom                 -> batang dok
+       stBottomBlockContainer -> "kartu gabungan" (#F2E8D6 + border + shadow)
+         stChatInput          -> kotak teks
+         st-key-chat_controls -> baris +/model
 
-   Versi sebelumnya keliru: kartunya dibuat transparan, lalu warna
-   dipasang di stChatInput > div dan chat_controls. Akibatnya muncul
-   DUA kotak bertumpuk — balok krem besar dengan kotak lebih terang di
-   dalamnya. Sekarang warnanya dikembalikan ke kartu yang benar saja. */
+   styles.py mewarnai KARTU LUAR, sehingga area di belakang baris
+   "+ ... Trinity Seed" tampak sebagai strip krem terang yang menutupi
+   wallpaper. Di sini kartu luar dibuat BENAR-BENAR transparan (termasuk
+   border & bayangannya), lalu warnanya dipindah ke kotak teks saja —
+   jadi yang terlihat melayang di atas wallpaper cuma satu kolom input,
+   sementara + dan nama model duduk langsung di atas wallpaper. */
 [data-testid="stBottom"],
-[data-testid="stBottom"] > div {
-  background: transparent !important;
-}
+[data-testid="stBottom"] > div,
 [data-testid="stBottomBlockContainer"] {
-  background: var(--tr-surface) !important;
-  border-color: var(--tr-border) !important;
-  border-radius: var(--tr-radius) !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 [data-testid="stBottomBlockContainer"]:focus-within {
-  border-color: var(--tr-accent) !important;
+  border: none !important;
+  box-shadow: none !important;
 }
-/* semua lapisan di dalam kartu wajib transparan */
-[data-testid="stChatInput"],
-[data-testid="stChatInput"] > div,
-[data-testid="stChatInput"] div,
-[data-testid="stChatInput"] [data-baseweb="base-input"],
-[data-testid="stChatInput"] [data-baseweb="textarea"],
+
+/* baris +/model: tanpa latar, duduk di atas wallpaper */
 .st-key-chat_controls,
 .st-key-chat_controls > div,
 .st-key-chat_controls [data-testid="stHorizontalBlock"],
-.st-key-chat_controls [data-testid="stColumn"] {
+.st-key-chat_controls [data-testid="stColumn"],
+[class*="st-key-pending_strip"] {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* kotak teks = satu-satunya permukaan berwarna di dok */
+[data-testid="stChatInput"] {
+  background: var(--tr-surface) !important;
+  border: 1px solid var(--tr-border) !important;
+  border-radius: var(--tr-radius) !important;
+  box-shadow: 0 2px 10px rgba(0,0,0,.06) !important;
+}
+[data-testid="stChatInput"]:focus-within {
+  border-color: var(--tr-accent) !important;
+}
+/* lapisan di DALAM kotak teks tetap transparan supaya tidak bertumpuk */
+[data-testid="stChatInput"] > div,
+[data-testid="stChatInput"] div,
+[data-testid="stChatInput"] [data-baseweb="base-input"],
+[data-testid="stChatInput"] [data-baseweb="textarea"] {
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
