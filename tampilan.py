@@ -494,6 +494,35 @@ small, .stCaption { color: var(--tr-text2) !important; }
 .st-key-chat_controls p {
   color: var(--tr-text2) !important;
 }
+/* BERSIHKAN RIWAYAT di sidebar: tombol teks kecil, tidak menyaingi
+   daftar percakapan di atasnya. */
+.st-key-sb_bersih_riwayat { margin-top: 10px !important; }
+.st-key-sb_bersih_riwayat div.stButton > button {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: var(--tr-text2) !important;
+  font-size: .8rem !important;
+  justify-content: flex-start !important;
+  padding: 4px 8px !important;
+  min-height: 0 !important;
+}
+.st-key-sb_bersih_riwayat div.stButton > button:hover {
+  color: var(--tr-accent) !important;
+  background: var(--tr-bubble) !important;
+}
+/* tombol "Ya, hapus" tetap tegas -> merah, bukan warna aksen */
+.st-key-sb_bersih_riwayat div.stButton > button[kind="primary"],
+[class*="st-key-set_bersih_ya"] div.stButton > button,
+[class*="st-key-wipe_ya"] div.stButton > button {
+  background: #C0392B !important;
+  border-color: #C0392B !important;
+  color: #FFFFFF !important;
+}
+.st-key-sb_bersih_riwayat [data-testid="stCaptionContainer"] p {
+  font-size: .72rem !important;
+  color: var(--tr-text2) !important;
+}
 /* tombol kirim (panah) memakai warna aksen */
 [data-testid="stChatInputSubmitButton"] {
   background: var(--tr-bubble) !important;
