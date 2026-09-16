@@ -290,6 +290,13 @@ def render_sidebar() -> None:
                         open_conversation(c["id"])
                         st.rerun()
 
+            # Bersihkan riwayat — konfirmasi dua langkah ditampilkan
+            # langsung di sidebar (konteks "sb" supaya kunci widgetnya
+            # tidak bentrok dengan yang di halaman Pengaturan).
+            from riwayat import dialog_bersihkan
+            with st.container(key="sb_bersih_riwayat"):
+                dialog_bersihkan("sb")
+
         # ---- Baris akun di dasar sidebar ala Claude ----
         # (U) Nama · Paket   [⋮ menu akun]
         s = get_settings()

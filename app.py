@@ -69,6 +69,7 @@ from panel_file import render_file_dock          # ← BARIS BARU
 from page_desain import page_desain
 from page_jadwal import page_jadwal
 from styles import inject_css
+from riwayat import dialog_bersihkan, tampilkan_toast_tertunda
 from tampilan import (
     PALET_NAMES, WALLPAPER_NAMES, SUDUT_NAMES, DEFAULT_PALET,
     inject_tampilan, kartu_pratinjau, siapkan_wallpaper_unggahan,
@@ -643,6 +644,14 @@ def _set_privasi() -> None:
         "Pengaturan privasi disimpan.",
     )
 
+    st.markdown('<div class="set-section">Riwayat obrolan</div>',
+                unsafe_allow_html=True)
+    st.caption(
+        "Menghapus riwayat hanya mengosongkan percakapan. Pengaturan, "
+        "memori, dan tampilan tetap tersimpan."
+    )
+    dialog_bersihkan("set")
+
     st.markdown('<div class="set-section danger">Hapus data</div>',
                 unsafe_allow_html=True)
     st.markdown(
@@ -651,14 +660,36 @@ def _set_privasi() -> None:
         "dibatalkan.</div>",
         unsafe_allow_html=True,
     )
-    _, kolom_hapus = st.columns([3, 1])
-    with kolom_hapus:
-        if st.button(":material/delete_forever:  Hapus seluruh data saya",
-                     key="wipe_data"):
-            for k in list(st.session_state.keys()):
-                del st.session_state[k]
-            st.session_state.page = "chat"
-            st.rerun()
+    # Konfirmasi dua langkah: tombol ini menghapus SEMUANYA (termasuk
+    # pengaturan & tampilan), jadi tidak boleh jalan hanya karena satu
+    # klik tak sengaja.
+    if not st.session_state.get("_wipe_tahap"):
+        _, kolom_hapus = st.columns([3, 1])
+        with kolom_hapus:
+            if st.button(":material/delete_forever:  Hapus seluruh data saya",
+                         key="wipe_data", use_container_width=True):
+                st.session_state["_wipe_tahap"] = True
+                st.rerun()
+    else:
+        st.error(
+            "Seluruh data akan dihapus: percakapan, artefak, memori, "
+            "pengaturan, dan tampilan kembali ke bawaan.",
+            icon=":material/warning:",
+        )
+        w1, w2 = st.columns(2)
+        with w1:
+            if st.button("Batal", key="wipe_batal", use_container_width=True):
+                st.session_state.pop("_wipe_tahap", None)
+                st.rerun()
+        with w2:
+            if st.button(":material/delete_forever:  Ya, hapus semua",
+                         key="wipe_ya", type="primary",
+                         use_container_width=True):
+                for k in list(st.session_state.keys()):
+                    del st.session_state[k]
+                st.session_state.page = "chat"
+                st.session_state["_toast_riwayat"] = "Seluruh data dihapus."
+                st.rerun()
 
 
 PRO_FEATURES = [
@@ -1439,6 +1470,8 @@ def main() -> None:
     # Lapisan tampilan pilihan User (wallpaper & warna) — HARUS sesudah
     # inject_css() supaya menimpa tema bawaan, bukan tertimpa.
     inject_tampilan()
+    # Toast hasil "bersihkan riwayat" (dititipkan sebelum rerun).
+    tampilkan_toast_tertunda()
 
     if st.session_state.get("logged_out"):
         st.session_state.logged_out = False
