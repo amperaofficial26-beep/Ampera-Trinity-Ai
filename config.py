@@ -80,12 +80,27 @@ AVAILABLE_MODELS = {m["key"]: m["id"] for m in MODEL_CATALOG}
 MODEL_BY_KEY = {m["key"]: m for m in MODEL_CATALOG}
 DEFAULT_MODEL_KEY = "gpt_oss_20b"
 
-VISION_MODEL_ID = "qwen/qwen3.6-27b"
-VISION_MODEL_LABEL = "Qwen 3.6"
+VISION_MODEL_ID = "meta-llama/llama-4-scout-17b-16e-instruct"
+VISION_MODEL_LABEL = "Llama 4 Scout"
+# Urutan cadangan untuk pesan bergambar. Model PERTAMA yang benar-benar
+# punya kemampuan vision ditaruh paling depan.
+#
+# Catatan penting (penyebab error 429 sebelumnya):
+#   qwen3.x-27b di tier on_demand hanya diberi jatah 1.000 output token
+#   per menit, sedangkan satu permintaan vision meminta 2.048 token.
+#   Jadi permintaan DITOLAK sebelum diproses ("Request too large ...
+#   OTPM: Limit 1000, Requested 2048"), bukan karena gambarnya besar.
+#   Karena itu batas keluaran vision dipatok di VISION_MAX_TOKENS.
 VISION_MODEL_FALLBACKS = (
+    "meta-llama/llama-4-scout-17b-16e-instruct",
+    "meta-llama/llama-4-maverick-17b-128e-instruct",
     "qwen/qwen3.6-27b",
-    "qwen/qwen3.8-27b",
 )
+
+# Batas token keluaran khusus permintaan bergambar. Ditahan di bawah
+# jatah OTPM tier gratis (1.000) supaya tidak ditolak 429. Jawaban
+# analisis gambar jarang butuh lebih dari ini.
+VISION_MAX_TOKENS = 900
 
 GROQ_MODEL_FALLBACKS = (
     "openai/gpt-oss-120b",

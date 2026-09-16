@@ -27,6 +27,7 @@ else:
 from config import (
     GROQ_API_KEY, GROQ_BASE_URL, GROQ_MODEL_FALLBACKS, MAX_HISTORY_MESSAGES,
     MAX_IMAGES_PER_MESSAGE, STT_MODEL, VISION_MODEL_FALLBACKS,
+    VISION_MAX_TOKENS,
     VISION_RECENT_MESSAGES, YUKI_SYSTEM_PROMPT, LANG_BY_CODE, DEFAULT_LANG_CODE,
     CLARIFY_RULES, CLARIFY_MODE_RULES, QUICK_REPLY_RULES, CARD_RULES,
     DESAIN_PROMPT, JADWAL_PROMPT,
@@ -160,15 +161,23 @@ def resolve_model_chain(preferred: str, vision: bool = False) -> list[str]:
     return chain
 
 
-def stream_chat_reply(client: OpenAI, model: str, history: list[dict]):
-    stream = client.chat.completions.create(
-        model=model,
-        messages=messages_for_api(history),
+def stream_chat_reply(client: OpenAI, model: str, history: list[dict],
+                      vision: bool = False):
+    kwargs: dict = {
+        "model": model,
+        "messages": messages_for_api(history),
         # Suhu jawaban (0,3 = kaku, 1,2 = liar); default 0,7 dari
         # DEFAULT_SETTINGS. Dibaca tiap request supaya perubahan langsung terasa.
-        temperature=float(get_settings().get("temperature", 0.7)),
-        stream=True,
-    )
+        "temperature": float(get_settings().get("temperature", 0.7)),
+        "stream": True,
+    }
+    # Permintaan bergambar dibatasi keluarannya. Tanpa ini, Groq memakai
+    # perkiraan bawaan 2.048 token yang MELEBIHI jatah OTPM tier gratis
+    # (1.000/menit), sehingga ditolak 429 "Request too large" — padahal
+    # jawabannya sendiri belum tentu sepanjang itu.
+    if vision:
+        kwargs["max_tokens"] = VISION_MAX_TOKENS
+    stream = client.chat.completions.create(**kwargs)
     for chunk in stream:
         try:
             delta = chunk.choices[0].delta
@@ -185,7 +194,8 @@ def stream_chat_with_fallback(client: OpenAI, preferred_model: str, history: lis
     last_exc: Exception | None = None
     for model in resolve_model_chain(preferred_model, vision=vision):
         try:
-            stream_iter = stream_chat_reply(client, model, history)
+            stream_iter = stream_chat_reply(client, model, history,
+                                            vision=vision)
             first = next(stream_iter, None)
             if first:
                 yield first

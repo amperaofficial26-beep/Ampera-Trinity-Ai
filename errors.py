@@ -32,7 +32,15 @@ def public_error_chat(exc: Exception) -> str:
     if status == 404 or "model_not_found" in text or "decommissioned" in text or "does not exist" in text:
         return "Model chat tidak tersedia lagi di provider. Coba pilih model lain."
     if status == 429 or "rate_limit" in text or "rate limit" in text or "quota" in text:
-        return "Kuota chat sedang penuh. Coba lagi nanti."
+        # Dibedakan: "request too large" bukan kuota habis, melainkan satu
+        # permintaan yang melebihi jatah token per menit. Sarannya beda —
+        # memperpendek permintaan menolong, menunggu tidak.
+        if "too large" in text or "tokens per minute" in text or "otpm" in text:
+            return (
+                "Permintaan ini terlalu besar untuk kuota gratis saat ini. "
+                "Coba kirim gambar satu per satu, atau perpendek pertanyaannya."
+            )
+        return "Kuota chat sedang penuh. Coba lagi sebentar."
     if "timeout" in text:
         return "Respons terlalu lama. Coba lagi."
     return "Gagal membalas. Coba kirim ulang atau mulai obrolan baru."
