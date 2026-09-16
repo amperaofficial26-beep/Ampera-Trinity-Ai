@@ -501,8 +501,18 @@ DEFAULT_SETTINGS: dict = {
     # Kredensial layanan (GROQ_API_KEY, CF_ACCOUNT_ID, CF_API_TOKEN) tidak
     # lagi diatur dari halaman Pengaturan (tab "Trinity Code" sudah dihapus);
     # cukup lewat Streamlit Secrets / environment variable.
-    "temperature": 0.7,
+       "temperature": 0.7,
 }
+
+# ⬇️⬇️ TAMBAHKAN BLOK INI ⬇️⬇️
+# Pengaturan tampilan (wallpaper & warna) tinggal di tampilan.py supaya
+# daftar palet/wallpaper dan nilai bawaannya ada di satu tempat.
+try:
+    from tampilan import TAMPILAN_DEFAULTS as _TAMPILAN_DEFAULTS
+except Exception:  # pragma: no cover
+    _TAMPILAN_DEFAULTS = {}
+DEFAULT_SETTINGS.update(_TAMPILAN_DEFAULTS)
+# ⬆️⬆️ SAMPAI SINI ⬆️⬆️
 
 PAGE_TITLES = {
     "artefak": "Artefak",
