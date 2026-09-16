@@ -57,14 +57,14 @@ MODEL_CATALOG = [
     # Mulai Trinity Nexus ke bawah berlabel premium.
     {"key": "gpt_oss_20b", "name": "Trinity Seed", "desc": "Level awal — cepat untuk chat & coding ringan", "id": "openai/gpt-oss-20b", "premium": False},
     {"key": "compound_mini", "name": "Trinity Spark", "desc": "Mulai lebih pintar — web search ringkas & cepat", "id": "groq/compound-mini", "premium": False},
-    {"key": "llama4_scout", "name": "Trinity Pulse", "desc": "Responsif — bisa melihat & menganalisis gambar", "id": "qwen/qwen3.6-27b", "premium": False},
+    {"key": "llama4_scout", "name": "Trinity Pulse", "desc": "Responsif — bisa melihat & menganalisis gambar", "id": "qwen/qwen3.8-27b", "premium": False},
     {"key": "plugsky_micro", "name": "Trinity Flux", "desc": "Adaptif — AI cepat via Plugsky", "id": "plugsky-micro", "provider": "plugsky", "premium": False},
     {"key": "plugsky_lite", "name": "Trinity Nova", "desc": "Lebih kuat — AI ringan via Plugsky", "id": "plugsky-lite", "provider": "plugsky", "premium": False},
     {"key": "aion_rp", "name": "Trinity Vortex", "desc": "Powerful — AI roleplay Aion Labs", "id": "aion-labs/aion-rp-llama-3.1-8b", "provider": "aion", "premium": False},
     {"key": "aion_2", "name": "Trinity Nexus", "desc": "Multi-kemampuan — AI Aion Labs generasi 2", "id": "aion-labs/aion-2.0", "provider": "aion", "premium": True},
     {"key": "aion_3_mini", "name": "Trinity Vector", "desc": "Presisi — Aion Labs versi ringan", "id": "aion-labs/aion-3.0-mini", "provider": "aion", "premium": True},
     {"key": "aion_3", "name": "Trinity Quantum", "desc": "Advanced — AI Aion Labs generasi 3", "id": "aion-labs/aion-3.0", "provider": "aion", "premium": True},
-    {"key": "qwen3_6_27b", "name": "Trinity Neural", "desc": "Reasoning kuat — matematika & logika", "id": "qwen/qwen3.6-27b", "premium": True},
+    {"key": "qwen3_6_27b", "name": "Trinity Neural", "desc": "Reasoning kuat — matematika & logika", "id": "openai/gpt-oss-120b", "premium": True},
     {"key": "compound", "name": "Trinity Apex", "desc": "Kelas tinggi — browsing web & eksekusi kode", "id": "groq/compound", "premium": True},
     {"key": "finalrouter_deepseek_v4", "name": "Trinity Zenith", "desc": "Hampir puncak — DeepSeek V4 Flash", "id": "deepseek/deepseek-v4-flash", "provider": "final_router", "premium": True},
     {"key": "gpt_oss_120b", "name": "Trinity Infinity", "desc": "Ultra — reasoning mendalam untuk tugas berat", "id": "openai/gpt-oss-120b", "premium": True},
@@ -103,10 +103,11 @@ VISION_MODEL_FALLBACKS = (
 # analisis gambar jarang butuh lebih dari ini.
 VISION_MAX_TOKENS = 900
 
+# Cadangan chat teks. Hanya model yang MASIH AKTIF di Groq
+# (qwen3.6-27b sudah tidak ada di daftar aktif -> 404).
 GROQ_MODEL_FALLBACKS = (
     "openai/gpt-oss-120b",
     "openai/gpt-oss-20b",
-    "qwen/qwen3.6-27b",
 )
 
 MAX_HISTORY_MESSAGES = 40
