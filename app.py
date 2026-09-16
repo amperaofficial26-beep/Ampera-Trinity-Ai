@@ -69,6 +69,12 @@ from panel_file import render_file_dock          # ← BARIS BARU
 from page_desain import page_desain
 from page_jadwal import page_jadwal
 from styles import inject_css
+# ⬇️ TAMBAHKAN ⬇️
+from tampilan import (
+    PALET_NAMES, WALLPAPER_NAMES, SUDUT_NAMES, DEFAULT_PALET,
+    inject_tampilan, kartu_pratinjau, siapkan_wallpaper_unggahan,
+    palet_aktif, _valid_hex,
+)
 from chat_handlers import (
     process_user_input, render_input_controls, render_pending_preview,
     maybe_run_yuki, fragmen_jawaban_yuki, chat_input_atau_hentikan,
@@ -401,11 +407,15 @@ def _cap_rows_html() -> str:
 
 def _set_umum() -> None:
     s = get_settings()
+   # SESUDAH:
+    # Catatan: pemilih "Tema" yang dulu ada di sini sudah dipindah ke tab
+    # "Tampilan" (tampilan.py) yang benar-benar mengubah warna aplikasi.
+    # Selectbox lama hanya menyimpan nilai tanpa efek apa pun.
     st.markdown('<div class="set-section">Tampilan</div>', unsafe_allow_html=True)
-    c1, c2, c3 = st.columns(3)
-    with c1:
-        theme = st.selectbox("Tema", THEME_OPTIONS, index=_opt_index(THEME_OPTIONS, s["theme"]),
-                             key="set_theme", help="Tema beige hangat adalah tampilan bawaan Trinity.")
+    st.caption(
+        "Wallpaper dan warna aplikasi diatur di tab **Tampilan**."
+    )
+    c2, c3 = st.columns(2)
     with c2:
         font = st.selectbox("Ukuran teks", FONT_OPTIONS, index=_opt_index(FONT_OPTIONS, s["font_size"]),
                             key="set_font")
@@ -434,7 +444,7 @@ def _set_umum() -> None:
     _baris_aksi_simpan(
         "Simpan perubahan", "save_umum",
         {
-            "theme": theme, "font_size": font,
+            "font_size": font,
             "stream_speed": speed, "personality": persona,
             "clarify_mode": clarify,
             "default_mode": mode,
@@ -442,6 +452,128 @@ def _set_umum() -> None:
         "Pengaturan umum disimpan.",
     )
 
+def _set_tampilan() -> None:
+    """Tab Pengaturan > Tampilan: wallpaper & warna pilihan User.
+
+    Pratinjau diperbarui LANGSUNG saat pilihan diubah (tanpa menekan
+    Simpan) karena widget-nya dibaca dari nilai balik, bukan dari
+    settings. Yang tersimpan permanen tetap lewat tombol Simpan.
+    """
+    s = get_settings()
+
+    st.markdown('<div class="set-section">Warna</div>', unsafe_allow_html=True)
+    c1, c2 = st.columns(2)
+    with c1:
+        palet = st.selectbox(
+            "Tema warna", PALET_NAMES,
+            index=_opt_index(PALET_NAMES, s.get("ui_palet", DEFAULT_PALET)),
+            key="set_ui_palet",
+            help="Mengubah warna latar, kartu, sidebar, dan teks di seluruh aplikasi.",
+        )
+    with c2:
+        sudut = st.selectbox(
+            "Kelengkungan sudut", SUDUT_NAMES,
+            index=_opt_index(SUDUT_NAMES, s.get("ui_sudut", "Sedang")),
+            key="set_ui_sudut",
+            help="Seberapa bulat sudut kartu, gelembung pesan, dan tombol.",
+        )
+
+    pakai_aksen = st.checkbox(
+        "Pakai warna aksen sendiri", value=bool(s.get("ui_accent_custom")),
+        key="set_ui_aksen_on",
+        help="Warna tombol utama, tautan, dan tab aktif.",
+    )
+    if pakai_aksen:
+        aksen = st.color_picker(
+            "Warna aksen",
+            value=(s.get("ui_accent_custom") or palet_aktif(s)["accent"]),
+            key="set_ui_aksen",
+        )
+    else:
+        aksen = ""
+
+    st.markdown('<div class="set-section">Wallpaper</div>', unsafe_allow_html=True)
+    wp = st.selectbox(
+        "Pola latar belakang", WALLPAPER_NAMES,
+        index=_opt_index(WALLPAPER_NAMES, s.get("ui_wallpaper", "Polos")),
+        key="set_ui_wp",
+        help="Pola dibuat dari CSS, jadi ringan dan tidak menambah waktu muat.",
+    )
+
+    berkas = st.file_uploader(
+        "Atau unggah gambar sendiri (JPG/PNG)",
+        type=["jpg", "jpeg", "png", "webp"], key="set_ui_wp_file",
+        help="Gambar unggahan menimpa pilihan pola di atas. "
+             "Otomatis dikecilkan maks 1920px agar aplikasi tetap ringan.",
+    )
+
+    wp_custom = s.get("ui_wallpaper_custom") or ""
+    if berkas is not None:
+        try:
+            wp_custom = siapkan_wallpaper_unggahan(berkas.getvalue())
+        except Exception:
+            st.warning("Gambar tidak bisa dibaca. Coba berkas lain.")
+
+    if wp_custom:
+        k1, k2 = st.columns([3, 1])
+        with k1:
+            st.caption("Gambar wallpaper sedang dipakai.")
+        with k2:
+            if st.button("Hapus gambar", key="set_ui_wp_hapus",
+                         use_container_width=True):
+                _save_settings({"ui_wallpaper_custom": ""}, "Wallpaper gambar dihapus.")
+                st.rerun()
+
+    c3, c4 = st.columns(2)
+    with c3:
+        opac = st.slider(
+            "Kepekatan wallpaper", 0, 100,
+            value=int(s.get("ui_wallpaper_opacity", 100)), step=5,
+            key="set_ui_wp_opac",
+            help="Turunkan kalau wallpaper membuat teks susah dibaca.",
+        )
+    with c4:
+        blur = st.slider(
+            "Buram", 0, 20, value=int(s.get("ui_wallpaper_blur", 0)),
+            key="set_ui_wp_blur",
+            help="Berguna untuk foto unggahan supaya teks tetap jelas terbaca.",
+        )
+
+    # Pratinjau memakai pilihan SAAT INI, bukan yang tersimpan.
+    pratinjau = dict(s)
+    pratinjau.update({
+        "ui_palet": palet, "ui_sudut": sudut,
+        "ui_accent_custom": aksen if (pakai_aksen and _valid_hex(aksen)) else "",
+        "ui_wallpaper": wp, "ui_wallpaper_custom": wp_custom,
+        "ui_wallpaper_opacity": opac, "ui_wallpaper_blur": blur,
+    })
+    st.markdown('<div class="set-section">Pratinjau</div>', unsafe_allow_html=True)
+    st.markdown(kartu_pratinjau(pratinjau), unsafe_allow_html=True)
+    st.caption("Tekan Simpan untuk menerapkan ke seluruh aplikasi.")
+
+    def _reset() -> None:
+        _save_settings({
+            "ui_palet": DEFAULT_PALET, "ui_sudut": "Sedang",
+            "ui_accent_custom": "", "ui_wallpaper": "Polos",
+            "ui_wallpaper_custom": "", "ui_wallpaper_opacity": 100,
+            "ui_wallpaper_blur": 0,
+        }, "Tampilan dikembalikan ke bawaan.")
+        st.rerun()
+
+    _baris_aksi_simpan(
+        "Simpan perubahan", "save_tampilan",
+        {
+            "ui_palet": palet, "ui_sudut": sudut,
+            "ui_accent_custom": aksen if (pakai_aksen and _valid_hex(aksen)) else "",
+            "ui_wallpaper": wp, "ui_wallpaper_custom": wp_custom,
+            "ui_wallpaper_opacity": opac, "ui_wallpaper_blur": blur,
+        },
+        "Tampilan disimpan.",
+        sekunder=("Kembalikan ke bawaan", "reset_tampilan", _reset),
+    )
+
+
+def _set_akun() -> None:
 def _set_akun() -> None:
     s = get_settings()
     st.markdown('<div class="set-section">Profil</div>', unsafe_allow_html=True)
@@ -772,6 +904,7 @@ def page_pengaturan() -> None:
 
     tabs = st.tabs([
         ":material/tune:  Umum",
+        ":material/palette:  Tampilan",        # ← BARIS BARU
         ":material/person:  Akun",
         ":material/shield:  Privasi",
         ":material/receipt_long:  Penagihan",
@@ -783,19 +916,21 @@ def page_pengaturan() -> None:
     with tabs[0]:
         _set_umum()
     with tabs[1]:
-        _set_akun()
+        _set_tampilan()        # ← BARU
     with tabs[2]:
-        _set_privasi()
+        _set_akun()            # ← geser dari [1]
     with tabs[3]:
-        _set_penagihan()
+        _set_privasi()         # ← geser dari [2]
     with tabs[4]:
-        _set_kemampuan()
+        _set_penagihan()       # ← geser dari [3]
     with tabs[5]:
-        _set_memori()
+        _set_kemampuan()       # ← geser dari [4]
     with tabs[6]:
-        _set_refleksi()
+        _set_memori()          # ← geser dari [5]
     with tabs[7]:
-        _set_waktu_fokus()
+        _set_refleksi()        # ← geser dari [6]
+    with tabs[8]:
+        _set_waktu_fokus()     # ← geser dari [7]
 
     _page_footer()
   # ============================================================================
@@ -1304,7 +1439,8 @@ def main() -> None:
     init_state()
     inject_css()
     inject_anim_css()
-
+    inject_tampilan()
+  
     if st.session_state.get("logged_out"):
         st.session_state.logged_out = False
         for k in list(st.session_state.keys()):
