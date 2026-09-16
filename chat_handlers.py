@@ -388,7 +388,10 @@ def _hentikan_dan_finalisasi_stream_lama() -> None:
             _finalisasi_stream_yuki({"buf": [potongan], "err": None})
 
 
-@st.fragment(run_every=0.4)
+# 0,15 detik ≈ 7 pembaruan/detik: teks terasa MENGALIR, bukan muncul
+# per blok tiap 0,4 detik. Masih cukup longgar supaya Streamlit tidak
+# kebanjiran rerun (0,1 detik ke bawah mulai membebani server).
+@st.fragment(run_every=0.15)
 def fragmen_jawaban_yuki() -> None:
     """Teks jawaban Yuki yang mengalir (fase setelah animasi berpikir).
 
