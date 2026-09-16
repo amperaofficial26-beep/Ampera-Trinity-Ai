@@ -157,6 +157,23 @@ def _valid_hex(v: str) -> bool:
         and all(c in "0123456789abcdefABCDEF" for c in v[1:])
     )
 
+def _luminansi(hex_color: str) -> float:
+    """Terang-gelapnya sebuah warna (0 = hitam, 1 = putih).
+
+    Pakai bobot mata manusia (hijau paling berpengaruh) supaya
+    keputusan teks hitam/putih di atasnya benar-benar terbaca.
+    """
+    h = (hex_color or "#000000").lstrip("#")
+    if len(h) != 6:
+        return 0.0
+    r, g, b = (int(h[i:i + 2], 16) / 255 for i in (0, 2, 4))
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+
+def warna_di_atas(hex_color: str) -> str:
+    """Warna teks yang kontras di atas `hex_color`."""
+    return "#1A1A1A" if _luminansi(hex_color) > 0.6 else "#FFFFFF"
+
 
 def palet_aktif(s: dict) -> dict:
     """Palet yang sedang dipakai, sudah termasuk aksen kustom User."""
@@ -164,8 +181,11 @@ def palet_aktif(s: dict) -> dict:
     custom = s.get("ui_accent_custom") or ""
     if _valid_hex(custom):
         p["accent"] = custom
+    # Teks di atas warna aksen dihitung, bukan dipatok putih: kalau User
+    # memilih aksen terang (kuning, cyan), teks putih jadi tak terbaca.
+    p["on_accent"] = warna_di_atas(p["accent"])
     return p
-
+  
 
 def siapkan_wallpaper_unggahan(data: bytes, maks_px: int = 1920) -> str:
     """Ubah gambar unggahan jadi data URL yang ringan.
@@ -216,6 +236,7 @@ def build_css(s: dict) -> str:
   --tr-text: {p['text']};
   --tr-text2: {p['text2']};
   --tr-accent: {p['accent']};
+  --tr-on-accent: {p['on_accent']};
   --tr-bubble: {p['bubble']};
   --tr-radius: {radius};
   color-scheme: {"dark" if gelap else "light"};
@@ -286,16 +307,24 @@ h1, h2, h3, h4, h5, h6,
 [data-testid="stCaptionContainer"] p,
 small, .stCaption { color: var(--tr-text2) !important; }
 
-/* gelembung pesan */
-.bubble-user, .msg-user, [class*="bubble"][class*="user"] {
+/* SESUDAH — ✅ */
+/* gelembung pesan
+   PENTING: hanya .bubble.user yang diwarnai. Selektor lama
+   [class*="bubble"][class*="user"] juga kena .bubble-row.user dan
+   .bubble-wrap — dua-duanya elemen FLEX selebar penuh, jadi warnanya
+   ikut melebar satu bar penuh, bukan mengikuti lebar teks. */
+.bubble.user {
   background: var(--tr-bubble) !important;
   color: var(--tr-text) !important;
   border-radius: var(--tr-radius) !important;
 }
-.bubble-assistant, .msg-assistant {
-  color: var(--tr-text) !important;
+/* wadahnya wajib tetap transparan */
+.bubble-row, .bubble-row.user, .bubble-wrap {
+  background: transparent !important;
 }
-
+.bubble.ai { background: transparent !important; color: var(--tr-text) !important; }
+.bubble-meta, .msg-action-time { color: var(--tr-text2) !important; 
+}
 /* kartu & panel */
 .cap-card, .set-card, .art-card, .course-card, .price-card,
 [data-testid="stExpander"], [data-testid="stForm"] {
@@ -336,14 +365,106 @@ small, .stCaption { color: var(--tr-text2) !important; }
 .stFormSubmitButton button[kind="primary"] {
   background: var(--tr-accent) !important;
   border-color: var(--tr-accent) !important;
-  color: #fff !important;
+  color: var(--tr-on-accent) !important;
   border-radius: var(--tr-radius) !important;
+}
+.stButton button[kind="primary"]:hover,
+.stFormSubmitButton button[kind="primary"]:hover {
+  filter: brightness(1.08);
+}
+.stButton button[kind="primary"] p,
+.stButton button[kind="primary"] [data-testid="stIconMaterial"] {
+  color: var(--tr-on-accent) !important;
 }
 .stButton button[kind="secondary"] {
   background: var(--tr-surface) !important;
   color: var(--tr-text) !important;
   border-color: var(--tr-border) !important;
   border-radius: var(--tr-radius) !important;
+}
+
+/* BARIS AKSI DI BAWAH JAWABAN YUKI (salin, 👍, 👎)
+   Tombol ini harus tampak seperti ikon telanjang — tanpa kotak, tanpa
+   latar — baik saat aktif maupun tidak. styles.py sudah membuat yang
+   varian primary transparan; di sini disamakan untuk SEMUA keadaan
+   supaya pilihan tema tidak memunculkan kembali kotak latarnya. */
+[class*="st-key-msg_actions_"] div.stButton > button,
+[class*="st-key-msg_actions_"] div.stButton > button[kind="primary"],
+[class*="st-key-msg_actions_"] div.stButton > button[kind="secondary"],
+[class*="st-key-msg_actions_"] [data-testid="stBaseButton-primary"],
+[class*="st-key-msg_actions_"] [data-testid="stBaseButton-secondary"] {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: var(--tr-text2) !important;
+  padding: 2px 4px !important;
+  min-height: 0 !important;
+}
+[class*="st-key-msg_actions_"] div.stButton > button:hover,
+[class*="st-key-msg_actions_"] div.stButton > button:hover
+  [data-testid="stIconMaterial"] {
+  color: var(--tr-accent) !important;
+  background: transparent !important;
+}
+/* keadaan TERPILIH (sudah diberi 👍/👎): ikon berwarna aksen, tetap
+   tanpa latar, jadi user tahu pilihannya tersimpan. */
+[class*="st-key-msg_actions_"] div.stButton > button[kind="primary"],
+[class*="st-key-msg_actions_"] div.stButton > button[kind="primary"]
+  [data-testid="stIconMaterial"] {
+  color: var(--tr-accent) !important;
+}
+
+/* POPUP MENU (menu pengguna & menu +) — ikut warna tema */
+[data-testid="stPopoverBody"],
+[data-baseweb="popover"] > div,
+[data-baseweb="popover"] [role="dialog"] {
+  background: var(--tr-surface) !important;
+  border-color: var(--tr-border) !important;
+  border-radius: var(--tr-radius) !important;
+}
+[data-testid="stPopoverBody"] div.stButton > button {
+  background: transparent !important;
+  color: var(--tr-text) !important;
+  border: none !important;
+}
+[data-testid="stPopoverBody"] div.stButton > button:hover {
+  background: var(--tr-bubble) !important;
+}
+[data-testid="stPopoverBody"] p,
+[data-testid="stPopoverBody"] [data-testid="stIconMaterial"] {
+  color: var(--tr-text) !important;
+}
+
+/* DOK INPUT CHAT bawah — kartu, disclaimer, dan tombol di dalamnya */
+[data-testid="stBottom"], [data-testid="stBottom"] > div {
+  background: transparent !important;
+}
+[data-testid="stBottomBlockContainer"] {
+  background: transparent !important;
+}
+.st-key-chat_controls,
+.st-key-chat_controls > div,
+[data-testid="stChatInput"] > div {
+  background: var(--tr-surface) !important;
+  border-color: var(--tr-border) !important;
+}
+.chat-disclaimer, .chat-note, .st-key-chat_controls p {
+  color: var(--tr-text2) !important;
+}
+.st-key-chat_controls [data-testid="stPopover"] button,
+.st-key-chat_controls button[data-testid="stPopoverButton"] {
+  background: transparent !important;
+  color: var(--tr-text2) !important;
+  border-color: var(--tr-border) !important;
+}
+/* tombol kirim (panah) memakai warna aksen */
+[data-testid="stChatInputSubmitButton"] {
+  background: var(--tr-bubble) !important;
+  color: var(--tr-text) !important;
+}
+[data-testid="stChatInputSubmitButton"]:hover {
+  background: var(--tr-accent) !important;
+  color: var(--tr-on-accent) !important;
 }
 
 /* tab & pemisah */
@@ -355,21 +476,48 @@ hr, [data-testid="stDivider"] { border-color: var(--tr-border) !important; }
 a { color: var(--tr-accent) !important; }
 """)
 
-    # ---- penyesuaian khusus tema gelap -------------------------------
-    # styles.py menulis banyak warna beige secara harfiah. Untuk tema
-    # gelap, beberapa permukaan terang perlu ditimpa agar teks tetap
-    # terbaca.
-    if gelap:
+    # ---- sapu bersih warna beige harfiah -----------------------------
+    # styles.py menulis warna beige langsung (bukan variabel) di puluhan
+    # tempat. Selama warnanya tidak disapu, tema apa pun akan menyisakan
+    # kartu/menu/dok yang masih krem — persis keluhan "warna tampilan
+    # nggak sesuai". Berlaku untuk SEMUA tema, bukan cuma yang gelap.
+    if (s.get("ui_palet") or DEFAULT_PALET) != DEFAULT_PALET or _valid_hex(
+        s.get("ui_accent_custom") or ""
+    ):
         bagian.append("""
-[style*="background: #F2E8D6"], [style*="background:#F2E8D6"],
-[style*="background: #EDE2D1"], [style*="background:#EDE2D1"],
-[style*="background: #E8DCC8"], [style*="background:#E8DCC8"] {
-  background: var(--tr-surface) !important;
+/* permukaan krem bawaan -> permukaan tema */
+[style*="#F2E8D6"], [style*="#EDE2D1"], [style*="#FBF6EC"],
+[style*="#F5EFE6"], [style*="#FFFBF2"], [style*="#F7F1E6"] {
+  background-color: var(--tr-surface) !important;
+  border-color: var(--tr-border) !important;
+}
+/* latar halaman krem -> latar tema */
+[style*="#E8DCC8"] { background-color: var(--tr-bg) !important; }
+/* garis tepi krem -> garis tema */
+[style*="#DBCEB9"] { border-color: var(--tr-border) !important; }
+/* teks ungu gelap bawaan -> teks tema */
+[style*="color: #2C1F33"], [style*="color:#2C1F33"],
+[style*="color: #4A3559"], [style*="color:#4A3559"] {
   color: var(--tr-text) !important;
 }
-[style*="color: #2C1F33"], [style*="color:#2C1F33"] { color: var(--tr-text) !important; }
-[style*="color: #6B6172"], [style*="color:#6B6172"] { color: var(--tr-text2) !important; }
-code, pre { background: rgba(255,255,255,.06) !important; color: var(--tr-text) !important; }
+[style*="color: #6B6172"], [style*="color:#6B6172"],
+[style*="color: #7E7387"], [style*="color:#7E7387"],
+[style*="color: #827788"], [style*="color:#827788"] {
+  color: var(--tr-text2) !important;
+}
+""")
+
+    # ---- penyesuaian khusus tema gelap -------------------------------
+    if gelap:
+        bagian.append("""
+code, pre, [data-testid="stCodeBlock"] {
+  background: rgba(255,255,255,.06) !important;
+  color: var(--tr-text) !important;
+}
+[data-testid="stSidebarNav"], [data-testid="stSidebarUserContent"] {
+  color: var(--tr-text) !important;
+}
+img[src*="logo"] { filter: brightness(1.35) !important; }
 """)
 
     return "\n".join(bagian)
