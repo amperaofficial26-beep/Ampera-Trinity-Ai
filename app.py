@@ -69,7 +69,6 @@ from panel_file import render_file_dock          # ← BARIS BARU
 from page_desain import page_desain
 from page_jadwal import page_jadwal
 from styles import inject_css
-# ⬇️ TAMBAHKAN ⬇️
 from tampilan import (
     PALET_NAMES, WALLPAPER_NAMES, SUDUT_NAMES, DEFAULT_PALET,
     inject_tampilan, kartu_pratinjau, siapkan_wallpaper_unggahan,
@@ -407,7 +406,6 @@ def _cap_rows_html() -> str:
 
 def _set_umum() -> None:
     s = get_settings()
-   # SESUDAH:
     # Catatan: pemilih "Tema" yang dulu ada di sini sudah dipindah ke tab
     # "Tampilan" (tampilan.py) yang benar-benar mengubah warna aplikasi.
     # Selectbox lama hanya menyimpan nilai tanpa efek apa pun.
@@ -573,7 +571,6 @@ def _set_tampilan() -> None:
     )
 
 
-def _set_akun() -> None:
 def _set_akun() -> None:
     s = get_settings()
     st.markdown('<div class="set-section">Profil</div>', unsafe_allow_html=True)
@@ -904,7 +901,7 @@ def page_pengaturan() -> None:
 
     tabs = st.tabs([
         ":material/tune:  Umum",
-        ":material/palette:  Tampilan",        # ← BARIS BARU
+        ":material/palette:  Tampilan",
         ":material/person:  Akun",
         ":material/shield:  Privasi",
         ":material/receipt_long:  Penagihan",
@@ -916,21 +913,21 @@ def page_pengaturan() -> None:
     with tabs[0]:
         _set_umum()
     with tabs[1]:
-        _set_tampilan()        # ← BARU
+        _set_tampilan()
     with tabs[2]:
-        _set_akun()            # ← geser dari [1]
+        _set_akun()
     with tabs[3]:
-        _set_privasi()         # ← geser dari [2]
+        _set_privasi()
     with tabs[4]:
-        _set_penagihan()       # ← geser dari [3]
+        _set_penagihan()
     with tabs[5]:
-        _set_kemampuan()       # ← geser dari [4]
+        _set_kemampuan()
     with tabs[6]:
-        _set_memori()          # ← geser dari [5]
+        _set_memori()
     with tabs[7]:
-        _set_refleksi()        # ← geser dari [6]
+        _set_refleksi()
     with tabs[8]:
-        _set_waktu_fokus()     # ← geser dari [7]
+        _set_waktu_fokus()
 
     _page_footer()
   # ============================================================================
@@ -1439,8 +1436,10 @@ def main() -> None:
     init_state()
     inject_css()
     inject_anim_css()
+    # Lapisan tampilan pilihan User (wallpaper & warna) — HARUS sesudah
+    # inject_css() supaya menimpa tema bawaan, bukan tertimpa.
     inject_tampilan()
-  
+
     if st.session_state.get("logged_out"):
         st.session_state.logged_out = False
         for k in list(st.session_state.keys()):
