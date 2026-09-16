@@ -504,6 +504,14 @@ DEFAULT_SETTINGS: dict = {
     "temperature": 0.7,
 }
 
+# Pengaturan tampilan (wallpaper & warna) tinggal di tampilan.py supaya
+# daftar palet/wallpaper dan nilai bawaannya ada di satu tempat.
+try:
+    from tampilan import TAMPILAN_DEFAULTS as _TAMPILAN_DEFAULTS
+except Exception:  # pragma: no cover
+    _TAMPILAN_DEFAULTS = {}
+DEFAULT_SETTINGS.update(_TAMPILAN_DEFAULTS)
+
 PAGE_TITLES = {
     "artefak": "Artefak",
     "bahasa": "Bahasa",
