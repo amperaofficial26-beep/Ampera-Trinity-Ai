@@ -34,8 +34,9 @@ def inject_toast_anim() -> None:
   position: relative !important;
   box-sizing: border-box !important;
 
-  min-height: 104px !important;
-  padding: 22px 48px 22px 94px !important;
+  min-height: 82px !important;
+  width: min(390px, calc(100vw - 28px)) !important;
+  padding: 16px 42px 16px 78px !important;
 
   color: #fff8e8 !important;
 
@@ -43,7 +44,7 @@ def inject_toast_anim() -> None:
     1px solid
     rgba(224, 184, 91, .72) !important;
 
-  border-radius: 22px !important;
+  border-radius: 18px !important;
 
   background:
     linear-gradient(
@@ -95,11 +96,11 @@ def inject_toast_anim() -> None:
   position: absolute;
   z-index: 3;
 
-  left: 23px;
-  top: 25px;
+  left: 20px;
+  top: 19px;
 
-  width: 52px;
-  height: 52px;
+  width: 44px;
+  height: 44px;
 
   background-image: {logo};
   background-size: contain;
@@ -141,11 +142,12 @@ def inject_toast_anim() -> None:
   position: absolute;
   z-index: 4;
 
-  left: 27px;
-  top: 29px;
+  left: 22px;
+  top: 21px;
+    
+  width: 40px;
+  height: 40px;
 
-  width: 44px;
-  height: 44px;
 
   display: grid;
   place-items: center;
@@ -171,9 +173,8 @@ def inject_toast_anim() -> None:
     0 0 22px rgba(235, 181, 55, .66);
 
   font:
-    700 27px/1
+    700 24px/1
     "Manrope",
-    "Trebuchet MS",
     sans-serif;
 
   opacity: 0;
@@ -204,9 +205,9 @@ def inject_toast_anim() -> None:
     "Lucida Blackletter",
     fantasy !important;
 
-  font-size: 21px !important;
+  font-size: 18px !important;
   font-weight: 700 !important;
-  line-height: 1.35 !important;
+  line-height: 1.3 !important;
   letter-spacing: .025em !important;
 
   text-shadow:
@@ -351,8 +352,6 @@ def inject_toast_anim() -> None:
       rotate(0deg);
   }}
 }}
-
-
 /* ================================================================
    ANIMASI TULISAN
    ================================================================ */
@@ -375,7 +374,25 @@ def inject_toast_anim() -> None:
     filter: blur(0);
   }}
 }}
+/* LETAKKAN KODE RESPONSIVE MOBILE DI SINI */
+@media (max-width: 600px) {{
+  [data-testid="stToast"] {{
+    width: calc(100vw - 24px) !important;
+    min-height: 78px !important;
 
+    padding:
+      14px
+      38px
+      14px
+      72px !important;
+  }}
+
+  [data-testid="stToast"] [data-testid="stMarkdownContainer"],
+  [data-testid="stToast"] [data-testid="stMarkdownContainer"] *,
+  [data-testid="stToast"] p {{
+    font-size: 17px !important;
+  }}
+}}
 
 /* ================================================================
    AKSESIBILITAS
