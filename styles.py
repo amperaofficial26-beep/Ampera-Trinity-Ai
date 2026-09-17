@@ -575,142 +575,424 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 .logo-greeting, .logo-label, .logo-progress, .logo-foot,
 .claude-think .logo-shimmer { color: #2C1F33; }
 
-/* ---------- chat input: kartu putih membulat ala Claude ---------- */
-/* ====== URUTAN AREA INPUT ala Claude — HANYA 2 lapisan terluar yang
-   dibongkar (pakai ">"), supaya struktur DI DALAM pending_strip dan
-   chat_controls (posisi tombol ×, baris + & model) tidak ikut rusak ====== */
-[data-testid="stBottomBlockContainer"] > [data-testid="stVerticalBlock"] {
-    display: contents !important;
-}
-[data-testid="stBottomBlockContainer"] > [data-testid="stVerticalBlock"] > [data-testid="stElementContainer"],
-[data-testid="stBottomBlockContainer"] > [data-testid="stVerticalBlock"] > .element-container {
-    display: contents !important;
-}
-[data-testid="stBottomBlockContainer"] [class*="st-key-pending_strip"] { order: 1 !important; }
-[data-testid="stBottomBlockContainer"] [data-testid="stChatInput"]      { order: 2 !important; }
-[data-testid="stBottomBlockContainer"] .st-key-chat_controls            { order: 3 !important; }
-
-[data-testid="stBottom"], [data-testid="stBottomBlockContainer"],
-[data-testid="stBottom"] > div {
-    background: #E8DCC8 !important; border: none !important; box-shadow: none !important;
-}
-/* KARTU GABUNGAN ala Claude: kotak teks + baris kontrol (+, model)
-   dibungkus jadi SATU kartu membulat. */
+/* ================================================================
+   KARTU CHAT GABUNGAN
+   Kolom teks, tombol +, dan nama model menjadi satu kartu.
+   ================================================================ */
 [data-testid="stBottomBlockContainer"] {
-    background: #F2E8D6 !important;
-    border: 1px solid #DBCEB9 !important;
+    position: relative !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    width: min(760px, calc(100vw - 24px)) !important;
+
+    margin-left: auto !important;
+    margin-right: auto !important;
+
+    padding:
+        8px
+        8px
+        6px !important;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(248, 239, 222, 0.98),
+            rgba(239, 225, 202, 0.98)
+        ) !important;
+
+    border:
+        1px solid
+        rgba(159, 126, 72, 0.38) !important;
+
     border-radius: 22px !important;
-    box-shadow: 0 4px 14px rgba(44,31,51,0.07) !important;
-    padding: 6px 6px 4px !important;
-    transition: border-color .18s ease, box-shadow .18s ease !important;
+
+    box-shadow:
+        0 8px 24px rgba(65, 46, 27, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.78) !important;
+
+    overflow: visible !important;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease !important;
 }
+
+
+/* Glow saat pengguna mengetik. */
 [data-testid="stBottomBlockContainer"]:focus-within {
-    border-color: #2C1F33 !important;
-    box-shadow: 0 4px 18px rgba(44,31,51,0.16) !important;
+    border-color:
+        rgba(177, 131, 47, 0.72) !important;
+
+    box-shadow:
+        0 10px 28px rgba(65, 46, 27, 0.16),
+        0 0 0 1px rgba(199, 151, 57, 0.18),
+        0 0 22px rgba(211, 163, 65, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.82) !important;
 }
+
+
+/* ================================================================
+   URUTAN ELEMEN DI DALAM KARTU
+   1. Lampiran
+   2. Kolom teks
+   3. Tombol + dan nama model
+   ================================================================ */
+[data-testid="stBottomBlockContainer"]
+> [data-testid="stVerticalBlock"] {
+    display: contents !important;
+}
+
+[data-testid="stBottomBlockContainer"]
+> [data-testid="stVerticalBlock"]
+> [data-testid="stElementContainer"],
+[data-testid="stBottomBlockContainer"]
+> [data-testid="stVerticalBlock"]
+> .element-container {
+    display: contents !important;
+}
+
+[data-testid="stBottomBlockContainer"]
+[class*="st-key-pending_strip"] {
+    order: 1 !important;
+}
+
+[data-testid="stBottomBlockContainer"]
 [data-testid="stChatInput"] {
+    order: 2 !important;
+}
+
+[data-testid="stBottomBlockContainer"]
+.st-key-chat_controls {
+    order: 3 !important;
+}
+
+
+/* ================================================================
+   KOLOM KETIK
+   Menghapus kotak terpisah bawaan Streamlit.
+   ================================================================ */
+[data-testid="stBottomBlockContainer"]
+[data-testid="stChatInput"] {
+    width: 100% !important;
+
+    padding:
+        4px
+        6px
+        2px !important;
+
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+
+/* Bersihkan seluruh pembungkus bawaan input. */
+[data-testid="stBottomBlockContainer"]
+[data-testid="stChatInput"] div,
+
+[data-testid="stBottomBlockContainer"]
+[data-testid="stChatInput"]
+[data-baseweb="base-input"],
+
+[data-testid="stBottomBlockContainer"]
+[data-testid="stChatInput"]
+[data-baseweb="textarea"] {
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
-    padding: 2px 6px !important;
 }
-[data-testid="stChatInput"] div,
-[data-testid="stChatInput"] [data-baseweb="base-input"],
-[data-testid="stChatInput"] [data-baseweb="textarea"] {
-    background: transparent !important; border: none !important; box-shadow: none !important;
-}
-[data-testid="stChatInput"] textarea {
-    background: transparent !important;
-    color: #2C1F33 !important;
-    font-family: 'Inter', sans-serif !important;
-    font-size: 0.95rem !important;
-}
-[data-testid="stChatInput"] textarea::placeholder {
-    color: #7E7387 !important;
-}
-[data-testid="stChatInput"] button {
-    background: #2C1F33 !important;
-    border: none !important;
-    border-radius: 10px !important;
-    color: #FFFFFF !important;
-    transition: background .18s ease !important;
-}
-[data-testid="stChatInput"] button:hover {
-    background: #4A3559 !important;
-}
-[data-testid="stChatInput"] button svg { fill: #FFFFFF !important; color: #FFFFFF !important; }
-[data-testid="stChatInput"] button:disabled {
-    background: #DBCEB9 !important;
-}
-[data-testid="stChatInput"] button:disabled svg { fill: #7E7387 !important; color: #7E7387 !important; }
 
-.st-key-chat_controls {
-    position: relative;
-    margin-top: 0 !important;
-    padding: 2px 4px 2px;
+
+/* Tulisan di dalam kolom chat. */
+[data-testid="stBottomBlockContainer"]
+[data-testid="stChatInput"] textarea {
+    min-height: 54px !important;
+
+    padding:
+        10px
+        8px
+        4px !important;
+
+    color: #34271e !important;
+
     background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+
+    font-family:
+        "Manrope",
+        "Inter",
+        sans-serif !important;
+
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    line-height: 1.5 !important;
+
+    resize: none !important;
 }
-.st-key-chat_controls [data-testid="stHorizontalBlock"] {
-    align-items: center;
-    gap: 2px !important;
+
+
+/* Warna placeholder. */
+[data-testid="stBottomBlockContainer"]
+[data-testid="stChatInput"]
+textarea::placeholder {
+    color: #8a7969 !important;
+    opacity: 1 !important;
+}
+
+
+/* ================================================================
+   BARIS TOMBOL + DAN NAMA MODEL
+   Tetap berada di dalam kartu chat yang sama.
+   ================================================================ */
+.st-key-chat_controls {
+    position: relative !important;
+
+    width: 100% !important;
+
+    margin: 0 !important;
+
+    padding:
+        3px
+        5px
+        2px !important;
+
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+
+/* Susunan horizontal tombol. */
+.st-key-chat_controls
+[data-testid="stHorizontalBlock"] {
+    width: 100% !important;
+
+    align-items: center !important;
+
+    gap: 4px !important;
+
     flex-wrap: nowrap !important;
 }
-.st-key-chat_controls [data-testid="stHorizontalBlock"]:last-of-type > [data-testid="stColumn"] {
+
+
+/* Kolom tombol dibuat seramping isinya. */
+.st-key-chat_controls
+[data-testid="stHorizontalBlock"]:last-of-type
+> [data-testid="stColumn"] {
     width: auto !important;
-    flex: 0 0 auto !important;
     min-width: 0 !important;
+
+    flex:
+        0
+        0
+        auto !important;
 }
-.st-key-chat_controls [data-testid="stHorizontalBlock"]:last-of-type > [data-testid="stColumn"]:nth-child(2) {
-    flex: 1 1 auto !important;
+
+
+/* Kolom tengah menjadi ruang fleksibel. */
+.st-key-chat_controls
+[data-testid="stHorizontalBlock"]:last-of-type
+> [data-testid="stColumn"]:nth-child(2) {
+    flex:
+        1
+        1
+        auto !important;
 }
+
+
+/* ================================================================
+   TOMBOL + DAN MODEL
+   ================================================================ */
+.st-key-chat_controls
+[data-testid="stPopover"] button,
+
+.st-key-chat_controls
+button[data-testid="stPopoverButton"],
+
+.st-key-chat_controls
+button[data-testid="stBaseButton-secondary"] {
+    min-height: 32px !important;
+    height: 32px !important;
+
+    padding:
+        3px
+        10px !important;
+
+    color: #5a493a !important;
+
+    background:
+        rgba(255, 250, 240, 0.46) !important;
+
+    border:
+        1px solid
+        rgba(150, 116, 62, 0.16) !important;
+
+    border-radius: 10px !important;
+
+    box-shadow: none !important;
+
+    font-family:
+        "Manrope",
+        "Inter",
+        sans-serif !important;
+
+    font-size: 12.5px !important;
+    font-weight: 700 !important;
+
+    white-space: nowrap !important;
+
+    transition:
+        color 0.18s ease,
+        background 0.18s ease,
+        border-color 0.18s ease,
+        transform 0.18s ease !important;
+}
+
+
+/* Efek hover tombol + dan nama model. */
+.st-key-chat_controls
+[data-testid="stPopover"] button:hover,
+
+.st-key-chat_controls
+button[data-testid="stPopoverButton"]:hover {
+    color: #3a2a1e !important;
+
+    background:
+        rgba(213, 169, 80, 0.18) !important;
+
+    border-color:
+        rgba(173, 128, 42, 0.32) !important;
+
+    transform:
+        translateY(-1px) !important;
+}
+
+
+/* ================================================================
+   KETERANGAN AI DI TENGAH
+   ================================================================ */
 .input-disclaimer {
-    text-align: center;
-    font-size: 0.76rem;
-    color: #7E7387;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding: 4px 8px 0;
+    padding:
+        5px
+        8px
+        1px !important;
+
+    color: #8a7969 !important;
+
+    text-align: center !important;
+
+    font-family:
+        "Inter",
+        sans-serif !important;
+
+    font-size: 11px !important;
+    font-weight: 400 !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
 }
-.st-key-chat_controls [data-testid="stPopover"] button,
-.st-key-chat_controls [data-testid="stPopover"] > div > button,
-.st-key-chat_controls button[data-testid="stBaseButton-secondary"],
-.st-key-chat_controls button[data-testid="stPopoverButton"] {
-    background: transparent !important;
-    background-color: transparent !important;
-    border: none !important;
-    outline: none !important;
-    border-radius: 8px !important;
-    padding: 2px 8px !important;
-    min-height: 30px !important;
-    height: 30px !important;
-    font-size: 0.8rem !important;
-    font-weight: 500 !important;
-    color: #6B6172 !important;
+
+
+/* ================================================================
+   TOMBOL KIRIM
+   ================================================================ */
+[data-testid="stBottomBlockContainer"]
+[data-testid="stChatInput"]
+button {
+    color: #fff8e8 !important;
+
+    background:
+        linear-gradient(
+            145deg,
+            #7a5930,
+            #4c3520
+        ) !important;
+
+    border:
+        1px solid
+        rgba(225, 187, 111, 0.36) !important;
+
+    border-radius: 10px !important;
+
+    box-shadow:
+        0 4px 12px
+        rgba(68, 43, 22, 0.18) !important;
+}
+
+
+/* Ikon tombol kirim. */
+[data-testid="stBottomBlockContainer"]
+[data-testid="stChatInput"]
+button svg {
+    color: #fff8e8 !important;
+    fill: #fff8e8 !important;
+}
+
+
+/* Tombol kirim saat tidak aktif. */
+[data-testid="stBottomBlockContainer"]
+[data-testid="stChatInput"]
+button:disabled {
+    color: #9b8a79 !important;
+
+    background:
+        rgba(183, 160, 126, 0.26) !important;
+
     box-shadow: none !important;
-    white-space: nowrap;
-    justify-content: flex-start !important;
-    width: auto !important;
 }
-.st-key-chat_controls [data-testid="stPopover"] button:hover,
-.st-key-chat_controls button[data-testid="stPopoverButton"]:hover {
-    background: rgba(44,31,51,0.06) !important;
-    color: #2C1F33 !important;
-    border: none !important;
-    box-shadow: none !important;
+
+
+/* ================================================================
+   RESPONSIVE HP
+   ================================================================ */
+@media (max-width: 600px) {
+    [data-testid="stBottomBlockContainer"] {
+        width:
+            calc(100vw - 16px) !important;
+
+        padding:
+            6px
+            6px
+            5px !important;
+
+        border-radius: 18px !important;
+    }
+
+    [data-testid="stBottomBlockContainer"]
+    [data-testid="stChatInput"]
+    textarea {
+        min-height: 48px !important;
+
+        font-size: 14px !important;
+    }
+
+    .st-key-chat_controls
+    [data-testid="stPopover"] button,
+
+    .st-key-chat_controls
+    button[data-testid="stPopoverButton"] {
+        min-height: 30px !important;
+        height: 30px !important;
+
+        padding:
+            2px
+            8px !important;
+
+        font-size: 11.5px !important;
+    }
+
+    .input-disclaimer {
+        font-size: 9.5px !important;
+        padding-left: 4px !important;
+        padding-right: 4px !important;
+    }
 }
-.st-key-chat_controls [data-testid="stPopover"] {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-}
-.st-key-chat_controls [data-testid="stPopover"] > div {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-}
-.st-key-chat_controls [data-testid="stVerticalBlock"] { gap: 0 !important; }
-.st-key-chat_controls .element-container { margin: 0 !important; }
 
 [data-testid="stChatInput"] [data-testid="stChatInputFileUploadButton"] {
     display: none !important;
