@@ -832,30 +832,41 @@ def tampilkan_gerbang() -> bool:
     """
     _proses_balasan_google()
 
-    tahap = st.session_state.get("_tahap") or "splash"
-
-    if tahap == "app":
-        pesan_masuk = ""
-
-        if st.session_state.pop("_google_baru_masuk", False):
-            u = st.session_state.get("_user_google") or {}
-
-            if u.get("email"):
-                pesan_masuk = f"Masuk sebagai {u['email']}"
-
-        elif st.session_state.pop("_baru_masuk_tamu", False):
-            pesan_masuk = "Berhasil masuk ke Ampera Trinity AI."
-
-        if pesan_masuk:
-            from toast_anim import toast_sukses
-
-            toast_sukses(pesan_masuk)
-
-        return False
-
-    if tahap == "splash":
-        render_splash()
-        return True
-
-    _render_login()
-    return True
+   tahap = st.session_state.get("_tahap") or "splash"
+   
+   if tahap == "app":
+       pesan_masuk = ""
+   
+       if st.session_state.pop("_google_baru_masuk", False):
+           u = st.session_state.get("_user_google") or {}
+   
+           if u.get("email"):
+               pesan_masuk = f"Masuk sebagai {u['email']}"
+   
+       elif st.session_state.pop("_baru_masuk_tamu", False):
+           pesan_masuk = "Berhasil masuk ke Ampera Trinity AI."
+   
+       if pesan_masuk:
+           # Animasi berasal dari inject_toast_anim() di app.py.
+           try:
+               st.toast(
+                   pesan_masuk,
+                   icon=":material/check:",
+                   duration="long",
+               )
+           except TypeError:
+               # Kompatibilitas untuk versi Streamlit yang belum
+               # mendukung parameter duration.
+               st.toast(
+                   pesan_masuk,
+                   icon=":material/check:",
+               )
+   
+       return False
+   
+   if tahap == "splash":
+       render_splash()
+       return True
+   
+   _render_login()
+   return True
