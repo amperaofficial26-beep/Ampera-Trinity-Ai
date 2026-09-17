@@ -827,24 +827,35 @@ def _render_login() -> None:
 def tampilkan_gerbang() -> bool:
     """Tampilkan splash/login bila sesi belum masuk aplikasi.
 
-    Return True berarti app.py harus st.stop() (gerbang masih menguasai
-    layar). Return False bila pengguna sudah masuk -> aplikasi jalan normal.
+    Return True berarti app.py harus st.stop() karena gerbang masih
+    menguasai layar. Return False berarti pengguna sudah masuk.
     """
-    # Balasan OAuth dari Google (?code=/?error=) diproses paling awal —
-    # bisa terjadi pada sesi baru tanpa session state sama sekali.
     _proses_balasan_google()
 
     tahap = st.session_state.get("_tahap") or "splash"
+
     if tahap == "app":
+        pesan_masuk = ""
+
         if st.session_state.pop("_google_baru_masuk", False):
             u = st.session_state.get("_user_google") or {}
+
             if u.get("email"):
-                toast_sukses(f"Masuk sebagai {u['email']}")
+                pesan_masuk = f"Masuk sebagai {u['email']}"
+
         elif st.session_state.pop("_baru_masuk_tamu", False):
-              toast_sukses("Berhasil masuk ke Ampera Trinity AI.")
+            pesan_masuk = "Berhasil masuk ke Ampera Trinity AI."
+
+        if pesan_masuk:
+            from toast_anim import toast_sukses
+
+            toast_sukses(pesan_masuk)
+
         return False
+
     if tahap == "splash":
         render_splash()
         return True
+
     _render_login()
     return True
