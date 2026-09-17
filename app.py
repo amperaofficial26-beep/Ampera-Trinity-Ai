@@ -1469,7 +1469,7 @@ def page_kursus() -> None:
 def main() -> None:
     init_state()
     inject_css()
-    inject_anim_css()
+    inject_toast_anim()
     inject_anim_css()
     # Lapisan tampilan pilihan User (wallpaper & warna) — HARUS sesudah
     # inject_css() supaya menimpa tema bawaan, bukan tertimpa.
