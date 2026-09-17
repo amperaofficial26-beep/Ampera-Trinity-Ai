@@ -91,14 +91,9 @@ def bersihkan_riwayat(termasuk_mode_lain: bool = False,
     # Dicoba SEBELUM state lokal dikosongkan, karena butuh email user
     # yang tersimpan di session_state.
     #
-    # PENTING: jangan disyaratkan pada setelan "cloud_sync".
-    # Pesan dikirim ke database oleh ui_helpers.py lewat kirim_pesan_baru()
-    # yang hanya memeriksa db_sync.siap() — sama sekali tidak melihat
-    # cloud_sync. Jadi riwayat BISA ADA di database walaupun setelan itu
-    # mati. Kalau penghapusan disyaratkan pada cloud_sync (bawaannya
-    # False), database tidak ikut dibersihkan dan riwayat muncul lagi
-    # begitu user login berikutnya — persis gejala "sudah dihapus tapi
-    # balik lagi".
+    # Syaratnya sama persis dengan penyimpanan (ui_helpers.py memanggil
+    # db_sync.kirim_pesan_baru() yang cuma memeriksa siap()): kalau
+    # pesannya bisa masuk database, penghapusannya juga harus jalan.
     cloud = None
     if hapus_di_cloud:
         try:
