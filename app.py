@@ -96,11 +96,34 @@ def render_multi_agent_launcher() -> None:
         <style>
         .st-key-multi_agent_launcher {
           position: fixed;
+        
           top: 14px;
-          left: 314px;
+          left: 58px;
+        
           z-index: 1000000;
+        
+          transition:
+            left .24s
+            cubic-bezier(.2, .8, .2, 1);
         }
-
+        
+        
+        /* Posisi saat sidebar terbuka. */
+        .stApp:has(
+          section[data-testid="stSidebar"][aria-expanded="true"]
+        )
+        .st-key-multi_agent_launcher {
+          left: 300px;
+        }
+        
+        
+        /* Posisi saat sidebar ditutup. */
+        .stApp:has(
+          section[data-testid="stSidebar"][aria-expanded="false"]
+        )
+        .st-key-multi_agent_launcher {
+          left: 58px;
+        }
         .st-key-multi_agent_launcher button {
           width: 46px !important;
           height: 46px !important;
