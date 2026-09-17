@@ -90,31 +90,22 @@ ROOM_CHAT_URL = "https://room-chat-ampera-group.streamlit.app/"
 
 
 def render_multi_agent_launcher() -> None:
-    """Ikon Pro mengambang di kanan atas, di luar sidebar."""
+    """Tombol Agent dan kartu informasi animasi di samping sidebar."""
     st.markdown(
         """
         <style>
         :root {
           /*
-           * POSISI TOMBOL
-           *
-           * Ubah hanya dua nilai ini.
+           * Posisi saat sidebar terbuka dan tertutup.
            */
-          --agent-launcher-sidebar-buka: 280px;
-          --agent-launcher-sidebar-tutup: 58px;
+          --agent-launcher-open: 280px;
+          --agent-launcher-closed: 58px;
         }
-        
-        
+
+
         /*
-         * PENTING:
-         *
-         * Tombol launcher berada di dalam stMainBlockContainer.
-         * Animasi perpindahan halaman memberikan transform kepada elemen
-         * tersebut. Transform itu membuat position:fixed dihitung dari
-         * area konten, bukan dari layar.
-         *
-         * Karena itu transform induk harus dimatikan ketika terdapat
-         * tombol Multi Trinity Agent.
+         * Mencegah position:fixed dihitung dari area tengah konten
+         * ketika animasi halaman sedang berjalan.
          */
         [data-testid="stMainBlockContainer"]:has(
           .st-key-multi_agent_launcher
@@ -122,51 +113,90 @@ def render_multi_agent_launcher() -> None:
           animation: none !important;
           transform: none !important;
         }
-        
-        
+
+
         /*
-         * Posisi dasar memakai nilai sidebar terbuka.
-         *
-         * Ini juga menjadi fallback jika versi Streamlit yang digunakan
-         * tidak memasang atribut aria-expanded.
+         * Pembungkus tombol dan kartu informasi.
          */
         .st-key-multi_agent_launcher {
           position: fixed !important;
-        
+
           top: 14px !important;
-        
+
           left:
-            var(--agent-launcher-sidebar-buka) !important;
-        
+            var(--agent-launcher-open) !important;
+
+          width: 340px !important;
+
           margin: 0 !important;
-          padding: 0 !important;
-        
+
           z-index: 1000000 !important;
-        
+
           transition:
             left .24s
             cubic-bezier(.2, .8, .2, 1) !important;
         }
-        
-        
-        /* Posisi ketika sidebar dipastikan terbuka. */
-        .stApp:has(
-          section[data-testid="stSidebar"][aria-expanded="true"]
-        )
-        .st-key-multi_agent_launcher {
-          left:
-            var(--agent-launcher-sidebar-buka) !important;
-        }
-        
-        
-        /* Posisi ketika sidebar ditutup. */
+
+
+        /*
+         * Posisi ketika sidebar ditutup.
+         */
         .stApp:has(
           section[data-testid="stSidebar"][aria-expanded="false"]
         )
         .st-key-multi_agent_launcher {
           left:
-            var(--agent-launcher-sidebar-tutup) !important;
+            var(--agent-launcher-closed) !important;
         }
+
+
+        /*
+         * Susunan horizontal:
+         *
+         * [Tombol] [Informasi]
+         */
+        .st-key-multi_agent_launcher
+        [data-testid="stHorizontalBlock"] {
+          align-items: center !important;
+
+          gap: 10px !important;
+
+          flex-wrap: nowrap !important;
+        }
+
+
+        /*
+         * Kolom tombol.
+         */
+        .st-key-multi_agent_launcher
+        [data-testid="stColumn"]:first-child {
+          width: 46px !important;
+          min-width: 46px !important;
+
+          flex:
+            0
+            0
+            46px !important;
+        }
+
+
+        /*
+         * Kolom informasi.
+         */
+        .st-key-multi_agent_launcher
+        [data-testid="stColumn"]:last-child {
+          min-width: 0 !important;
+
+          flex:
+            1
+            1
+            auto !important;
+        }
+
+
+        /*
+         * Tombol Multi Trinity Agent.
+         */
         .st-key-multi_agent_launcher button {
           width: 46px !important;
           height: 46px !important;
@@ -194,17 +224,229 @@ def render_multi_agent_launcher() -> None:
             0 0 18px rgba(218, 166, 55, .38) !important;
         }
 
+
+        /*
+         * Efek tombol saat disentuh kursor.
+         */
         .st-key-multi_agent_launcher button:hover {
           transform:
             translateY(-2px)
             scale(1.04);
         }
 
-        @media (max-width: 600px) {
+
+        /*
+         * Kartu informasi.
+         */
+        .agent-launch-info {
+          position: relative;
+
+          box-sizing: border-box;
+
+          height: 46px;
+
+          padding:
+            7px
+            14px
+            6px
+            34px;
+
+          overflow: hidden;
+
+          border:
+            1px solid
+            color-mix(
+              in srgb,
+              var(--tr-accent) 25%,
+              var(--tr-border)
+            );
+
+          border-radius: 14px;
+
+          background:
+            color-mix(
+              in srgb,
+              var(--tr-surface) 94%,
+              white 6%
+            );
+
+          box-shadow:
+            0 6px 18px
+            rgba(44, 31, 51, .09);
+
+          color:
+            var(--tr-text);
+        }
+
+
+        /*
+         * Bintang kecil pada kartu informasi.
+         */
+        .agent-launch-info::before {
+          content: "✦";
+
+          position: absolute;
+
+          left: 12px;
+          top: 13px;
+
+          color: #bd8125;
+
+          animation:
+            agentInfoStar
+            1.8s
+            ease-in-out
+            infinite;
+        }
+
+
+        /*
+         * Setiap informasi ditumpuk di posisi yang sama.
+         * CSS animation menentukan informasi mana yang terlihat.
+         */
+        .agent-info-line {
+          position: absolute;
+
+          left: 34px;
+          right: 10px;
+          top: 6px;
+
+          opacity: 0;
+
+          transform:
+            translateY(8px);
+
+          animation:
+            agentInfoRotate
+            12s
+            ease-in-out
+            infinite;
+        }
+
+
+        /*
+         * Informasi kedua muncul setelah tiga detik.
+         */
+        .agent-info-line:nth-child(2) {
+          animation-delay: 3s;
+        }
+
+
+        /*
+         * Informasi ketiga muncul setelah enam detik.
+         */
+        .agent-info-line:nth-child(3) {
+          animation-delay: 6s;
+        }
+
+
+        /*
+         * Informasi keempat muncul setelah sembilan detik.
+         */
+        .agent-info-line:nth-child(4) {
+          animation-delay: 9s;
+        }
+
+
+        /*
+         * Judul informasi.
+         */
+        .agent-info-line b {
+          display: block;
+
+          color:
+            var(--tr-text);
+
+          font-size: 11.5px;
+          line-height: 1.25;
+        }
+
+
+        /*
+         * Keterangan informasi.
+         */
+        .agent-info-line small {
+          display: block;
+
+          color:
+            var(--tr-text2);
+
+          font-size: 9.5px;
+          line-height: 1.3;
+
+          white-space: nowrap;
+
+          overflow: hidden;
+
+          text-overflow: ellipsis;
+        }
+
+
+        /*
+         * Informasi masuk dari bawah, diam, lalu keluar ke atas.
+         */
+        @keyframes agentInfoRotate {
+          0% {
+            opacity: 0;
+
+            transform:
+              translateY(8px);
+          }
+
+          5%,
+          20% {
+            opacity: 1;
+
+            transform:
+              translateY(0);
+          }
+
+          25%,
+          100% {
+            opacity: 0;
+
+            transform:
+              translateY(-7px);
+          }
+        }
+
+
+        /*
+         * Bintang kecil berputar dan menyala.
+         */
+        @keyframes agentInfoStar {
+          50% {
+            transform:
+              rotate(180deg)
+              scale(1.2);
+
+            filter:
+              drop-shadow(
+                0
+                0
+                5px
+                #d9a637
+              );
+          }
+        }
+
+
+        /*
+         * Di layar HP hanya tampilkan tombol.
+         * Kartu informasi disembunyikan supaya tidak menutupi layar.
+         */
+        @media (max-width: 760px) {
           .st-key-multi_agent_launcher {
-            left: auto;
-            right: 68px;
-            top: 10px;
+            left: auto !important;
+            right: 66px !important;
+            top: 10px !important;
+
+            width: 46px !important;
+          }
+
+          .st-key-multi_agent_launcher
+          [data-testid="stColumn"]:last-child {
+            display: none !important;
           }
         }
         </style>
@@ -215,13 +457,55 @@ def render_multi_agent_launcher() -> None:
     with st.container(
         key="multi_agent_launcher"
     ):
-        dibuka = st.button(
-            "✦",
-            key="open_multi_agent",
-            help="Multi Trinity Agent · Pro",
+        tombol, info = st.columns(
+            [46, 284],
+            gap="small",
         )
 
-        if dibuka:
+        with tombol:
+            buka = st.button(
+                "✦",
+                key="open_multi_agent",
+                help="Multi Trinity Agent · Pro",
+            )
+
+        with info:
+            st.markdown(
+                '<div class="agent-launch-info">'
+
+                '<div class="agent-info-line">'
+                '<b>Multi Trinity Agent</b>'
+                '<small>'
+                'Semua model, satu jawaban profesional'
+                '</small>'
+                '</div>'
+
+                '<div class="agent-info-line">'
+                '<b>Analisis berlapis</b>'
+                '<small>'
+                'Jawaban diperiksa dari banyak sudut'
+                '</small>'
+                '</div>'
+
+                '<div class="agent-info-line">'
+                '<b>Khusus Trinity Pro</b>'
+                '<small>'
+                'Panel AI premium bekerja bersama'
+                '</small>'
+                '</div>'
+
+                '<div class="agent-info-line">'
+                '<b>Lebih teliti</b>'
+                '<small>'
+                'Menilai solusi, risiko, dan saran lanjutan'
+                '</small>'
+                '</div>'
+
+                '</div>',
+                unsafe_allow_html=True,
+            )
+
+        if buka:
             from chat_handlers import (
                 _boleh_premium,
                 _dialog_premium,
