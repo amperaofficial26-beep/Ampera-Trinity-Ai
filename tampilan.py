@@ -435,53 +435,80 @@ small, .stCaption { color: var(--tr-text2) !important; }
   color: var(--tr-text) !important;
 }
 
-/* DOK INPUT CHAT bawah
-   Struktur aslinya di styles.py:
-     stBottom                 -> batang dok
-       stBottomBlockContainer -> "kartu gabungan" (#F2E8D6 + border + shadow)
-         stChatInput          -> kotak teks
-         st-key-chat_controls -> baris +/model
-
-   styles.py mewarnai KARTU LUAR, sehingga area di belakang baris
-   "+ ... Trinity Seed" tampak sebagai strip krem terang yang menutupi
-   wallpaper. Di sini kartu luar dibuat BENAR-BENAR transparan (termasuk
-   border & bayangannya), lalu warnanya dipindah ke kotak teks saja —
-   jadi yang terlihat melayang di atas wallpaper cuma satu kolom input,
-   sementara + dan nama model duduk langsung di atas wallpaper. */
+/* DOK INPUT CHAT bawah — satu kartu gabungan yang sedikit lebih terang
+   dari latar aplikasi. Kolom teks, tombol +, disclaimer, dan nama model
+   tetap berada di dalam permukaan yang sama. */
 [data-testid="stBottom"],
-[data-testid="stBottom"] > div,
-[data-testid="stBottomBlockContainer"] {
+[data-testid="stBottom"] > div {
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
 }
-[data-testid="stBottomBlockContainer"]:focus-within {
-  border: none !important;
-  box-shadow: none !important;
+
+
+/* Kartu gabungan: campuran surface + putih membuatnya tetap terlihat
+   pada tema beige, tetapi masih mengikuti palet yang dipilih User. */
+[data-testid="stBottomBlockContainer"] {
+  background:
+    color-mix(
+      in srgb,
+      var(--tr-surface) 82%,
+      white 18%
+    ) !important;
+
+  border:
+    1px solid
+    color-mix(
+      in srgb,
+      var(--tr-border) 72%,
+      var(--tr-accent) 28%
+    ) !important;
+
+  border-radius:
+    calc(var(--tr-radius) + 8px) !important;
+
+  box-shadow:
+    0 8px 24px rgba(44, 31, 51, .11),
+    inset 0 1px 0 rgba(255, 255, 255, .72) !important;
+
+  padding:
+    7px
+    8px
+    5px !important;
+
+  overflow: visible !important;
+
+  transition:
+    border-color .18s ease,
+    box-shadow .18s ease !important;
 }
 
-/* baris +/model: tanpa latar, duduk di atas wallpaper */
+
+/* Saat pengguna mengetik, garis dan glow mengikuti warna aksen. */
+[data-testid="stBottomBlockContainer"]:focus-within {
+  border-color:
+    var(--tr-accent) !important;
+
+  box-shadow:
+    0 9px 28px rgba(44, 31, 51, .14),
+    0 0 0 3px
+      color-mix(
+        in srgb,
+        var(--tr-accent) 14%,
+        transparent
+      ),
+    inset 0 1px 0 rgba(255, 255, 255, .76) !important;
+}
+
+
+/* Semua bagian di dalam kartu transparan agar tidak terlihat seperti
+   beberapa kotak yang ditumpuk. */
 .st-key-chat_controls,
 .st-key-chat_controls > div,
 .st-key-chat_controls [data-testid="stHorizontalBlock"],
 .st-key-chat_controls [data-testid="stColumn"],
-[class*="st-key-pending_strip"] {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
-/* kotak teks = satu-satunya permukaan berwarna di dok */
-[data-testid="stChatInput"] {
-  background: var(--tr-surface) !important;
-  border: 1px solid var(--tr-border) !important;
-  border-radius: var(--tr-radius) !important;
-  box-shadow: 0 2px 10px rgba(0,0,0,.06) !important;
-}
-[data-testid="stChatInput"]:focus-within {
-  border-color: var(--tr-accent) !important;
-}
-/* lapisan di DALAM kotak teks tetap transparan supaya tidak bertumpuk */
+[class*="st-key-pending_strip"],
+[data-testid="stChatInput"],
 [data-testid="stChatInput"] > div,
 [data-testid="stChatInput"] div,
 [data-testid="stChatInput"] [data-baseweb="base-input"],
@@ -490,11 +517,22 @@ small, .stCaption { color: var(--tr-text2) !important; }
   border: none !important;
   box-shadow: none !important;
 }
-.chat-disclaimer, .chat-note, .input-disclaimer,
+
+
+/* Fokus ditunjukkan oleh kartu luar, bukan kotak teks terpisah. */
+[data-testid="stChatInput"]:focus-within {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+
+/* Warna disclaimer mengikuti teks sekunder tema. */
+.chat-disclaimer,
+.chat-note,
+.input-disclaimer,
 .st-key-chat_controls p {
   color: var(--tr-text2) !important;
 }
-
 /* BERSIHKAN RIWAYAT di sidebar: tombol teks kecil, tidak menyaingi
    daftar percakapan di atasnya. */
 .st-key-sb_bersih_riwayat { margin-top: 10px !important; }
