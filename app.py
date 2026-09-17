@@ -96,24 +96,50 @@ def render_multi_agent_launcher() -> None:
         <style>
         :root {
           /*
-           * Ubah HANYA dua angka ini untuk mengatur posisi tombol.
+           * POSISI TOMBOL
            *
-           * Sidebar terbuka  = posisi tombol saat sidebar terlihat.
-           * Sidebar tertutup = posisi tombol saat sidebar disembunyikan.
+           * Ubah hanya dua nilai ini.
            */
           --agent-launcher-sidebar-buka: 280px;
           --agent-launcher-sidebar-tutup: 58px;
         }
         
         
-        /* Posisi bawaan ketika sidebar tertutup. */
+        /*
+         * PENTING:
+         *
+         * Tombol launcher berada di dalam stMainBlockContainer.
+         * Animasi perpindahan halaman memberikan transform kepada elemen
+         * tersebut. Transform itu membuat position:fixed dihitung dari
+         * area konten, bukan dari layar.
+         *
+         * Karena itu transform induk harus dimatikan ketika terdapat
+         * tombol Multi Trinity Agent.
+         */
+        [data-testid="stMainBlockContainer"]:has(
+          .st-key-multi_agent_launcher
+        ) {
+          animation: none !important;
+          transform: none !important;
+        }
+        
+        
+        /*
+         * Posisi dasar memakai nilai sidebar terbuka.
+         *
+         * Ini juga menjadi fallback jika versi Streamlit yang digunakan
+         * tidak memasang atribut aria-expanded.
+         */
         .st-key-multi_agent_launcher {
           position: fixed !important;
         
           top: 14px !important;
         
           left:
-            var(--agent-launcher-sidebar-tutup) !important;
+            var(--agent-launcher-sidebar-buka) !important;
+        
+          margin: 0 !important;
+          padding: 0 !important;
         
           z-index: 1000000 !important;
         
@@ -123,7 +149,7 @@ def render_multi_agent_launcher() -> None:
         }
         
         
-        /* Posisi ketika sidebar terbuka. */
+        /* Posisi ketika sidebar dipastikan terbuka. */
         .stApp:has(
           section[data-testid="stSidebar"][aria-expanded="true"]
         )
@@ -133,7 +159,7 @@ def render_multi_agent_launcher() -> None:
         }
         
         
-        /* Posisi ketika sidebar tertutup. */
+        /* Posisi ketika sidebar ditutup. */
         .stApp:has(
           section[data-testid="stSidebar"][aria-expanded="false"]
         )
