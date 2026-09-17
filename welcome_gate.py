@@ -840,9 +840,9 @@ def tampilkan_gerbang() -> bool:
             u = st.session_state.get("_user_google") or {}
             if u.get("email"):
                 toast_sukses(f"Masuk sebagai {u['email']}")
-    elif st.session_state.pop("_baru_masuk_tamu", False):
-        toast_sukses("Berhasil masuk ke Ampera Trinity AI.")
-    return False
+        elif st.session_state.pop("_baru_masuk_tamu", False):
+              toast_sukses("Berhasil masuk ke Ampera Trinity AI.")
+        return False
     if tahap == "splash":
         render_splash()
         return True
