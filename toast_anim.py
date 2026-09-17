@@ -209,6 +209,8 @@ def inject_toast_anim() -> None:
   font-weight: 700 !important;
   line-height: 1.3 !important;
   letter-spacing: .025em !important;
+  position: relative;
+  top: 3px;
 
   text-shadow:
     0 1px 8px rgba(246, 206, 112, .15),
