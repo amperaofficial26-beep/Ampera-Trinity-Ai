@@ -94,35 +94,52 @@ def render_multi_agent_launcher() -> None:
     st.markdown(
         """
         <style>
-        .st-key-multi_agent_launcher {
-          position: fixed;
-        
-          top: 14px;
-          left: 58px;
-        
-          z-index: 1000000;
-        
-          transition:
-            left .24s
-            cubic-bezier(.2, .8, .2, 1);
+        :root {
+          /*
+           * Ubah HANYA dua angka ini untuk mengatur posisi tombol.
+           *
+           * Sidebar terbuka  = posisi tombol saat sidebar terlihat.
+           * Sidebar tertutup = posisi tombol saat sidebar disembunyikan.
+           */
+          --agent-launcher-sidebar-buka: 280px;
+          --agent-launcher-sidebar-tutup: 58px;
         }
         
         
-        /* Posisi saat sidebar terbuka. */
+        /* Posisi bawaan ketika sidebar tertutup. */
+        .st-key-multi_agent_launcher {
+          position: fixed !important;
+        
+          top: 14px !important;
+        
+          left:
+            var(--agent-launcher-sidebar-tutup) !important;
+        
+          z-index: 1000000 !important;
+        
+          transition:
+            left .24s
+            cubic-bezier(.2, .8, .2, 1) !important;
+        }
+        
+        
+        /* Posisi ketika sidebar terbuka. */
         .stApp:has(
           section[data-testid="stSidebar"][aria-expanded="true"]
         )
         .st-key-multi_agent_launcher {
-          left: 280px;
+          left:
+            var(--agent-launcher-sidebar-buka) !important;
         }
         
         
-        /* Posisi saat sidebar ditutup. */
+        /* Posisi ketika sidebar tertutup. */
         .stApp:has(
           section[data-testid="stSidebar"][aria-expanded="false"]
         )
         .st-key-multi_agent_launcher {
-          left: 58px;
+          left:
+            var(--agent-launcher-sidebar-tutup) !important;
         }
         .st-key-multi_agent_launcher button {
           width: 46px !important;
