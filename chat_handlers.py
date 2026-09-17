@@ -85,7 +85,7 @@ _STOP_BTN_CSS = (
 #                     supaya animasi shimmer sempat terlihat.
 # IMAGE_DONE_SECONDS: jeda singkat pada keadaan "Selesai" sebelum gambar muncul.
 # IMAGE_MAX_SECONDS : batas aman menunggu API sebelum dianggap timeout.
-IMAGE_MIN_SECONDS = 6.0
+IMAGE_MIN_SECONDS = 15.0
 IMAGE_DONE_SECONDS = 0.7
 IMAGE_MAX_SECONDS = 200.0
 
