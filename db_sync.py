@@ -270,8 +270,7 @@ def hapus_riwayat(email: str = "") -> bool:
     Return True HANYA bila server benar-benar mengonfirmasi baris
     terhapus. Dipakai riwayat.py saat user menekan "Bersihkan riwayat
     obrolan" — kalau ini gagal diam-diam, riwayat akan dimuat ulang oleh
-    muat_riwayat_setelah_login() pada login berikutnya dan user mengira
-    penghapusannya tidak berfungsi.
+    muat_riwayat_setelah_login() pada login berikutnya.
     """
     try:
         email = (email or (st.session_state.get("_user_google") or {})
@@ -280,8 +279,8 @@ def hapus_riwayat(email: str = "") -> bool:
             return False
         # Prefer: return=representation membuat Supabase mengirim balik
         # baris yang dihapus. Tanpa ini DELETE menjawab 200/204 walaupun
-        # TIDAK ADA baris yang cocok (mis. kebijakan RLS memblokirnya),
-        # sehingga kegagalan terbaca sebagai sukses.
+        # TIDAK ADA baris yang cocok (mis. diblokir RLS), sehingga
+        # kegagalan terbaca sebagai sukses.
         headers = dict(_headers())
         headers["Prefer"] = "return=representation"
         r = requests.delete(
