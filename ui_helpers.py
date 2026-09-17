@@ -54,7 +54,7 @@ THINKING_PHRASES_IMAGE = [
 # Sekarang: animasi tampil sebentar, lalu teks langsung mengalir begitu
 # token pertama datang. Animasi parameter di loading_params.py tetap
 # berputar (loop) selama API memang belum merespons.
-THINKING_MIN_SECONDS = 1.2
+THINKING_MIN_SECONDS = 20.0
 
 # Durasi minimum progress bar gambar (detik) — biar animasi % terasa
 IMAGE_MIN_SECONDS = 10.0
