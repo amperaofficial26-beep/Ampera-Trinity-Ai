@@ -55,7 +55,7 @@ def inject_toast_anim() -> None:
   /* Warna latar mengikuti warna kartu/permukaan aplikasi. */
   background: color-mix(
     in srgb,
-    var(--tr-surface, #fffdf9) 94%,
+    var(--tr-surface, #FFFBF2) 94%,
     transparent
   ) !important;
 
