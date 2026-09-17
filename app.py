@@ -65,6 +65,7 @@ from ui_helpers import (
     logo_img_html, render_message,
 )
 from anim import inject_anim_css, inject_page_anim
+from toast_anim import inject_toast_anim
 from panel_file import render_file_dock          # ← BARIS BARU
 from page_desain import page_desain
 from page_jadwal import page_jadwal
@@ -349,13 +350,14 @@ CAPABILITY_ROWS = [
 ]
 
 
-def _save_settings(
-    patch: dict,
-    label: str = "Perubahan disimpan.",
-) -> None:
+def _save_settings(patch: dict, label: str = "Perubahan disimpan.") -> None:
     merged = dict(st.session_state.get("settings") or {})
     merged.update(patch)
     st.session_state.settings = merged
+
+    # Import lokal menjaga fungsi selalu tersedia saat callback dijalankan,
+    # termasuk setelah hot-reload Streamlit memakai modul app versi lama.
+    from toast_anim import toast_sukses
     toast_sukses(label)
 
 
