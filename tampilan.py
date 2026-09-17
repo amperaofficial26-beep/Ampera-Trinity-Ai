@@ -157,6 +157,7 @@ def _valid_hex(v: str) -> bool:
         and all(c in "0123456789abcdefABCDEF" for c in v[1:])
     )
 
+
 def _luminansi(hex_color: str) -> float:
     """Terang-gelapnya sebuah warna (0 = hitam, 1 = putih).
 
@@ -185,7 +186,7 @@ def palet_aktif(s: dict) -> dict:
     # memilih aksen terang (kuning, cyan), teks putih jadi tak terbaca.
     p["on_accent"] = warna_di_atas(p["accent"])
     return p
-  
+
 
 def siapkan_wallpaper_unggahan(data: bytes, maks_px: int = 1920) -> str:
     """Ubah gambar unggahan jadi data URL yang ringan.
@@ -307,7 +308,6 @@ h1, h2, h3, h4, h5, h6,
 [data-testid="stCaptionContainer"] p,
 small, .stCaption { color: var(--tr-text2) !important; }
 
-/* SESUDAH — ✅ */
 /* gelembung pesan
    PENTING: hanya .bubble.user yang diwarnai. Selektor lama
    [class*="bubble"][class*="user"] juga kena .bubble-row.user dan
@@ -323,8 +323,8 @@ small, .stCaption { color: var(--tr-text2) !important; }
   background: transparent !important;
 }
 .bubble.ai { background: transparent !important; color: var(--tr-text) !important; }
-.bubble-meta, .msg-action-time { color: var(--tr-text2) !important; 
-}
+.bubble-meta, .msg-action-time { color: var(--tr-text2) !important; }
+
 /* kartu & panel */
 .cap-card, .set-card, .art-card, .course-card, .price-card,
 [data-testid="stExpander"], [data-testid="stForm"] {
@@ -494,6 +494,7 @@ small, .stCaption { color: var(--tr-text2) !important; }
 .st-key-chat_controls p {
   color: var(--tr-text2) !important;
 }
+
 /* BERSIHKAN RIWAYAT di sidebar: tombol teks kecil, tidak menyaingi
    daftar percakapan di atasnya. */
 .st-key-sb_bersih_riwayat { margin-top: 10px !important; }
@@ -523,14 +524,40 @@ small, .stCaption { color: var(--tr-text2) !important; }
   font-size: .72rem !important;
   color: var(--tr-text2) !important;
 }
-/* tombol kirim (panah) memakai warna aksen */
-[data-testid="stChatInputSubmitButton"] {
-  background: var(--tr-bubble) !important;
-  color: var(--tr-text) !important;
+.st-key-chat_controls [data-testid="stPopover"] button,
+.st-key-chat_controls button[data-testid="stPopoverButton"] {
+  background: transparent !important;
+  color: var(--tr-text2) !important;
+  border-color: var(--tr-border) !important;
 }
-[data-testid="stChatInputSubmitButton"]:hover {
+/* TOMBOL KIRIM (panah) & mikrofon di dalam kotak teks.
+   styles.py menargetkan '[data-testid="stChatInput"] button' — bukan
+   stChatInputSubmitButton — jadi selektor itu harus ditiru persis,
+   kalau tidak warnanya kalah spesifisitas dan panahnya tetap ungu. */
+[data-testid="stChatInput"] button {
   background: var(--tr-accent) !important;
   color: var(--tr-on-accent) !important;
+  border-radius: var(--tr-radius) !important;
+}
+[data-testid="stChatInput"] button svg {
+  fill: var(--tr-on-accent) !important;
+  color: var(--tr-on-accent) !important;
+}
+[data-testid="stChatInput"] button:hover { filter: brightness(1.12); }
+[data-testid="stChatInput"] button:disabled {
+  background: var(--tr-bubble) !important;
+}
+[data-testid="stChatInput"] button:disabled svg {
+  fill: var(--tr-text2) !important;
+  color: var(--tr-text2) !important;
+}
+/* mikrofon: ikon telanjang, bukan tombol berwarna */
+[data-testid="stChatInput"] [data-testid="stChatInputMicButton"] {
+  background: transparent !important;
+}
+[data-testid="stChatInput"] [data-testid="stChatInputMicButton"] svg {
+  fill: var(--tr-text2) !important;
+  color: var(--tr-text2) !important;
 }
 
 /* tab & pemisah */
@@ -553,7 +580,14 @@ a { color: var(--tr-accent) !important; }
         bagian.append("""
 /* permukaan krem bawaan -> permukaan tema */
 [style*="#F2E8D6"], [style*="#EDE2D1"], [style*="#FBF6EC"],
-[style*="#F5EFE6"], [style*="#FFFBF2"], [style*="#F7F1E6"] {
+[style*="#F5EFE6"], [style*="#FFFBF2"], [style*="#F7F1E6"],
+[style*="#E5D8C3"], [style*="#E0D2BB"] {
+  background-color: var(--tr-surface) !important;
+  border-color: var(--tr-border) !important;
+}
+/* sisa permukaan krem yang ditulis lewat class di styles.py */
+.cap-card, .set-card, .price-card, .art-card, .course-card,
+.rc-card, .plus-menu, .dna-card {
   background-color: var(--tr-surface) !important;
   border-color: var(--tr-border) !important;
 }

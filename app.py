@@ -624,7 +624,6 @@ def _set_privasi() -> None:
               key="set_hist")
     st.toggle("Simpan rekaman suara setelah ditranskrip", value=s["keep_voice"],
               key="set_voice")
-    st.toggle("Cadangkan data ke cloud", value=s["cloud_sync"], key="set_sync")
 
     st.markdown('<div class="set-section">Personalisasi</div>', unsafe_allow_html=True)
     st.toggle("Kirim data pemakaian anonim untuk perbaikan aplikasi",
@@ -637,13 +636,12 @@ def _set_privasi() -> None:
         {
             "save_history": st.session_state.set_hist,
             "keep_voice": st.session_state.set_voice,
-            "cloud_sync": st.session_state.set_sync,
             "analytics": st.session_state.set_analytics,
             "personalization": st.session_state.set_personal,
         },
         "Pengaturan privasi disimpan.",
     )
-  
+
     st.markdown('<div class="set-section">Riwayat obrolan</div>',
                 unsafe_allow_html=True)
     st.caption(
@@ -654,16 +652,12 @@ def _set_privasi() -> None:
 
     st.markdown('<div class="set-section danger">Hapus data</div>',
                 unsafe_allow_html=True)
-  
-    st.markdown('<div class="set-section danger">Hapus data</div>',
-                unsafe_allow_html=True)
     st.markdown(
         '<div class="danger-box">Menghapus seluruh data akan mengosongkan '
         "percakapan, artefak, memori, dan pengaturan. Tindakan ini tidak bisa "
         "dibatalkan.</div>",
         unsafe_allow_html=True,
     )
-# ✅ BARU
     # Konfirmasi dua langkah: tombol ini menghapus SEMUANYA (termasuk
     # pengaturan & tampilan), jadi tidak boleh jalan hanya karena satu
     # klik tak sengaja.
@@ -694,6 +688,7 @@ def _set_privasi() -> None:
                 st.session_state.page = "chat"
                 st.session_state["_toast_riwayat"] = "Seluruh data dihapus."
                 st.rerun()
+
 
 PRO_FEATURES = [
     ("Model premium tertinggi tanpa batas", True, False),
@@ -1473,6 +1468,7 @@ def main() -> None:
     # Lapisan tampilan pilihan User (wallpaper & warna) — HARUS sesudah
     # inject_css() supaya menimpa tema bawaan, bukan tertimpa.
     inject_tampilan()
+    # Toast hasil "bersihkan riwayat" (dititipkan sebelum rerun).
     tampilkan_toast_tertunda()
 
     if st.session_state.get("logged_out"):

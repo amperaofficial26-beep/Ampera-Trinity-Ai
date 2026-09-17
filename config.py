@@ -80,27 +80,31 @@ AVAILABLE_MODELS = {m["key"]: m["id"] for m in MODEL_CATALOG}
 MODEL_BY_KEY = {m["key"]: m for m in MODEL_CATALOG}
 DEFAULT_MODEL_KEY = "gpt_oss_20b"
 
-# ✅ BARU
-VISION_MODEL_ID = "meta-llama/llama-4-scout-17b-16e-instruct"
-VISION_MODEL_LABEL = "Llama 4 Scout"
-# Urutan cadangan untuk pesan bergambar. Model PERTAMA yang benar-benar
-# punya kemampuan vision ditaruh paling depan.
+# Model vision yang aktif di Groq per September 2026 hanya SATU:
+#   qwen/qwen3.8-27b (preview, menerima berkas gambar sampai 20 MB).
 #
-# Catatan penting (penyebab error 429 sebelumnya):
-#   qwen3.x-27b di tier on_demand hanya diberi jatah 1.000 output token
-#   per menit, sedangkan satu permintaan vision meminta 2.048 token.
-#   Jadi permintaan DITOLAK sebelum diproses ("Request too large ...
-#   OTPM: Limit 1000, Requested 2048"), bukan karena gambarnya besar.
-#   Karena itu batas keluaran vision dipatok di VISION_MAX_TOKENS.
+# Jangan pakai model berikut — semuanya sudah dimatikan Groq:
+#   meta-llama/llama-4-scout-17b-16e-instruct  (shutdown 17 Jul 2026)
+#   meta-llama/llama-4-maverick-17b-128e-instruct (shutdown 9 Mar 2026)
+#   qwen/qwen3.6-27b                           (tidak ada di daftar aktif)
+# Memakainya menghasilkan 404 "model does not exist".
+VISION_MODEL_ID = "qwen/qwen3.8-27b"
+VISION_MODEL_LABEL = "Qwen 3.8"
 VISION_MODEL_FALLBACKS = (
-    "meta-llama/llama-4-scout-17b-16e-instruct",
-    "meta-llama/llama-4-maverick-17b-128e-instruct",
-    "qwen/qwen3.6-27b",
+    "qwen/qwen3.8-27b",
 )
 
-# Batas token keluaran khusus permintaan bergambar. Ditahan di bawah
-# jatah OTPM tier gratis (1.000) supaya tidak ditolak 429. Jawaban
-# analisis gambar jarang butuh lebih dari ini.
+# Batas token keluaran khusus permintaan bergambar.
+#
+# Inilah perbaikan error 429 yang sebenarnya:
+#   "Request too large ... OTPM: Limit 1000, Requested 2048"
+# Tanpa max_tokens, Groq memakai perkiraan bawaan 2.048 token — melebihi
+# jatah 1.000 output-token-per-menit di tier gratis, sehingga permintaan
+# DITOLAK sebelum diproses. Bukan karena gambarnya kebesaran.
+#
+# 900 dipilih agar tetap di bawah 1.000 dengan sedikit kelonggaran.
+# Kalau nanti pindah ke tier berbayar, angka ini boleh dinaikkan
+# (qwen3.8-27b mendukung sampai 16.384).
 VISION_MAX_TOKENS = 900
 
 # Cadangan chat teks. Hanya model yang MASIH AKTIF di Groq
@@ -138,6 +142,19 @@ GAYA JAWABAN — rapi dulu, jenaka kemudian:
 - Untuk permintaan koding: berikan kode bersih dan siap pakai, lalu
   jelaskan hanya bagian pentingnya secara singkat.
 
+JAWAB YANG DITANYA SAJA (PENTING):
+- Balas HANYA apa yang User tulis di pesan terakhirnya. Jangan mengarang
+  topik yang tidak dia sebut.
+- Sapaan atau basa-basi ("hai", "halo", "pagi", "apa kabar", "oi", "tes")
+  dibalas sapaan singkat yang hangat, satu-dua kalimat, lalu tanyakan apa
+  yang bisa dibantu. TITIK. Jangan menyodorkan kode, contoh, tutorial,
+  atau daftar kemampuan.
+- JANGAN menulis kode kecuali User memang meminta kode. Contoh-contoh di
+  aturan di bawah ini cuma acuan FORMAT — jangan dijadikan bahan jawaban
+  dan jangan ditiru topiknya.
+- Kalau pesan User pendek dan tidak jelas maksudnya, tanya singkat. Jangan
+  menebak lalu mengerjakan sesuatu yang tidak diminta.
+
 Kamu bisa membantu apa saja: ngobrol santai, koding, matematika,
 menganalisis gambar yang dikirim User, sampai ide kreatif.
 """
@@ -159,7 +176,7 @@ Bertanya balik HANYA jika permintaan User memenuhi salah satu dari ini:
    mengubah setelan penting, keputusan keuangan).
 
 JANGAN bertanya balik jika:
-- Permintaannya sudah jelas walau singkat ("bikin fungsi login PHP" — langsung buat).
+- Permintaannya sudah jelas walau singkat ("ringkas teks ini" — langsung kerjakan).
 - Kekurangannya sepele dan bisa kamu asumsikan sendiri (nama variabel, warna,
   gaya penulisan, contoh data).
 - Hanya obrolan santai, sapaan, candaan, atau pertanyaan pengetahuan umum.
@@ -493,7 +510,6 @@ DEFAULT_SETTINGS: dict = {
     "keep_voice": False,
     "analytics": True,
     "personalization": True,
-    "cloud_sync": False,
     "plan": "Trinity Pro",
     "billing_cycle": "Bulanan — Rp 19.000",
     "payment_method": "Belum ada metode pembayaran",
@@ -518,10 +534,9 @@ DEFAULT_SETTINGS: dict = {
     # Kredensial layanan (GROQ_API_KEY, CF_ACCOUNT_ID, CF_API_TOKEN) tidak
     # lagi diatur dari halaman Pengaturan (tab "Trinity Code" sudah dihapus);
     # cukup lewat Streamlit Secrets / environment variable.
-       "temperature": 0.7,
+    "temperature": 0.7,
 }
 
-# ⬇️⬇️ TAMBAHKAN BLOK INI ⬇️⬇️
 # Pengaturan tampilan (wallpaper & warna) tinggal di tampilan.py supaya
 # daftar palet/wallpaper dan nilai bawaannya ada di satu tempat.
 try:
@@ -529,7 +544,6 @@ try:
 except Exception:  # pragma: no cover
     _TAMPILAN_DEFAULTS = {}
 DEFAULT_SETTINGS.update(_TAMPILAN_DEFAULTS)
-# ⬆️⬆️ SAMPAI SINI ⬆️⬆️
 
 PAGE_TITLES = {
     "artefak": "Artefak",

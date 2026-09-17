@@ -43,8 +43,18 @@ THINKING_PHRASES_IMAGE = [
     "Melukis perlahan",
 ]
 
-# Durasi minimum proses berpikir (detik) — ±10 detik ala Claude
-THINKING_MIN_SECONDS = 25.0  # 5 parameter x 5 detik (loading_params.py)
+# Durasi minimum animasi "berpikir" (detik) — HANYA lantai bawah supaya
+# animasinya tidak berkedip sekejap, BUKAN penundaan yang disengaja.
+#
+# Dulu bernilai 25.0 (5 parameter x 5 detik) sehingga jawaban yang SUDAH
+# tiba di buffer tetap ditahan sampai animasi selesai satu putaran penuh.
+# Akibatnya user menatap layar 25 detik untuk teks yang sebenarnya sudah
+# siap — ini gesekan UX terbesar di aplikasi.
+#
+# Sekarang: animasi tampil sebentar, lalu teks langsung mengalir begitu
+# token pertama datang. Animasi parameter di loading_params.py tetap
+# berputar (loop) selama API memang belum merespons.
+THINKING_MIN_SECONDS = 1.2
 
 # Durasi minimum progress bar gambar (detik) — biar animasi % terasa
 IMAGE_MIN_SECONDS = 10.0

@@ -99,7 +99,6 @@ def maybe_run_yuki(answer_slot) -> bool:
         return True
     st.session_state.pop("_yuki_job", None)
     st.session_state.pop("_yuki_ui_flushed", None)
-    # ✅ BARU
     if job.get("image_mode"):
         # Beri tahu kalau perpindahan mode terjadi otomatis, supaya User
         # paham kenapa jawabannya berupa gambar — bukan mode yang
@@ -395,7 +394,10 @@ def _hentikan_dan_finalisasi_stream_lama() -> None:
             _finalisasi_stream_yuki({"buf": [potongan], "err": None})
 
 
-@st.fragment(run_every=0.4)
+# 0,15 detik ≈ 7 pembaruan/detik: teks terasa MENGALIR, bukan muncul
+# per blok tiap 0,4 detik. Masih cukup longgar supaya Streamlit tidak
+# kebanjiran rerun (0,1 detik ke bawah mulai membebani server).
+@st.fragment(run_every=0.15)
 def fragmen_jawaban_yuki() -> None:
     """Teks jawaban Yuki yang mengalir (fase setelah animasi berpikir).
 
@@ -632,7 +634,7 @@ def handle_chat_request(answer_slot) -> None:
                 client,
                 thread,
                 model=model_id,
-                system_prompt=build_system_prompt(),
+                system_prompt=build_system_prompt(thread),
             )
         else:
             client = build_chat_client()
@@ -1045,29 +1047,14 @@ def process_user_input(user_input, answer_slot, is_fresh: bool = False) -> bool:
             if k not in keys:
                 images.append(im)
                 keys.add(k)
-# ✅ BARU
-    st.session_state.pending_images = []
-    st.session_state.plus_uploader_gen = st.session_state.get("plus_uploader_gen", 0) + 1
-
-    # ROUTER NIAT (niat.py): kalau User tidak menyalakan mode gambar
-    # sendiri, Yuki menebak dari kalimatnya. Saklar manual tetap menang —
-    # User yang sengaja menyalakan mode gambar tidak akan dibantah.
-    mode_manual = bool(st.session_state.image_mode and not images)
-    if mode_manual:
-        buat_gambar = True
-    else:
-        from niat import tebak_niat, GAMBAR
-        buat_gambar = (
-            tebak_niat(text, punya_gambar=bool(images)) == GAMBAR
-            and get_settings().get("cap_image", True)
+        st.session_state.pending_images = []
+        st.session_state.plus_uploader_gen = (
+            st.session_state.get("plus_uploader_gen", 0) + 1
         )
+    images = images[:MAX_IMAGES_PER_MESSAGE]
 
-    st.session_state["_yuki_job"] = {
-        "image_mode": buat_gambar,
-        "text": text,
-        "auto": buat_gambar and not mode_manual,
-    }
-    return True
+    if not (text or images):
+        return False
 
     # Ada kiriman baru → catatan "anda menghentikan respon yuki..."
     # dari jawaban sebelumnya tidak perlu tampil lagi.
@@ -1095,8 +1082,23 @@ def process_user_input(user_input, answer_slot, is_fresh: bool = False) -> bool:
 
     st.session_state.pending_images = []
     st.session_state.plus_uploader_gen = st.session_state.get("plus_uploader_gen", 0) + 1
+
+    # ROUTER NIAT (niat.py): kalau User tidak menyalakan mode gambar
+    # sendiri, Yuki menebak dari kalimatnya. Saklar manual tetap menang —
+    # User yang sengaja menyalakan mode gambar tidak akan dibantah.
+    mode_manual = bool(st.session_state.image_mode and not images)
+    if mode_manual:
+        buat_gambar = True
+    else:
+        from niat import tebak_niat, GAMBAR
+        buat_gambar = (
+            tebak_niat(text, punya_gambar=bool(images)) == GAMBAR
+            and get_settings().get("cap_image", True)
+        )
+
     st.session_state["_yuki_job"] = {
-        "image_mode": bool(st.session_state.image_mode and not images),
+        "image_mode": buat_gambar,
         "text": text,
+        "auto": buat_gambar and not mode_manual,
     }
     return True

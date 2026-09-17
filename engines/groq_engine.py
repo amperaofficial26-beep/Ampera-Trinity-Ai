@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import base64
 import io
+import re
 
 import streamlit as st
 from PIL import Image
@@ -45,11 +46,51 @@ def build_chat_client():
         )
     return OpenAI(api_key=GROQ_API_KEY, base_url=GROQ_BASE_URL)
 
-def build_system_prompt() -> str:
+# Sapaan/basa-basi pendek. Untuk pesan seperti ini, CARD_RULES dan
+# QUICK_REPLY_RULES TIDAK dikirim: gabungan keduanya ~800 token contoh
+# (tabel perbandingan, itinerary, blok kode) yang mengawal satu kata
+# "hai". Model kecil gampang menyangka contoh-contoh itu bahan jawaban,
+# lalu membalas sapaan dengan tutorial kode yang tidak diminta.
+_POLA_SAPAAN = re.compile(
+    r"^\W*(?:"
+    r"h[ae]i+|h[ae]l+o+|h[ae]l+ow+|hoi+|oi+|woi+|yo+|hi+|"
+    r"p[ae]gi+|siang+|sore+|malam+|"
+    r"selamat\s+(?:pagi|siang|sore|malam)|"
+    r"assalamu?'?alaikum\w*|"
+    r"apa\s*kabar|gimana\s*kabar|kabar\s*(?:mu|nya)?|"
+    r"tes+|test+|ping|cek|halo+\s*yuki|hai+\s*yuki|yuki"
+    r")\W*$",
+    re.I,
+)
+
+
+def _cuma_sapaan(history: list[dict]) -> bool:
+    """True bila pesan user TERAKHIR hanya sapaan pendek tanpa permintaan."""
+    last = next(
+        (m for m in reversed(history or []) if m.get("role") == "user"),
+        None,
+    )
+    if not last or last.get("images"):
+        return False
+    teks = (last.get("content") or "")
+    if not isinstance(teks, str):
+        return False
+    teks = teks.strip()
+    # Dibatasi pendek: "hai, tolong buatkan fungsi login" bukan sapaan.
+    return bool(teks) and len(teks) <= 25 and _POLA_SAPAAN.match(teks) is not None
+
+
+def build_system_prompt(history: list[dict] | None = None) -> str:
     """Gabungkan persona dasar Yuki + preferensi dari halaman "Sesuaikan",
-    Pengaturan (kepribadian, bahasa, memori, refleksi), dan konteks mode."""
+    Pengaturan (kepribadian, bahasa, memori, refleksi), dan konteks mode.
+
+    Bila pesan terakhir User cuma sapaan, aturan kartu dan quick-reply
+    dilewati supaya Yuki membalas sapaan dengan sapaan — bukan dengan
+    contoh kode yang kebetulan ada di dalam aturan itu.
+    """
     s = get_settings()
-    parts = [YUKI_SYSTEM_PROMPT, CARD_RULES]
+    ringan = _cuma_sapaan(history or [])
+    parts = [YUKI_SYSTEM_PROMPT] if ringan else [YUKI_SYSTEM_PROMPT, CARD_RULES]
 
     # Persona tambahan sesuai halaman yang sedang dibuka.
     halaman = st.session_state.get("page", "chat")
@@ -78,7 +119,15 @@ def build_system_prompt() -> str:
     # Aturan bertanya balik: hanya untuk permintaan yang benar-benar kabur.
     # Mode "Mati" mengganti aturan itu dengan larangan bertanya.
     clarify_mode = s.get("clarify_mode", "Seperlunya")
-    if clarify_mode == "Mati":
+    if ringan:
+        # Sapaan tidak perlu aturan klarifikasi maupun kartu pilihan.
+        parts.append(
+            "User cuma menyapa. Balas sapaannya dengan hangat dan singkat "
+            "(satu-dua kalimat), lalu tanyakan apa yang bisa kamu bantu. "
+            "Jangan menulis kode, contoh, daftar, tabel, kartu, atau blok "
+            "[[PILIHAN]]."
+        )
+    elif clarify_mode == "Mati":
         parts.append(CLARIFY_MODE_RULES["Mati"])
     else:
         parts.append(CLARIFY_RULES)
@@ -133,7 +182,7 @@ def messages_for_api(history: list[dict]) -> list[dict]:
         m for m in history
         if m.get("role") in ("user", "assistant") and m.get("type", "text") == "text"
     ][-MAX_HISTORY_MESSAGES:]
-    msgs: list[dict] = [{"role": "system", "content": build_system_prompt()}]
+    msgs: list[dict] = [{"role": "system", "content": build_system_prompt(trimmed)}]
     n = len(trimmed)
     for i, m in enumerate(trimmed):
         imgs = m.get("images") or []
@@ -186,7 +235,6 @@ def stream_chat_reply(client: OpenAI, model: str, history: list[dict],
                 yield piece
         except Exception:
             continue
-                  
 
 def stream_chat_with_fallback(client: OpenAI, preferred_model: str, history: list[dict],
                               vision: bool = False):
