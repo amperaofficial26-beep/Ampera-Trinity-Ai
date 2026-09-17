@@ -113,7 +113,7 @@ def render_multi_agent_launcher() -> None:
           section[data-testid="stSidebar"][aria-expanded="true"]
         )
         .st-key-multi_agent_launcher {
-          left: 300px;
+          left: 292px;
         }
         
         
