@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Notifikasi sukses Trinity: gelap elegan, glow, logo, lalu centang."""
+"""Notifikasi sukses Trinity: emas elegan, glow, logo, lalu centang."""
 from __future__ import annotations
 
 import streamlit as st
@@ -21,9 +21,14 @@ def inject_toast_anim() -> None:
     st.markdown(
         f"""
 <style>
+@import url(
+  'https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&display=swap'
+);
+
 
 /* ================================================================
    KOTAK POPUP
+   Warna cokelat gelap dengan garis dan glow emas.
    ================================================================ */
 [data-testid="stToast"] {{
   position: relative !important;
@@ -32,19 +37,19 @@ def inject_toast_anim() -> None:
   min-height: 104px !important;
   padding: 22px 48px 22px 94px !important;
 
-  color: #f8f1e8 !important;
+  color: #fff8e8 !important;
 
   border:
     1px solid
-    rgba(190, 164, 205, .52) !important;
+    rgba(224, 184, 91, .72) !important;
 
   border-radius: 22px !important;
 
   background:
     linear-gradient(
       145deg,
-      rgba(52, 43, 58, .98),
-      rgba(35, 29, 41, .98)
+      rgba(48, 38, 29, .985),
+      rgba(27, 22, 19, .985)
     ) !important;
 
   backdrop-filter:
@@ -56,10 +61,10 @@ def inject_toast_anim() -> None:
     saturate(1.18) !important;
 
   box-shadow:
-    0 18px 42px rgba(30, 22, 35, .38),
-    inset 0 1px 0 rgba(255, 255, 255, .13),
-    0 0 0 1px rgba(73, 55, 82, .24),
-    0 0 34px rgba(156, 113, 181, .44) !important;
+    0 18px 42px rgba(38, 27, 17, .42),
+    inset 0 1px 0 rgba(255, 235, 177, .18),
+    0 0 0 1px rgba(119, 84, 28, .30),
+    0 0 36px rgba(218, 166, 55, .48) !important;
 
   overflow: hidden !important;
 
@@ -72,6 +77,7 @@ def inject_toast_anim() -> None:
 
 /* ================================================================
    SEMBUNYIKAN IKON BAWAAN STREAMLIT
+   Mencegah munculnya dua tanda centang.
    ================================================================ */
 [data-testid="stToast"] [data-testid="stToastIcon"],
 [data-testid="stToast"] [data-testid="stIconMaterial"] {{
@@ -81,7 +87,7 @@ def inject_toast_anim() -> None:
 
 /* ================================================================
    LOGO TRINITY
-   Ukuran logo diperbesar menjadi 48px.
+   Logo diubah menjadi emas agar terlihat di atas latar gelap.
    ================================================================ */
 [data-testid="stToast"]::before {{
   content: "";
@@ -89,21 +95,33 @@ def inject_toast_anim() -> None:
   position: absolute;
   z-index: 3;
 
-  left: 25px;
-  top: 27px;
+  left: 23px;
+  top: 25px;
 
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
 
   background-image: {logo};
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
 
+  /*
+   * Bagian ini mengubah warna logo menjadi emas.
+   * Drop-shadow menambahkan glow emas di sekeliling logo.
+   */
   filter:
+    brightness(0)
+    saturate(100%)
+    invert(79%)
+    sepia(65%)
+    saturate(653%)
+    hue-rotate(355deg)
+    brightness(103%)
+    contrast(93%)
     drop-shadow(
-      0 5px 10px
-      rgba(195, 151, 220, .48)
+      0 5px 11px
+      rgba(246, 199, 91, .62)
     );
 
   animation:
@@ -114,8 +132,8 @@ def inject_toast_anim() -> None:
 
 
 /* ================================================================
-   TANDA CENTANG BUATAN
-   Hanya centang ini yang akan tampil.
+   TANDA CENTANG EMAS
+   Muncul setelah animasi logo selesai.
    ================================================================ */
 [data-testid="stToast"]::after {{
   content: "✓";
@@ -132,26 +150,30 @@ def inject_toast_anim() -> None:
   display: grid;
   place-items: center;
 
+  border:
+    1px solid
+    rgba(255, 226, 151, .68);
+
   border-radius: 50%;
 
-  color: #fffaf2;
+  color: #241b12;
 
   background:
     linear-gradient(
       145deg,
-      #9270a6,
-      #5c3f6c
+      #f3d47d,
+      #bd8125
     );
 
   box-shadow:
-    0 7px 18px rgba(20, 13, 24, .36),
-    inset 0 1px 1px rgba(255, 255, 255, .24),
-    0 0 20px rgba(183, 135, 211, .58);
+    0 7px 18px rgba(20, 13, 8, .42),
+    inset 0 1px 1px rgba(255, 249, 218, .55),
+    0 0 22px rgba(235, 181, 55, .66);
 
   font:
     700 27px/1
-    "Inter",
-    "Segoe UI",
+    "Manrope",
+    "Trebuchet MS",
     sans-serif;
 
   opacity: 0;
@@ -169,22 +191,27 @@ def inject_toast_anim() -> None:
 
 /* ================================================================
    TULISAN POPUP
+   Menggunakan Manrope agar modern dan tidak terlalu formal.
    ================================================================ */
 [data-testid="stToast"] [data-testid="stMarkdownContainer"],
 [data-testid="stToast"] [data-testid="stMarkdownContainer"] *,
 [data-testid="stToast"] p {{
-  color: #f8f1e8 !important;
+  color: #fff8e8 !important;
 
   font-family:
+    "Manrope",
+    "Trebuchet MS",
     "Inter",
-    "Segoe UI",
-    system-ui,
     sans-serif !important;
 
   font-size: 16px !important;
-  font-weight: 600 !important;
+  font-weight: 700 !important;
   line-height: 1.48 !important;
-  letter-spacing: .01em !important;
+  letter-spacing: .012em !important;
+
+  text-shadow:
+    0 1px 8px
+    rgba(246, 206, 112, .10);
 
   opacity: 1;
 
@@ -198,18 +225,18 @@ def inject_toast_anim() -> None:
    TOMBOL TUTUP
    ================================================================ */
 [data-testid="stToast"] button {{
-  color: #d8c8df !important;
+  color: #e8cf91 !important;
   border-radius: 50% !important;
 }}
 
 [data-testid="stToast"] button:hover {{
-  color: #ffffff !important;
-  background: rgba(196, 153, 220, .15) !important;
+  color: #fff5d6 !important;
+  background: rgba(224, 178, 72, .15) !important;
 }}
 
 
 /* ================================================================
-   ANIMASI POPUP
+   ANIMASI KOTAK POPUP
    ================================================================ */
 @keyframes trinityToast7s {{
   0% {{
@@ -257,6 +284,7 @@ def inject_toast_anim() -> None:
 
 /* ================================================================
    ANIMASI LOGO
+   Logo timbul, meloncat, berputar, kemudian mengecil.
    ================================================================ */
 @keyframes trinityLogoJadiCentang {{
   0% {{
