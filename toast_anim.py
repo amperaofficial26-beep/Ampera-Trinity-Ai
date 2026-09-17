@@ -205,7 +205,7 @@ def inject_toast_anim() -> None:
     "Lucida Blackletter",
     fantasy !important;
 
-  font-size: 18px !important;
+  font-size: 20px !important;
   font-weight: 700 !important;
   line-height: 1.3 !important;
   letter-spacing: .025em !important;
