@@ -7,6 +7,7 @@ from zoneinfo import ZoneInfo
 
 import streamlit as st
 
+from logo import LOGO_B64
 from multi_agent import run_multi_agent
 from state import mode_thread, next_msg_id
 from ui_helpers import _page_footer, render_message
@@ -225,7 +226,413 @@ _AGENT_CSS = """
       scale(1.15);
   }
 }
+/* ================================================================
+   TRINITY AI ASSEMBLY
+   ================================================================ */
+.trinity-assembly {
+  position: relative;
 
+  width:
+    min(360px, 100%);
+
+  height: 92px;
+
+  margin:
+    14px
+    auto;
+
+  overflow: hidden;
+
+  border:
+    1px solid
+    color-mix(
+      in srgb,
+      var(--tr-accent) 28%,
+      var(--tr-border)
+    );
+
+  border-radius: 17px;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--tr-surface) 94%,
+      white 6%
+    );
+
+  box-shadow:
+    0 9px 25px
+    rgba(0, 0, 0, .08);
+}
+
+
+/* Trinity Core di sebelah kiri. */
+.assembly-core {
+  position: absolute;
+
+  z-index: 4;
+
+  left: 14px;
+  top: 13px;
+
+  width: 70px;
+
+  text-align: center;
+}
+
+
+.assembly-core img {
+  display: block;
+
+  width: 40px;
+  height: 40px;
+
+  object-fit: contain;
+
+  margin:
+    0
+    auto
+    1px;
+
+  filter:
+    drop-shadow(
+      0
+      0
+      5px
+      var(--tr-accent)
+    );
+
+  animation:
+    corePulse
+    1.55s
+    ease-in-out
+    infinite;
+}
+
+
+.assembly-core b {
+  display: block;
+
+  color:
+    var(--tr-text);
+
+  font-size: 9px;
+
+  letter-spacing: .11em;
+}
+
+
+.assembly-core small {
+  display: block;
+
+  color:
+    var(--tr-text2);
+
+  font-size: 7px;
+
+  letter-spacing: .14em;
+}
+
+
+/* Garis arah menuju Trinity Core. */
+.assembly-arrow {
+  position: absolute;
+
+  left: 89px;
+  right: 12px;
+  top: 45px;
+
+  height: 1px;
+
+  opacity: .35;
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--tr-accent),
+      transparent
+    );
+}
+
+
+.assembly-arrow::before {
+  content: "←";
+
+  position: absolute;
+
+  left: -2px;
+  top: -11px;
+
+  color:
+    var(--tr-accent);
+}
+
+
+/* Kartu satu model aktif. */
+.assembly-model {
+  --step: 1.55s;
+
+  position: absolute;
+
+  z-index: 3;
+
+  left: 116px;
+  right: 12px;
+  top: 15px;
+
+  height: 61px;
+
+  box-sizing: border-box;
+
+  padding:
+    9px
+    10px;
+
+  border-radius: 12px;
+
+  border:
+    1px solid
+    var(--tr-border);
+
+  background:
+    var(--tr-bg);
+
+  opacity: 0;
+
+  animation:
+    modelAssemble
+    var(--step)
+    ease-in-out
+    both;
+
+  animation-delay:
+    calc(
+      var(--i) * var(--step)
+    );
+}
+
+
+.assembly-model strong {
+  display: block;
+
+  color:
+    var(--tr-text);
+
+  font-size: 11px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+.assembly-state {
+  position: relative;
+
+  margin-top: 7px;
+
+  color:
+    var(--tr-text2);
+
+  font-size: 9px;
+}
+
+
+/* Tulisan Thinking. */
+.assembly-thinking {
+  animation:
+    thinkingSwap
+    1.55s
+    both;
+
+  animation-delay:
+    calc(
+      var(--i) * 1.55s
+    );
+}
+
+
+/* Tulisan Done. */
+.assembly-done {
+  position: absolute;
+
+  left: 0;
+
+  opacity: 0;
+
+  color: #9b741f;
+
+  animation:
+    doneSwap
+    1.55s
+    both;
+
+  animation-delay:
+    calc(
+      var(--i) * 1.55s
+    );
+}
+
+
+/* Titik Thinking yang fade, bukan berputar. */
+.assembly-dots i {
+  display: inline-block;
+
+  width: 3px;
+  height: 3px;
+
+  margin-left: 3px;
+
+  border-radius: 50%;
+
+  background:
+    var(--tr-accent);
+
+  animation:
+    dotFade
+    .65s
+    infinite
+    alternate;
+}
+
+
+.assembly-dots i:nth-child(2) {
+  animation-delay: .18s;
+}
+
+
+.assembly-dots i:nth-child(3) {
+  animation-delay: .36s;
+}
+
+
+.assembly-count {
+  position: absolute;
+
+  right: 9px;
+  bottom: 5px;
+
+  color:
+    var(--tr-text2);
+
+  font-size: 8px;
+}
+
+
+/* Kartu muncul, selesai, lalu masuk ke Trinity Core. */
+@keyframes modelAssemble {
+  0% {
+    opacity: 0;
+
+    transform:
+      translateX(14px);
+  }
+
+  12%,
+  58% {
+    opacity: 1;
+
+    transform:
+      translateX(0);
+  }
+
+  72% {
+    opacity: 1;
+
+    transform:
+      translateX(-4px);
+  }
+
+  92% {
+    opacity: 0;
+
+    transform:
+      translateX(-112px)
+      scale(.25);
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+
+/* Thinking hilang ketika proses selesai. */
+@keyframes thinkingSwap {
+  0%,
+  52% {
+    opacity: 1;
+  }
+
+  62%,
+  100% {
+    opacity: 0;
+  }
+}
+
+
+/* Done muncul sebelum kartu masuk Core. */
+@keyframes doneSwap {
+  0%,
+  52% {
+    opacity: 0;
+  }
+
+  62%,
+  82% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+
+/* Titik fade naik-turun sedikit. */
+@keyframes dotFade {
+  from {
+    opacity: .18;
+
+    transform:
+      translateY(1px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(-1px);
+  }
+}
+
+
+/* Core memberikan pulse saat model masuk. */
+@keyframes corePulse {
+  0%,
+  65% {
+    transform:
+      scale(1);
+  }
+
+  86% {
+    transform:
+      scale(1.16);
+
+    filter:
+      drop-shadow(
+        0
+        0
+        12px
+        var(--tr-accent)
+      );
+  }
+
+  100% {
+    transform:
+      scale(1);
+  }
+}
 @media (max-width: 600px) {
   .agent-hero h1 {
     font-size: 1.55rem;
@@ -246,8 +653,87 @@ _AGENT_CSS = """
 
 
 def _now() -> str:
-    """Waktu WIB untuk metadata pesan."""
     return datetime.now(WIB).strftime("%H:%M")
+
+
+def _assembly_html() -> str:
+    """Loader 14 model: thinking, done, lalu menyatu ke Trinity Core."""
+    nama_model = [
+        "GPT-OSS 20B",
+        "Compound Mini",
+        "Qwen 3.8",
+        "Plugsky Micro",
+        "Plugsky Lite",
+        "Aion RP",
+        "Aion 2.0",
+        "Aion 3 Mini",
+        "Aion 3.0",
+        "GPT-OSS 120B",
+        "Compound",
+        "DeepSeek V4",
+        "Trinity Infinity",
+        "GPT-5 Mini",
+    ]
+
+    logo = (
+        f"data:image/png;base64,{LOGO_B64}"
+    )
+
+    kartu = []
+
+    for index, nama in enumerate(nama_model):
+        kartu.append(
+            f'<div class="assembly-model" '
+            f'style="--i:{index}">'
+
+            f'<strong>'
+            f'{index + 1:02d} · {nama}'
+            f'</strong>'
+
+            '<div class="assembly-state">'
+
+            '<span class="assembly-thinking">'
+            'Thinking'
+
+            '<span class="assembly-dots">'
+            '<i></i>'
+            '<i></i>'
+            '<i></i>'
+            '</span>'
+
+            '</span>'
+
+            '<span class="assembly-done">'
+            '✓ Done'
+            '</span>'
+
+            '</div>'
+            '</div>'
+        )
+
+    return (
+        '<div class="trinity-assembly">'
+
+        '<div class="assembly-core">'
+
+        f'<img src="{logo}" '
+        'alt="Trinity">'
+
+        '<b>TRINITY</b>'
+        '<small>CORE</small>'
+
+        '</div>'
+
+        '<div class="assembly-arrow"></div>'
+
+        + "".join(kartu)
+
+        + '<div class="assembly-count">'
+        '14 AI · ASSEMBLY'
+        '</div>'
+
+        '</div>'
+    )
 
 
 def page_multi_agent() -> None:
@@ -328,20 +814,6 @@ def page_multi_agent() -> None:
         )
 
         loader = st.empty()
-
-        loader.markdown(
-            '<div class="agent-thinking">'
-            '<div class="agent-orbit"></div>'
-            '<div>'
-            '<b>Panel Trinity sedang berpikir…</b>'
-            '<span>'
-            'Menelaah konteks, menguji jawaban, '
-            'dan menyusun sintesis.'
-            '</span>'
-            '</div>'
-            '</div>',
-            unsafe_allow_html=True,
-        )
 
         try:
             result = run_multi_agent(thread)
