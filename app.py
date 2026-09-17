@@ -239,7 +239,15 @@ def render_multi_agent_launcher() -> None:
            */
           font-size: 0 !important;
         }
-        
+        /*
+         * Sembunyikan label ✦ bawaan st.button.
+         * Logo Trinity dari button::before tetap ditampilkan.
+         */
+        .st-key-multi_agent_launcher button p,
+        .st-key-multi_agent_launcher
+        button [data-testid="stMarkdownContainer"] {
+          display: none !important;
+        }
         
         /* Logo Trinity asli. */
         .st-key-multi_agent_launcher button::before {
