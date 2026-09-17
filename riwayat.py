@@ -203,4 +203,5 @@ def tampilkan_toast_tertunda() -> None:
     """
     pesan = st.session_state.pop("_toast_riwayat", None)
     if pesan:
-        st.toast(pesan, icon=":material/check:")
+        from toast_anim import toast_sukses
+        toast_sukses(pesan)
