@@ -634,7 +634,7 @@ def handle_chat_request(answer_slot) -> None:
                 client,
                 thread,
                 model=model_id,
-                system_prompt=build_system_prompt(),
+                system_prompt=build_system_prompt(thread),
             )
         else:
             client = build_chat_client()
