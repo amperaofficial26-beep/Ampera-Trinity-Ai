@@ -349,11 +349,14 @@ CAPABILITY_ROWS = [
 ]
 
 
-def _save_settings(patch: dict, label: str = "Perubahan disimpan.") -> None:
+def _save_settings(
+    patch: dict,
+    label: str = "Perubahan disimpan.",
+) -> None:
     merged = dict(st.session_state.get("settings") or {})
     merged.update(patch)
     st.session_state.settings = merged
-    st.toast(label, icon=":material/check:")
+    toast_sukses(label)
 
 
 def _baris_aksi_simpan(label: str, key: str, patch: dict, toast: str,
@@ -829,7 +832,7 @@ def _set_memori() -> None:
             merged = dict(st.session_state.get("settings") or {})
             merged["memories"] = facts + [baru]
             st.session_state.settings = merged
-            st.toast("Memori ditambahkan.", icon=":material/check:")
+            toast_sukses("Memori ditambahkan.")
             st.rerun()
 
     _baris_aksi_simpan(
@@ -1464,6 +1467,7 @@ def page_kursus() -> None:
 def main() -> None:
     init_state()
     inject_css()
+    inject_anim_css()
     inject_anim_css()
     # Lapisan tampilan pilihan User (wallpaper & warna) — HARUS sesudah
     # inject_css() supaya menimpa tema bawaan, bukan tertimpa.
