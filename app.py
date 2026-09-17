@@ -98,7 +98,7 @@ def render_multi_agent_launcher() -> None:
           /*
            * Posisi saat sidebar terbuka dan tertutup.
            */
-          --agent-launcher-open: 200px;
+          --agent-launcher-open: 250px;
           --agent-launcher-closed: 58px;
         }
 
