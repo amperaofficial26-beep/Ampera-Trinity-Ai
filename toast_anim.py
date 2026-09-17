@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Toast sukses Trinity: glow, logo beranimasi, lalu tanda centang."""
+"""Notifikasi sukses Trinity: gelap elegan, glow, logo, lalu centang."""
 from __future__ import annotations
 
 import streamlit as st
@@ -7,12 +7,11 @@ import streamlit as st
 from logo import LOGO_B64
 
 
-# Durasi popup: 7.000 milidetik = 7 detik.
 _DURASI_MS = 7000
 
 
 def inject_toast_anim() -> None:
-    """Pasang tampilan dan animasi popup Trinity."""
+    """Pasang desain dan animasi toast Trinity pada setiap rerun."""
     logo = (
         f'url("data:image/png;base64,{LOGO_B64}")'
         if LOGO_B64
@@ -25,38 +24,42 @@ def inject_toast_anim() -> None:
 
 /* ================================================================
    KOTAK POPUP
-   Warna utama popup diatur pada bagian ini.
    ================================================================ */
 [data-testid="stToast"] {{
   position: relative !important;
+  box-sizing: border-box !important;
 
-  min-height: 92px !important;
-  padding: 18px 46px 18px 78px !important;
+  min-height: 104px !important;
+  padding: 22px 48px 22px 94px !important;
 
-  /* Warna teks utama. */
-  color: #342b3a !important;
+  color: #f8f1e8 !important;
 
-  /* Garis cokelat-beige lembut. */
-  border: 1px solid #b9a58c !important;
-  border-radius: 18px !important;
+  border:
+    1px solid
+    rgba(190, 164, 205, .52) !important;
 
-  /* Latar beige agar menyatu dengan tampilan aplikasi. */
-  background: rgba(247, 236, 216, .98) !important;
+  border-radius: 22px !important;
 
-  /* Efek kaca lembut. */
+  background:
+    linear-gradient(
+      145deg,
+      rgba(52, 43, 58, .98),
+      rgba(35, 29, 41, .98)
+    ) !important;
+
   backdrop-filter:
-    blur(18px)
-    saturate(1.12) !important;
+    blur(20px)
+    saturate(1.18) !important;
 
   -webkit-backdrop-filter:
-    blur(18px)
-    saturate(1.12) !important;
+    blur(20px)
+    saturate(1.18) !important;
 
-  /* Bayangan gelap dan glow ungu Trinity. */
   box-shadow:
-    0 12px 34px rgba(52, 43, 58, .20),
-    0 0 0 1px rgba(255, 252, 245, .88),
-    0 0 28px rgba(111, 82, 128, .26) !important;
+    0 18px 42px rgba(30, 22, 35, .38),
+    inset 0 1px 0 rgba(255, 255, 255, .13),
+    0 0 0 1px rgba(73, 55, 82, .24),
+    0 0 34px rgba(156, 113, 181, .44) !important;
 
   overflow: hidden !important;
 
@@ -68,24 +71,17 @@ def inject_toast_anim() -> None:
 
 
 /* ================================================================
-   IKON BAWAAN STREAMLIT
-   Hanya glyph ikon yang disembunyikan.
-
-   Jangan menyembunyikan div pertama karena pada Streamlit terbaru
-   div tersebut juga membungkus tulisan popup.
+   SEMBUNYIKAN IKON BAWAAN STREAMLIT
    ================================================================ */
+[data-testid="stToast"] [data-testid="stToastIcon"],
 [data-testid="stToast"] [data-testid="stIconMaterial"] {{
-  opacity: 0 !important;
-
-  width: 0 !important;
-  min-width: 0 !important;
-
-  margin: 0 !important;
+  display: none !important;
 }}
 
 
 /* ================================================================
    LOGO TRINITY
+   Ukuran logo diperbesar menjadi 48px.
    ================================================================ */
 [data-testid="stToast"]::before {{
   content: "";
@@ -96,8 +92,8 @@ def inject_toast_anim() -> None:
   left: 25px;
   top: 27px;
 
-  width: 38px;
-  height: 38px;
+  width: 48px;
+  height: 48px;
 
   background-image: {logo};
   background-size: contain;
@@ -106,8 +102,8 @@ def inject_toast_anim() -> None:
 
   filter:
     drop-shadow(
-      0 4px 8px
-      rgba(91, 66, 109, .38)
+      0 5px 10px
+      rgba(195, 151, 220, .48)
     );
 
   animation:
@@ -118,8 +114,8 @@ def inject_toast_anim() -> None:
 
 
 /* ================================================================
-   TANDA CENTANG
-   Muncul setelah logo mengecil.
+   TANDA CENTANG BUATAN
+   Hanya centang ini yang akan tampil.
    ================================================================ */
 [data-testid="stToast"]::after {{
   content: "✓";
@@ -130,32 +126,32 @@ def inject_toast_anim() -> None:
   left: 27px;
   top: 29px;
 
-  width: 34px;
-  height: 34px;
+  width: 44px;
+  height: 44px;
 
   display: grid;
   place-items: center;
 
   border-radius: 50%;
 
-  /* Warna centang. */
-  color: #ffffff;
+  color: #fffaf2;
 
-  /* Ungu Trinity. */
   background:
     linear-gradient(
       145deg,
-      #765c87,
-      #4a3559
+      #9270a6,
+      #5c3f6c
     );
 
   box-shadow:
-    0 5px 14px rgba(74, 53, 89, .35),
-    0 0 16px rgba(183, 148, 212, .32);
+    0 7px 18px rgba(20, 13, 24, .36),
+    inset 0 1px 1px rgba(255, 255, 255, .24),
+    0 0 20px rgba(183, 135, 211, .58);
 
   font:
-    700 21px/1
-    Arial,
+    700 27px/1
+    "Inter",
+    "Segoe UI",
     sans-serif;
 
   opacity: 0;
@@ -173,19 +169,27 @@ def inject_toast_anim() -> None:
 
 /* ================================================================
    TULISAN POPUP
-   Selector dibuat lebih kuat agar aturan tema Streamlit tidak
-   membuat tulisan transparan atau sama dengan latarnya.
    ================================================================ */
 [data-testid="stToast"] [data-testid="stMarkdownContainer"],
 [data-testid="stToast"] [data-testid="stMarkdownContainer"] *,
 [data-testid="stToast"] p {{
-  color: #342b3a !important;
+  color: #f8f1e8 !important;
+
+  font-family:
+    "Inter",
+    "Segoe UI",
+    system-ui,
+    sans-serif !important;
+
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  line-height: 1.48 !important;
+  letter-spacing: .01em !important;
+
   opacity: 1;
 
-  font-weight: 500 !important;
-
   animation:
-    trinityToastText .6s .72s
+    trinityToastText .62s .70s
     ease both !important;
 }}
 
@@ -194,27 +198,28 @@ def inject_toast_anim() -> None:
    TOMBOL TUTUP
    ================================================================ */
 [data-testid="stToast"] button {{
-  color: #5e5267 !important;
+  color: #d8c8df !important;
+  border-radius: 50% !important;
 }}
 
 [data-testid="stToast"] button:hover {{
-  color: #4a3559 !important;
-  background: rgba(74, 53, 89, .10) !important;
+  color: #ffffff !important;
+  background: rgba(196, 153, 220, .15) !important;
 }}
 
 
 /* ================================================================
-   ANIMASI KOTAK POPUP
+   ANIMASI POPUP
    ================================================================ */
 @keyframes trinityToast7s {{
   0% {{
     opacity: 0;
 
     transform:
-      translateY(16px)
+      translateY(17px)
       scale(.88);
 
-    filter: brightness(1.25);
+    filter: brightness(1.28);
   }}
 
   7% {{
@@ -222,7 +227,7 @@ def inject_toast_anim() -> None:
 
     transform:
       translateY(-3px)
-      scale(1.025);
+      scale(1.018);
   }}
 
   12% {{
@@ -258,8 +263,8 @@ def inject_toast_anim() -> None:
     opacity: 0;
 
     transform:
-      translateY(13px)
-      scale(.35)
+      translateY(14px)
+      scale(.32)
       rotate(0deg);
   }}
 
@@ -267,8 +272,8 @@ def inject_toast_anim() -> None:
     opacity: 1;
 
     transform:
-      translateY(-8px)
-      scale(1.12)
+      translateY(-9px)
+      scale(1.13)
       rotate(0deg);
   }}
 
@@ -284,7 +289,7 @@ def inject_toast_anim() -> None:
 
     transform:
       translateY(-3px)
-      scale(1.02)
+      scale(1.03)
       rotate(360deg);
   }}
 
@@ -328,7 +333,7 @@ def inject_toast_anim() -> None:
     opacity: 0;
 
     transform:
-      translateX(13px);
+      translateX(14px);
 
     filter: blur(3px);
   }}
@@ -364,15 +369,15 @@ def inject_toast_anim() -> None:
 
 
 def toast_sukses(pesan: str) -> None:
-    """Tampilkan popup sukses dengan durasi visual tujuh detik."""
+    """Tampilkan toast tanpa ikon bawaan agar centang tidak menjadi dua."""
     try:
         st.toast(
             pesan,
-            icon=":material/check:",
+            icon=None,
             duration="long",
         )
     except TypeError:
         st.toast(
             pesan,
-            icon=":material/check:",
+            icon=None,
         )
