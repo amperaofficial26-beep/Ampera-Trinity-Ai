@@ -22,7 +22,7 @@ def inject_toast_anim() -> None:
         f"""
 <style>
 @import url(
-  'https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&display=swap'
+  'https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap'
 );
 
 
@@ -199,20 +199,20 @@ def inject_toast_anim() -> None:
   color: #fff8e8 !important;
 
   font-family:
-    "Manrope",
-    "Trebuchet MS",
-    "Inter",
-    sans-serif !important;
+    "UnifrakturCook",
+    "Old English Text MT",
+    "Lucida Blackletter",
+    fantasy !important;
 
-  font-size: 16px !important;
+  font-size: 21px !important;
   font-weight: 700 !important;
-  line-height: 1.48 !important;
-  letter-spacing: .012em !important;
+  line-height: 1.35 !important;
+  letter-spacing: .025em !important;
 
   text-shadow:
-    0 1px 8px
-    rgba(246, 206, 112, .10);
-
+    0 1px 8px rgba(246, 206, 112, .15),
+    0 0 15px rgba(218, 166, 55, .10);
+    
   opacity: 1;
 
   animation:
