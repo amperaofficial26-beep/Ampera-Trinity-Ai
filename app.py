@@ -90,7 +90,13 @@ ROOM_CHAT_URL = "https://room-chat-ampera-group.streamlit.app/"
 
 
 def render_multi_agent_launcher() -> None:
-    """Tombol Agent dan kartu informasi animasi di samping sidebar."""
+    """Tombol Agent + kartu informasi animasi di samping sidebar."""
+
+    # Di dalam room, launcher disembunyikan agar tidak menutupi judul.
+    if st.session_state.get("page") == "multi_agent":
+        return
+
+    logo_agent = f"data:image/png;base64,{LOGO_B64}"
     st.markdown(
         """
         <style>
@@ -198,42 +204,120 @@ def render_multi_agent_launcher() -> None:
          * Tombol Multi Trinity Agent.
          */
         .st-key-multi_agent_launcher button {
+          position: relative !important;
+        
           width: 46px !important;
           height: 46px !important;
           min-height: 46px !important;
-
+        
           padding: 0 !important;
-
+        
+          overflow: hidden !important;
+        
           border-radius: 50% !important;
-
+        
           color: #2d2115 !important;
-
+        
           background:
             linear-gradient(
               145deg,
               #f3d47d,
               #bd8125
             ) !important;
-
+        
           border:
             1px solid
             rgba(255, 226, 151, .8) !important;
-
+        
           box-shadow:
             0 7px 18px rgba(66, 43, 16, .25),
             0 0 18px rgba(218, 166, 55, .38) !important;
+        
+          /*
+           * Menyembunyikan teks ✦.
+           * Logo akan dibuat melalui ::before.
+           */
+          font-size: 0 !important;
         }
-
-
-        /*
-         * Efek tombol saat disentuh kursor.
-         */
+        
+        
+        /* Logo Trinity asli. */
+        .st-key-multi_agent_launcher button::before {
+          content: "";
+        
+          width: 31px;
+          height: 31px;
+        
+          background:
+            url("__AGENT_LOGO__")
+            center
+            /
+            contain
+            no-repeat;
+        
+          filter:
+            drop-shadow(
+              0
+              0
+              5px
+              rgba(218, 166, 55, .52)
+            );
+        }
+        
+        
+        /* Cahaya yang menyapu logo dari kanan ke kiri. */
+        .st-key-multi_agent_launcher button::after {
+          content: "";
+        
+          position: absolute;
+        
+          inset:
+            -30%
+            -45%;
+        
+          background:
+            linear-gradient(
+              90deg,
+              transparent,
+              rgba(255, 248, 206, .78),
+              transparent
+            );
+        
+          transform:
+            translateX(100%)
+            rotate(-18deg);
+        
+          animation:
+            agentLogoSweep
+            2.8s
+            ease-in-out
+            infinite;
+        }
+        
+        
+        /* Arah sapuan: kanan ke kiri. */
+        @keyframes agentLogoSweep {
+          0%,
+          35% {
+            transform:
+              translateX(100%)
+              rotate(-18deg);
+          }
+        
+          72%,
+          100% {
+            transform:
+              translateX(-100%)
+              rotate(-18deg);
+          }
+        }
+        
+        
         .st-key-multi_agent_launcher button:hover {
           transform:
             translateY(-2px)
             scale(1.04);
         }
-
 
         /*
          * Kartu informasi.
@@ -450,7 +534,10 @@ def render_multi_agent_launcher() -> None:
           }
         }
         </style>
-        """,
+        """.replace(
+            "__AGENT_LOGO__",
+            logo_agent,
+        ),
         unsafe_allow_html=True,
     )
 
