@@ -69,6 +69,7 @@ from toast_anim import inject_toast_anim
 from panel_file import render_file_dock          # ← BARIS BARU
 from page_desain import page_desain
 from page_jadwal import page_jadwal
+from page_multi_agent import page_multi_agent
 from styles import inject_css
 from riwayat import dialog_bersihkan, tampilkan_toast_tertunda
 from tampilan import (
@@ -87,6 +88,83 @@ from chat_handlers import (
 # pesan user di room itu diteruskan ke inbox amperaofficialgroup@gmail.com.
 ROOM_CHAT_URL = "https://room-chat-ampera-group.streamlit.app/"
 
+
+def render_multi_agent_launcher() -> None:
+    """Ikon Pro mengambang di kanan atas, di luar sidebar."""
+    st.markdown(
+        """
+        <style>
+        .st-key-multi_agent_launcher {
+          position: fixed;
+          top: 14px;
+          left: 314px;
+          z-index: 1000000;
+        }
+
+        .st-key-multi_agent_launcher button {
+          width: 46px !important;
+          height: 46px !important;
+          min-height: 46px !important;
+
+          padding: 0 !important;
+
+          border-radius: 50% !important;
+
+          color: #2d2115 !important;
+
+          background:
+            linear-gradient(
+              145deg,
+              #f3d47d,
+              #bd8125
+            ) !important;
+
+          border:
+            1px solid
+            rgba(255, 226, 151, .8) !important;
+
+          box-shadow:
+            0 7px 18px rgba(66, 43, 16, .25),
+            0 0 18px rgba(218, 166, 55, .38) !important;
+        }
+
+        .st-key-multi_agent_launcher button:hover {
+          transform:
+            translateY(-2px)
+            scale(1.04);
+        }
+
+        @media (max-width: 600px) {
+          .st-key-multi_agent_launcher {
+            left: auto;
+            right: 68px;
+            top: 10px;
+          }
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    with st.container(
+        key="multi_agent_launcher"
+    ):
+        dibuka = st.button(
+            "✦",
+            key="open_multi_agent",
+            help="Multi Trinity Agent · Pro",
+        )
+
+        if dibuka:
+            from chat_handlers import (
+                _boleh_premium,
+                _dialog_premium,
+            )
+
+            if _boleh_premium():
+                go("multi_agent")
+            else:
+                _dialog_premium()
 # ============================================================================
 # KONFIGURASI HALAMAN
 # ============================================================================
@@ -1489,7 +1567,8 @@ def main() -> None:
     from welcome_gate import tampilkan_gerbang
     if tampilkan_gerbang():
         st.stop()
-
+      
+    render_multi_agent_launcher()
     render_sidebar()
 
     page = st.session_state.get("page", "chat")
@@ -1526,6 +1605,8 @@ def main() -> None:
         page_desain()
     elif page == "jadwal":
         page_jadwal()
+    elif page == "multi_agent":
+        page_multi_agent()
     else:
         render_chat_page()
 
