@@ -41,6 +41,8 @@ import urllib.request
 import streamlit as st
 import streamlit.components.v1 as components
 
+from toast_anim import toast_sukses
+
 # Durasi total animasi splash (detik). Garis waktu di dalam animasi
 # berakhir ±14,65 detik; sisanya jeda aman sebelum halaman login muncul.
 SPLASH_TOTAL_DETIK = 15.5
@@ -818,6 +820,7 @@ def _render_login() -> None:
             )
             if st.button("Lanjut tanpa masuk (sementara)", key="btn_tamu"):
                 st.session_state["_tahap"] = "app"
+                st.session_state["_baru_masuk_tamu"] = True
                 st.rerun()
 
 
@@ -839,7 +842,9 @@ def tampilkan_gerbang() -> bool:
         if st.session_state.pop("_google_baru_masuk", False):
             u = st.session_state.get("_user_google") or {}
             if u.get("email"):
-                st.toast(f"Masuk sebagai {u['email']}", icon="✅")
+                toast_sukses(f"Masuk sebagai {u['email']}")
+        elif st.session_state.pop("_baru_masuk_tamu", False):
+            toast_sukses("Berhasil masuk ke Ampera Trinity AI.")
         return False
     if tahap == "splash":
         render_splash()

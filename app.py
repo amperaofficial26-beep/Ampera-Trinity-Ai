@@ -69,6 +69,7 @@ from panel_file import render_file_dock          # ← BARIS BARU
 from page_desain import page_desain
 from page_jadwal import page_jadwal
 from styles import inject_css
+from toast_anim import inject_toast_anim
 from riwayat import dialog_bersihkan, tampilkan_toast_tertunda
 from tampilan import (
     PALET_NAMES, WALLPAPER_NAMES, SUDUT_NAMES, DEFAULT_PALET,
@@ -353,7 +354,10 @@ def _save_settings(patch: dict, label: str = "Perubahan disimpan.") -> None:
     merged = dict(st.session_state.get("settings") or {})
     merged.update(patch)
     st.session_state.settings = merged
-    st.toast(label, icon=":material/check:")
+    # Import lokal menjaga fungsi selalu tersedia saat callback dijalankan,
+    # termasuk setelah hot-reload Streamlit memakai modul app versi lama.
+    from toast_anim import toast_sukses
+    toast_sukses(label)
 
 
 def _baris_aksi_simpan(label: str, key: str, patch: dict, toast: str,
@@ -829,7 +833,8 @@ def _set_memori() -> None:
             merged = dict(st.session_state.get("settings") or {})
             merged["memories"] = facts + [baru]
             st.session_state.settings = merged
-            st.toast("Memori ditambahkan.", icon=":material/check:")
+            from toast_anim import toast_sukses
+            toast_sukses("Memori ditambahkan.")
             st.rerun()
 
     _baris_aksi_simpan(
@@ -1464,6 +1469,7 @@ def page_kursus() -> None:
 def main() -> None:
     init_state()
     inject_css()
+    inject_toast_anim()
     inject_anim_css()
     # Lapisan tampilan pilihan User (wallpaper & warna) — HARUS sesudah
     # inject_css() supaya menimpa tema bawaan, bukan tertimpa.
