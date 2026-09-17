@@ -4,7 +4,10 @@ from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-from config import MODEL_CATALOG, MODEL_ID_TANPA_TEMPERATURE
+from config import (
+    MODEL_CATALOG,
+    MODEL_ID_TANPA_TEMPERATURE,
+)
 from engines.compatible_engine import (
     PROVIDER_CONFIG,
     build_compatible_client,
@@ -12,7 +15,24 @@ from engines.compatible_engine import (
 from engines.groq_engine import build_chat_client
 
 
-# Peran berbeda mencegah semua model memberi jawaban yang sama.
+# Batas token anggota panel.
+PANEL_MAX_TOKENS = 2048
+
+# Batas token retry anggota panel.
+PANEL_RETRY_MAX_TOKENS = 4096
+
+# Batas token penyusunan jawaban akhir.
+SYNTHESIS_MAX_TOKENS = 4096
+
+# Batas token retry penyusunan jawaban akhir.
+SYNTHESIS_RETRY_MAX_TOKENS = 8192
+
+# Jumlah riwayat terakhir yang dikirim kepada setiap model.
+MAX_AGENT_HISTORY = 12
+
+
+# Setiap model mendapat peran berbeda agar hasil panel tidak
+# hanya berisi jawaban yang sama berulang kali.
 ROLES = {
     "gpt_oss_20b": (
         "Jawab inti masalah secara cepat, jelas, dan praktis."
@@ -24,14 +44,14 @@ ROLES = {
         "Analisis struktur masalah dan hubungan antarbagiannya."
     ),
     "plugsky_micro": (
-        "Cari solusi paling sederhana yang dapat langsung dilakukan."
+        "Cari solusi paling sederhana yang bisa langsung dilakukan."
     ),
     "plugsky_lite": (
-        "Berikan alternatif yang lebih efisien."
+        "Berikan alternatif solusi yang lebih efisien."
     ),
     "aion_rp": (
-        "Nilai sudut pandang manusia, komunikasi, dan dampak "
-        "ke pengguna."
+        "Nilai sudut pandang manusia, komunikasi, "
+        "dan dampak kepada pengguna."
     ),
     "aion_2": (
         "Periksa dampak keputusan dan risiko jangka menengah."
@@ -40,10 +60,11 @@ ROLES = {
         "Audit detail teknis serta konsistensi logika."
     ),
     "aion_3": (
-        "Bertindak sebagai kritikus; cari kesalahan dan asumsi lemah."
+        "Bertindak sebagai kritikus; cari kesalahan, "
+        "kelemahan, dan asumsi yang tidak kuat."
     ),
     "qwen3_6_27b": (
-        "Uji penalaran, hitungan, dan ketepatan kesimpulan."
+        "Uji penalaran, perhitungan, dan ketepatan kesimpulan."
     ),
     "compound": (
         "Periksa kebutuhan fakta terbaru dan konteks eksternal."
@@ -63,39 +84,52 @@ ROLES = {
 AGENT_SYSTEM = """
 Kamu adalah salah satu anggota panel Multi Trinity Agent.
 
-Analisis permintaan User secara independen sesuai peranmu.
+Analisis permintaan User secara independen sesuai peran khususmu.
 
 ATURAN:
 - Jangan berbasa-basi.
-- Fokus pada masalah yang ditanyakan.
+- Fokus hanya pada permintaan User.
+- Pahami konteks percakapan sebelum menjawab.
 - Tulis temuan, solusi, risiko, dan asumsi penting.
-- Periksa kemungkinan kesalahan.
-- Jika benar-benar diperlukan, berikan satu pertanyaan klarifikasi.
+- Periksa kemungkinan kesalahan pada solusi.
+- Untuk permintaan kode, berikan rancangan atau potongan kode yang valid.
+- Jika informasi belum cukup, sebutkan informasi apa yang diperlukan.
 - Jangan mengaku sebagai jawaban akhir.
+- Jangan menyebut proses internal panel.
 - Hasilmu akan diperiksa dan disatukan oleh model penyintesis.
-"""
+""".strip()
 
 
 SYNTHESIS_SYSTEM = """
 Kamu adalah Ketua Multi Trinity Agent.
 
-Tugasmu menggabungkan laporan dari seluruh panel menjadi SATU jawaban
+Tugasmu menggabungkan laporan seluruh anggota panel menjadi SATU jawaban
 profesional dalam bahasa yang digunakan User.
 
-ATURAN:
+ATURAN UTAMA:
+- Jawab permintaan User secara langsung.
 - Utamakan kebenaran, relevansi, dan tindakan konkret.
-- Hilangkan pengulangan.
-- Jangan menyebut nama model atau proses internal.
-- Jangan mengatakan bahwa jawaban dibuat oleh beberapa AI.
-- Selesaikan kontradiksi menggunakan penalaran terbaik.
+- Hilangkan pengulangan dari laporan panel.
+- Perbaiki kesalahan yang ditemukan dalam laporan.
+- Selesaikan kontradiksi dengan penalaran terbaik.
+- Jangan menyebut nama model.
+- Jangan menyebut jumlah model.
+- Jangan membicarakan proses internal panel.
 - Jangan mengarang fakta yang tidak didukung laporan atau konteks.
 - Bedakan fakta, asumsi, dan rekomendasi.
-- Berikan jawaban utama terlebih dahulu.
-- Tambahkan langkah atau saran konkret bila relevan.
-- Jelaskan risiko atau catatan penting bila ada.
+- Berikan langkah praktis jika relevan.
+- Sebutkan risiko atau catatan penting jika memang ada.
 - Berikan maksimal satu pertanyaan lanjutan.
 - Jangan bertanya jika permintaan User sudah jelas.
-"""
+
+ATURAN KHUSUS KODE:
+- Jika User meminta dibuatkan kode, berikan kode lengkap dan siap digunakan.
+- Jangan hanya memberi rancangan apabila User meminta hasil jadi.
+- Gunakan blok kode Markdown dengan bahasa yang sesuai.
+- Pastikan kode memiliki struktur yang valid.
+- Berikan cara menjalankan secara singkat.
+- Jangan memotong kode hanya untuk menghemat jawaban.
+""".strip()
 
 
 def _provider_ready(provider: str) -> bool:
@@ -105,44 +139,59 @@ def _provider_ready(provider: str) -> bool:
             from config import GROQ_API_KEY
 
             return bool(GROQ_API_KEY)
+
         except Exception:
             return False
 
-    konfigurasi = PROVIDER_CONFIG.get(provider) or {}
+    provider_config = (
+        PROVIDER_CONFIG.get(provider) or {}
+    )
 
-    return bool(konfigurasi.get("api_key"))
+    return bool(
+        provider_config.get("api_key")
+    )
 
 
 def _client(provider: str):
-    """Buat client sesuai provider model."""
+    """Bangun client API berdasarkan provider."""
     if provider == "groq":
         return build_chat_client()
 
     return build_compatible_client(provider)
 
 
-def _messages(
-    history: list[dict],
-    role: str,
-) -> list[dict]:
-    """Susun riwayat yang dikirim kepada satu anggota panel."""
-    messages = [
-        {
-            "role": "system",
-            "content": (
-                AGENT_SYSTEM
-                + "\n\nPERAN KHUSUSMU:\n"
-                + role
-            ),
-        }
-    ]
+def _is_token_error(exc: Exception) -> bool:
+    """Periksa apakah error disebabkan batas output token."""
+    error_text = str(exc).lower()
 
-    # Batasi riwayat agar pemakaian token tidak terlalu besar.
-    for item in history[-12:]:
-        message_role = item.get("role")
+    token_error_markers = (
+        "max_tokens",
+        "max_completion_tokens",
+        "output budget",
+        "output token",
+        "needed more than",
+        "token limit",
+        "completion limit",
+        "maximum context length",
+    )
+
+    return any(
+        marker in error_text
+        for marker in token_error_markers
+    )
+
+
+def _history_messages(
+    history: list[dict],
+) -> list[dict]:
+    """Ambil riwayat teks yang aman dikirim ke model."""
+    messages: list[dict] = []
+
+    for item in history[-MAX_AGENT_HISTORY:]:
+        role = item.get("role")
         content = item.get("content")
 
-        if message_role not in ("user", "assistant"):
+        if role not in ("user", "assistant"):
             continue
 
         if not content:
@@ -150,7 +199,7 @@ def _messages(
 
         messages.append(
             {
-                "role": message_role,
+                "role": role,
                 "content": str(content),
             }
         )
@@ -158,90 +207,186 @@ def _messages(
     return messages
 
 
+def _messages(
+    history: list[dict],
+    agent_role: str,
+) -> list[dict]:
+    """Susun prompt untuk satu anggota panel."""
+    messages = [
+        {
+            "role": "system",
+            "content": (
+                AGENT_SYSTEM
+                + "\n\nPERAN KHUSUSMU:\n"
+                + agent_role
+            ),
+        }
+    ]
+
+    messages.extend(
+        _history_messages(history)
+    )
+
+    return messages
+
+
+def _create_completion_with_retry(
+    client,
+    params: dict,
+    retry_max_tokens: int,
+):
+    """Kirim completion dan retry satu kali jika budget token habis."""
+    try:
+        return client.chat.completions.create(
+            **params
+        )
+
+    except Exception as exc:
+        # Error selain masalah token jangan dicoba ulang.
+        if not _is_token_error(exc):
+            raise
+
+        retry_params = dict(params)
+
+        retry_params["max_tokens"] = (
+            retry_max_tokens
+        )
+
+        return client.chat.completions.create(
+            **retry_params
+        )
+
+
 def _ask_one(
     model: dict,
     history: list[dict],
 ) -> tuple[str, str]:
-    """Kirim pertanyaan kepada satu model."""
-    provider = model.get("provider", "groq")
+    """Kirim pertanyaan kepada satu anggota panel."""
+    provider = model.get(
+        "provider",
+        "groq",
+    )
 
     if not _provider_ready(provider):
         raise RuntimeError(
             f"Provider {provider} belum dikonfigurasi."
         )
 
+    model_key = model.get("key") or ""
+
+    agent_role = ROLES.get(
+        model_key,
+        "Analisis masalah secara kritis dan objektif.",
+    )
+
     params = {
         "model": model["id"],
         "messages": _messages(
             history,
-            ROLES.get(
-                model["key"],
-                "Analisis masalah secara kritis.",
-            ),
+            agent_role,
         ),
         "stream": False,
 
-        # Jawaban anggota panel tidak perlu terlalu panjang.
-        "max_tokens": 700,
+        # Model reasoning memakai sebagian budget token
+        # untuk proses berpikir internal.
+        "max_tokens": PANEL_MAX_TOKENS,
     }
 
-    if model["id"] not in MODEL_ID_TANPA_TEMPERATURE:
+    if (
+        model["id"]
+        not in MODEL_ID_TANPA_TEMPERATURE
+    ):
         params["temperature"] = 0.45
 
     client = _client(provider)
 
-    response = client.chat.completions.create(**params)
+    response = _create_completion_with_retry(
+        client=client,
+        params=params,
+        retry_max_tokens=PANEL_RETRY_MAX_TOKENS,
+    )
 
     text = (
         response.choices[0].message.content or ""
     ).strip()
 
     if not text:
-        raise RuntimeError("Model menghasilkan jawaban kosong.")
+        raise RuntimeError(
+            "Model menghasilkan jawaban kosong."
+        )
 
     return model["name"], text
+
+
+def _reports_text(
+    reports: list[tuple[str, str]],
+) -> str:
+    """Gabungkan laporan tanpa memperlihatkan nama model."""
+    return "\n\n".join(
+        (
+            f"LAPORAN PANEL {index + 1}:\n"
+            f"{text}"
+        )
+        for index, (_, text)
+        in enumerate(reports)
+    )
+
+
+def _last_user_message(
+    history: list[dict],
+) -> str:
+    """Ambil pertanyaan terakhir User."""
+    return next(
+        (
+            str(message.get("content") or "")
+            for message in reversed(history)
+            if message.get("role") == "user"
+        ),
+        "",
+    )
+
+
+def _select_synthesis_model() -> dict:
+    """Pilih model tertinggi dengan provider yang tersedia."""
+    candidates = list(
+        reversed(MODEL_CATALOG)
+    )
+
+    selected = next(
+        (
+            model
+            for model in candidates
+            if _provider_ready(
+                model.get(
+                    "provider",
+                    "groq",
+                )
+            )
+        ),
+        None,
+    )
+
+    if selected is None:
+        raise RuntimeError(
+            "Tidak ada provider AI yang dikonfigurasi."
+        )
+
+    return selected
 
 
 def _synthesize(
     history: list[dict],
     reports: list[tuple[str, str]],
 ) -> str:
-    """Satukan seluruh hasil panel menjadi satu jawaban."""
-    # Katalog dibalik agar model dengan tingkatan tertinggi
-    # diprioritaskan sebagai penyintesis.
-    candidates = list(reversed(MODEL_CATALOG))
+    """Satukan seluruh laporan panel menjadi satu jawaban akhir."""
+    chosen = _select_synthesis_model()
 
-    chosen = next(
-        (
-            model
-            for model in candidates
-            if _provider_ready(
-                model.get("provider", "groq")
-            )
-        ),
-        None,
+    user_question = _last_user_message(
+        history
     )
 
-    if chosen is None:
-        raise RuntimeError(
-            "Tidak ada provider AI yang dikonfigurasi."
-        )
-
-    reports_text = "\n\n".join(
-        (
-            f"LAPORAN PANEL {index + 1}:\n"
-            f"{text}"
-        )
-        for index, (_, text) in enumerate(reports)
-    )
-
-    user_last = next(
-        (
-            str(message.get("content"))
-            for message in reversed(history)
-            if message.get("role") == "user"
-        ),
-        "",
+    panel_reports = _reports_text(
+        reports
     )
 
     messages = [
@@ -253,9 +398,9 @@ def _synthesize(
             "role": "user",
             "content": (
                 "PERTANYAAN USER:\n"
-                f"{user_last}\n\n"
+                f"{user_question}\n\n"
                 "HASIL ANALISIS PANEL:\n"
-                f"{reports_text}"
+                f"{panel_reports}"
             ),
         },
     ]
@@ -264,26 +409,49 @@ def _synthesize(
         "model": chosen["id"],
         "messages": messages,
         "stream": False,
-        "max_tokens": 1500,
+
+        # Nilai awal dibuat cukup besar karena model reasoning
+        # memakai sebagian budget untuk berpikir internal.
+        "max_tokens": SYNTHESIS_MAX_TOKENS,
     }
 
-    if chosen["id"] not in MODEL_ID_TANPA_TEMPERATURE:
+    if (
+        chosen["id"]
+        not in MODEL_ID_TANPA_TEMPERATURE
+    ):
         params["temperature"] = 0.35
 
-    provider = chosen.get("provider", "groq")
+    provider = chosen.get(
+        "provider",
+        "groq",
+    )
+
     client = _client(provider)
 
-    response = client.chat.completions.create(**params)
+    response = _create_completion_with_retry(
+        client=client,
+        params=params,
+        retry_max_tokens=(
+            SYNTHESIS_RETRY_MAX_TOKENS
+        ),
+    )
 
     answer = (
         response.choices[0].message.content or ""
     ).strip()
 
+    if not answer:
+        raise RuntimeError(
+            "Model penyintesis tidak menghasilkan jawaban."
+        )
+
     return answer
 
 
-def run_multi_agent(history: list[dict]) -> dict:
-    """Jalankan seluruh model secara paralel dan sintesis hasilnya."""
+def run_multi_agent(
+    history: list[dict],
+) -> dict:
+    """Panggil semua model paralel lalu sintesis hasilnya."""
     reports: list[tuple[str, str]] = []
     failures: list[str] = []
 
@@ -301,6 +469,7 @@ def run_multi_agent(history: list[dict]) -> dict:
                 model,
                 history,
             ): model
+
             for model in MODEL_CATALOG
         }
 
@@ -308,26 +477,25 @@ def run_multi_agent(history: list[dict]) -> dict:
             model = jobs[future]
 
             try:
-                reports.append(future.result())
+                result = future.result()
+                reports.append(result)
+
             except Exception:
-                # Model yang gagal tidak menghentikan panel.
-                failures.append(model["name"])
+                # Satu model gagal tidak menghentikan seluruh panel.
+                failures.append(
+                    model["name"]
+                )
 
     if not reports:
         raise RuntimeError(
             "Semua model gagal merespons. "
-            "Periksa API key dan kuota provider."
+            "Periksa API key, kuota, dan status provider."
         )
 
     answer = _synthesize(
-        history,
-        reports,
+        history=history,
+        reports=reports,
     )
-
-    if not answer:
-        raise RuntimeError(
-            "Penyintesis menghasilkan jawaban kosong."
-        )
 
     return {
         "answer": answer,
