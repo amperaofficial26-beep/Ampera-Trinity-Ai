@@ -265,20 +265,44 @@ def _judul(messages: list) -> str:
 # HAPUS — alat bantu bila suatu saat ingin mengosongkan riwayat seorang user
 # ---------------------------------------------------------------------------
 def hapus_riwayat(email: str = "") -> bool:
-    """Hapus seluruh riwayat seorang user dari database. Return True bila
-    berhasil. (Belum dipakai UI mana pun — disiapkan untuk tombol 'hapus
-    riwayat' di masa depan.)"""
+    """Hapus seluruh riwayat seorang user dari database.
+
+    Return True HANYA bila server benar-benar mengonfirmasi baris
+    terhapus. Dipakai riwayat.py saat user menekan "Bersihkan riwayat
+    obrolan" — kalau ini gagal diam-diam, riwayat akan dimuat ulang oleh
+    muat_riwayat_setelah_login() pada login berikutnya dan user mengira
+    penghapusannya tidak berfungsi.
+    """
     try:
         email = (email or (st.session_state.get("_user_google") or {})
                  .get("email", "")).strip()
         if not email or not siap():
             return False
+        # Prefer: return=representation membuat Supabase mengirim balik
+        # baris yang dihapus. Tanpa ini DELETE menjawab 200/204 walaupun
+        # TIDAK ADA baris yang cocok (mis. kebijakan RLS memblokirnya),
+        # sehingga kegagalan terbaca sebagai sukses.
+        headers = dict(_headers())
+        headers["Prefer"] = "return=representation"
         r = requests.delete(
             _url("/rest/v1/chat_messages?user_email=eq."
+                 + urllib.parse.quote(email, safe="")),
+            headers=headers,
+            timeout=_TIMEOUT_MUAT,
+        )
+        if r.status_code not in (200, 204):
+            return False
+
+        # Pastikan lewat pembacaan ulang: kalau masih ada baris tersisa,
+        # penghapusan dianggap GAGAL walau status HTTP-nya sukses.
+        cek = requests.get(
+            _url("/rest/v1/chat_messages?select=id&limit=1&user_email=eq."
                  + urllib.parse.quote(email, safe="")),
             headers=_headers(),
             timeout=_TIMEOUT_MUAT,
         )
-        return r.status_code in (200, 204)
+        if cek.status_code == 200 and (cek.json() or []):
+            return False
+        return True
     except Exception:
         return False

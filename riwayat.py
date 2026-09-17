@@ -43,6 +43,7 @@ _KUNCI_OBROLAN = (
     "conv_counter",      # penomoran percakapan
     "pending_images",    # lampiran yang belum terkirim
     "_yuki_dihentikan",  # catatan "anda menghentikan respon yuki"
+    "_db_synced",        # penanda pesan yang sudah dikirim ke database
 )
 
 # Thread milik halaman lain (Desain, Jadwal, Artefak, Kursus) disimpan
@@ -86,17 +87,24 @@ def bersihkan_riwayat(termasuk_mode_lain: bool = False,
     """
     sebelum = ringkasan_riwayat()
 
-    # --- database (kalau dipakai) ------------------------------------
+    # --- database ----------------------------------------------------
     # Dicoba SEBELUM state lokal dikosongkan, karena butuh email user
     # yang tersimpan di session_state.
+    #
+    # PENTING: jangan disyaratkan pada setelan "cloud_sync".
+    # Pesan dikirim ke database oleh ui_helpers.py lewat kirim_pesan_baru()
+    # yang hanya memeriksa db_sync.siap() — sama sekali tidak melihat
+    # cloud_sync. Jadi riwayat BISA ADA di database walaupun setelan itu
+    # mati. Kalau penghapusan disyaratkan pada cloud_sync (bawaannya
+    # False), database tidak ikut dibersihkan dan riwayat muncul lagi
+    # begitu user login berikutnya — persis gejala "sudah dihapus tapi
+    # balik lagi".
     cloud = None
     if hapus_di_cloud:
         try:
-            from state import get_settings
-            if get_settings().get("cloud_sync"):
-                import db_sync
-                if db_sync.siap():
-                    cloud = db_sync.hapus_riwayat()
+            import db_sync
+            if db_sync.siap():
+                cloud = db_sync.hapus_riwayat()
         except Exception:
             cloud = False
 
@@ -177,7 +185,13 @@ def dialog_bersihkan(konteks: str = "set") -> bool:
             if hasil["mode_lain"]:
                 pesan += f" {hasil['mode_lain']} thread mode lain ikut dihapus."
             if hasil["cloud"] is False:
-                pesan += " (Gagal menghapus di cloud — coba lagi nanti.)"
+                # Jujur bahwa salinan di server masih ada — kalau tidak,
+                # user mengira sudah bersih lalu terkejut riwayatnya
+                # kembali saat login berikutnya.
+                pesan += (
+                    " Tapi salinan di server GAGAL dihapus — riwayat bisa "
+                    "muncul lagi saat login berikutnya. Coba ulangi nanti."
+                )
             st.session_state["_toast_riwayat"] = pesan
 
             st.session_state.page = "chat"
