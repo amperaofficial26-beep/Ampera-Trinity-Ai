@@ -232,15 +232,16 @@ _AGENT_CSS = """
 .trinity-assembly {
   position: relative;
 
-  width:
-    min(360px, 100%);
+  width: min(360px, 100%);
+  height: 104px;
 
-  height: 92px;
-
+  /*
+   * Nilai 0 pada kiri-kanan membuat loader rata kiri.
+   */
   margin:
     14px
-    auto;
-
+    0;
+    
   overflow: hidden;
 
   border:
@@ -267,46 +268,59 @@ _AGENT_CSS = """
 
 
 /* Trinity Core di sebelah kiri. */
+/* ================================================================
+   TRINITY CORE
+   ================================================================ */
 .assembly-core {
   position: absolute;
 
   z-index: 4;
 
-  left: 14px;
-  top: 13px;
+  left: 10px;
+  top: 10px;
 
-  width: 70px;
+  width: 88px;
 
   text-align: center;
 }
 
 
+/*
+ * Logo diperbesar menjadi 58px.
+ * scale(1.22) membantu memperbesar isi gambar yang masih
+ * memiliki sedikit area transparan.
+ */
 .assembly-core img {
   display: block;
 
-  width: 40px;
-  height: 40px;
+  width: 58px;
+  height: 58px;
 
   object-fit: contain;
 
   margin:
     0
-    auto
-    1px;
+    auto;
+
+  transform:
+    scale(1.22);
+
+  transform-origin:
+    center;
+
+  animation:
+    corePulse
+    2.142857s
+    ease-in-out
+    infinite;
 
   filter:
     drop-shadow(
       0
       0
-      5px
+      7px
       var(--tr-accent)
     );
-
-  animation:
-    corePulse
-    1.55s
-    ease-in-out
-    infinite;
 }
 
 
@@ -316,9 +330,9 @@ _AGENT_CSS = """
   color:
     var(--tr-text);
 
-  font-size: 9px;
+  font-size: 10px;
 
-  letter-spacing: .11em;
+  letter-spacing: .12em;
 }
 
 
@@ -328,49 +342,14 @@ _AGENT_CSS = """
   color:
     var(--tr-text2);
 
-  font-size: 7px;
+  font-size: 8px;
 
-  letter-spacing: .14em;
+  letter-spacing: .15em;
 }
-
-
-/* Garis arah menuju Trinity Core. */
-.assembly-arrow {
-  position: absolute;
-
-  left: 89px;
-  right: 12px;
-  top: 45px;
-
-  height: 1px;
-
-  opacity: .35;
-
-  background:
-    linear-gradient(
-      90deg,
-      var(--tr-accent),
-      transparent
-    );
-}
-
-
-.assembly-arrow::before {
-  content: "←";
-
-  position: absolute;
-
-  left: -2px;
-  top: -11px;
-
-  color:
-    var(--tr-accent);
-}
-
 
 /* Kartu satu model aktif. */
 .assembly-model {
-  --step: 1.55s;
+  --step: 5.0s;
 
   position: absolute;
 
@@ -442,17 +421,15 @@ _AGENT_CSS = """
 .assembly-thinking {
   animation:
     thinkingSwap
-    1.55s
+    var(--step)
     both;
 
   animation-delay:
     calc(
-      var(--i) * 1.55s
+      var(--i) * var(--step)
     );
 }
 
-
-/* Tulisan Done. */
 .assembly-done {
   position: absolute;
 
@@ -464,12 +441,12 @@ _AGENT_CSS = """
 
   animation:
     doneSwap
-    1.55s
+    var(--step)
     both;
 
   animation-delay:
     calc(
-      var(--i) * 1.55s
+      var(--i) * var(--step)
     );
 }
 
@@ -518,6 +495,35 @@ _AGENT_CSS = """
   font-size: 8px;
 }
 
+.assembly-wait {
+  position: absolute;
+
+  left: 112px;
+  right: 12px;
+  top: 39px;
+
+  text-align: center;
+
+  color:
+    var(--tr-text2);
+
+  font-size: 10px;
+
+  opacity: 0;
+
+  animation:
+    assemblyWait
+    .5s
+    30s
+    forwards;
+}
+
+
+@keyframes assemblyWait {
+  to {
+    opacity: 1;
+  }
+}
 
 /* Kartu muncul, selesai, lalu masuk ke Trinity Core. */
 @keyframes modelAssemble {
@@ -612,25 +618,25 @@ _AGENT_CSS = """
   0%,
   65% {
     transform:
-      scale(1);
+      scale(1.22);
   }
 
   86% {
     transform:
-      scale(1.16);
+      scale(1.38);
 
     filter:
       drop-shadow(
         0
         0
-        12px
+        14px
         var(--tr-accent)
       );
   }
 
   100% {
     transform:
-      scale(1);
+      scale(1.22);
   }
 }
 @media (max-width: 600px) {
@@ -713,25 +719,25 @@ def _assembly_html() -> str:
 
     return (
         '<div class="trinity-assembly">'
-
+    
         '<div class="assembly-core">'
-
-        f'<img src="{logo}" '
-        'alt="Trinity">'
-
+    
+        f'<img src="{logo}" alt="Trinity">'
         '<b>TRINITY</b>'
         '<small>CORE</small>'
-
+    
         '</div>'
-
-        '<div class="assembly-arrow"></div>'
-
+    
         + "".join(kartu)
-
-        + '<div class="assembly-count">'
-        '14 AI · ASSEMBLY'
+    
+        + '<div class="assembly-wait">'
+        'Menyatukan jawaban panel…'
         '</div>'
-
+    
+        + '<div class="assembly-count">'
+        '14 AI · 30 DETIK'
+        '</div>'
+    
         '</div>'
     )
 
