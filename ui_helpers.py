@@ -554,6 +554,43 @@ def render_message(msg: dict) -> None:
                         msg.get("time", ""), imgs_html, note),
             unsafe_allow_html=True,
         )
+                # Tampilkan simulator HTML interaktif.
+        if (
+            msg.get("interactive_html")
+            and msg.get("role") == "assistant"
+        ):
+            import streamlit.components.v1 as components
+
+            simulator_id = msg.get(
+                "id",
+                id(msg),
+            )
+
+            html_document = str(
+                msg["interactive_html"]
+            )
+
+            with st.container(
+                key=f"simulator_{simulator_id}"
+            ):
+                components.html(
+                    html_document,
+                    height=520,
+                    scrolling=True,
+                )
+
+                st.download_button(
+                    label=(
+                        ":material/download:  "
+                        "Unduh simulasi HTML"
+                    ),
+                    data=html_document,
+                    file_name=(
+                        "trinity-simulasi.html"
+                    ),
+                    mime="text/html",
+                    key=f"sim_dl_{simulator_id}",
+                )
         # Kalau pesan ini berasal dari kegagalan pembuatan gambar, detail
         # teknisnya ditampilkan terlipat supaya penyebabnya bisa dicek
         # (bukan sekadar "tidak ada hasil" tanpa keterangan).
