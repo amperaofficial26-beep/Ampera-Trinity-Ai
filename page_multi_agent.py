@@ -833,18 +833,34 @@ def page_multi_agent() -> None:
                 thread
             )
 
-            thread.append(
-                {
-                    "id": next_msg_id(),
-                    "role": "assistant",
-                    "type": "text",
-                    "content": result["answer"],
-                    "time": _now(),
-                    "multi_agent": {
-                        "success": result["success"],
-                        "total": result["total"],
-                    },
-                }
+                        from interactive_simulation import (
+                extract_interactive_html,
+            )
+
+            answer, interactive_html = (
+                extract_interactive_html(
+                    result["answer"]
+                )
+            )
+
+            reply = {
+                "id": next_msg_id(),
+                "role": "assistant",
+                "type": "text",
+                "content": answer,
+                "time": _now(),
+                "multi_agent": {
+                    "success": result["success"],
+                    "total": result["total"],
+                },
+            }
+
+            if interactive_html:
+                reply["interactive_html"] = (
+                    interactive_html
+                )
+
+            thread.append(reply)
             )
 
             st.toast(
