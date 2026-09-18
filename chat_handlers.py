@@ -315,10 +315,20 @@ def _susun_balasan_yuki(full: str, thread: list[dict]) -> None:
     if not full:
         full = "Ini hasilnya ya!"
 
-    # Blok kode -> file
-    full, file_ids = ambil_artefak(full)
-    full = rapihkan_teks_chat(full)
+    # Simulator HTML harus diambil sebelum parser artefak.
+    from interactive_simulation import (
+        extract_interactive_html,
+    )
 
+    full, interactive_html = (
+        extract_interactive_html(full)
+    )
+
+    # Blok kode biasa tetap diproses menjadi artefak.
+    full, file_ids = ambil_artefak(full)
+
+    full = rapihkan_teks_chat(full)
+    
     if not full:
         full = (
             "Selesai! Filenya sudah kubuat ya."
@@ -342,6 +352,11 @@ def _susun_balasan_yuki(full: str, thread: list[dict]) -> None:
 
     if kartu_kaya:
         reply["cards"] = kartu_kaya
+
+    if interactive_html:
+        reply["interactive_html"] = (
+            interactive_html
+        )
 
     thread.append(reply)
 
