@@ -813,10 +813,19 @@ def page_multi_agent() -> None:
             }
         )
 
+        # Siapkan tempat untuk animasi Trinity AI Assembly.
         loader = st.empty()
 
+        # Tampilkan loader sebelum seluruh model dipanggil.
+        loader.markdown(
+            _assembly_html(),
+            unsafe_allow_html=True,
+        )
+
         try:
-            result = run_multi_agent(thread)
+            result = run_multi_agent(
+                thread
+            )
 
             thread.append(
                 {
@@ -837,7 +846,7 @@ def page_multi_agent() -> None:
                 f"{result['total']} model berpartisipasi."
             )
 
-         except Exception as exc:
+        except Exception as exc:
             thread.append(
                 {
                     "id": next_msg_id(),
@@ -851,14 +860,10 @@ def page_multi_agent() -> None:
                 }
             )
 
-        # Jangan kosongkan loader dalam run yang sama.
-        # Jika loader dibuat dan langsung dikosongkan, browser hanya
-        # menerima kondisi akhir sehingga animasi tidak sempat tampil.
-        #
-        # st.rerun() akan membersihkan loader secara otomatis setelah
-        # jawaban selesai disimpan.
-        st.rerun()   
-
+        # Jangan menggunakan loader.empty() di sini.
+        # Loader akan dibersihkan otomatis oleh proses rerun.
+        st.rerun()
+      
     _page_footer(
         in_chat=bool(thread)
     )
