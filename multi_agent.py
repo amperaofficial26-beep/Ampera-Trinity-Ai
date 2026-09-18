@@ -467,10 +467,28 @@ def run_multi_agent(
     # Deteksi dilakukan pada thread utama.
     # Worker model tidak boleh mengubah session_state.
     from simulation import simulation_instruction
-    
-    simulasi = simulation_instruction(
+    from interactive_simulation import (
+        interactive_instruction,
+    )
+
+    roleplay_prompt = simulation_instruction(
         history,
         room="multi_agent",
+    )
+
+    interactive_prompt = interactive_instruction(
+        history
+    )
+
+    instructions = [
+        roleplay_prompt,
+        interactive_prompt,
+    ]
+
+    simulasi = "\n\n".join(
+        instruction
+        for instruction in instructions
+        if instruction
     )
     worker_count = min(
         14,
