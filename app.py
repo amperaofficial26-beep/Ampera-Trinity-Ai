@@ -96,7 +96,9 @@ def render_multi_agent_launcher() -> None:
     if st.session_state.get("page") == "multi_agent":
         return
 
-    logo_agent = f"data:image/png;base64,{LOGO_B64}"
+    # _TAB_ICON sudah dipotong rapat dari margin transparan PNG.
+    # Logo akan benar-benar berada di tengah tombol.
+    logo_agent = _TAB_ICON
     st.markdown(
         """
         <style>
@@ -253,8 +255,18 @@ def render_multi_agent_launcher() -> None:
         .st-key-multi_agent_launcher button::before {
           content: "";
         
-          width: 31px;
-          height: 31px;
+          position: absolute;
+        
+          /*
+           * Logo mengisi tombol dengan jarak 5px pada setiap sisi.
+           * Karena menggunakan position:absolute, posisinya tidak
+           * dipengaruhi label tombol yang disembunyikan.
+           */
+          inset: 5px;
+        
+          display: block;
+        
+          z-index: 1;
         
           background:
             url("__AGENT_LOGO__")
@@ -267,11 +279,10 @@ def render_multi_agent_launcher() -> None:
             drop-shadow(
               0
               0
-              5px
-              rgba(218, 166, 55, .52)
+              6px
+              rgba(218, 166, 55, .58)
             );
         }
-        
         
         /* Cahaya yang menyapu logo dari kanan ke kiri. */
         .st-key-multi_agent_launcher button::after {
