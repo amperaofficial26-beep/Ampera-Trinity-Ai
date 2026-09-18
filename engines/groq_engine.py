@@ -169,10 +169,37 @@ def build_system_prompt(history: list[dict] | None = None) -> str:
             "kemajuannya:\n" + "\n".join(refl)
         )
 
-    extra = (st.session_state.get("custom_instruction") or "").strip()
+    extra = (
+        st.session_state.get("custom_instruction") or ""
+    ).strip()
+
     if extra:
-        parts.append(f"Instruksi tambahan dari User yang harus selalu diikuti:\n{extra}")
-    return "\n\n".join(parts)
+        parts.append(
+            "Instruksi tambahan dari User "
+            f"yang harus selalu diikuti:\n{extra}"
+        )
+
+     # Simulasi percakapan aktif otomatis dari kalimat User.
+     # Tidak ada tombol atau menu tambahan pada antarmuka.
+     from simulation import simulation_instruction
+          
+     room = (
+         "multi_agent"
+         if halaman == "multi_agent"
+         else "chat"
+     )
+          
+     simulation_prompt = simulation_instruction(
+         history or [],
+         room=room,
+     )
+          
+     if simulation_prompt:
+         parts.append(
+             simulation_prompt
+         )
+          
+     return "\n\n".join(parts)
 
 def messages_for_api(history: list[dict]) -> list[dict]:
     """System prompt Yuki + riwayat terakhir (ramah free-tier).
