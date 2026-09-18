@@ -209,57 +209,55 @@ def _history_messages(
 
 def _messages(
     history: list[dict],
-    agent_role: str,
+    role: str,
+    simulasi: str = "",
 ) -> list[dict]:
-    """Susun prompt untuk satu anggota panel."""
+    """Susun pesan untuk satu anggota panel."""
+    system_prompt = (
+        AGENT_SYSTEM
+        + "\n\nPERANMU: "
+        + role
+    )
+
+    if simulasi:
+        system_prompt += (
+            "\n\n"
+            + simulasi
+        )
+
     messages = [
         {
             "role": "system",
-            "content": (
-                AGENT_SYSTEM
-                + "\n\nPERAN KHUSUSMU:\n"
-                + agent_role
-            ),
+            "content": system_prompt,
         }
     ]
 
-    messages.extend(
-        _history_messages(history)
-    )
+    for item in history[-12:]:
+        if (
+            item.get("role")
+            not in ("user", "assistant")
+        ):
+            continue
+
+        if not item.get("content"):
+            continue
+
+        messages.append(
+            {
+                "role": item["role"],
+                "content": str(
+                    item["content"]
+                ),
+            }
+        )
 
     return messages
-
-
-def _create_completion_with_retry(
-    client,
-    params: dict,
-    retry_max_tokens: int,
-):
-    """Kirim completion dan retry satu kali jika budget token habis."""
-    try:
-        return client.chat.completions.create(
-            **params
-        )
-
-    except Exception as exc:
-        # Error selain masalah token jangan dicoba ulang.
-        if not _is_token_error(exc):
-            raise
-
-        retry_params = dict(params)
-
-        retry_params["max_tokens"] = (
-            retry_max_tokens
-        )
-
-        return client.chat.completions.create(
-            **retry_params
-        )
-
+    
 
 def _ask_one(
     model: dict,
     history: list[dict],
+    simulasi: str = "",
 ) -> tuple[str, str]:
     """Kirim pertanyaan kepada satu anggota panel."""
     provider = model.get(
@@ -283,7 +281,11 @@ def _ask_one(
         "model": model["id"],
         "messages": _messages(
             history,
-            agent_role,
+            ROLES.get(
+                model["key"],
+                "Analisis masalah secara kritis.",
+            ),
+            simulasi,
         ),
         "stream": False,
 
@@ -377,6 +379,7 @@ def _select_synthesis_model() -> dict:
 def _synthesize(
     history: list[dict],
     reports: list[tuple[str, str]],
+    simulasi: str = "",
 ) -> str:
     """Satukan seluruh laporan panel menjadi satu jawaban akhir."""
     chosen = _select_synthesis_model()
@@ -392,7 +395,7 @@ def _synthesize(
     messages = [
         {
             "role": "system",
-            "content": SYNTHESIS_SYSTEM,
+            "content": synthesis_prompt,
         },
         {
             "role": "user",
@@ -404,7 +407,14 @@ def _synthesize(
             ),
         },
     ]
+synthesis_prompt = SYNTHESIS_SYSTEM
 
+if simulasi:
+    synthesis_prompt += (
+        "\n\n"
+        + simulasi
+    )
+    
     params = {
         "model": chosen["id"],
         "messages": messages,
@@ -454,7 +464,14 @@ def run_multi_agent(
     """Panggil semua model paralel lalu sintesis hasilnya."""
     reports: list[tuple[str, str]] = []
     failures: list[str] = []
-
+    # Deteksi dilakukan pada thread utama.
+    # Worker model tidak boleh mengubah session_state.
+    from simulation import simulation_instruction
+    
+    simulasi = simulation_instruction(
+        history,
+        room="multi_agent",
+    )
     worker_count = min(
         14,
         len(MODEL_CATALOG),
@@ -464,12 +481,13 @@ def run_multi_agent(
         max_workers=worker_count
     ) as executor:
         jobs = {
-            executor.submit(
+            pool.submit(
                 _ask_one,
                 model,
                 history,
+                simulasi,
             ): model
-
+        
             for model in MODEL_CATALOG
         }
 
@@ -495,6 +513,7 @@ def run_multi_agent(
     answer = _synthesize(
         history=history,
         reports=reports,
+        simulasi,
     )
 
     return {
