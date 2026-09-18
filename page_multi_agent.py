@@ -833,7 +833,7 @@ def page_multi_agent() -> None:
                 thread
             )
 
-                        from interactive_simulation import (
+            from interactive_simulation import (
                 extract_interactive_html,
             )
 
@@ -861,7 +861,6 @@ def page_multi_agent() -> None:
                 )
 
             thread.append(reply)
-            )
 
             st.toast(
                 f"{result['success']} dari "
