@@ -499,7 +499,7 @@ def run_multi_agent(
         max_workers=worker_count
     ) as executor:
         jobs = {
-            pool.submit(
+            executor.submit(
                 _ask_one,
                 model,
                 history,
@@ -531,7 +531,7 @@ def run_multi_agent(
     answer = _synthesize(
         history=history,
         reports=reports,
-        simulasi,
+        simulasi=simulasi,
     )
 
     return {
