@@ -179,27 +179,40 @@ def build_system_prompt(history: list[dict] | None = None) -> str:
             f"yang harus selalu diikuti:\n{extra}"
         )
 
-     # Simulasi percakapan aktif otomatis dari kalimat User.
-     # Tidak ada tombol atau menu tambahan pada antarmuka.
-     from simulation import simulation_instruction
+           # Simulasi percakapan/roleplay.
+          from simulation import simulation_instruction
           
-     room = (
-         "multi_agent"
-         if halaman == "multi_agent"
-         else "chat"
-     )
+          room = (
+              "multi_agent"
+              if halaman == "multi_agent"
+              else "chat"
+          )
           
-     simulation_prompt = simulation_instruction(
-         history or [],
-         room=room,
-     )
+          simulation_prompt = simulation_instruction(
+              history or [],
+              room=room,
+          )
           
-     if simulation_prompt:
-         parts.append(
-             simulation_prompt
-         )
+          if simulation_prompt:
+              parts.append(
+                  simulation_prompt
+              )
           
-     return "\n\n".join(parts)
+          
+          # Permintaan simulator visual otomatis menghasilkan HTML interaktif.
+          from interactive_simulation import interactive_instruction
+          
+          interactive_prompt = interactive_instruction(
+              history or []
+          )
+          
+          if interactive_prompt:
+              parts.append(
+                  interactive_prompt
+              )
+          
+          
+          return "\n\n".join(parts)
 
 def messages_for_api(history: list[dict]) -> list[dict]:
     """System prompt Yuki + riwayat terakhir (ramah free-tier).
