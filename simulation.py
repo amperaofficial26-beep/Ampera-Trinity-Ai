@@ -41,7 +41,27 @@ _INFO_RE = re.compile(
     r"bagaimana\s+cara\s+kerja)\b",
     re.I,
 )
-
+_CONVERSATION_RE = re.compile(
+    r"\b(?:"
+    r"wawancara|"
+    r"interview|"
+    r"negosiasi|"
+    r"percakapan|"
+    r"bahasa|"
+    r"pelanggan|"
+    r"komplain|"
+    r"pewawancara|"
+    r"guru|"
+    r"mentor|"
+    r"customer|"
+    r"role\s*play|"
+    r"bermain\s+peran|"
+    r"jadilah|"
+    r"berpura-pura|"
+    r"berperan"
+    r")\b",
+    re.IGNORECASE,
+)
 
 def _room_key(room: str) -> str:
     """Tentukan kunci state berdasarkan room."""
@@ -113,13 +133,18 @@ def update_simulation_context(
         _INFO_RE.search(text)
     )
 
-    start_request = bool(
+       start_request = bool(
         _START_RE.search(text)
+    )
+
+    conversation_request = bool(
+        _CONVERSATION_RE.search(text)
     )
 
     if (
         not informative_question
         and start_request
+        and conversation_request
     ):
         current = {
             "active": True,
