@@ -837,7 +837,7 @@ def page_multi_agent() -> None:
                 f"{result['total']} model berpartisipasi."
             )
 
-        except Exception as exc:
+         except Exception as exc:
             thread.append(
                 {
                     "id": next_msg_id(),
@@ -851,10 +851,13 @@ def page_multi_agent() -> None:
                 }
             )
 
-        finally:
-            loader.empty()
-
-        st.rerun()
+        # Jangan kosongkan loader dalam run yang sama.
+        # Jika loader dibuat dan langsung dikosongkan, browser hanya
+        # menerima kondisi akhir sehingga animasi tidak sempat tampil.
+        #
+        # st.rerun() akan membersihkan loader secara otomatis setelah
+        # jawaban selesai disimpan.
+        st.rerun()   
 
     _page_footer(
         in_chat=bool(thread)
