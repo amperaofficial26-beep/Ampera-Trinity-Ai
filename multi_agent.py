@@ -181,6 +181,60 @@ def _is_token_error(exc: Exception) -> bool:
     )
 
 
+def _create_completion_with_retry(
+    client,
+    params: dict,
+    retry_max_tokens: int,
+):
+    """Kirim completion dan ulangi sekali untuk masalah parameter/token."""
+    try:
+        return client.chat.completions.create(
+            **params
+        )
+    except Exception as first_error:
+        if not _is_token_error(
+            first_error
+        ):
+            raise
+
+        retry_params = dict(
+            params
+        )
+
+        error_text = str(
+            first_error
+        ).lower()
+
+        # Sebagian model reasoning menggunakan
+        # max_completion_tokens sebagai pengganti max_tokens.
+        if (
+            "max_tokens" in error_text
+            and "max_completion_tokens" in error_text
+        ):
+            retry_params.pop(
+                "max_tokens",
+                None,
+            )
+            retry_params[
+                "max_completion_tokens"
+            ] = retry_max_tokens
+        elif (
+            "max_completion_tokens"
+            in retry_params
+        ):
+            retry_params[
+                "max_completion_tokens"
+            ] = retry_max_tokens
+        else:
+            retry_params[
+                "max_tokens"
+            ] = retry_max_tokens
+
+        return client.chat.completions.create(
+            **retry_params
+        )
+
+
 def _history_messages(
     history: list[dict],
 ) -> list[dict]:
