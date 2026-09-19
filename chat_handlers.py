@@ -366,7 +366,19 @@ def _finalisasi_stream_yuki(stream_state: dict) -> None:
     thread = active_thread()
     err = stream_state.get("err")
 
+     full = "".join(stream_state.get("buf") or [])
+
     if err is not None:
+        # Provider kadang menutup stream karena timeout sesaat setelah HTML
+        # simulator lengkap terkirim. Selamatkan hasil yang sudah memiliki
+        # dokumen utuh; jangan menggantinya dengan pesan error.
+        from interactive_simulation import extract_interactive_html
+
+        _, recovered_html = extract_interactive_html(full)
+        if recovered_html:
+            _susun_balasan_yuki(full, thread)
+            return
+
         thread.append({
             "id": next_msg_id(),
             "role": "assistant",
@@ -376,6 +388,8 @@ def _finalisasi_stream_yuki(stream_state: dict) -> None:
             "error_detail": f"{type(err).__name__}: {err}",
         })
         return
+
+    _susun_balasan_yuki(full, thread)
 
     full = "".join(stream_state.get("buf") or [])
     _susun_balasan_yuki(full, thread)
