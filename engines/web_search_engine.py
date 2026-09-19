@@ -57,7 +57,7 @@ def search_web(
             json={
                 "api_key": TAVILY_API_KEY,
                 "query": query[:1000],
-                "search_depth": "basic",
+                "search_depth": "advanced",
                 "topic": "general",
                 "max_results": max(
                     1,
@@ -66,6 +66,7 @@ def search_web(
                         MAX_RESULTS,
                     ),
                 ),
+                "chunks_per_source": 3,
                 "include_answer": False,
                 "include_raw_content": False,
             },
