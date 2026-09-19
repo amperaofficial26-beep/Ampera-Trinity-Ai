@@ -36,12 +36,13 @@ _INFO = re.compile(
 
 # Blok khusus yang akan dihasilkan AI.
 _BLOCK = re.compile(
-    r"\[\[SIMULASI_HTML\]\]"
-    r"\s*(.*?)\s*"
-    r"\[\[/SIMULASI_HTML\]\]",
+    r"\[\[SIMULASI_HTML\]\]\s*(.*?)\s*\[\[/SIMULASI_HTML\]\]",
     re.S | re.I,
 )
-
+_OPEN_BLOCK = re.compile(
+    r"\[\[SIMULASI_HTML\]\]\s*(.*?</html\s*>)",
+    re.S | re.I,
+)
 
 def _last_user_text(
     history: list[dict],
@@ -115,61 +116,40 @@ INTERAKSI:
 - Berikan nilai awal yang masuk akal.
 
 FORMAT WAJIB:
-Tulis satu kalimat pengantar singkat, kemudian hasil HTML harus
-dibungkus persis seperti ini:
-
+Buat kode seringkas mungkin: maksimal 180 baris, tanpa komentar panjang, tanpa
+penjelasan langkah kerja, dan tanpa kode yang tidak dipakai. Setelah satu
+pengantar singkat, bungkus HTML persis dengan:
 [[SIMULASI_HTML]]
-<!doctype html>
-<html>
-  ...seluruh HTML, CSS, dan JavaScript...
-</html>
+<!doctype html>...seluruh kode...
 [[/SIMULASI_HTML]]
-
-Jangan membungkus SIMULASI_HTML di dalam pagar Markdown.
-Jangan menggunakan ```html.
-Jangan membuat file Python.
-Hanya penyintesis akhir yang boleh menghasilkan blok ini.
+Marker penutup wajib ditulis segera setelah </html>; jangan menulis apa pun
+setelah marker penutup. Jangan pakai pagar Markdown ``` atau membuat file
+Python. Hanya penyintesis akhir yang boleh menghasilkan blok ini.
 """.strip()
 
 
-def extract_interactive_html(
-    text: str,
-) -> tuple[str, str]:
-    """Pisahkan simulator HTML dari teks jawaban."""
-    match = _BLOCK.search(
-        text or ""
-    )
+def extract_interactive_html(text: str) -> tuple[str, str]:
+    """Pisahkan blok simulator, termasuk respons yang putus usai ``</html>``."""
+    source = text or ""
+    match = _BLOCK.search(source)
+    complete_marker = match is not None
 
-    if not match:
+    # Beberapa provider memutus stream tepat setelah dokumen HTML selesai,
+    # sebelum marker penutup terkirim. Dokumen tetap aman dipakai jika sudah
+    # memiliki </html>; JavaScript yang benar-benar terpotong tidak diterima.
+    if match is None:
+        match = _OPEN_BLOCK.search(source)
+    if match is None:
         return text, ""
 
-    html_document = (
-        match.group(1).strip()
-    )
+    html_doc = match.group(1).strip()
+    # Toleransi bila model tetap membungkus HTML dengan pagar Markdown.
+    html_doc = re.sub(r"^```(?:html)?\s*", "", html_doc, flags=re.I)
+    html_doc = re.sub(r"\s*```$", "", html_doc).strip()
 
-    # Toleransi jika model masih menambahkan pagar Markdown.
-    html_document = re.sub(
-        r"^```(?:html)?\s*",
-        "",
-        html_document,
-        flags=re.I,
-    )
+    if complete_marker:
+        clean = _BLOCK.sub("", source, count=1).strip()
+    else:
+        clean = source[:match.start()].strip()
 
-    html_document = re.sub(
-        r"\s*```$",
-        "",
-        html_document,
-    ).strip()
-
-    clean_text = _BLOCK.sub(
-        "",
-        text,
-        count=1,
-    ).strip()
-
-    if not clean_text:
-        clean_text = (
-            "Simulasi interaktif siap digunakan."
-        )
-
-    return clean_text, html_document
+    return clean or "Simulasi interaktif siap digunakan.", html_doc
