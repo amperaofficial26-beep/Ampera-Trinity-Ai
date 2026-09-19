@@ -310,7 +310,7 @@ def stream_chat_reply(
     if vision:
         kwargs["max_tokens"] = VISION_MAX_TOKENS
     elif web_search:
-        kwargs["max_tokens"] = 1200
+        kwargs["max_tokens"] = 450
     stream = client.chat.completions.create(**kwargs)
     for chunk in stream:
         try:
