@@ -318,10 +318,11 @@ def _susun_balasan_yuki(full: str, thread: list[dict]) -> None:
     # Simulator HTML harus diambil sebelum parser artefak.
     from interactive_simulation import (
         extract_interactive_html,
+        is_interactive_request,
     )
-
-    full, interactive_html = (
-        extract_interactive_html(full)
+    full, interactive_html = extract_interactive_html(
+        full,
+        allow_raw=is_interactive_request(thread),
     )
 
     # Blok kode biasa tetap diproses menjadi artefak.
@@ -372,9 +373,15 @@ def _finalisasi_stream_yuki(stream_state: dict) -> None:
         # Provider kadang menutup stream karena timeout sesaat setelah HTML
         # simulator lengkap terkirim. Selamatkan hasil yang sudah memiliki
         # dokumen utuh; jangan menggantinya dengan pesan error.
-        from interactive_simulation import extract_interactive_html
+        from interactive_simulation import (
+            extract_interactive_html,
+            is_interactive_request,
+        )
 
-        _, recovered_html = extract_interactive_html(full)
+        _, recovered_html = extract_interactive_html(
+            full,
+            allow_raw=is_interactive_request(thread),
+        )
         if recovered_html:
             _susun_balasan_yuki(full, thread)
             return
