@@ -257,11 +257,45 @@ def resolve_model_chain(preferred: str, vision: bool = False) -> list[str]:
     return chain
 
 
-def stream_chat_reply(client: OpenAI, model: str, history: list[dict],
-                      vision: bool = False):
+def messages_for_web_api(history: list[dict]) -> list[dict]:
+    """Prompt ringkas untuk model pencarian agar payload dan sumber terkendali."""
+    system_prompt = (
+        "Gunakan pencarian web untuk menjawab berdasarkan data terbaru yang "
+        "benar-benar ditemukan. Jangan menebak angka, tanggal, atau isi sumber. "
+        "Untuk data finansial, bedakan kurs beli, kurs jual, kurs tengah/JISDOR, "
+        "tanggal, waktu, dan hari kerja terakhir. Sertakan nama sumber dan URL "
+        "langsung. Jika sumber tidak dapat diverifikasi, katakan tidak dapat "
+        "memverifikasi. Ikuti format dan panjang jawaban yang diminta User."
+    )
+    messages = [{"role": "system", "content": system_prompt}]
+
+    for item in history[-6:]:
+        if (
+            item.get("role") in ("user", "assistant")
+            and item.get("content")
+        ):
+            messages.append({
+                "role": item["role"],
+                "content": str(item["content"]),
+            })
+
+    return messages
+
+
+def stream_chat_reply(
+    client: OpenAI,
+    model: str,
+    history: list[dict],
+    vision: bool = False,
+    web_search: bool = False,
+):
     kwargs: dict = {
         "model": model,
-        "messages": messages_for_api(history),
+        "messages": (
+            messages_for_web_api(history)
+            if web_search
+            else messages_for_api(history)
+        ),
         # Suhu jawaban (0,3 = kaku, 1,2 = liar); default 0,7 dari
         # DEFAULT_SETTINGS. Dibaca tiap request supaya perubahan langsung terasa.
         "temperature": float(get_settings().get("temperature", 0.7)),
@@ -283,15 +317,25 @@ def stream_chat_reply(client: OpenAI, model: str, history: list[dict],
         except Exception:
             continue
 
-def stream_chat_with_fallback(client: OpenAI, preferred_model: str, history: list[dict],
-                              vision: bool = False):
+def stream_chat_with_fallback(
+    client: OpenAI,
+    preferred_model: str,
+    history: list[dict],
+    vision: bool = False,
+    web_search: bool = False,
+):
     """Coba model pilihan user; kalau sudah dihapus provider, pakai fallback.
     vision=True → pakai rantai model vision (untuk pesan bergambar)."""
     last_exc: Exception | None = None
     for model in resolve_model_chain(preferred_model, vision=vision):
         try:
-            stream_iter = stream_chat_reply(client, model, history,
-                                            vision=vision)
+            stream_iter = stream_chat_reply(
+                client,
+                model,
+                history,
+                vision=vision,
+                web_search=web_search,
+            )
             first = next(stream_iter, None)
             if first:
                 yield first
