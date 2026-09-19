@@ -633,6 +633,20 @@ def handle_chat_request(answer_slot) -> None:
 
     model_key = st.session_state.selected_model_key
 
+    selected_config = MODEL_BY_KEY.get(
+        model_key,
+        {},
+    )
+
+    if not selected_config.get(
+        "chat_selectable",
+        True,
+    ):
+        model_key = DEFAULT_MODEL_KEY
+        st.session_state.selected_model_key = (
+            model_key
+        )
+
     model_id = AVAILABLE_MODELS.get(
         model_key,
         AVAILABLE_MODELS[DEFAULT_MODEL_KEY],
@@ -645,29 +659,20 @@ def handle_chat_request(answer_slot) -> None:
 
     has_images = bool(last_user and last_user.get("images"))
 
-    web_search_active = (
-        st.session_state.get("web_search_on")
-        and s.get("cap_web_search", True)
-    )
-
-    native_web_model = model_key in {
-        "compound_mini",
-        "compound",
-    }
-
-    use_web_search = bool(
-        (
-            web_search_active
-            or native_web_model
+    web_search_active = bool(
+        st.session_state.get(
+            "web_search_on"
+        )
+        and s.get(
+            "cap_web_search",
+            True,
         )
         and not has_images
     )
 
     if has_images:
         model_id = VISION_MODEL_ID
-    elif web_search_active:
-        model_id = AVAILABLE_MODELS["compound"]
-
+        
     # Kalau masih ada jawaban yang mengalir (pengguna kirim pesan baru di
     # tengah jawaban sebelumnya), hentikan dulu yang lama lalu simpan
     # potongannya sebagai pesan.
@@ -681,22 +686,53 @@ def handle_chat_request(answer_slot) -> None:
     # tampil sebelum teks jawaban boleh mengalir.
     st.session_state["_yuki_t0"] = t0
     try:
-        provider = _get_model_provider(model_key)
+        request_thread = thread
 
-        # Vision dan Web Search tetap menggunakan Groq.
+        if web_search_active:
+            from engines.web_search_engine import (
+                history_with_web_context,
+                search_web,
+            )
+
+            query = str(
+                (last_user or {}).get("content")
+                or ""
+            )
+
+            search_results = search_web(
+                query
+            )
+
+            request_thread = history_with_web_context(
+                thread,
+                search_results,
+            )
+
+        provider = _get_model_provider(
+            model_key
+        )
+
+        # Vision tetap menggunakan Groq; Web Search memakai Tavily terlebih
+        # dahulu lalu hasilnya dirangkum oleh model yang dipilih pengguna.
         # Model OpenAI-compatible digunakan untuk chat teks biasa.
         if (
-            provider in ("plugsky", "aion", "final_router")
+            provider
+            in (
+                "plugsky",
+                "aion",
+                "final_router",
+            )
             and not has_images
-            and not web_search_active
         ):
             client = build_compatible_client(provider)
 
             stream = stream_compatible_reply(
                 client,
-                thread,
+                request_thread,
                 model=model_id,
-                system_prompt=build_system_prompt(thread),
+                system_prompt=build_system_prompt(
+                    thread
+                ),
             )
         else:
             client = build_chat_client()
@@ -704,9 +740,9 @@ def handle_chat_request(answer_slot) -> None:
             stream = stream_chat_with_fallback(
                 client,
                 model_id,
-                thread,
+                request_thread,
                 vision=has_images,
-                web_search=use_web_search,
+                web_search=False,
             )
 
         # Stream dijalankan di THREAD BELAKANG. Tampilannya — animasi
@@ -1048,7 +1084,16 @@ def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> Non
                 unsafe_allow_html=True,
             )
             for m in MODEL_CATALOG:
-                is_active = m["key"] == st.session_state.selected_model_key
+                if not m.get(
+                    "chat_selectable",
+                    True,
+                ):
+                    continue
+
+                is_active = (
+                    m["key"]
+                    == st.session_state.selected_model_key
+                )
                 # Model aktif TIDAK pakai tanda ✓ lagi — ditandai lewat
                 # animasi glow putih berjalan (active_node_css).
                 label = f"{m['name']}  \n:gray[{m['desc']}]"
