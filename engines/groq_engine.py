@@ -331,7 +331,24 @@ def stream_chat_with_fallback(
     """Coba model pilihan user; kalau sudah dihapus provider, pakai fallback.
     vision=True → pakai rantai model vision (untuk pesan bergambar)."""
     last_exc: Exception | None = None
-    for model in resolve_model_chain(preferred_model, vision=vision):
+
+    if web_search:
+        web_fallback = "groq/compound-mini"
+        model_chain = [
+            preferred_model
+        ]
+
+        if web_fallback not in model_chain:
+            model_chain.append(
+                web_fallback
+            )
+    else:
+        model_chain = resolve_model_chain(
+            preferred_model,
+            vision=vision,
+        )
+
+    for model in model_chain:
         try:
             stream_iter = stream_chat_reply(
                 client,
@@ -346,10 +363,33 @@ def stream_chat_with_fallback(
             for piece in stream_iter:
                 yield piece
             return
+                  
         except Exception as e:
             last_exc = e
-            if _is_model_unavailable_error(e):
+            error_text = str(
+                e
+            ).lower()
+
+            web_request_too_large = (
+                web_search
+                and (
+                    "request entity too large"
+                    in error_text
+                    or "request too large"
+                    in error_text
+                    or "status code: 413"
+                    in error_text
+                    or "error code: 413"
+                    in error_text
+                )
+            )
+
+            if (
+                _is_model_unavailable_error(e)
+                or web_request_too_large
+            ):
                 continue
+
             raise
     if last_exc:
         raise last_exc
