@@ -18,6 +18,35 @@ class WebSearchError(RuntimeError):
     """Error publik yang aman untuk fitur pencarian web."""
 
 
+def _preferred_domains(
+    query: str,
+) -> list[str]:
+    """Pilih domain resmi ketika entitasnya jelas dari query."""
+    lowered = query.lower()
+
+    if any(
+        term in lowered
+        for term in (
+            "bank indonesia",
+            "kurs transaksi bi",
+            "jisdor",
+        )
+    ):
+        return [
+            "bi.go.id",
+        ]
+
+    if "presiden indonesia" in lowered:
+        return [
+            "presidenri.go.id",
+            "setneg.go.id",
+            "setkab.go.id",
+            "indonesia.go.id",
+        ]
+
+    return []
+
+
 def _valid_url(value: object) -> str:
     url = str(value or "").strip()
     parsed = urlparse(url)
@@ -115,25 +144,36 @@ def search_web(
             "Tambahkan TAVILY_API_KEY ke Streamlit Secrets."
         )
 
+    preferred_domains = _preferred_domains(
+        query
+    )
+
+    request_payload = {
+        "api_key": TAVILY_API_KEY,
+        "query": query[:1000],
+        "search_depth": "advanced",
+        "topic": "general",
+        "max_results": max(
+            1,
+            min(
+                int(max_results),
+                MAX_RESULTS,
+            ),
+        ),
+        "chunks_per_source": 3,
+        "include_answer": False,
+        "include_raw_content": "markdown",
+    }
+
+    if preferred_domains:
+        request_payload[
+            "include_domains"
+        ] = preferred_domains
+
     try:
         response = requests.post(
             TAVILY_SEARCH_URL,
-            json={
-                "api_key": TAVILY_API_KEY,
-                "query": query[:1000],
-                "search_depth": "advanced",
-                "topic": "general",
-                "max_results": max(
-                    1,
-                    min(
-                        int(max_results),
-                        MAX_RESULTS,
-                    ),
-                ),
-                "chunks_per_source": 3,
-                "include_answer": False,
-                "include_raw_content": "markdown",
-            },
+            json=request_payload,
             timeout=20,
         )
 
