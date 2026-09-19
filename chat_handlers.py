@@ -362,17 +362,20 @@ def _susun_balasan_yuki(full: str, thread: list[dict]) -> None:
     thread.append(reply)
 
 
-def _finalisasi_stream_yuki(stream_state: dict) -> None:
-    """Ubah hasil stream (selesai / dihentikan / error) jadi pesan Yuki."""
+def _finalisasi_stream_yuki(
+    stream_state: dict,
+) -> None:
+    """Ubah hasil stream selesai, dihentikan, atau error menjadi pesan."""
     thread = active_thread()
     err = stream_state.get("err")
-
-     full = "".join(stream_state.get("buf") or [])
+    full = "".join(
+        stream_state.get("buf")
+        or []
+    )
 
     if err is not None:
-        # Provider kadang menutup stream karena timeout sesaat setelah HTML
-        # simulator lengkap terkirim. Selamatkan hasil yang sudah memiliki
-        # dokumen utuh; jangan menggantinya dengan pesan error.
+        # Provider kadang menutup stream karena timeout setelah dokumen
+        # simulator selesai terkirim. Selamatkan dokumen HTML lengkap.
         from interactive_simulation import (
             extract_interactive_html,
             is_interactive_request,
@@ -380,26 +383,36 @@ def _finalisasi_stream_yuki(stream_state: dict) -> None:
 
         _, recovered_html = extract_interactive_html(
             full,
-            allow_raw=is_interactive_request(thread),
+            allow_raw=is_interactive_request(
+                thread
+            ),
         )
+
         if recovered_html:
-            _susun_balasan_yuki(full, thread)
+            _susun_balasan_yuki(
+                full,
+                thread,
+            )
             return
 
         thread.append({
             "id": next_msg_id(),
             "role": "assistant",
             "type": "text",
-            "content": public_error_chat(err),
+            "content": public_error_chat(
+                err
+            ),
             "time": now_wib(),
-            "error_detail": f"{type(err).__name__}: {err}",
+            "error_detail": (
+                f"{type(err).__name__}: {err}"
+            ),
         })
         return
 
-    _susun_balasan_yuki(full, thread)
-
-    full = "".join(stream_state.get("buf") or [])
-    _susun_balasan_yuki(full, thread)
+    _susun_balasan_yuki(
+        full,
+        thread,
+    )
 
 
 def _hentikan_dan_finalisasi_stream_lama() -> None:
