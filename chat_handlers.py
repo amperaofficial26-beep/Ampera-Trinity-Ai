@@ -653,7 +653,7 @@ def handle_chat_request(answer_slot) -> None:
     if has_images:
         model_id = VISION_MODEL_ID
     elif web_search_active:
-        model_id = AVAILABLE_MODELS["compound"]
+        model_id = AVAILABLE_MODELS["compound_mini"]
 
     # Kalau masih ada jawaban yang mengalir (pengguna kirim pesan baru di
     # tengah jawaban sebelumnya), hentikan dulu yang lama lalu simpan
@@ -693,6 +693,10 @@ def handle_chat_request(answer_slot) -> None:
                 model_id,
                 thread,
                 vision=has_images,
+                web_search=bool(
+                    web_search_active
+                    and not has_images
+                ),
             )
 
         # Stream dijalankan di THREAD BELAKANG. Tampilannya — animasi
