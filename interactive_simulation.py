@@ -89,18 +89,7 @@ def interactive_instruction(history: list[dict]) -> str:
     if not is_interactive_request(history):
         return ""
 
-    # Pertanyaan pengetahuan biasa.
-    if _INFO.search(text):
-        return ""
-
-    # Wawancara, negosiasi, dan percakapan ditangani
-    # sistem roleplay, bukan simulator HTML.
-    if _ROLEPLAY.search(text):
-        return ""
-
-    # Tidak ada permintaan aktif membuat simulasi.
-    if not _START.search(text):
-        return ""
+    return """
 
     return """
 USER MEMINTA SIMULASI VISUAL INTERAKTIF.
