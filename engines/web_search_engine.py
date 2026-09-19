@@ -2,7 +2,9 @@
 """Pencarian web terpisah melalui Tavily dengan konteks yang dibatasi."""
 from __future__ import annotations
 
+from html import unescape
 from urllib.parse import urlparse
+import re
 
 import requests
 
@@ -84,6 +86,76 @@ def _domain_allowed(
         for domain in preferred_domains
     )
 
+def _fetch_official_page(
+    url: str,
+    preferred_domains: list[str],
+) -> str:
+    """Ambil teks halaman resmi secara langsung agar data dinamis tidak basi."""
+    if not _domain_allowed(
+        url,
+        preferred_domains,
+    ):
+        return ""
+
+    try:
+        response = requests.get(
+            url,
+            headers={
+                "User-Agent": (
+                    "Mozilla/5.0 "
+                    "AmperaTrinityAI/1.0"
+                ),
+            },
+            timeout=15,
+        )
+
+        response.raise_for_status()
+
+        if not _domain_allowed(
+            response.url,
+            preferred_domains,
+        ):
+            return ""
+
+        content_type = response.headers.get(
+            "content-type",
+            "",
+        ).lower()
+
+        if "html" not in content_type:
+            return ""
+
+        source = response.text[
+            :2_000_000
+        ]
+
+    except requests.RequestException:
+        return ""
+
+    source = re.sub(
+        r"<script\b[^>]*>.*?</script>",
+        " ",
+        source,
+        flags=re.I | re.S,
+    )
+
+    source = re.sub(
+        r"<style\b[^>]*>.*?</style>",
+        " ",
+        source,
+        flags=re.I | re.S,
+    )
+
+    source = re.sub(
+        r"<[^>]+>",
+        " ",
+        source,
+    )
+
+    return " ".join(
+        unescape(source).split()
+    )
+
 
 def _relevant_excerpt(
     raw: str,
@@ -100,15 +172,33 @@ def _relevant_excerpt(
     lowered = normalized.lower()
 
     tokens = [
-        token.lower()
+        token.lower().strip(
+            ".,:;!?()[]"
+        )
         for token in query.split()
         if len(token) >= 3
     ]
 
+    priorities: list[str] = []
+
+    if "usd" in tokens:
+        priorities.append(
+            "usd"
+        )
+
+    if "presiden" in tokens:
+        priorities.append(
+            "presiden"
+        )
+
+    priorities.extend(
+        reversed(tokens)
+    )
+
     position = next(
         (
             lowered.find(token)
-            for token in reversed(tokens)
+            for token in priorities
             if lowered.find(token) >= 0
         ),
         0,
@@ -214,6 +304,15 @@ def search_web(
         ):
             continue
 
+        live_content = (
+            _fetch_official_page(
+                url,
+                preferred_domains,
+            )
+            if preferred_domains
+            else ""
+        )
+
         raw_content = str(
             item.get("raw_content")
             or ""
@@ -225,7 +324,11 @@ def search_web(
         )
 
         content = _relevant_excerpt(
-            raw_content or snippet,
+            (
+                live_content
+                or raw_content
+                or snippet
+            ),
             query,
         )
 
