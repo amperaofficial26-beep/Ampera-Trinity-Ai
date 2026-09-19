@@ -835,12 +835,11 @@ def page_multi_agent() -> None:
 
             from interactive_simulation import (
                 extract_interactive_html,
+                is_interactive_request,
             )
-
-            answer, interactive_html = (
-                extract_interactive_html(
-                    result["answer"]
-                )
+            answer, interactive_html = extract_interactive_html(
+                result["answer"],
+                allow_raw=is_interactive_request(thread),
             )
 
             reply = {
