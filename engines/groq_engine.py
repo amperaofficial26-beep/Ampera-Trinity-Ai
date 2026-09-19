@@ -265,7 +265,9 @@ def messages_for_web_api(history: list[dict]) -> list[dict]:
         "Untuk data finansial, bedakan kurs beli, kurs jual, kurs tengah/JISDOR, "
         "tanggal, waktu, dan hari kerja terakhir. Sertakan nama sumber dan URL "
         "langsung. Jika sumber tidak dapat diverifikasi, katakan tidak dapat "
-        "memverifikasi. Ikuti format dan panjang jawaban yang diminta User."
+        "Jangan menebak atau membentuk URL sendiri. Jika sumber tidak dapat "
+        "diverifikasi, katakan tidak dapat memverifikasi."
+        "Ikuti format dan panjang jawaban yang diminta User."
     )
     messages = [{"role": "system", "content": system_prompt}]
 
