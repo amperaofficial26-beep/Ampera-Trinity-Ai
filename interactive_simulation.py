@@ -90,8 +90,6 @@ def interactive_instruction(history: list[dict]) -> str:
         return ""
 
     return """
-
-    return """
 USER MEMINTA SIMULASI VISUAL INTERAKTIF.
 
 Buat simulator yang benar-benar dapat digunakan, bukan hanya
