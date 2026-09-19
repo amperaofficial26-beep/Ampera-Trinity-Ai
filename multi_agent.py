@@ -523,6 +523,7 @@ def run_multi_agent(
     """Panggil semua model paralel lalu sintesis hasilnya."""
     reports: list[tuple[str, str]] = []
     failures: list[str] = []
+    failure_details: list[str] = []
     # Deteksi dilakukan pada thread utama.
     # Worker model tidak boleh mengubah session_state.
     from simulation import simulation_instruction
@@ -575,16 +576,30 @@ def run_multi_agent(
                 result = future.result()
                 reports.append(result)
 
-            except Exception:
+            except Exception as exc:
                 # Satu model gagal tidak menghentikan seluruh panel.
                 failures.append(
                     model["name"]
                 )
-
+                failure_details.append(
+                    (
+                        f"{model['name']} "
+                        f"({model.get('provider', 'groq')}): "
+                        f"{type(exc).__name__}: {exc}"
+                    )
+                )
     if not reports:
+        diagnostic = " | ".join(
+            failure_details[:4]
+        )
+
         raise RuntimeError(
             "Semua model gagal merespons. "
-            "Periksa API key, kuota, dan status provider."
+            "Diagnosis awal: "
+            + (
+                diagnostic
+                or "detail error tidak tersedia"
+            )
         )
 
     answer = _synthesize(
