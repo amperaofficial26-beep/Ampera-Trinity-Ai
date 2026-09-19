@@ -435,9 +435,7 @@ def _synthesize(
     reports: list[tuple[str, str]],
     simulasi: str = "",
 ) -> str:
-    """Satukan seluruh laporan panel menjadi satu jawaban akhir."""
-    chosen = _select_synthesis_model()
-
+    """Sintesis dengan fallback jika model terkuat gagal atau kehabisan kuota."""
     user_question = _last_user_message(
         history
     )
@@ -446,7 +444,6 @@ def _synthesize(
         reports
     )
 
-    # Buat system prompt sebelum dipakai di dalam messages.
     synthesis_prompt = SYNTHESIS_SYSTEM
 
     if simulasi:
@@ -471,50 +468,96 @@ def _synthesize(
         },
     ]
 
-    params = {
-        "model": chosen["id"],
-        "messages": messages,
-        "stream": False,
+    errors: list[str] = []
+    attempted_ids: set[str] = set()
 
-        # Model reasoning menggunakan sebagian token
-        # untuk proses berpikir internal.
-        "max_tokens": SYNTHESIS_MAX_TOKENS,
-    }
-
-    if (
-        chosen["id"]
-        not in MODEL_ID_TANPA_TEMPERATURE
+    # Mulai dari model tertinggi. Jika gagal karena kuota, rate limit,
+    # model tidak tersedia, atau error provider, coba model berikutnya.
+    for chosen in reversed(
+        MODEL_CATALOG
     ):
-        params["temperature"] = 0.35
-
-    provider = chosen.get(
-        "provider",
-        "groq",
-    )
-
-    client = _client(
-        provider
-    )
-
-    response = _create_completion_with_retry(
-        client=client,
-        params=params,
-        retry_max_tokens=(
-            SYNTHESIS_RETRY_MAX_TOKENS
-        ),
-    )
-
-    answer = (
-        response.choices[0].message.content
-        or ""
-    ).strip()
-
-    if not answer:
-        raise RuntimeError(
-            "Model penyintesis tidak menghasilkan jawaban."
+        provider = chosen.get(
+            "provider",
+            "groq",
         )
 
-    return answer
+        model_id = chosen["id"]
+
+        if not _provider_ready(
+            provider
+        ):
+            continue
+
+        # Beberapa tingkat menggunakan ID model yang sama.
+        # Jangan memanggil model identik lebih dari sekali.
+        if model_id in attempted_ids:
+            continue
+
+        attempted_ids.add(
+            model_id
+        )
+
+        params = {
+            "model": model_id,
+            "messages": messages,
+            "stream": False,
+            "max_tokens": SYNTHESIS_MAX_TOKENS,
+        }
+
+        if (
+            model_id
+            not in MODEL_ID_TANPA_TEMPERATURE
+        ):
+            params["temperature"] = 0.35
+
+        try:
+            client = _client(
+                provider
+            )
+
+            response = _create_completion_with_retry(
+                client=client,
+                params=params,
+                retry_max_tokens=(
+                    SYNTHESIS_RETRY_MAX_TOKENS
+                ),
+            )
+
+            answer = (
+                response.choices[0].message.content
+                or ""
+            ).strip()
+
+            if answer:
+                return answer
+
+            raise RuntimeError(
+                "Model penyintesis menghasilkan jawaban kosong."
+            )
+
+        except Exception as exc:
+            # Kegagalan satu penyintesis tidak membatalkan laporan panel.
+            # Coba kandidat berikutnya.
+            errors.append(
+                (
+                    f"{chosen['name']}: "
+                    f"{type(exc).__name__}: {exc}"
+                )
+            )
+
+    diagnostic = " | ".join(
+        errors[:3]
+    )
+
+    raise RuntimeError(
+        "Semua model penyintesis gagal. "
+        "Diagnosis awal: "
+        + (
+            diagnostic
+            or "provider penyintesis tidak tersedia"
+        )
+    )
+
 
 
 def run_multi_agent(
