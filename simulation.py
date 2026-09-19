@@ -133,7 +133,7 @@ def update_simulation_context(
         _INFO_RE.search(text)
     )
 
-       start_request = bool(
+    start_request = bool(
         _START_RE.search(text)
     )
 
