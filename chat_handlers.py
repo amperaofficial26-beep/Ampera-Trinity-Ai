@@ -650,6 +650,19 @@ def handle_chat_request(answer_slot) -> None:
         and s.get("cap_web_search", True)
     )
 
+    native_web_model = model_key in {
+        "compound_mini",
+        "compound",
+    }
+
+    use_web_search = bool(
+        (
+            web_search_active
+            or native_web_model
+        )
+        and not has_images
+    )
+
     if has_images:
         model_id = VISION_MODEL_ID
     elif web_search_active:
@@ -693,10 +706,7 @@ def handle_chat_request(answer_slot) -> None:
                 model_id,
                 thread,
                 vision=has_images,
-                web_search=bool(
-                    web_search_active
-                    and not has_images
-                ),
+                web_search=use_web_search,
             )
 
         # Stream dijalankan di THREAD BELAKANG. Tampilannya — animasi
