@@ -10,8 +10,8 @@ from config import TAVILY_API_KEY
 
 TAVILY_SEARCH_URL = "https://api.tavily.com/search"
 MAX_RESULTS = 5
-MAX_CONTENT_PER_RESULT = 1600
-MAX_TOTAL_CONTEXT = 7000
+MAX_CONTENT_PER_RESULT = 3600
+MAX_TOTAL_CONTEXT = 12000
 
 
 class WebSearchError(RuntimeError):
@@ -29,6 +29,70 @@ def _valid_url(value: object) -> str:
         return ""
 
     return url
+
+
+def _domain_allowed(
+    url: str,
+    preferred_domains: list[str],
+) -> bool:
+    """Pastikan hasil tidak keluar dari domain resmi yang diminta."""
+    if not preferred_domains:
+        return True
+
+    hostname = (
+        urlparse(url).hostname
+        or ""
+    ).lower()
+
+    return any(
+        (
+            hostname == domain
+            or hostname.endswith(
+                "."
+                + domain
+            )
+        )
+        for domain in preferred_domains
+    )
+
+
+def _relevant_excerpt(
+    raw: str,
+    query: str,
+) -> str:
+    """Ambil bagian halaman di sekitar kata query."""
+    normalized = " ".join(
+        str(raw or "").split()
+    )
+
+    if len(normalized) <= MAX_CONTENT_PER_RESULT:
+        return normalized
+
+    lowered = normalized.lower()
+
+    tokens = [
+        token.lower()
+        for token in query.split()
+        if len(token) >= 3
+    ]
+
+    position = next(
+        (
+            lowered.find(token)
+            for token in reversed(tokens)
+            if lowered.find(token) >= 0
+        ),
+        0,
+    )
+
+    start = max(
+        0,
+        position - 700,
+    )
+
+    return normalized[
+        start:start + MAX_CONTENT_PER_RESULT
+    ]
 
 
 def search_web(
@@ -68,7 +132,7 @@ def search_web(
                 ),
                 "chunks_per_source": 3,
                 "include_answer": False,
-                "include_raw_content": False,
+                "include_raw_content": "markdown",
             },
             timeout=20,
         )
@@ -101,14 +165,31 @@ def search_web(
             item.get("url")
         )
 
-        content = " ".join(
-            str(
-                item.get("content")
-                or ""
-            ).split()
+        if (
+            not url
+            or not _domain_allowed(
+                url,
+                preferred_domains,
+            )
+        ):
+            continue
+
+        raw_content = str(
+            item.get("raw_content")
+            or ""
         )
 
-        if not url or not content:
+        snippet = str(
+            item.get("content")
+            or ""
+        )
+
+        content = _relevant_excerpt(
+            raw_content or snippet,
+            query,
+        )
+
+        if not content:
             continue
 
         cleaned.append({
@@ -119,9 +200,7 @@ def search_web(
                 ).split()
             )[:240],
             "url": url,
-            "content": content[
-                :MAX_CONTENT_PER_RESULT
-            ],
+            "content": content,
         })
 
     if not cleaned:
