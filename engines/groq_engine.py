@@ -170,49 +170,56 @@ def build_system_prompt(history: list[dict] | None = None) -> str:
         )
 
     extra = (
-        st.session_state.get("custom_instruction") or ""
+        st.session_state.get(
+            "custom_instruction"
+        )
+        or ""
     ).strip()
 
     if extra:
         parts.append(
             "Instruksi tambahan dari User "
-            f"yang harus selalu diikuti:\n{extra}"
+            "yang harus selalu diikuti:\n"
+            + extra
         )
 
-           # Simulasi percakapan/roleplay.
-          from simulation import simulation_instruction
-          
-          room = (
-              "multi_agent"
-              if halaman == "multi_agent"
-              else "chat"
-          )
-          
-          simulation_prompt = simulation_instruction(
-              history or [],
-              room=room,
-          )
-          
-          if simulation_prompt:
-              parts.append(
-                  simulation_prompt
-              )
-          
-          
-          # Permintaan simulator visual otomatis menghasilkan HTML interaktif.
-          from interactive_simulation import interactive_instruction
-          
-          interactive_prompt = interactive_instruction(
-              history or []
-          )
-          
-          if interactive_prompt:
-              parts.append(
-                  interactive_prompt
-              )
-          
-          
-          return "\n\n".join(parts)
+    # Simulasi percakapan/roleplay.
+    from simulation import (
+        simulation_instruction,
+    )
+
+    room = (
+        "multi_agent"
+        if halaman == "multi_agent"
+        else "chat"
+    )
+
+    simulation_prompt = simulation_instruction(
+        history or [],
+        room=room,
+    )
+
+    if simulation_prompt:
+        parts.append(
+            simulation_prompt
+        )
+
+    # Permintaan simulator visual otomatis menghasilkan
+    # dokumen HTML interaktif.
+    from interactive_simulation import (
+        interactive_instruction,
+    )
+
+    interactive_prompt = interactive_instruction(
+        history or []
+    )
+
+    if interactive_prompt:
+        parts.append(
+            interactive_prompt
+        )
+
+    return "\n\n".join(parts)
 
 def messages_for_api(history: list[dict]) -> list[dict]:
     """System prompt Yuki + riwayat terakhir (ramah free-tier).
