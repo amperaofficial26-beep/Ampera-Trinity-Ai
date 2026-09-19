@@ -392,6 +392,15 @@ def _synthesize(
         reports
     )
 
+    # Buat system prompt sebelum dipakai di dalam messages.
+    synthesis_prompt = SYNTHESIS_SYSTEM
+
+    if simulasi:
+        synthesis_prompt += (
+            "\n\n"
+            + simulasi
+        )
+
     messages = [
         {
             "role": "system",
@@ -407,21 +416,14 @@ def _synthesize(
             ),
         },
     ]
-synthesis_prompt = SYNTHESIS_SYSTEM
 
-if simulasi:
-    synthesis_prompt += (
-        "\n\n"
-        + simulasi
-    )
-    
     params = {
         "model": chosen["id"],
         "messages": messages,
         "stream": False,
 
-        # Nilai awal dibuat cukup besar karena model reasoning
-        # memakai sebagian budget untuk berpikir internal.
+        # Model reasoning menggunakan sebagian token
+        # untuk proses berpikir internal.
         "max_tokens": SYNTHESIS_MAX_TOKENS,
     }
 
@@ -436,7 +438,9 @@ if simulasi:
         "groq",
     )
 
-    client = _client(provider)
+    client = _client(
+        provider
+    )
 
     response = _create_completion_with_retry(
         client=client,
@@ -447,7 +451,8 @@ if simulasi:
     )
 
     answer = (
-        response.choices[0].message.content or ""
+        response.choices[0].message.content
+        or ""
     ).strip()
 
     if not answer:
