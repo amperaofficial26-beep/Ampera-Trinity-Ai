@@ -653,7 +653,7 @@ def handle_chat_request(answer_slot) -> None:
     if has_images:
         model_id = VISION_MODEL_ID
     elif web_search_active:
-        model_id = AVAILABLE_MODELS["compound_mini"]
+        model_id = AVAILABLE_MODELS["compound"]
 
     # Kalau masih ada jawaban yang mengalir (pengguna kirim pesan baru di
     # tengah jawaban sebelumnya), hentikan dulu yang lama lalu simpan
