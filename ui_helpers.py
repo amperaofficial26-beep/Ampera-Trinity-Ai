@@ -185,39 +185,302 @@ def image_progress_html(labels: list[str] | None = None,
 # ============================================================================
 # BUBBLE CHAT
 # ============================================================================
+def _inline_chat_markup(text: str) -> str:
+    """Render markup inline aman: kode, tautan, tebal, dan miring."""
+    code_parts: list[str] = []
+
+    def keep_code(match: re.Match) -> str:
+        code_parts.append(
+            (
+                '<code class="yuki-inline-code">'
+                f"{html.escape(match.group(1))}"
+                "</code>"
+            )
+        )
+        return (
+            f"\x00INLINE"
+            f"{len(code_parts) - 1}"
+            f"\x00"
+        )
+
+    rendered = re.sub(
+        r"`([^`\n]+)`",
+        keep_code,
+        text,
+    )
+
+    rendered = html.escape(
+        rendered
+    )
+
+    rendered = re.sub(
+        r"\[([^\]]+)\]\((https?://[^\s)]+)\)",
+        (
+            r'<a href="\2" target="_blank" '
+            r'rel="noopener noreferrer">\1</a>'
+        ),
+        rendered,
+    )
+
+    rendered = re.sub(
+        r"\*\*(.+?)\*\*",
+        r"<strong>\1</strong>",
+        rendered,
+    )
+
+    rendered = re.sub(
+        r"(?<!\*)\*([^*\n]+)\*(?!\*)",
+        r"<em>\1</em>",
+        rendered,
+    )
+
+    for index, code in enumerate(
+        code_parts
+    ):
+        rendered = rendered.replace(
+            f"\x00INLINE{index}\x00",
+            code,
+        )
+
+    return rendered
+
+
 def _body_html(content: str) -> str:
-    """Ubah teks jawaban jadi HTML yang jaraknya rapat & terkontrol.
+    """Render struktur jawaban Yuki dengan hierarki judul yang jelas."""
+    text = (
+        content
+        or ""
+    ).strip()
 
-    Masalah lama: bubble memakai white-space:pre-wrap, jadi TIAP baris
-    kosong di teks jadi satu baris kosong penuh (setinggi line-height)
-    — paragraf terlihat berjauhan. Sekarang:
-      - baris kosong pemisah paragraf -> <div class="para-gap"> (spacer
-        kecil ~0.6em, jarak pas seperti Claude)
-      - baris biasa di dalam paragraf -> <br>
-      - blok kode (``` ... ```) dibiarkan utuh per baris (jangan dirapatkan)
-    """
-    teks = content or ""
-    if not teks:
+    if not text:
         return ""
-    elemen: list[str] = []
-    # pisahkan dulu blok kode agar tidak ikut dirapatkan
-    for potong in re.split(r"(```.*?```|```.*$)", teks, flags=re.S):
-        if not potong:
+
+    blocks: list[str] = []
+
+    for part in re.split(
+        r"(```.*?```|```.*$)",
+        text,
+        flags=re.S,
+    ):
+        if not part:
             continue
-        if potong.startswith("```"):
-            elemen.append(html.escape(potong).replace("\n", "<br>"))
+
+        if part.startswith("```"):
+            match = re.match(
+                r"```([^\n`]*)\n?(.*?)(?:```)?$",
+                part,
+                flags=re.S,
+            )
+
+            language = html.escape(
+                (
+                    match.group(1)
+                    if match
+                    else ""
+                ).strip()
+            )
+
+            code = html.escape(
+                (
+                    match.group(2)
+                    if match
+                    else part
+                ).strip("\n")
+            )
+
+            blocks.append(
+                (
+                    '<pre class="yuki-code">'
+                    f'<code data-language="{language}">'
+                    f"{code}"
+                    "</code></pre>"
+                )
+            )
             continue
-        for p in re.split(r"\n{2,}", potong):
-            p = p.strip("\n")
-            if not p.strip():
+
+        list_type = ""
+        list_items: list[str] = []
+
+        def flush_list() -> None:
+            nonlocal list_type
+            nonlocal list_items
+
+            if list_items:
+                tag = (
+                    "ol"
+                    if list_type == "ol"
+                    else "ul"
+                )
+
+                blocks.append(
+                    f'<{tag} class="yuki-list">'
+                    + "".join(
+                        f"<li>{item}</li>"
+                        for item in list_items
+                    )
+                    + f"</{tag}>"
+                )
+
+            list_type = ""
+            list_items = []
+
+        paragraph: list[str] = []
+
+        def flush_paragraph() -> None:
+            nonlocal paragraph
+
+            if paragraph:
+                blocks.append(
+                    '<p class="yuki-paragraph">'
+                    + "<br>".join(
+                        _inline_chat_markup(line)
+                        for line in paragraph
+                    )
+                    + "</p>"
+                )
+
+            paragraph = []
+
+        for raw_line in part.splitlines():
+            line = raw_line.strip()
+
+            if not line:
+                flush_paragraph()
+                flush_list()
                 continue
-            elemen.append(html.escape(p).replace("\n", "<br>"))
-    return '<div class="para-gap"></div>'.join(elemen)
 
+            heading = re.match(
+                r"^(#{1,3})\s+(.+)$",
+                line,
+            )
 
-def bubble_html(role: str, content: str, timestamp: str = "",
-                images_html: str = "", meta_note: str = "",
-                icon_html: str = "") -> str:
+            bullet = re.match(
+                r"^[-*+•]\s+(.+)$",
+                line,
+            )
+
+            numbered = re.match(
+                r"^\d+[.)]\s+(.+)$",
+                line,
+            )
+
+            bold_heading = re.match(
+                r"^\*\*(.+?)\*\*:?$",
+                line,
+            )
+
+            natural_heading = (
+                len(line) <= 72
+                and line.endswith(":")
+                and not line.startswith(
+                    (
+                        "http://",
+                        "https://",
+                    )
+                )
+            )
+
+            if heading:
+                flush_paragraph()
+                flush_list()
+
+                level = len(
+                    heading.group(1)
+                )
+
+                css = (
+                    "title"
+                    if level == 1
+                    else (
+                        "subtitle"
+                        if level == 2
+                        else "section"
+                    )
+                )
+
+                blocks.append(
+                    (
+                        f'<div class="yuki-{css}">'
+                        f"{_inline_chat_markup(heading.group(2))}"
+                        "</div>"
+                    )
+                )
+
+            elif bold_heading:
+                flush_paragraph()
+                flush_list()
+
+                blocks.append(
+                    (
+                        '<div class="yuki-subtitle">'
+                        f"{_inline_chat_markup(bold_heading.group(1))}"
+                        "</div>"
+                    )
+                )
+
+            elif natural_heading:
+                flush_paragraph()
+                flush_list()
+
+                blocks.append(
+                    (
+                        '<div class="yuki-section">'
+                        f"{_inline_chat_markup(line[:-1])}"
+                        "</div>"
+                    )
+                )
+
+            elif bullet or numbered:
+                flush_paragraph()
+
+                wanted = (
+                    "ol"
+                    if numbered
+                    else "ul"
+                )
+
+                if (
+                    list_type
+                    and list_type != wanted
+                ):
+                    flush_list()
+
+                list_type = wanted
+
+                list_items.append(
+                    _inline_chat_markup(
+                        (
+                            numbered
+                            or bullet
+                        ).group(1)
+                    )
+                )
+
+            else:
+                flush_list()
+                paragraph.append(
+                    line
+                )
+
+        flush_paragraph()
+        flush_list()
+
+    return (
+        '<div class="yuki-answer-body">'
+        + "".join(blocks)
+        + "</div>"
+    )
+    
+
+def bubble_html(
+    role: str,
+    content: str,
+    timestamp: str = "",
+    images_html: str = "",
+    meta_note: str = "",
+    icon_html: str = "",
+    animate: bool = False,
+) -> str:
     body = _body_html(content)
     css = "user" if role == "user" else "ai"
     if role == "user":
@@ -228,8 +491,15 @@ def bubble_html(role: str, content: str, timestamp: str = "",
         meta = f'<div class="ai-label">{logo_img_html("logo-label")} Yuki</div>'
     # meta_note & icon_html diisi oleh kode ini sendiri (aman, bukan input user)
     note = f'<div class="bubble-meta">{meta_note}</div>' if meta_note else ""
+    animation_class = (
+        " yuki-fade-blur"
+        if animate
+        and role == "assistant"
+        else ""
+    )
+
     return (
-        f'<div class="bubble-row {css}">'
+        f'<div class="bubble-row {css}{animation_class}">'
         f'<div class="bubble-wrap">{meta}'
         f'<div class="bubble {css}">{icon_html}{body}{images_html}</div>'
         f"{note}"
@@ -548,12 +818,54 @@ def render_message(msg: dict) -> None:
             )
     else:
         note = f"{ICON_MIC} via suara" if msg.get("via_voice") else ""
-        imgs_html = images_bubble_html(msg.get("images") or [])
+        imgs_html = images_bubble_html(
+            msg.get("images")
+            or []
+        )
+
+        role = msg.get(
+            "role",
+            "assistant",
+        )
+
+        thread = active_thread()
+
+        message_id = msg.get(
+            "id",
+            id(msg),
+        )
+
+        animate = bool(
+            role == "assistant"
+            and thread
+            and thread[-1] is msg
+            and st.session_state.get(
+                "_last_fade_message_id"
+            ) != message_id
+        )
+
         st.markdown(
-            bubble_html(msg.get("role", "assistant"), msg.get("content", ""),
-                        msg.get("time", ""), imgs_html, note),
+            bubble_html(
+                role,
+                msg.get(
+                    "content",
+                    "",
+                ),
+                msg.get(
+                    "time",
+                    "",
+                ),
+                imgs_html,
+                note,
+                animate=animate,
+            ),
             unsafe_allow_html=True,
         )
+
+        if animate:
+            st.session_state[
+                "_last_fade_message_id"
+            ] = message_id
                 # Tampilkan simulator HTML interaktif.
         if (
             msg.get("interactive_html")
