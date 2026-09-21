@@ -24,10 +24,18 @@ import random
 import re
 
 # >>> GANTI WARNA GLOW DI SINI (satu tempat untuk semuanya) <<<
-# Format hex "#RRGGBB". Dipakai untuk glow logo DAN glow berjalan di teks.
+# Format hex "#RRGGBB". Dipakai untuk glow logo DAN glow berjalan di teks
+# pada loader PARAMETER (chat biasa) di bawah.
 #   "#EDE2D1" = krem sidebar (sekarang)
 #   "#E8B04B" = emas   |  "#7C3AED" = ungu violet  |  "#2C1F33" = ungu gelap
 WARNA_GLOW = "#FFFFFF"
+
+# >>> WARNA UNTUK LOADING KHUSUS (web/file/design/code/card/schedule) <<<
+# Disamakan dengan palet resmi Trinity di styles.py (beige + ungu):
+#   Aksen utama  : #4A3559 (Deep Violet) — ikon, kursor kode, puncak sapuan glow
+#   Aksen lembut : #7E7387 — titik-titik berdenyut mode web
+AKSEN_KHUSUS = "#4A3559"
+AKSEN_KHUSUS_LEMBUT = "#7E7387"
 
 
 def _rgb(hex_color: str) -> str:
@@ -308,11 +316,16 @@ _SPECIAL_PATTERNS = {
         re.I | re.S,
     ),
 }
+# ---------------------------------------------------------------------------
+# IKON MODE. "web" memakai bentuk kaca pembesar asli (bukan globe) supaya
+# sama persis dengan referensi demo — lingkaran lensa + tangkai diagonal.
+# Semua ikon di bawah memakai currentColor, jadi warnanya ikut CSS
+# `.special-icon { color: AKSEN_KHUSUS }` di special_loading_html().
+# ---------------------------------------------------------------------------
 _ICON_SVG = {
     "web": (
-        '<circle cx="12" cy="12" r="9"/>'
-        '<path d="M3 12h18M12 3a15 15 0 0 1 0 18'
-        'M12 3a15 15 0 0 0 0 18"/>'
+        '<circle cx="10" cy="10" r="6"/>'
+        '<line x1="15" y1="15" x2="21" y2="21"/>'
     ),
     "code": (
         '<path d="m8 9-4 3 4 3'
@@ -427,7 +440,9 @@ def special_loading_html(
     mode: str,
     subject: str = "",
 ) -> str:
-    """Loading khusus tanpa logo Trinity dan tanpa gerakan pada ikon."""
+    """Loading khusus — ikon & sapuan glow memakai warna aksen Trinity
+    (AKSEN_KHUSUS / AKSEN_KHUSUS_LEMBUT), disamakan dengan demo animasi
+    5-mode (web/file/design/code/card)."""
     config = SPECIAL_LOADING.get(
         mode
     )
@@ -483,16 +498,25 @@ def special_loading_html(
     )
 
     icon = _ICON_SVG.get(mode, _ICON_SVG["file"])
-    glow_rgb = _rgb(WARNA_GLOW)
+    aksen_rgb = _rgb(AKSEN_KHUSUS)
+
+    # Titik-titik berdenyut (seperti demo "Mencari di web ...") — hanya
+    # dirender untuk mode web, disembunyikan CSS-nya untuk mode lain.
+    dots_html = (
+        '<span class="special-dots"><span></span><span></span><span></span></span>'
+        if mode == "web" else ""
+    )
+
     return f"""
 <style>
-/* Sapuan glow sama dengan loader parameter biasa: gradient di-clip ke teks. */
+/* Sapuan glow sama dengan loader parameter biasa: gradient di-clip ke teks.
+   Puncaknya sekarang pakai AKSEN_KHUSUS (ungu Trinity), bukan putih polos. */
 @keyframes specialGlowSweep {{
   0% {{ background-position:130% 0; }}
   100% {{ background-position:-30% 0; }}
 }}
-/* Gerak mode diadaptasi dari demo Claude, tetapi warna dan ukurannya memakai
-   tema Trinity. Masing-masing mode punya karakter gerak sendiri. */
+/* Gerak per mode — karakter animasi tiap ikon beda, warnanya seragam
+   memakai currentColor (diatur lewat .special-icon di bawah). */
 @keyframes specialWebSweep {{
   0%,100% {{ transform:translateX(-1.5px) rotate(-2deg); }}
   50% {{ transform:translateX(1.5px) rotate(2deg); }}
@@ -517,6 +541,10 @@ def special_loading_html(
 @keyframes specialCalendarTick {{
   0%,100% {{ stroke-dashoffset:16; opacity:.3; }}
   45%,72% {{ stroke-dashoffset:0; opacity:1; }}
+}}
+@keyframes specialDotPulse {{
+  0%,60%,100% {{ opacity:.25; transform:scale(.8); }}
+  30% {{ opacity:1; transform:scale(1); }}
 }}
 @keyframes specialPhraseCycle {{
     0% {{
@@ -555,7 +583,7 @@ def special_loading_html(
 }}
 .special-icon {{
   position:relative; width:19px; height:19px; flex:0 0 19px;
-  color:#6B6172; transform-origin:center; will-change:transform,filter,opacity;
+  color:{AKSEN_KHUSUS}; transform-origin:center; will-change:transform,filter,opacity;
 }}
 .special-icon svg {{ width:100%; height:100%; display:block; fill:none; stroke:currentColor;
   stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }}
@@ -566,13 +594,22 @@ def special_loading_html(
 .special-loader.mode-design .special-icon {{ animation:specialBlurFocus 2s ease-in-out infinite; }}
 .special-loader.mode-code .special-icon::after {{
   content:""; position:absolute; right:-3px; top:2px; width:1.5px; height:15px;
-  border-radius:2px; background:rgba({glow_rgb},.95);
+  border-radius:2px; background:{AKSEN_KHUSUS};
   animation:specialCaret .8s step-end infinite;
 }}
 .special-loader.mode-card .special-icon {{ animation:specialCardPulse 1.4s ease-in-out infinite; }}
 .special-loader.mode-schedule .special-icon svg path:last-child {{
   stroke-dasharray:16; animation:specialCalendarTick 1.8s ease-in-out infinite;
 }}
+.special-dots {{ display:none; align-items:center; margin-left:2px; }}
+.special-loader.mode-web .special-dots {{ display:inline-flex; }}
+.special-dots span {{
+  width:4px; height:4px; border-radius:50%;
+  background:{AKSEN_KHUSUS_LEMBUT}; margin-right:3px;
+  animation:specialDotPulse 1.2s ease-in-out infinite;
+}}
+.special-dots span:nth-child(2) {{ animation-delay:.15s; }}
+.special-dots span:nth-child(3) {{ animation-delay:.3s; }}
 .special-phrases {{ position:relative; display:block; width:min(72vw,520px); height:18px; 
 }}
 
@@ -582,7 +619,7 @@ def special_loading_html(
   background:linear-gradient(
     100deg,
     #6B6172 0%, #6B6172 38%,
-    rgba({glow_rgb},1) 50%,
+    rgba({aksen_rgb},1) 50%,
     #6B6172 62%, #6B6172 100%
   );
   background-size:220% 100%;
@@ -598,10 +635,12 @@ def special_loading_html(
 @media (prefers-reduced-motion:reduce) {{
   .special-icon,
   .special-icon svg path,
-  .special-icon::after {{
+  .special-icon::after,
+  .special-dots span {{
     animation: none !important;
     transform: none !important;
     filter: none !important;
+    opacity: .6 !important;
   }}
 
   .special-phrase {{
@@ -632,6 +671,8 @@ def special_loading_html(
         <span class="special-phrases">
             {spans}
         </span>
+
+        {dots_html}
     </div>
 </div>
 """.strip()
