@@ -227,9 +227,28 @@ def _archive_current_conversation() -> None:
         "conv_key": st.session_state.get("conv_key") or uuid.uuid4().hex,
     })
 
+def _cancel_pending_yuki() -> None:
+    """Batalkan job/stream agar tidak terbawa ke percakapan lain."""
+    stop = st.session_state.get("_yuki_stop")
+    if stop is not None:
+        stop.set()
+    for key in (
+        "_yuki_job",
+        "_yuki_ui_flushed",
+        "_yuki_stream",
+        "_yuki_stop",
+        "_yuki_thread",
+        "_yuki_t0",
+        "_yuki_loader_tampil",
+        "_yuki_loader_mode",
+        "_yuki_loader_subject",
+    ):
+        st.session_state.pop(key, None)
+
 
 def reset_conversation() -> None:
     """Chat baru: arsipkan obrolan utama, lalu kosongkan thread utama."""
+    _cancel_pending_yuki()
     _archive_current_conversation()
     st.session_state.active_conv_id = None
     # Chat baru: dok file ditutup dulu biar layar bersih.
@@ -245,6 +264,7 @@ def reset_conversation() -> None:
 
 def open_conversation(conv_id: int) -> None:
     """Buka kembali percakapan lama dari riwayat sidebar."""
+    _cancel_pending_yuki()
     _archive_current_conversation()
     for c in st.session_state.conversations:
         if c["id"] == conv_id:
