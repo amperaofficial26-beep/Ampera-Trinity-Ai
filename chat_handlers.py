@@ -436,12 +436,18 @@ def _hentikan_dan_finalisasi_stream_lama() -> None:
     if not lama:
         return
 
-    tampil = int(lama.get("tampil") or 0)
-    if tampil > 0:
-        potongan = "".join(lama.get("buf") or [])[:tampil]
-        if potongan.strip():
-            _finalisasi_stream_yuki({"buf": [potongan], "err": None})
+    potongan = "".join(
+        lama.get("buf")
+        or []
+    )
 
+    if potongan.strip():
+        _finalisasi_stream_yuki({
+            "buf": [
+                potongan,
+            ],
+            "err": None,
+        })
 
 # 0,15 detik ≈ 7 pembaruan/detik: teks terasa MENGALIR, bukan muncul
 # per blok tiap 0,4 detik. Masih cukup longgar supaya Streamlit tidak
@@ -492,25 +498,10 @@ def fragmen_jawaban_yuki() -> None:
     minta_henti = bool(stream_state.get("hentikan"))
 
     if hidup and not minta_henti:
-        t0 = st.session_state.get("_yuki_t0") or 0
-        animasi_wajib = (time.time() - t0) < float(THINKING_MIN_SECONDS)
-        if not teks or animasi_wajib:
-            # Masih fase animasi berpikir — biarkan loader statis dari
-            # script utama yang tampil. Jangan sentuh apa pun di sini.
-            return
-
-        # Pindah ke fase teks: satu rerun penuh supaya loader statis
-        # dari script utama ikut terhapus.
-        if st.session_state.pop("_yuki_loader_tampil", None):
-            st.rerun()
-
-        # Teks jawaban mengalir + kursor mengetik. Panjang teks yang
-        # sudah tampil dicatat di "tampil" — dipakai saat tombol
-        # Hentikan ditekan supaya yang disimpan persis teks yang
-        # terlihat di layar saat itu.
-        st.markdown(bubble_html("assistant", teks + " ▍"),
-                    unsafe_allow_html=True)
-        stream_state["tampil"] = len(teks)
+        # Jawaban tetap dikumpulkan di background, tetapi tidak lagi
+        # ditampilkan karakter demi karakter. Loader berpikir tetap terlihat
+        # sampai respons selesai; jawaban kemudian muncul sekaligus dengan
+        # animasi fade-blur dari render_message().
         return
 
     # Thread sudah selesai ATAU pengguna menekan tombol "Hentikan":
@@ -527,10 +518,11 @@ def fragmen_jawaban_yuki() -> None:
         # teks yang tampil), jawabannya dibuang. Lalu pasang catatan
         # "anda menghentikan respon yuki..." yang terkunci ke kondisi
         # thread saat ini.
-        tampil = int(stream_state.get("tampil") or 0)
-        potongan = (
-            "".join(stream_state.get("buf") or [])[:tampil]
-            if tampil > 0 else ""
+        # Tidak ada lagi animasi ketik, jadi simpan seluruh bagian respons
+        # yang sudah diterima worker sampai tombol Hentikan ditekan.
+        potongan = "".join(
+            stream_state.get("buf")
+            or []
         )
         if potongan.strip():
             _finalisasi_stream_yuki({"buf": [potongan], "err": None})
