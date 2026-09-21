@@ -582,7 +582,7 @@ def special_loading_html(
   overflow:hidden;
 }}
 .special-icon {{
-  position:relative; width:19px; height:19px; flex:0 0 19px;
+  position:relative; width:25px; height:25px; flex:0 0 25px;
   color:{AKSEN_KHUSUS}; transform-origin:center; will-change:transform,filter,opacity;
 }}
 .special-icon svg {{ width:100%; height:100%; display:block; fill:none; stroke:currentColor;
