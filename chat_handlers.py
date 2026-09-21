@@ -574,8 +574,17 @@ def _scroll_to_yuki_work_once() -> None:
 (function () {
   const frame = window.frameElement;
   if (!frame) return;
-  const move = () => frame.scrollIntoView({behavior: "smooth", block: "end"});
-  window.requestAnimationFrame(() => window.requestAnimationFrame(move));
+
+  // Posisi "end" menaruh iframe tepat di balik bottom dock chat. Gunakan
+  // center agar loader yang berada persis di atas marker tetap terlihat.
+  const move = () => frame.scrollIntoView({
+    behavior: "smooth",
+    block: "center"
+  });
+
+  window.requestAnimationFrame(
+    () => window.requestAnimationFrame(move)
+  );
 })();
 </script>
         """,
