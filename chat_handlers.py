@@ -115,10 +115,7 @@ def maybe_run_yuki(answer_slot) -> bool:
                      icon=":material/auto_awesome:")
         handle_image_request(job.get("text") or "")
     else:
-        handle_chat_request(answer_slot, request_text=text)
-        # Render pada run pengiriman yang sama. Jangan hanya mengandalkan
-        # rerun berikutnya karena respons cepat dapat selesai lebih dahulu.
-        render_loader_yuki()
+        handle_chat_request(answer_slot, request_text=job.get("text") or "")
     return True
 # Blok kode (``` ... ```), kode inline (` ... `), dan blok kode tak
 # tertutup — isinya TIDAK boleh dirapatkan saat merapikan jawaban Yuki
@@ -1299,24 +1296,13 @@ def process_user_input(user_input, answer_slot, is_fresh: bool = False) -> bool:
     st.session_state["_yuki_loader_subject"] = loading_subject(text)
     st.session_state["_yuki_scroll_pending"] = True
 
-    # Jalankan pekerjaan sekarang, jangan menunggu antrean job/rerun berikutnya.
-    st.session_state.pop("_yuki_job", None)
-    st.session_state.pop("_yuki_ui_flushed", None)
-
-    if buat_gambar:
-        if not mode_manual:
-            st.toast(
-                "Beralih ke mode gambar otomatis.",
-                icon=":material/auto_awesome:",
-            )
-        handle_image_request(text)
-        return True
-
-    handle_chat_request(answer_slot, request_text=text)
-
-    # Render pada run pengiriman yang sama lalu BIARKAN run selesai. Memanggil
-    # st.rerun() tepat sesudah components.html membuat delta iframe dibatalkan
-    # sebelum browser sempat melukis animasinya. Fragment akan memantau worker
-    # dan melakukan rerun sendiri ketika jawaban selesai.
-    render_loader_yuki()
-    return False
+    # Antrekan satu kali agar rerun pertama menempatkan pesan pengguna pada
+    # riwayat normal. Pada run berikutnya maybe_run_yuki() memulai worker lalu
+    # membiarkan halaman terus merender loader tanpa rerun kedua.
+    st.session_state["_yuki_job"] = {
+        "image_mode": buat_gambar,
+        "text": text,
+        "auto": buat_gambar and not mode_manual,
+        "loader_mode": loader_mode,
+    }
+    return True
