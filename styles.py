@@ -491,26 +491,37 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     text-underline-offset: 3px;
 }
 
-/* Jawaban baru muncul sekaligus: lembut dari blur ke tajam. */
-.yuki-fade-blur {
+/* Setiap baris jawaban muncul bergiliran dengan interval 0,9 detik. */
+.yuki-fade-blur .yuki-reveal-line {
     animation:
-        yukiAnswerFadeBlur
-        560ms
+        yukiLineFadeBlur
+        720ms
         cubic-bezier(.22,.8,.24,1)
         both;
-    transform-origin: top left;
+
+    animation-delay:
+        calc(
+            var(--yuki-line-index, 0)
+            * 0.9s
+        );
+
+    transform-origin: left center;
 }
 
-@keyframes yukiAnswerFadeBlur {
+.yuki-fade-blur span.yuki-reveal-line {
+    display: inline-block;
+}
+
+@keyframes yukiLineFadeBlur {
     0% {
         opacity: 0;
-        filter: blur(10px);
-        transform: translateY(8px);
+        filter: blur(9px);
+        transform: translateY(6px);
     }
 
     55% {
-        opacity: .72;
-        filter: blur(2.5px);
+        opacity: .76;
+        filter: blur(2px);
     }
 
     100% {
@@ -521,7 +532,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .yuki-fade-blur {
+    .yuki-fade-blur .yuki-reveal-line {
         animation: none !important;
     }
 }
