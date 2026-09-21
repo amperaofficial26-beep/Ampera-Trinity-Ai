@@ -377,8 +377,6 @@ def _susun_balasan_yuki(full: str, thread: list[dict]) -> None:
         # Tata letak baru: nama model + lencana Free/Premium pada bubble AI.
         **_meta_model(),
     }
-    (),
-    }
 
     if file_ids:
         reply["artifact_ids"] = file_ids
