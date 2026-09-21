@@ -482,20 +482,15 @@ def special_loading_html(
         in enumerate(phrases)
     )
 
-    icon = _ICON_SVG.get(
-        mode,
-        _ICON_SVG["file"],
-    )
-
+    icon = _ICON_SVG.get(mode, _ICON_SVG["file"])
+    glow_rgb = _rgb(WARNA_GLOW)
     return f"""
 <style>
+/* Sapuan glow sama dengan loader parameter biasa: gradient di-clip ke teks. */
 @keyframes specialGlowSweep {{
-  0% {{ transform:translateX(-150%); opacity:0; }}
-  18% {{ opacity:.34; }}
-  72% {{ opacity:.34; }}
-  100% {{ transform:translateX(420%); opacity:0; }}
+  0% {{ background-position:130% 0; }}
+  100% {{ background-position:-30% 0; }}
 }}
-
 @keyframes specialPhraseCycle {{
     0% {{
         opacity: 0;
@@ -531,14 +526,7 @@ def special_loading_html(
   position:relative; display:flex; align-items:center; gap:8px;
   overflow:hidden;
 }}
-.special-row::after {{
-  content:""; position:absolute; top:-9px; bottom:-9px; left:0; width:24%;
-  pointer-events:none;
-  background:linear-gradient(100deg,transparent,rgba(255,255,255,.46),transparent);
-  filter:blur(7px);
-  animation:specialGlowSweep 3.4s cubic-bezier(.45,0,.55,1) infinite;
-}}
-.special-icon {{ width:19px; height:19px; flex:0 0 19px; color:#6B6172; 
+.special-icon {{ width:19px; height:19px; flex:0 0 19px; color:#6B6172;
 }}
 .special-icon svg {{
     width: 100%;
@@ -569,19 +557,23 @@ def special_loading_html(
         infinite;
 }}
 
-@media (prefers-reduced-motion: reduce) {{
-    .special-row::after {{
-        animation: none;
-    }}
-
-    .special-phrase {{
-        animation: none;
-        opacity: 0;
-    }}
-
-    .special-phrase:first-child {{
-        opacity: 1;
-    }}
+.special-phrase {{
+  position:absolute; inset:0 auto auto 0; opacity:0; white-space:nowrap;
+  overflow:hidden; text-overflow:ellipsis; max-width:100%;
+  background:linear-gradient(
+    100deg,
+    #6B6172 0%, #6B6172 38%,
+    rgba({glow_rgb},1) 50%,
+    #6B6172 62%, #6B6172 100%
+  );
+  background-size:220% 100%;
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+  color:transparent;
+  animation:
+    specialPhraseCycle {duration:.3f}s ease infinite,
+    specialGlowSweep 2.4s linear infinite;
 }}
 </style>
 
