@@ -491,6 +491,34 @@ def special_loading_html(
   0% {{ background-position:130% 0; }}
   100% {{ background-position:-30% 0; }}
 }}
+/* Gerak mode diadaptasi dari demo Claude, tetapi warna dan ukurannya memakai
+   tema Trinity. Masing-masing mode punya karakter gerak sendiri. */
+@keyframes specialWebSweep {{
+  0%,100% {{ transform:translateX(-1.5px) rotate(-2deg); }}
+  50% {{ transform:translateX(1.5px) rotate(2deg); }}
+}}
+@keyframes specialLineIn {{
+  0% {{ opacity:.18; stroke-dashoffset:18; }}
+  30%,72% {{ opacity:1; stroke-dashoffset:0; }}
+  100% {{ opacity:.18; stroke-dashoffset:-18; }}
+}}
+@keyframes specialBlurFocus {{
+  0%,100% {{ filter:blur(2.2px); opacity:.48; }}
+  50% {{ filter:blur(0); opacity:1; }}
+}}
+@keyframes specialCaret {{
+  0%,45% {{ opacity:1; }}
+  46%,100% {{ opacity:0; }}
+}}
+@keyframes specialCardPulse {{
+  0%,100% {{ opacity:.38; transform:scale(.95); }}
+  50% {{ opacity:1; transform:scale(1); }}
+}}
+@keyframes specialCalendarTick {{
+  0%,100% {{ stroke-dashoffset:16; opacity:.3; }}
+  45%,72% {{ stroke-dashoffset:0; opacity:1; }}
+}}
+@keyframes specialPhraseCycle {{
 @keyframes specialPhraseCycle {{
     0% {{
         opacity: 0;
@@ -526,19 +554,26 @@ def special_loading_html(
   position:relative; display:flex; align-items:center; gap:8px;
   overflow:hidden;
 }}
-.special-icon {{ width:19px; height:19px; flex:0 0 19px; color:#6B6172;
+.special-icon {{
+  position:relative; width:19px; height:19px; flex:0 0 19px;
+  color:#6B6172; transform-origin:center; will-change:transform,filter,opacity;
 }}
-.special-icon svg {{
-    width: 100%;
-    height: 100%;
-    display: block;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.8;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+.special-icon svg {{ width:100%; height:100%; display:block; fill:none; stroke:currentColor;
+  stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }}
+.special-loader.mode-web .special-icon {{ animation:specialWebSweep 1.4s ease-in-out infinite; }}
+.special-loader.mode-file .special-icon svg path:last-child {{
+  stroke-dasharray:18; animation:specialLineIn 1.8s ease-in-out infinite;
 }}
-
+.special-loader.mode-design .special-icon {{ animation:specialBlurFocus 2s ease-in-out infinite; }}
+.special-loader.mode-code .special-icon::after {{
+  content:""; position:absolute; right:-3px; top:2px; width:1.5px; height:15px;
+  border-radius:2px; background:rgba({glow_rgb},.95);
+  animation:specialCaret .8s step-end infinite;
+}}
+.special-loader.mode-card .special-icon {{ animation:specialCardPulse 1.4s ease-in-out infinite; }}
+.special-loader.mode-schedule .special-icon svg path:last-child {{
+  stroke-dasharray:16; animation:specialCalendarTick 1.8s ease-in-out infinite;
+}}
 .special-phrases {{ position:relative; display:block; width:min(72vw,520px); height:18px; 
 }}
 
@@ -575,9 +610,31 @@ def special_loading_html(
     specialPhraseCycle {duration:.3f}s ease infinite,
     specialGlowSweep 2.4s linear infinite;
 }}
+
+@media (prefers-reduced-motion:reduce) {{
+  .special-icon,
+  .special-icon svg path,
+  .special-icon::after {{
+    animation: none !important;
+    transform: none !important;
+    filter: none !important;
+  }}
+
+  .special-phrase {{
+    animation: none !important;
+    opacity: 0;
+    background: none;
+    -webkit-text-fill-color: #6B6172;
+    color: #6B6172;
+  }}
+
+  .special-phrase:first-child {{
+    opacity: 1;
+  }}
+}}
 </style>
 
-<div class="special-loader">
+<div class="special-loader mode-{mode}">
     <div class="special-row">
         <span class="special-icon">
             <svg
