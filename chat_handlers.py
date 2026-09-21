@@ -1281,3 +1281,4 @@ def process_user_input(user_input, answer_slot, is_fresh: bool = False) -> bool:
         ),
         "loader_mode": loader_mode,
     }
+    return True
