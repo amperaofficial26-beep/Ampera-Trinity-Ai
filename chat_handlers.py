@@ -39,7 +39,6 @@ from loading_params import (
     detect_loading_mode,
     loading_subject,
     param_loading_html,
-    special_loading_duration,
     special_loading_html,
 )
 from model_dna import DNA_CSS, dna_header_html, active_node_css
@@ -91,7 +90,9 @@ _STOP_BTN_CSS = (
 #                     supaya animasi shimmer sempat terlihat.
 # IMAGE_DONE_SECONDS: jeda singkat pada keadaan "Selesai" sebelum gambar muncul.
 # IMAGE_MAX_SECONDS : batas aman menunggu API sebelum dianggap timeout.
-IMAGE_MIN_SECONDS = 15.0
+# Siklus frasa desain tetap 15 detik di loading_params.py; angka ini hanya
+# mencegah kedipan jika API gambar menjawab sangat cepat.
+IMAGE_MIN_SECONDS = float(THINKING_MIN_SECONDS)
 IMAGE_DONE_SECONDS = 0.7
 IMAGE_MAX_SECONDS = 200.0
 
@@ -716,29 +717,34 @@ def handle_chat_request(answer_slot, request_text: str = "") -> None:
     _hentikan_dan_finalisasi_stream_lama()
 
     t0 = time.time()
-    # Durasi tampil animasi "berpikir" minimal = THINKING_MIN_SECONDS.
-    # Pengaturan manual "min_think_seconds" sudah dihapus.
-    loader_mode = str(
-        st.session_state.get(
-            "_yuki_loader_mode"
-        )
-        or ""
+    # Durasi 8/10/12/15 detik pada loader khusus adalah durasi SATU SIKLUS
+    # frasa, bukan waktu blokir respons. Respons boleh muncul segera setelah
+    # provider selesai; jeda minimum tetap mengikuti loader chat biasa.
+    loader_mode = str(st.session_state.get("_yuki_loader_mode") or "")
+    min_think = float(THINKING_MIN_SECONDS)
     )
-
-    min_think = (
-        special_loading_duration(
-            loader_mode
-        )
-        if loader_mode
-        else float(
-            THINKING_MIN_SECONDS
-        )
-    )
+    
     # Dicatat supaya fragmen tahu sampai kapan animasi "berpikir" wajib
     # tampil sebelum teks jawaban boleh mengalir.
     st.session_state["_yuki_t0"] = t0
     try:
+        # Semua pembacaan Streamlit/session state wajib selesai di thread utama.
+        # Worker hanya boleh menjalankan I/O Tavily dan streaming provider.
+        provider = _get_model_provider(model_key)
+        use_compatible = (
+            provider in ("plugsky", "aion", "final_router")
+            and not has_images
+        )
+        if use_compatible:
+            provider_client = build_compatible_client(provider)
+            system_prompt = build_system_prompt(thread)
+        else:
+            provider_client = build_chat_client()
+            system_prompt = ""
+
         def _lazy_reply_stream():
+            """Mulai I/O pencarian/model di worker agar loader sudah terlihat."""
+            request_thread = thread
             """Mulai pencarian/model di worker agar loader sudah terlihat."""
             request_thread = thread
             if web_search_active:
@@ -760,25 +766,18 @@ def handle_chat_request(answer_slot, request_text: str = "") -> None:
                     search_results,
                 )
 
-            provider = _get_model_provider(model_key)
-
             # Vision tetap menggunakan Groq; Web Search memakai Tavily lalu
             # hasilnya dirangkum oleh model yang dipilih pengguna.
-            if (
-                provider in ("plugsky", "aion", "final_router")
-                and not has_images
-            ):
-                client = build_compatible_client(provider)
+            if use_compatible:
                 reply_stream = stream_compatible_reply(
-                    client,
+                    provider_client,
                     request_thread,
                     model=model_id,
-                    system_prompt=build_system_prompt(thread),
+                    system_prompt=system_prompt,
                 )
             else:
-                client = build_chat_client()
                 reply_stream = stream_chat_with_fallback(
-                    client,
+                    provider_client,
                     model_id,
                     request_thread,
                     vision=has_images,
