@@ -251,7 +251,7 @@ def _body_html(content: str) -> str:
     if not text:
         return ""
 
-       blocks: list[str] = []
+    blocks: list[str] = []
     reveal_index = 0
 
     def reveal_style() -> str:
@@ -473,7 +473,6 @@ def _body_html(content: str) -> str:
 
                 list_type = wanted
 
-                list_items.append(
                 list_items.append(
                     (
                         '<li class="yuki-reveal-line"'
