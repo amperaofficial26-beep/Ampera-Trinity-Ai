@@ -227,6 +227,9 @@ def handle_image_request(prompt: str) -> None:
             height=62,
             scrolling=False,
         )
+        if st.session_state.pop("_yuki_scroll_pending", False):
+            _scroll_to_yuki_work_once()
+
     # Tunggu hasilnya. Kotak tetap tampil MINIMAL IMAGE_MIN_SECONDS detik
     # supaya animasinya sempat terlihat utuh (FLUX-schnell sering selesai
     # dalam 2-3 detik). Polling pakai sleep pendek TANPA render ulang, jadi
@@ -563,6 +566,23 @@ def fragmen_jawaban_yuki() -> None:
 
     st.rerun()
 
+def _scroll_to_yuki_work_once() -> None:
+    """Scroll halus satu kali; sesudahnya posisi sepenuhnya milik pengguna."""
+    components.html(
+        """
+<script>
+(function () {
+  const frame = window.frameElement;
+  if (!frame) return;
+  const move = () => frame.scrollIntoView({behavior: "smooth", block: "end"});
+  window.requestAnimationFrame(() => window.requestAnimationFrame(move));
+})();
+</script>
+        """,
+        height=1,
+        scrolling=False,
+    )
+    
 
 def render_loader_yuki() -> None:
     """Animasi "Yuki sedang berpikir" — dirender oleh SCRIPT UTAMA.
@@ -586,6 +606,7 @@ def render_loader_yuki() -> None:
     subject = str(
         st.session_state.get(
             "_yuki_loader_subject"
+            "_yuki_scroll_pending",
         )
         or ""
     )
@@ -608,6 +629,10 @@ def render_loader_yuki() -> None:
         height=62 if loader_mode else 90,
         scrolling=False,
     )
+    # Hanya kiriman baru yang menggeser kamera. Rerun fragmen dan kemunculan
+    # jawaban tidak mengulang scroll, sehingga pengguna bebas melihat ke atas.
+    if st.session_state.pop("_yuki_scroll_pending", False):
+        _scroll_to_yuki_work_once()
 
 
 def stream_yuki_aktif() -> bool:
@@ -1264,16 +1289,11 @@ def process_user_input(user_input, answer_slot, is_fresh: bool = False) -> bool:
         image_mode=buat_gambar,
     )
 
-    st.session_state[
-        "_yuki_loader_mode"
-    ] = loader_mode
+    st.session_state["_yuki_loader_mode"] = loader_mode
+    st.session_state["_yuki_loader_subject"] = loading_subject(text)
+    st.session_state["_yuki_scroll_pending"] = True
 
-    st.session_state[
-        "_yuki_loader_subject"
-    ] = loading_subject(
-        text
-    )
-
+    # Mulai pekerjaan pada run yang sama dengan pengiriman pesan. Menaruhnya
     st.session_state["_yuki_job"] = {
         "image_mode": buat_gambar,
         "text": text,
