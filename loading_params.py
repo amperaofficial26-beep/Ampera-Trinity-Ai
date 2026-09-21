@@ -519,7 +519,6 @@ def special_loading_html(
   45%,72% {{ stroke-dashoffset:0; opacity:1; }}
 }}
 @keyframes specialPhraseCycle {{
-@keyframes specialPhraseCycle {{
     0% {{
         opacity: 0;
         filter: blur(4px);
@@ -575,21 +574,6 @@ def special_loading_html(
   stroke-dasharray:16; animation:specialCalendarTick 1.8s ease-in-out infinite;
 }}
 .special-phrases {{ position:relative; display:block; width:min(72vw,520px); height:18px; 
-}}
-
-.special-phrase {{
-    position: absolute;
-    inset: 0 auto auto 0;
-    opacity: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
-    animation:
-        specialPhraseCycle
-        {duration:.3f}s
-        ease
-        infinite;
 }}
 
 .special-phrase {{
