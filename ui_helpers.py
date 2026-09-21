@@ -11,7 +11,6 @@ import base64
 import html
 import random
 import re
-import time
 from datetime import datetime
 
 import streamlit as st
@@ -58,9 +57,6 @@ THINKING_MIN_SECONDS = 20.0
 
 # Durasi minimum progress bar gambar (detik) — biar animasi % terasa
 IMAGE_MIN_SECONDS = 15.0
-
-# Delay antar potongan kalimat saat jawaban muncul bertahap
-SENTENCE_STREAM_DELAY = 0.15
 
 # ----------------------------------------------------------------------
 # UKURAN LOGO PER TEMPAT PAKAI (FIX: logo greeting kegedean)
@@ -982,42 +978,6 @@ def render_message_actions(msg: dict) -> None:
                     unsafe_allow_html=True,
                 )
                 
-
-def _sentence_chunks(text: str) -> list[str]:
-    """Pecah teks jadi potongan per kalimat / per baris. Whitespace asli
-    ikut di dalam potongan, sehingga gabungannya persis sama dengan teks
-    awal (tidak ada spasi atau baris baru yang hilang/bertambah)."""
-    raw = re.split(r"((?:[.!?]+|\n)\s*)", text or "")
-    chunks: list[str] = []
-    it = iter(raw)
-    for body in it:
-        delim = next(it, "")
-        chunk = body + delim
-        if chunk:
-            chunks.append(chunk)
-    return chunks
-
-
-def stream_sentences(answer_slot, full_text: str) -> None:
-    """Tampilkan jawaban bertahap per kalimat — animasi muncul yang beda
-    dari sebelumnya (bukan kata per kata): lebih cepat, tetap terasa hidup,
-    plus caret berkedip di ujung selama proses berlangsung."""
-    chunks = _sentence_chunks(full_text)
-    if not chunks:
-        chunks = [full_text or "…"]
-    acc = ""
-    for i, chunk in enumerate(chunks):
-        acc += chunk
-        is_last = i == len(chunks) - 1
-        caret = "" if is_last else '<span class="type-caret"></span>'
-        html_bubble = bubble_html("assistant", acc)
-        if caret:
-            # sisipkan caret sebelum penutup bubble
-            html_bubble = html_bubble.replace("</div></div></div>", f"{caret}</div></div></div>")
-        answer_slot.markdown(html_bubble, unsafe_allow_html=True)
-        if not is_last:
-            time.sleep(SENTENCE_STREAM_DELAY)
-
 
 # ============================================================================
 # EXPORT CHAT (.md)
