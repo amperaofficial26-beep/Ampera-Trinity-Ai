@@ -602,7 +602,7 @@ def render_loader_yuki() -> None:
 
     components.html(
         loader_html,
-        height=90,
+        height=62 if loader_mode else 90,
         scrolling=False,
     )
 
