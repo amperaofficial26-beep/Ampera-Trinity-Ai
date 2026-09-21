@@ -18,8 +18,10 @@ Dipakai chat_handlers.py lewat: components.html(param_loading_html(), ...)
 
 from __future__ import annotations
 
+import html
 import json
 import random
+import re
 
 # >>> GANTI WARNA GLOW DI SINI (satu tempat untuk semuanya) <<<
 # Format hex "#RRGGBB". Dipakai untuk glow logo DAN glow berjalan di teks.
@@ -231,3 +233,412 @@ def param_loading_html(indices: list[int] | None = None,
             .replace("__GLOW__", _rgb(WARNA_GLOW))     # ← BARIS BARU
             .replace("__ORDER__", json.dumps(indices))
             .replace("__DUR__", str(durasi_ms)))
+
+# Loading khusus. Chat biasa tetap menggunakan animasi parameter di atas.
+SPECIAL_LOADING = {
+    "web": {
+        "duration": 8,
+        "phrases": (
+            "Menelusuri web tentang {subject}",
+            "Memverifikasi tentang {subject}",
+        ),
+    },
+    "code": {
+        "duration": 10,
+        "phrases": (
+            "Used bash",
+            "Menjalankan mode coding",
+            "Menjelajahi bahasa kode",
+        ),
+    },
+    "card": {
+        "duration": 10,
+        "phrases": (
+            "Membuat kartu {subject}",
+            "Menimbang susunan yang tepat",
+            "Menjalankan ulang",
+        ),
+    },
+    "design": {
+        "duration": 15,
+        "phrases": (
+            "Melukis",
+            "Membayangkan",
+            "Membuat sketsa",
+            "Memoles",
+            "Membuat hasil akhir",
+        ),
+    },
+    "schedule": {
+        "duration": 12,
+        "phrases": (
+            "Menyusun rencana Anda",
+            "Memilih waktu yang tepat",
+            "Menyesuaikan",
+        ),
+    },
+    "file": {
+        "duration": 15,
+        "phrases": (
+            "Menyusun teks",
+            "Memilah kata",
+            "Membaca ulang",
+        ),
+    },
+}
+_SPECIAL_PATTERNS = {
+    "code": re.compile(
+        r"\b(?:buat(?:kan)?|tulis|perbaiki|debug|refactor|coding|kode|program|"
+        r"script|fungsi|class|api|html|css|javascript|python|sql|bash)\b",
+        re.I,
+    ),
+    "card": re.compile(
+        r"\b(?:kartu|bandingkan|perbandingan|langkah[- ]?demi[- ]?langkah|"
+        r"tautan|link|peta|lokasi|itinerary|rencana perjalanan|terjemah)\b",
+        re.I,
+    ),
+    "schedule": re.compile(
+        r"\b(?:jadwal|agenda|kalender|rencana harian|pengingat|deadline|"
+        r"pukul|jam\s+\d)\b",
+        re.I,
+    ),
+    "file": re.compile(
+        r"\b(?:buat(?:kan)?|susun|hasilkan)\b.{0,45}\b(?:file|dokumen|pdf|"
+        r"docx|xlsx|csv|pptx|presentasi|laporan|surat)\b",
+        re.I | re.S,
+    ),
+}
+_ICON_SVG = {
+    "web": (
+        '<circle cx="12" cy="12" r="9"/>'
+        '<path d="M3 12h18M12 3a15 15 0 0 1 0 18'
+        'M12 3a15 15 0 0 0 0 18"/>'
+    ),
+    "code": (
+        '<path d="m8 9-4 3 4 3'
+        'M16 9l4 3-4 3M14 5l-4 14"/>'
+    ),
+    "card": (
+        '<rect x="3" y="5" width="18" height="14" rx="2"/>'
+        '<path d="M7 9h10M7 13h6"/>'
+    ),
+    "design": (
+        '<path d="m14.5 4.5 5 5L9 20H4v-5L14.5 4.5Z"/>'
+        '<path d="m12 7 5 5"/>'
+    ),
+    "schedule": (
+        '<rect x="3" y="5" width="18" height="16" rx="2"/>'
+        '<path d="M16 3v4M8 3v4M3 10h18"/>'
+    ),
+    "file": (
+        '<path d="M6 2h8l4 4v16H6z"/>'
+        '<path d="M14 2v5h5M9 13h6M9 17h6"/>'
+    ),
+}
+
+def loading_subject(text: str) -> str:
+    """Ringkas permintaan untuk frasa 'tentang X'."""
+    clean = " ".join(
+        str(text or "").split()
+    )
+
+    clean = re.sub(
+        (
+            r"^(?:tolong\s+)?"
+            r"(?:buatkan|buat|cari|carikan|tampilkan|jelaskan|susun)\s+"
+        ),
+        "",
+        clean,
+        flags=re.I,
+    )
+
+    clean = clean.strip(
+        " .,:;!?"
+    )
+
+    if len(clean) > 46:
+        return (
+            clean[:46].rstrip()
+            + "…"
+        )
+
+    return (
+        clean
+        or "permintaan Anda"
+    )
+
+def detect_loading_mode(
+    text: str,
+    *,
+    page: str = "chat",
+    web_search: bool = False,
+    image_mode: bool = False,
+) -> str:
+    """Pilih loading khusus; string kosong berarti loading chat biasa."""
+    if web_search:
+        return "web"
+
+    if (
+        image_mode
+        or page == "desain"
+    ):
+        return "design"
+
+    if (
+        page == "jadwal"
+        or _SPECIAL_PATTERNS[
+            "schedule"
+        ].search(text or "")
+    ):
+        return "schedule"
+
+    if _SPECIAL_PATTERNS[
+        "file"
+    ].search(text or ""):
+        return "file"
+
+    if _SPECIAL_PATTERNS[
+        "card"
+    ].search(text or ""):
+        return "card"
+
+    if _SPECIAL_PATTERNS[
+        "code"
+    ].search(text or ""):
+        return "code"
+
+    return ""
+
+
+def special_loading_duration(
+    mode: str,
+) -> float:
+    return float(
+        (
+            SPECIAL_LOADING.get(mode)
+            or {}
+        ).get(
+            "duration",
+            0,
+        )
+    )
+
+def special_loading_html(
+    mode: str,
+    subject: str = "",
+) -> str:
+    """Loading khusus tanpa logo Trinity dan tanpa gerakan pada ikon."""
+    config = SPECIAL_LOADING.get(
+        mode
+    )
+
+    if not config:
+        return param_loading_html()
+
+    duration = float(
+        config["duration"]
+    )
+
+    phrases = [
+        phrase.format(
+            subject=html.escape(
+                subject
+                or "permintaan Anda"
+            )
+        )
+        for phrase in config[
+            "phrases"
+        ]
+    ]
+
+    count = max(
+        1,
+        len(phrases),
+    )
+
+    slot = (
+        duration
+        / count
+    )
+
+    active_end = max(
+        8.0,
+        (
+            100.0
+            / count
+        )
+        - 4.0,
+    )
+
+    spans = "".join(
+        (
+            '<span class="special-phrase" '
+            f'style="animation-delay:'
+            f'{index * slot:.3f}s">'
+            f"{phrase}"
+            "</span>"
+        )
+        for index, phrase
+        in enumerate(phrases)
+    )
+
+    icon = _ICON_SVG.get(
+        mode,
+        _ICON_SVG["file"],
+    )
+
+    return f"""
+<style>
+@keyframes specialGlowSweep {{
+    0% {{
+        background-position: 140% 0;
+    }}
+
+    100% {{
+        background-position: -40% 0;
+    }}
+}}
+
+@keyframes specialPhraseCycle {{
+    0% {{
+        opacity: 0;
+        filter: blur(4px);
+    }}
+
+    4% {{
+        opacity: 1;
+        filter: blur(0);
+    }}
+
+    {active_end:.2f}% {{
+        opacity: 1;
+        filter: blur(0);
+    }}
+
+    {min(active_end + 4.0, 99.0):.2f}% {{
+        opacity: 0;
+        filter: blur(4px);
+    }}
+
+    100% {{
+        opacity: 0;
+    }}
+}}
+
+.special-loader {{
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 74px;
+    padding: 14px 0;
+    color: #6B6172;
+    font:
+        500 14px/1.4
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        sans-serif;
+}}
+
+.special-row {{
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    overflow: hidden;
+}}
+
+.special-row::after {{
+    content: "";
+    position: absolute;
+    inset: -8px -28px;
+    pointer-events: none;
+    background:
+        linear-gradient(
+            100deg,
+            transparent 35%,
+            rgba(255,255,255,.9) 50%,
+            transparent 65%
+        );
+    background-size: 220% 100%;
+    animation:
+        specialGlowSweep
+        2.4s
+        linear
+        infinite;
+    mix-blend-mode: screen;
+}}
+
+.special-icon {{
+    width: 24px;
+    height: 24px;
+    flex: 0 0 24px;
+    color: #6B6172;
+}}
+
+.special-icon svg {{
+    width: 100%;
+    height: 100%;
+    display: block;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}}
+
+.special-phrases {{
+    position: relative;
+    display: block;
+    width: min(72vw, 520px);
+    height: 22px;
+}}
+
+.special-phrase {{
+    position: absolute;
+    inset: 0 auto auto 0;
+    opacity: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    animation:
+        specialPhraseCycle
+        {duration:.3f}s
+        ease
+        infinite;
+}}
+
+@media (prefers-reduced-motion: reduce) {{
+    .special-row::after {{
+        animation: none;
+    }}
+
+    .special-phrase {{
+        animation: none;
+        opacity: 0;
+    }}
+
+    .special-phrase:first-child {{
+        opacity: 1;
+    }}
+}}
+</style>
+
+<div class="special-loader">
+    <div class="special-row">
+        <span class="special-icon">
+            <svg
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+            >
+                {icon}
+            </svg>
+        </span>
+
+        <span class="special-phrases">
+            {spans}
+        </span>
+    </div>
+</div>
+""".strip()
