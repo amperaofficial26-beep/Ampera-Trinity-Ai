@@ -90,7 +90,22 @@ def build_system_prompt(history: list[dict] | None = None) -> str:
     """
     s = get_settings()
     ringan = _cuma_sapaan(history or [])
-    parts = [YUKI_SYSTEM_PROMPT] if ringan else [YUKI_SYSTEM_PROMPT, CARD_RULES]
+    parts = (
+        [YUKI_SYSTEM_PROMPT]
+        if ringan
+        else [
+            YUKI_SYSTEM_PROMPT,
+            CARD_RULES,
+        ]
+    )
+
+    parts.append(
+        "FORMAT JAWABAN: Susun jawaban dengan hierarki Markdown yang rapi. "
+        "Gunakan # untuk judul utama hanya pada jawaban panjang, ## untuk "
+        "subjudul, dan ### untuk bagian kecil. Gunakan paragraf pendek serta "
+        "daftar hanya bila membantu. Jangan menempelkan judul pada kalimat "
+        "sebelumnya dan jangan membuat heading untuk jawaban satu kalimat."
+    )
 
     # Persona tambahan sesuai halaman yang sedang dibuka.
     halaman = st.session_state.get("page", "chat")
