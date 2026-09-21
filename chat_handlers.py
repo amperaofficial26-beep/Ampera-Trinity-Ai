@@ -284,6 +284,18 @@ def _get_model_provider(model_key: str) -> str:
     model = MODEL_BY_KEY.get(model_key, {})
     return model.get("provider", "groq")
     
+def _meta_model() -> dict:
+    """Nama model + status premium untuk disimpan pada pesan jawaban AI.
+
+    Dipakai bubble AI (tata letak baru): label "Yuki · <nama model>"
+    beserta lencana Free/Premium.
+    """
+    m = MODEL_BY_KEY.get(st.session_state.get("selected_model_key")) or {}
+    return {
+        "model": m.get("name", ""),
+        "model_premium": bool(m.get("premium")) if m else None,
+    }
+
 
 def _susun_balasan_yuki(full: str, thread: list[dict]) -> None:
     """Pascaproses teks jawaban Yuki lalu simpan sebagai pesan assistant.
@@ -362,6 +374,10 @@ def _susun_balasan_yuki(full: str, thread: list[dict]) -> None:
         "type": "text",
         "content": full,
         "time": now_wib(),
+        # Tata letak baru: nama model + lencana Free/Premium pada bubble AI.
+        **_meta_model(),
+    }
+    (),
     }
 
     if file_ids:
@@ -1036,10 +1052,21 @@ def _dialog_premium() -> None:
 
 
 def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> None:
-    """Baris di bawah kotak ketik: [+] ........... [Nama Model]."""
+    """Baris di bawah kotak ketik (tata letak pill baru).
+
+    Halaman chat (show_mode=True):  [+] ..... [🖼️] [✨] [Nama Model]
+    Halaman lain   (show_mode=False): [+] .............. [Nama Model]
+    """
     kp = "" if page_key == "chat" else f"{page_key}_"
 
-    ctrl_plus, _sp, ctrl_model = st.columns([0.08, 1.64, 0.28])
+    if show_mode:
+        ctrl_plus, _sp, ctrl_img, ctrl_tools, ctrl_model = st.columns(
+            [0.08, 1.06, 0.09, 0.09, 0.30]
+        )
+    else:
+        ctrl_plus, _sp, ctrl_model = st.columns([0.08, 1.62, 0.30])
+        ctrl_img = None
+        ctrl_tools = None
 
     with ctrl_plus:
         with st.container(key=f"{kp}plus_menu"):
@@ -1137,13 +1164,49 @@ def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> Non
                     st.rerun()
 
     with _sp:
-        if st.session_state.messages or st.session_state.get("page") != "chat":
-            st.markdown(
-                '<div class="input-disclaimer">'
-                "Yuki adalah AI dan bisa membuat kesalahan. Harap periksa kembali respons."
-                "</div>",
-                unsafe_allow_html=True,
-            )
+        # Disclaimer "Yuki adalah AI..." pindah ke footer bar global
+        # (render_footer_bar di layout.py) supaya pill input tetap bersih.
+        pass
+
+    if ctrl_img is not None:
+        with ctrl_img:
+            # Toggle mode Gambar — fitur lama yang tadinya hanya di sidebar,
+            # kini juga bisa dijangkau langsung dari dalam pill input.
+            aktif = bool(st.session_state.get("image_mode"))
+            if st.button(
+                ":material/image:",
+                key=f"{kp}btn_imgmode",
+                type="primary" if aktif else "secondary",
+                help="Mode generate gambar",
+            ):
+                st.session_state.image_mode = not aktif
+                st.rerun()
+
+    if ctrl_tools is not None:
+        with ctrl_tools:
+            # ✨ Alat bantu: pintasan fitur yang sudah ada (bukan fitur baru).
+            with st.popover(":material/auto_awesome:", help="Alat bantu"):
+                web_check = (
+                    " :orange[✓]"
+                    if st.session_state.get("web_search_on")
+                    else ""
+                )
+                if st.button(
+                    f":material/public:  Pencarian web{web_check}",
+                    key=f"{kp}tm_web",
+                    use_container_width=True,
+                ):
+                    st.session_state.web_search_on = not st.session_state.get(
+                        "web_search_on", False
+                    )
+                    st.rerun()
+                from sidebar import show_sesuaikan_dialog
+                if st.button(
+                    ":material/tune:  Sesuaikan Yuki…",
+                    key=f"{kp}tm_sesuaikan",
+                    use_container_width=True,
+                ):
+                    show_sesuaikan_dialog()
 
     with ctrl_model:
         # Pengaman: kalau model terpilih ternyata premium tapi user ini
