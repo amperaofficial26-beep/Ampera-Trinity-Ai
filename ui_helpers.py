@@ -72,6 +72,8 @@ _LOGO_SIZES = {
     "logo-foot":     "18px",   # logo di footer halaman
     "logo-inline":   "18px",   # default umum
     "logo-shimmer":  "25px",   # logo di indikator "berpikir"
+    "topbar-logo":   "34px",   # logo di topbar kiri atas (tata letak baru)
+    "logo-footbrand": "30px",  # logo branding dasar sidebar kiri
 }
 
 
@@ -506,17 +508,42 @@ def bubble_html(
     meta_note: str = "",
     icon_html: str = "",
     animate: bool = False,
+    model_name: str = "",
+    model_premium: bool | None = None,
 ) -> str:
     body = _body_html(content)
     css = "user" if role == "user" else "ai"
     if role == "user":
-        # User: bubble krem membulat di kanan (gaya Claude)
+        # User: bubble krem membulat di kanan (gaya Claude).
+        # Tata letak baru: waktu kirim (dan catatan kecil seperti
+        # "via suara") ditampilkan di bawah bubble, rata kanan.
+        parts = [p for p in (timestamp, meta_note) if p]
         meta = ""
+        note = (
+            '<div class="bubble-meta user-meta">'
+            + " &middot; ".join(parts)
+            + "</div>"
+            if parts else ""
+        )
     else:
-        # AI: teks polos + label kecil "Yuki" dengan titik terracotta (gaya Claude)
-        meta = f'<div class="ai-label">{logo_img_html("logo-label")} Yuki</div>'
-    # meta_note & icon_html diisi oleh kode ini sendiri (aman, bukan input user)
-    note = f'<div class="bubble-meta">{meta_note}</div>' if meta_note else ""
+        # AI: teks polos + label kecil "Yuki" dengan logo (gaya Claude).
+        # Tata letak baru: nama model + lencana Free/Premium menyertai
+        # label bila informasinya tersedia pada pesan.
+        meta = (
+            '<div class="ai-label">'
+            f'{logo_img_html("logo-label")} Yuki'
+        )
+        if model_name:
+            meta += (
+                f' <span class="ai-model">&middot; '
+                f'{html.escape(model_name)}</span>'
+            )
+        if model_premium is not None:
+            kelas = "model-badge premium" if model_premium else "model-badge"
+            teks = "Premium" if model_premium else "Free"
+            meta += f' <span class="{kelas}">{teks}</span>'
+        meta += "</div>"
+        note = f'<div class="bubble-meta">{meta_note}</div>' if meta_note else ""
     animation_class = (
         " yuki-fade-blur"
         if animate
@@ -819,7 +846,8 @@ def render_message(msg: dict) -> None:
     if msg.get("type") == "image" and msg.get("image_bytes"):
         st.markdown(
             bubble_html("assistant", f"Hasil gambar untuk: {msg.get('prompt', '')}",
-                        msg.get("time", ""), icon_html=ICON_IMAGE),
+                        msg.get("time", ""), icon_html=ICON_IMAGE,
+                        model_name=msg.get("model") or "Generate Gambar"),
             unsafe_allow_html=True,
         )
         mid = msg.get("id", id(msg))
@@ -884,6 +912,8 @@ def render_message(msg: dict) -> None:
                 imgs_html,
                 note,
                 animate=animate,
+                model_name=msg.get("model") or "",
+                model_premium=msg.get("model_premium"),
             ),
             unsafe_allow_html=True,
         )
