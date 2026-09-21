@@ -722,7 +722,6 @@ def handle_chat_request(answer_slot, request_text: str = "") -> None:
     # provider selesai; jeda minimum tetap mengikuti loader chat biasa.
     loader_mode = str(st.session_state.get("_yuki_loader_mode") or "")
     min_think = float(THINKING_MIN_SECONDS)
-    )
     
     # Dicatat supaya fragmen tahu sampai kapan animasi "berpikir" wajib
     # tampil sebelum teks jawaban boleh mengalir.
