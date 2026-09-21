@@ -490,13 +490,10 @@ def special_loading_html(
     return f"""
 <style>
 @keyframes specialGlowSweep {{
-    0% {{
-        background-position: 140% 0;
-    }}
-
-    100% {{
-        background-position: -40% 0;
-    }}
+  0% {{ transform:translateX(-150%); opacity:0; }}
+  18% {{ opacity:.34; }}
+  72% {{ opacity:.34; }}
+  100% {{ transform:translateX(420%); opacity:0; }}
 }}
 
 @keyframes specialPhraseCycle {{
@@ -526,56 +523,23 @@ def special_loading_html(
 }}
 
 .special-loader {{
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    min-height: 74px;
-    padding: 14px 0;
-    color: #6B6172;
-    font:
-        500 14px/1.4
-        Inter,
-        ui-sans-serif,
-        system-ui,
-        sans-serif;
+  display:flex; align-items:center; justify-content:flex-start;
+  min-height:50px; padding:7px 0; color:#6B6172;
+  font:500 12.5px/1.35 Inter,ui-sans-serif,system-ui,sans-serif;
 }}
-
 .special-row {{
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    overflow: hidden;
+  position:relative; display:flex; align-items:center; gap:8px;
+  overflow:hidden;
 }}
-
 .special-row::after {{
-    content: "";
-    position: absolute;
-    inset: -8px -28px;
-    pointer-events: none;
-    background:
-        linear-gradient(
-            100deg,
-            transparent 35%,
-            rgba(255,255,255,.9) 50%,
-            transparent 65%
-        );
-    background-size: 220% 100%;
-    animation:
-        specialGlowSweep
-        2.4s
-        linear
-        infinite;
-    mix-blend-mode: screen;
+  content:""; position:absolute; top:-9px; bottom:-9px; left:0; width:24%;
+  pointer-events:none;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.46),transparent);
+  filter:blur(7px);
+  animation:specialGlowSweep 3.4s cubic-bezier(.45,0,.55,1) infinite;
 }}
-
-.special-icon {{
-    width: 24px;
-    height: 24px;
-    flex: 0 0 24px;
-    color: #6B6172;
+.special-icon {{ width:19px; height:19px; flex:0 0 19px; color:#6B6172; 
 }}
-
 .special-icon svg {{
     width: 100%;
     height: 100%;
@@ -587,11 +551,7 @@ def special_loading_html(
     stroke-linejoin: round;
 }}
 
-.special-phrases {{
-    position: relative;
-    display: block;
-    width: min(72vw, 520px);
-    height: 22px;
+.special-phrases {{ position:relative; display:block; width:min(72vw,520px); height:18px; 
 }}
 
 .special-phrase {{
