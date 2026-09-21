@@ -251,7 +251,21 @@ def _body_html(content: str) -> str:
     if not text:
         return ""
 
-    blocks: list[str] = []
+       blocks: list[str] = []
+    reveal_index = 0
+
+    def reveal_style() -> str:
+        """Nomori baris agar CSS memberi jeda kemunculan 0,9 detik."""
+        nonlocal reveal_index
+
+        style = (
+            f' style="--yuki-line-index:'
+            f'{reveal_index}"'
+        )
+
+        reveal_index += 1
+
+        return style
 
     for part in re.split(
         r"(```.*?```|```.*$)",
@@ -284,9 +298,12 @@ def _body_html(content: str) -> str:
                 ).strip("\n")
             )
 
+            style = reveal_style()
+
             blocks.append(
                 (
-                    '<pre class="yuki-code">'
+                    '<pre class="yuki-code yuki-reveal-line"'
+                    f"{style}>"
                     f'<code data-language="{language}">'
                     f"{code}"
                     "</code></pre>"
@@ -310,9 +327,8 @@ def _body_html(content: str) -> str:
 
                 blocks.append(
                     f'<{tag} class="yuki-list">'
-                    + "".join(
-                        f"<li>{item}</li>"
-                        for item in list_items
+                      + "".join(
+                        list_items
                     )
                     + f"</{tag}>"
                 )
@@ -326,15 +342,26 @@ def _body_html(content: str) -> str:
             nonlocal paragraph
 
             if paragraph:
+                rendered_lines = []
+
+                for line in paragraph:
+                    rendered_lines.append(
+                        (
+                            '<span class="yuki-reveal-line"'
+                            f"{reveal_style()}>"
+                            f"{_inline_chat_markup(line)}"
+                            "</span>"
+                        )
+                    )
+
                 blocks.append(
                     '<p class="yuki-paragraph">'
                     + "<br>".join(
-                        _inline_chat_markup(line)
-                        for line in paragraph
+                        rendered_lines
                     )
                     + "</p>"
                 )
-
+                
             paragraph = []
 
         for raw_line in part.splitlines():
@@ -396,7 +423,8 @@ def _body_html(content: str) -> str:
 
                 blocks.append(
                     (
-                        f'<div class="yuki-{css}">'
+                        f'<div class="yuki-{css} yuki-reveal-line"'
+                        f"{reveal_style()}>"
                         f"{_inline_chat_markup(heading.group(2))}"
                         "</div>"
                     )
@@ -408,19 +436,21 @@ def _body_html(content: str) -> str:
 
                 blocks.append(
                     (
-                        '<div class="yuki-subtitle">'
+                        '<div class="yuki-subtitle yuki-reveal-line"'
+                        f"{reveal_style()}>"
                         f"{_inline_chat_markup(bold_heading.group(1))}"
                         "</div>"
                     )
                 )
-
+                
             elif natural_heading:
                 flush_paragraph()
                 flush_list()
 
                 blocks.append(
                     (
-                        '<div class="yuki-section">'
+                        '<div class="yuki-section yuki-reveal-line"'
+                        f"{reveal_style()}>"
                         f"{_inline_chat_markup(line[:-1])}"
                         "</div>"
                     )
@@ -444,11 +474,12 @@ def _body_html(content: str) -> str:
                 list_type = wanted
 
                 list_items.append(
-                    _inline_chat_markup(
-                        (
-                            numbered
-                            or bullet
-                        ).group(1)
+                list_items.append(
+                    (
+                        '<li class="yuki-reveal-line"'
+                        f"{reveal_style()}>"
+                        f"{_inline_chat_markup((numbered or bullet).group(1))}"
+                        "</li>"
                     )
                 )
 
