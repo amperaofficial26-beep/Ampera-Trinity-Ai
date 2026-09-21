@@ -114,9 +114,8 @@ def maybe_run_yuki(answer_slot) -> bool:
                      icon=":material/auto_awesome:")
         handle_image_request(job.get("text") or "")
     else:
-        handle_chat_request(answer_slot)
+        handle_chat_request(answer_slot, request_text=job.get("text") or "")
     return True
-
 # Blok kode (``` ... ```), kode inline (` ... `), dan blok kode tak
 # tertutup — isinya TIDAK boleh dirapatkan saat merapikan jawaban Yuki
 # supaya indentasi dan spasi di dalam kode tetap utuh.
@@ -444,6 +443,9 @@ def _hentikan_dan_finalisasi_stream_lama() -> None:
     st.session_state.pop("_yuki_t0", None)
     st.session_state.pop("_yuki_loader_tampil", None)
 
+    # Jangan hapus mode/subjek loader di sini. Fungsi ini juga dipanggil
+    # sesudah job baru dibuat, sehingga penghapusan tersebut membuat semua
+    # tugas baru jatuh kembali ke loader chat biasa.
     if stop:
         stop.set()
 
@@ -648,7 +650,7 @@ def chat_input_atau_hentikan(placeholder: str, **kwargs):
         return None
     return st.chat_input(placeholder, **kwargs)
 
-def handle_chat_request(answer_slot) -> None:
+def handle_chat_request(answer_slot, request_text: str = "") -> None:
     thread = active_thread()
 
     if not CHAT_READY:
@@ -736,64 +738,56 @@ def handle_chat_request(answer_slot) -> None:
     # tampil sebelum teks jawaban boleh mengalir.
     st.session_state["_yuki_t0"] = t0
     try:
-        request_thread = thread
+        def _lazy_reply_stream():
+            """Mulai pencarian/model di worker agar loader sudah terlihat."""
+            request_thread = thread
+            if web_search_active:
+                from engines.web_search_engine import (
+                    history_with_web_context,
+                    search_web,
+                )
 
-        if web_search_active:
-            from engines.web_search_engine import (
-                history_with_web_context,
-                search_web,
-            )
+                # Teks job adalah sumber utama. Fallback ke pesan terakhir
+                # menjaga jalur lama (artefak/kursus) tetap kompatibel.
+                query = str(
+                    request_text
+                    or (last_user or {}).get("content")
+                    or ""
+                ).strip()
+                search_results = search_web(query)
+                request_thread = history_with_web_context(
+                    thread,
+                    search_results,
+                )
 
-            query = str(
-                (last_user or {}).get("content")
-                or ""
-            )
+            provider = _get_model_provider(model_key)
 
-            search_results = search_web(
-                query
-            )
+            # Vision tetap menggunakan Groq; Web Search memakai Tavily lalu
+            # hasilnya dirangkum oleh model yang dipilih pengguna.
+            if (
+                provider in ("plugsky", "aion", "final_router")
+                and not has_images
+            ):
+                client = build_compatible_client(provider)
+                reply_stream = stream_compatible_reply(
+                    client,
+                    request_thread,
+                    model=model_id,
+                    system_prompt=build_system_prompt(thread),
+                )
+            else:
+                client = build_chat_client()
+                reply_stream = stream_chat_with_fallback(
+                    client,
+                    model_id,
+                    request_thread,
+                    vision=has_images,
+                    web_search=False,
+                )
 
-            request_thread = history_with_web_context(
-                thread,
-                search_results,
-            )
+            yield from reply_stream
 
-        provider = _get_model_provider(
-            model_key
-        )
-
-        # Vision tetap menggunakan Groq; Web Search memakai Tavily terlebih
-        # dahulu lalu hasilnya dirangkum oleh model yang dipilih pengguna.
-        # Model OpenAI-compatible digunakan untuk chat teks biasa.
-        if (
-            provider
-            in (
-                "plugsky",
-                "aion",
-                "final_router",
-            )
-            and not has_images
-        ):
-            client = build_compatible_client(provider)
-
-            stream = stream_compatible_reply(
-                client,
-                request_thread,
-                model=model_id,
-                system_prompt=build_system_prompt(
-                    thread
-                ),
-            )
-        else:
-            client = build_chat_client()
-
-            stream = stream_chat_with_fallback(
-                client,
-                model_id,
-                request_thread,
-                vision=has_images,
-                web_search=False,
-            )
+        stream = _lazy_reply_stream()
 
         # Stream dijalankan di THREAD BELAKANG. Tampilannya — animasi
         # "berpikir", teks jawaban yang mengalir, dan tombol "Hentikan
