@@ -215,16 +215,18 @@ def handle_image_request(prompt: str) -> None:
     # API. Jangan me-render ulang di dalam loop: setiap markdown() baru akan
     # mengganti node DOM dan me-reset animasi CSS dari nol (itu penyebab
     # shimmer terlihat diam/berkedip sebelumnya).
-    progress_slot.markdown(
-        special_loading_html(
-            "design",
-            loading_subject(
-                prompt
+    # `special_loading_html()` berisi CSS + elemen bertumpuk. Renderer
+    # Markdown dapat menutup tag <span> lebih awal dan menampilkan sisanya
+    # sebagai teks kode; components.html merendernya sebagai dokumen HTML utuh.
+    with progress_slot:
+        components.html(
+            special_loading_html(
+                "design",
+                loading_subject(prompt),
             ),
-        ),
-        unsafe_allow_html=True,
-    )
-
+            height=62,
+            scrolling=False,
+        )
     # Tunggu hasilnya. Kotak tetap tampil MINIMAL IMAGE_MIN_SECONDS detik
     # supaya animasinya sempat terlihat utuh (FLUX-schnell sering selesai
     # dalam 2-3 detik). Polling pakai sleep pendek TANPA render ulang, jadi
