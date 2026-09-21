@@ -35,7 +35,13 @@ from engines.compatible_engine import (
     stream_compatible_reply,
 )
 from artifacts import ambil_artefak
-from loading_params import param_loading_html
+from loading_params import (
+    detect_loading_mode,
+    loading_subject,
+    param_loading_html,
+    special_loading_duration,
+    special_loading_html,
+)
 from model_dna import DNA_CSS, dna_header_html, active_node_css
 from cards import parse_cards
 from engines.image_engine import generate_image
@@ -85,7 +91,7 @@ _STOP_BTN_CSS = (
 #                     supaya animasi shimmer sempat terlihat.
 # IMAGE_DONE_SECONDS: jeda singkat pada keadaan "Selesai" sebelum gambar muncul.
 # IMAGE_MAX_SECONDS : batas aman menunggu API sebelum dianggap timeout.
-IMAGE_MIN_SECONDS = 6.0
+IMAGE_MIN_SECONDS = 15.0
 IMAGE_DONE_SECONDS = 0.7
 IMAGE_MAX_SECONDS = 200.0
 
@@ -209,7 +215,15 @@ def handle_image_request(prompt: str) -> None:
     # API. Jangan me-render ulang di dalam loop: setiap markdown() baru akan
     # mengganti node DOM dan me-reset animasi CSS dari nol (itu penyebab
     # shimmer terlihat diam/berkedip sebelumnya).
-    progress_slot.markdown(image_progress_html(), unsafe_allow_html=True)
+    progress_slot.markdown(
+        special_loading_html(
+            "design",
+            loading_subject(
+                prompt
+            ),
+        ),
+        unsafe_allow_html=True,
+    )
 
     # Tunggu hasilnya. Kotak tetap tampil MINIMAL IMAGE_MIN_SECONDS detik
     # supaya animasinya sempat terlihat utuh (FLUX-schnell sering selesai
@@ -510,7 +524,15 @@ def fragmen_jawaban_yuki() -> None:
     st.session_state.pop("_yuki_stop", None)
     st.session_state.pop("_yuki_thread", None)
     st.session_state.pop("_yuki_t0", None)
-    st.session_state.pop("_yuki_loader_tampil", None)
+    st.session_state.pop(
+        "_yuki_loader_mode",
+        None,
+    )
+    
+    st.session_state.pop(
+        "_yuki_loader_subject",
+        None,
+    )
 
     if minta_henti:
         # Dihentikan lewat tombol: simpan HANYA potongan teks yang sudah
@@ -549,14 +571,35 @@ def render_loader_yuki() -> None:
     # lagi — sekarang dirender oleh fragmen_jawaban_yuki.)
     if not stream_yuki_aktif():
         return
-    t0 = st.session_state.get("_yuki_t0") or 0
-    teks = "".join((st.session_state.get("_yuki_stream") or {}).get("buf") or [])
-    animasi_wajib = (time.time() - t0) < float(THINKING_MIN_SECONDS)
-    if teks and not animasi_wajib:
-        return  # sudah fase teks — loader tidak perlu dirender
-    st.session_state["_yuki_loader_tampil"] = True
+    loader_mode = str(
+        st.session_state.get(
+            "_yuki_loader_mode"
+        )
+        or ""
+    )
+
+    subject = str(
+        st.session_state.get(
+            "_yuki_loader_subject"
+        )
+        or ""
+    )
+
+    loader_html = (
+        special_loading_html(
+            loader_mode,
+            subject,
+        )
+        if loader_mode
+        else param_loading_html()
+    )
+
+    st.session_state[
+        "_yuki_loader_tampil"
+    ] = True
+
     components.html(
-        param_loading_html(),
+        loader_html,
         height=90,
         scrolling=False,
     )
@@ -673,7 +716,22 @@ def handle_chat_request(answer_slot) -> None:
     t0 = time.time()
     # Durasi tampil animasi "berpikir" minimal = THINKING_MIN_SECONDS.
     # Pengaturan manual "min_think_seconds" sudah dihapus.
-    min_think = float(THINKING_MIN_SECONDS)
+    loader_mode = str(
+        st.session_state.get(
+            "_yuki_loader_mode"
+        )
+        or ""
+    )
+
+    min_think = (
+        special_loading_duration(
+            loader_mode
+        )
+        if loader_mode
+        else float(
+            THINKING_MIN_SECONDS
+        )
+    )
     # Dicatat supaya fragmen tahu sampai kapan animasi "berpikir" wajib
     # tampil sebelum teks jawaban boleh mengalir.
     st.session_state["_yuki_t0"] = t0
@@ -1196,9 +1254,38 @@ def process_user_input(user_input, answer_slot, is_fresh: bool = False) -> bool:
             and get_settings().get("cap_image", True)
         )
 
+    loader_mode = detect_loading_mode(
+        text,
+        page=str(
+            st.session_state.get(
+                "page"
+            )
+            or "chat"
+        ),
+        web_search=bool(
+            st.session_state.get(
+                "web_search_on"
+            )
+        ),
+        image_mode=buat_gambar,
+    )
+
+    st.session_state[
+        "_yuki_loader_mode"
+    ] = loader_mode
+
+    st.session_state[
+        "_yuki_loader_subject"
+    ] = loading_subject(
+        text
+    )
+
     st.session_state["_yuki_job"] = {
         "image_mode": buat_gambar,
         "text": text,
-        "auto": buat_gambar and not mode_manual,
+        "auto": (
+            buat_gambar
+            and not mode_manual
+        ),
+        "loader_mode": loader_mode,
     }
-    return True
