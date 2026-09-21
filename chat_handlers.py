@@ -605,8 +605,7 @@ def render_loader_yuki() -> None:
 
     subject = str(
         st.session_state.get(
-            "_yuki_loader_subject"
-            "_yuki_scroll_pending",
+            "_yuki_loader_subject",
         )
         or ""
     )
@@ -1293,14 +1292,21 @@ def process_user_input(user_input, answer_slot, is_fresh: bool = False) -> bool:
     st.session_state["_yuki_loader_subject"] = loading_subject(text)
     st.session_state["_yuki_scroll_pending"] = True
 
-    # Mulai pekerjaan pada run yang sama dengan pengiriman pesan. Menaruhnya
-    st.session_state["_yuki_job"] = {
-        "image_mode": buat_gambar,
-        "text": text,
-        "auto": (
-            buat_gambar
-            and not mode_manual
-        ),
-        "loader_mode": loader_mode,
-    }
+    # Jalankan pekerjaan sekarang, jangan menunggu antrean job/rerun berikutnya.
+    st.session_state.pop("_yuki_job", None)
+    st.session_state.pop("_yuki_ui_flushed", None)
+
+    if buat_gambar:
+        if not mode_manual:
+            st.toast(
+                "Beralih ke mode gambar otomatis.",
+                icon=":material/auto_awesome:",
+            )
+        handle_image_request(text)
+    else:
+        handle_chat_request(
+            answer_slot,
+            request_text=text,
+        )
+
     return True
