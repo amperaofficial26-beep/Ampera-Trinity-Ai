@@ -98,14 +98,14 @@ IMAGE_MAX_SECONDS = 200.0
 
 
 def maybe_run_yuki(answer_slot) -> bool:
-    job = st.session_state.get("_yuki_job")
+    job = st.session_state.pop("_yuki_job", None)
     if not job:
         return False
-    if not st.session_state.get("_yuki_ui_flushed"):
-        st.session_state["_yuki_ui_flushed"] = True
-        return True
-    st.session_state.pop("_yuki_job", None)
+    # Pesan pengguna sudah tersimpan dan halaman sudah masuk ke rerun baru.
+    # Job harus dimulai pada run ini juga; gerbang dua-rerun sebelumnya dapat
+    # meninggalkan job tertunda sampai pengguna membuka percakapan baru.
     st.session_state.pop("_yuki_ui_flushed", None)
+    
     if job.get("image_mode"):
         # Beri tahu kalau perpindahan mode terjadi otomatis, supaya User
         # paham kenapa jawabannya berupa gambar — bukan mode yang
