@@ -115,7 +115,10 @@ def maybe_run_yuki(answer_slot) -> bool:
                      icon=":material/auto_awesome:")
         handle_image_request(job.get("text") or "")
     else:
-        handle_chat_request(answer_slot, request_text=job.get("text") or "")
+        handle_chat_request(answer_slot, request_text=text)
+        # Render pada run pengiriman yang sama. Jangan hanya mengandalkan
+        # rerun berikutnya karena respons cepat dapat selesai lebih dahulu.
+        render_loader_yuki()
     return True
 # Blok kode (``` ... ```), kode inline (` ... `), dan blok kode tak
 # tertutup — isinya TIDAK boleh dirapatkan saat merapikan jawaban Yuki
@@ -747,8 +750,12 @@ def handle_chat_request(answer_slot, request_text: str = "") -> None:
     # frasa, bukan waktu blokir respons. Respons boleh muncul segera setelah
     # provider selesai; jeda minimum tetap mengikuti loader chat biasa.
     loader_mode = str(st.session_state.get("_yuki_loader_mode") or "")
-    min_think = float(THINKING_MIN_SECONDS)
-    
+    # Loader khusus membutuhkan satu sapuan glow penuh agar tidak selesai di
+    # antara dua rerun Streamlit sebelum sempat dilukis oleh browser.
+    min_think = max(
+        float(THINKING_MIN_SECONDS),
+        2.4 if loader_mode else 0.0,
+    )    
     # Dicatat supaya fragmen tahu sampai kapan animasi "berpikir" wajib
     # tampil sebelum teks jawaban boleh mengalir.
     st.session_state["_yuki_t0"] = t0
