@@ -418,6 +418,123 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     padding: 0 2px;
     border: none;
 }
+/* Hierarki tipografi jawaban Yuki: judul, subjudul, bagian, dan isi. */
+.yuki-answer-body {
+    display: block;
+    width: 100%;
+}
+
+.yuki-title {
+    margin: 0 0 12px;
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 1.48rem;
+    line-height: 1.25;
+    font-weight: 650;
+    letter-spacing: -0.018em;
+}
+
+.yuki-subtitle {
+    margin: 18px 0 7px;
+    font-size: 1.14rem;
+    line-height: 1.35;
+    font-weight: 700;
+}
+
+.yuki-section {
+    margin: 14px 0 5px;
+    font-size: 0.98rem;
+    line-height: 1.4;
+    font-weight: 700;
+}
+
+.yuki-paragraph {
+    margin: 0 0 10px;
+    line-height: 1.72;
+}
+
+.yuki-paragraph:last-child {
+    margin-bottom: 0;
+}
+
+.yuki-list {
+    margin: 5px 0 12px;
+    padding-left: 1.35rem;
+}
+
+.yuki-list li {
+    margin: 3px 0;
+    padding-left: 2px;
+    line-height: 1.62;
+}
+
+.yuki-code {
+    margin: 10px 0 14px;
+    padding: 13px 15px;
+    overflow-x: auto;
+    border: 1px solid rgba(44,31,51,0.11);
+    border-radius: 12px;
+    background: rgba(44,31,51,0.045);
+    white-space: pre;
+    line-height: 1.55;
+}
+
+.yuki-inline-code {
+    padding: 1px 5px;
+    border-radius: 5px;
+    background: rgba(44,31,51,0.07);
+    font-size: 0.91em;
+}
+
+.yuki-answer-body a {
+    color: inherit;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+}
+
+/* Jawaban baru muncul sekaligus: lembut dari blur ke tajam. */
+.yuki-fade-blur {
+    animation:
+        yukiAnswerFadeBlur
+        560ms
+        cubic-bezier(.22,.8,.24,1)
+        both;
+    transform-origin: top left;
+}
+
+@keyframes yukiAnswerFadeBlur {
+    0% {
+        opacity: 0;
+        filter: blur(10px);
+        transform: translateY(8px);
+    }
+
+    55% {
+        opacity: .72;
+        filter: blur(2.5px);
+    }
+
+    100% {
+        opacity: 1;
+        filter: blur(0);
+        transform: translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .yuki-fade-blur {
+        animation: none !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .yuki-title {
+        font-size: 1.3rem;
+    }
+
+    .yuki-subtitle {
+        font-size: 1.08rem;
+    }
+}
 .bubble-meta {
     font-size: 0.7rem; color: #7E7387;
     margin: 0 4px 4px; font-weight: 500;
