@@ -1310,10 +1310,13 @@ def process_user_input(user_input, answer_slot, is_fresh: bool = False) -> bool:
                 icon=":material/auto_awesome:",
             )
         handle_image_request(text)
-    else:
-        handle_chat_request(
-            answer_slot,
-            request_text=text,
-        )
+        return True
 
-    return True
+    handle_chat_request(answer_slot, request_text=text)
+
+    # Render pada run pengiriman yang sama lalu BIARKAN run selesai. Memanggil
+    # st.rerun() tepat sesudah components.html membuat delta iframe dibatalkan
+    # sebelum browser sempat melukis animasinya. Fragment akan memantau worker
+    # dan melakukan rerun sendiri ketika jawaban selesai.
+    render_loader_yuki()
+    return False
