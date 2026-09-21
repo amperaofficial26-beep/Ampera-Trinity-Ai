@@ -57,6 +57,7 @@ GROQ_API_KEY = "gsk_..."
 | `config.py` | Konstanta & katalog (model, bahasa, artefak, kursus, identitas & harga Ampera) |
 | `state.py` | Manajemen state sesi |
 | `chat_handlers.py` | Handler kirim pesan & render input chat |
+| `layout.py` | Kerangka tata letak baru: topbar, panel kanan (Fitur Cepat · Model AI · Chat Terbaru), footer bar |
 | `sidebar.py` | Sidebar navigasi |
 | `ui_helpers.py` | Komponen render kecil |
 | `engines/` | Engine AI (Groq & image) |
