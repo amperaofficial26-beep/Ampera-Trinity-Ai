@@ -502,7 +502,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     animation-delay:
         calc(
             var(--yuki-line-index, 0)
-            * 0.9s
+            * 0.3s
         );
 
     transform-origin: left center;
