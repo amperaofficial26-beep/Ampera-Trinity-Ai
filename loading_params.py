@@ -485,12 +485,19 @@ def special_loading_html(
         - 4.0,
     )
 
+    # Mode "code": kursor berkedip ditempel di UJUNG teks (bukan di ikon),
+    # supaya kelihatan seperti kursor yang sedang mengetik, bukan elemen
+    # mengambang yang menutupi/berdempetan dengan teksnya.
+    caret_html = (
+        '<span class="type-caret"></span>' if mode == "code" else ""
+    )
+
     spans = "".join(
         (
             '<span class="special-phrase" '
             f'style="animation-delay:'
             f'{index * slot:.3f}s">'
-            f"{phrase}"
+            f"{phrase}{caret_html}"
             "</span>"
         )
         for index, phrase
@@ -582,7 +589,7 @@ def special_loading_html(
   overflow:hidden;
 }}
 .special-icon {{
-  position:relative; width:25px; height:25px; flex:0 0 25px;
+  position:relative; width:19px; height:19px; flex:0 0 19px;
   color:{AKSEN_KHUSUS}; transform-origin:center; will-change:transform,filter,opacity;
 }}
 .special-icon svg {{ width:100%; height:100%; display:block; fill:none; stroke:currentColor;
