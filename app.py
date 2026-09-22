@@ -60,9 +60,8 @@ from state import (
     main_thread, next_msg_id, open_conversation, reset_conversation,
 )
 from sidebar import go, go_cb, render_sidebar
-from layout import render_topbar, render_right_sidebar, render_footer_bar
 from ui_helpers import (
-    _BOTTOM_RESET_CSS, _FRESH_BOTTOM_CSS, get_greeting,
+    _BOTTOM_RESET_CSS, _FRESH_BOTTOM_CSS, _page_footer, get_greeting,
     logo_img_html, render_message,
 )
 from anim import inject_anim_css, inject_page_anim
@@ -91,12 +90,7 @@ ROOM_CHAT_URL = "https://room-chat-ampera-group.streamlit.app/"
 
 
 def render_multi_agent_launcher() -> None:
-    """Tombol Agent + kartu informasi animasi di samping sidebar.
-
-    KELEWAT MASA: launcher melayang ini sudah tidak dipanggil lagi —
-    tombol Multi AI sekarang menjadi menu biasa di sidebar kiri
-    (lihat sidebar.py). Fungsi disimpan untuk referensi.
-    """
+    """Tombol Agent + kartu informasi animasi di samping sidebar."""
 
     # Di dalam room, launcher disembunyikan agar tidak menutupi judul.
     if st.session_state.get("page") == "multi_agent":
@@ -683,71 +677,61 @@ st.set_page_config(
 def render_chat_page() -> None:
     is_fresh = len(main_thread()) == 0
 
-    # Tata letak baru: kolom chat utama (terbesar) + panel kanan
-    # (Fitur Cepat · Model AI · Chat Terbaru). Di layar sempit panel
-    # kanan otomatis disembunyikan lewat CSS (lihat layout.py).
-    kolom_chat, kolom_panel = st.columns([1.85, 1], gap="large")
+    if is_fresh:
+        # ---------- HALAMAN AWAL ala Claude ----------
+        st.markdown(_FRESH_BOTTOM_CSS, unsafe_allow_html=True)
+        st.markdown(
+            '<div class="trinity-greeting" style="margin-top:18vh;">'
+            f'{logo_img_html("logo-greeting")} {get_greeting()}'
+            "</div>",
+            unsafe_allow_html=True,
+        )
 
-    with kolom_chat:
-        if is_fresh:
-            # ---------- HALAMAN AWAL ala Claude ----------
-            st.markdown(_FRESH_BOTTOM_CSS, unsafe_allow_html=True)
-            st.markdown(
-                '<div class="trinity-greeting" style="margin-top:18vh;">'
-                f'{logo_img_html("logo-greeting")} {get_greeting()}'
-                "</div>",
-                unsafe_allow_html=True,
-            )
+    for msg in main_thread():
+        render_message(msg)
 
-        for msg in main_thread():
-            render_message(msg)
+    pending_prompt = (st.session_state.pop("pending_prompt", "") or "").strip()
 
-        pending_prompt = (st.session_state.pop("pending_prompt", "") or "").strip()
+    if st.session_state.image_mode:
+        placeholder_text = "Deskripsikan gambar yang ingin dibuat…"
+    elif is_fresh:
+        placeholder_text = "Apa yang bisa Yuki bantu hari ini?"
+    else:
+        placeholder_text = "Tulis pesan…"
 
-        if st.session_state.image_mode:
-            placeholder_text = "Deskripsikan gambar yang ingin dibuat…"
-        elif is_fresh:
-            placeholder_text = "Apa yang bisa Yuki bantu hari ini?"
-        else:
-            placeholder_text = "Tulis pesan…"
+    chat_kwargs: dict = {}
+    if CHAT_INPUT_SUPPORTS_FILE:
+        chat_kwargs["accept_file"] = True
+        chat_kwargs["file_type"] = IMAGE_INPUT_TYPES
+    if CHAT_INPUT_SUPPORTS_AUDIO:
+        chat_kwargs["accept_audio"] = True
 
-        chat_kwargs: dict = {}
-        if CHAT_INPUT_SUPPORTS_FILE:
-            chat_kwargs["accept_file"] = True
-            chat_kwargs["file_type"] = IMAGE_INPUT_TYPES
-        if CHAT_INPUT_SUPPORTS_AUDIO:
-            chat_kwargs["accept_audio"] = True
+    # ====== URUTAN AREA INPUT ala Claude: preview lampiran di atas, lalu
+    # kotak teks, lalu baris "+" & pilihan model di paling bawah. Urutan ini
+    # ditentukan MURNI oleh urutan pemanggilan widget di sini (bukan CSS) —
+    # st.chat_input() SENGAJA dipanggil di antara pending_preview dan
+    # chat_controls, bukan sesudahnya. ======
+    bottom_dock = getattr(st, "bottom", None) or st._bottom
+    with bottom_dock:
+        with st.container(key="pending_preview"):
+            render_pending_preview("chat")
+        user_input = chat_input_atau_hentikan(placeholder_text, **chat_kwargs)
+        with st.container(key="chat_controls"):
+            render_input_controls("chat", show_mode=True)
 
-        # ====== URUTAN AREA INPUT ala Claude: preview lampiran di atas, lalu
-        # kotak teks, lalu baris "+" & pilihan model di paling bawah. Urutan ini
-        # ditentukan MURNI oleh urutan pemanggilan widget di sini (bukan CSS) —
-        # st.chat_input() SENGAJA dipanggil di antara pending_preview dan
-        # chat_controls, bukan sesudahnya. ======
-        bottom_dock = getattr(st, "bottom", None) or st._bottom
-        with bottom_dock:
-            with st.container(key="pending_preview"):
-                render_pending_preview("chat")
-            user_input = chat_input_atau_hentikan(placeholder_text, **chat_kwargs)
-            with st.container(key="chat_controls"):
-                render_input_controls("chat", show_mode=True)
+    if maybe_run_yuki(st.empty()):
+        st.rerun()
 
-        if maybe_run_yuki(st.empty()):
-            st.rerun()
+    # Jawaban yang sedang mengalir + animasi berpikir + tombol Hentikan.
+    fragmen_jawaban_yuki()
+    render_loader_yuki()
 
-        # Jawaban yang sedang mengalir + animasi berpikir + tombol Hentikan.
-        fragmen_jawaban_yuki()
-        render_loader_yuki()
+    if pending_prompt and user_input is None:
+        user_input = pending_prompt
+    if process_user_input(user_input, st.empty(), is_fresh=is_fresh):
+        st.rerun()
 
-        if pending_prompt and user_input is None:
-            user_input = pending_prompt
-        if process_user_input(user_input, st.empty(), is_fresh=is_fresh):
-            st.rerun()
-
-        # Footer lama di dalam halaman digantikan footer bar global
-        # (render_footer_bar di layout.py).
-
-    with kolom_panel:
-        render_right_sidebar()
+    _page_footer(in_chat=not is_fresh)
 
 
 # ============================================================================
@@ -2040,10 +2024,9 @@ def main() -> None:
     if tampilkan_gerbang():
         st.stop()
       
-    render_topbar()
-    render_footer_bar()
+    render_multi_agent_launcher()
     render_sidebar()
-  
+
     page = st.session_state.get("page", "chat")
     # Dok file kecil (panel_file.py): ikon folder melayang + daftar file
     # buatan Yuki. Tidak buka otomatis — hanya gelembung penanda.
