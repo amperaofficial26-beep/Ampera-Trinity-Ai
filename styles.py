@@ -3747,10 +3747,10 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
      sidebar kiri dan panel kanan
 ==================================================================== */
 .stApp:has(.tr-chat-layout) {
-    --dash-sidebar: 250px;
+    --dash-sidebar: 220px;
     --dash-rail: 250px;
     --dash-gap: 15px;
-    --dash-top: 12px;
+    --dash-top: 18px;
     --dash-bottom: 8px;
 
     --dash-center-left: calc(var(--dash-sidebar) + var(--dash-gap));
