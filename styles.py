@@ -3577,7 +3577,7 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
 .stApp:has(.tr-chat-layout) {
     --topbar-left-open: 252px;      /* posisi kiri saat sidebar terbuka */
     --topbar-left-closed: 76px;     /* posisi kiri saat sidebar tertutup */
-    --topbar-right-safe: 430px;     /* jarak aman dari panel kanan */
+    --topbar-right-safe: 480px;     /* jarak aman dari panel kanan */
     --topbar-max-width: 700px;      /* panjang maksimal kolom atas */
 }
 
