@@ -3749,7 +3749,7 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
 .stApp:has(.tr-chat-layout) {
     --dash-sidebar: 220px;
     --dash-rail: 250px;
-    --dash-gap: 15px;
+    --dash-gap: 9px;
     --dash-top: 18px;
     --dash-bottom: 8px;
 
