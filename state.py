@@ -9,7 +9,6 @@ fungsi-fungsi di modul ini supaya struktur data tetap konsisten.
 
 from __future__ import annotations
 
-import time
 import uuid
 from datetime import datetime
 
@@ -215,9 +214,6 @@ def _archive_current_conversation() -> None:
             if c["id"] == conv_id:
                 c["messages"] = msgs
                 c["title"] = _conversation_title(msgs)
-                # segarkan stempel waktu (dipakai "Chat Terbaru" di panel
-                # kanan: "2 menit yang lalu", dst.)
-                c["ts"] = time.time()
                 # ingat kunci database percakapan ini (dipakai lagi bila
                 # percakapan dibuka ulang)
                 if not c.get("conv_key"):
@@ -229,9 +225,7 @@ def _archive_current_conversation() -> None:
         "title": _conversation_title(msgs),
         "messages": msgs,
         "conv_key": st.session_state.get("conv_key") or uuid.uuid4().hex,
-        "ts": time.time(),
     })
-    
 
 def _cancel_pending_yuki() -> None:
     """Batalkan job/stream agar tidak terbawa ke percakapan lain."""
