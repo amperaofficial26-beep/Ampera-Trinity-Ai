@@ -3180,66 +3180,6 @@ button[class*="st-key-pel_pro"]::after {
         transition-duration: 0.001ms !important;
     }
 }
-
-/* ================================================================
-   GAYA KOMPONEN TATA LETAK BARU (lihat layout.py untuk kerangkanya)
-   ================================================================ */
-
-/* Nama model + lencana Free/Premium pada label bubble AI */
-.ai-label .ai-model {
-    font-weight: 500;
-    color: var(--tr-text2, #6B6172);
-    font-size: 0.85rem;
-}
-.ai-label .model-badge {
-    display: inline-block;
-    margin-left: 6px;
-    padding: 0 8px 1px;
-    border-radius: 999px;
-    border: 1px solid var(--tr-border, #DBCEB9);
-    background: var(--tr-surface, #F2E8D6);
-    color: var(--tr-text2, #6B6172);
-    font-size: 0.68rem;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    line-height: 1.45;
-    vertical-align: middle;
-}
-.ai-label .model-badge.premium {
-    color: #8A5A3C;
-    border-color: rgba(138, 90, 60, 0.45);
-}
-
-/* Waktu kirim di bawah bubble user (rata kanan) */
-.bubble-meta.user-meta {
-    text-align: right;
-    color: var(--tr-text2, #98A0AB);
-    font-size: 0.72rem;
-    margin-top: 3px;
-}
-
-/* Branding + maskot di dasar sidebar kiri */
-.sb-footbrand {
-    margin-top: 16px;
-    padding: 14px 8px 4px;
-    border-top: 1px solid var(--tr-border, #DBCEB9);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 3px;
-    text-align: center;
-}
-.sb-footbrand .t {
-    font-family: 'Source Serif 4', Georgia, serif;
-    font-weight: 700;
-    font-size: 1.08rem;
-    color: var(--tr-text, #2C1F33);
-    letter-spacing: -0.01em;
-}
-.sb-footbrand .s {
-    font-size: 0.72rem;
-    color: var(--tr-text2, #6B6172);
-}
 </style>
 """,
         unsafe_allow_html=True,
