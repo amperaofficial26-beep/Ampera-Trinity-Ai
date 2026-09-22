@@ -13,8 +13,8 @@ import html
 
 import streamlit as st
 
-from state import open_conversation, reset_conversation
-from ui_helpers import get_chat_export_text, logo_img_html
+from state import get_settings, open_conversation, reset_conversation
+from ui_helpers import get_chat_export_text
 
 HAS_DIALOG = hasattr(st, "dialog")
 
@@ -215,10 +215,12 @@ show_sesuaikan_dialog = _register_dialog("Sesuaikan", _sesuaikan_dialog_body)
 
 def render_sidebar() -> None:
     with st.sidebar:
-        # Catatan tata letak baru: brand "Trinity" yang tadinya di sini
-        # sudah pindah ke TOPBAR di atas (layout.py). Sidebar kini langsung
-        # diawali tombol "+ Baru" lalu menu navigasi utama.
-
+        # Brand serif ala "Claude"
+        st.markdown(
+            '<div class="sb-brand">Trinity</div>',
+            unsafe_allow_html=True,
+        )
+        
         # Di room Multi Trinity Agent, sidebar sengaja dibersihkan.
         # Hanya navigasi kembali dan riwayat room yang ditampilkan.
         if st.session_state.get("page") == "multi_agent":
@@ -292,66 +294,25 @@ def render_sidebar() -> None:
         
             # Menghentikan render menu sidebar biasa.
             return
-
+        
         # + Baru (latar krem menonjol seperti Claude)
         with st.container(key="sb_new"):
             if st.button(":material/add: &nbsp;Baru", use_container_width=True):
                 reset_conversation()
                 st.rerun()
 
-        # ---- Navigasi utama (tata letak baru: Chat AI · Multi AI ·
-        #      Generate Gambar · Riwayat · Pengaturan) ----
+        # Menu ala Claude (ikon garis tipis + teks rata kiri)
         with st.container(key="sb_menu_chat"):
-            if st.button(":material/chat_bubble: &nbsp;Chat AI",
-                         use_container_width=True):
+            if st.button(":material/chat_bubble: &nbsp;Chat", use_container_width=True):
                 st.session_state.image_mode = False
                 st.rerun()
-        with st.container(key="sb_menu_multi"):
-            if st.button(":material/groups: &nbsp;Multi AI",
-                         use_container_width=True):
-                go("multi_agent")
         with st.container(key="sb_menu_img"):
-            if st.button(":material/image: &nbsp;Generate Gambar",
-                         use_container_width=True):
+            if st.button(":material/palette: &nbsp;Gambar", use_container_width=True):
                 st.session_state.image_mode = True
                 st.rerun()
 
         st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
 
-        # ---- Riwayat Chat (navigasi percakapan lama) ----
-        convs = st.session_state.get("conversations", [])
-        st.markdown('<div class="sb-group">Riwayat Chat</div>',
-                    unsafe_allow_html=True)
-        if convs:
-            for c in convs[:15]:
-                key = f"sb_hist_{c['id']}"
-                with st.container(key=key):
-                    if st.button(c["title"], key=f"btn_{key}",
-                                 use_container_width=True):
-                        open_conversation(c["id"])
-                        st.rerun()
-
-            # Bersihkan riwayat — konfirmasi dua langkah ditampilkan
-            # langsung di sidebar (konteks "sb" supaya kunci widgetnya
-            # tidak bentrok dengan yang di halaman Pengaturan).
-            from riwayat import dialog_bersihkan
-            with st.container(key="sb_bersih_riwayat"):
-                dialog_bersihkan("sb")
-        else:
-            st.caption("Belum ada percakapan.")
-
-        st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
-
-        # ---- Pengaturan ----
-        with st.container(key="sb_menu_pengaturan"):
-            if st.button(":material/settings: &nbsp;Pengaturan",
-                         use_container_width=True):
-                go("pengaturan")
-
-        # ---- Lainnya: fitur yang sudah ada, dikelompokkan agar menu
-        #      utama di atas tetap ringkas ----
-        st.markdown('<div class="sb-group">Lainnya</div>',
-                    unsafe_allow_html=True)
         with st.container(key="sb_menu_proyek"):
             # Proyek tampil sebagai POPOVER (muncul di samping tombolnya),
             # bukan dialog yang melayang di tengah halaman. Gaya tombolnya
@@ -370,6 +331,8 @@ def render_sidebar() -> None:
             if st.button(":material/tune: &nbsp;Sesuaikan", use_container_width=True):
                 show_sesuaikan_dialog()
 
+                st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
+
         # ---- Kelompok AI khusus ----
         with st.container(key="sb_menu_desain"):
             if st.button(":material/palette: &nbsp;AI Desain", use_container_width=True):
@@ -382,6 +345,8 @@ def render_sidebar() -> None:
             if st.button(label_jd, use_container_width=True):
                 go("jadwal")
 
+        st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
+
         with st.container(key="sb_download"):
             st.download_button(
                 label=":material/download: &nbsp;Unduh Chat",
@@ -391,14 +356,112 @@ def render_sidebar() -> None:
                 use_container_width=True,
             )
 
-        # ---- Branding + maskot di dasar sidebar (tata letak baru).
-        #      Menu akun yang tadinya di sini sudah pindah ke popover
-        #      "Profil" di topbar (layout.py). ----
-        st.markdown(
-            '<div class="sb-footbrand">'
-            + logo_img_html("logo-footbrand")
-            + '<div class="t">Trinity</div>'
-            + '<div class="s">by Ampera Official</div>'
-            + '</div>',
-            unsafe_allow_html=True,
-        )
+        # Riwayat percakapan (grup "Hari ini" seperti Claude)
+        convs = st.session_state.get("conversations", [])
+        if convs:
+            st.markdown('<div class="sb-group">Hari ini</div>', unsafe_allow_html=True)
+            for c in convs[:15]:
+                key = f"sb_hist_{c['id']}"
+                with st.container(key=key):
+                    if st.button(c["title"], key=f"btn_{key}", use_container_width=True):
+                        open_conversation(c["id"])
+                        st.rerun()
+
+            # Bersihkan riwayat — konfirmasi dua langkah ditampilkan
+            # langsung di sidebar (konteks "sb" supaya kunci widgetnya
+            # tidak bentrok dengan yang di halaman Pengaturan).
+            from riwayat import dialog_bersihkan
+            with st.container(key="sb_bersih_riwayat"):
+                dialog_bersihkan("sb")
+
+        # ---- Baris akun di dasar sidebar ala Claude ----
+        # (U) Nama · Paket   [⋮ menu akun]
+        s = get_settings()
+        name = (s.get("display_name") or "User").strip() or "User"
+        plan = s.get("plan") or "Free"
+        initial = name[0].upper()
+        with st.container(key="sb_account"):
+            acc_col, menu_col = st.columns([5, 1.05], gap="small")
+            with acc_col:
+                # Baris akun. Disusun dari potongan string biasa (bukan
+                # f-string tiga kutip) supaya aman saat kode ini di-copy
+                # paste ke editor lain, dan bebas karakter non-ASCII di
+                # luar string.
+                acc_html = (
+                    '<div class="sb-account">'
+                    '<div class="ava">' + html.escape(initial) + '</div>'
+                    '<div class="name">' + html.escape(name)
+                    + ' <span class="plan">&middot; ' + html.escape(plan)
+                    + '</span></div>'
+                    '</div>'
+                )
+                st.markdown(acc_html, unsafe_allow_html=True)
+            with menu_col:
+                # Gaya tombol titik tiga disusun sebagai string biasa
+                # (bukan f-string) supaya kurung kurawal CSS tidak bentrok
+                # dengan sintaks f-string Python.
+                gaya_acct = (
+                    "<style>"
+                    ".st-key-acct_menu{"
+                    "position:fixed !important;"
+                    "left:" + str(ACCT_MENU_X_PX) + "px !important;"
+                    "bottom:" + str(ACCT_MENU_Y_PX) + "px !important;"
+                    "top:auto !important;right:auto !important;"
+                    "width:32px !important;margin:0 !important;"
+                    "background:transparent !important;"
+                    "box-shadow:none !important;"
+                    "z-index:999996 !important;"
+                    "}"
+                    ".st-key-acct_menu [data-testid='stPopover'],"
+                    ".st-key-acct_menu [data-testid='stPopover'] > div,"
+                    ".st-key-acct_menu button,"
+                    ".st-key-acct_menu button[data-testid='stPopoverButton'],"
+                    ".st-key-acct_menu [data-testid='stBaseButton-secondary']{"
+                    "background:" + ACCT_MENU_BG + " !important;"
+                    "background-color:" + ACCT_MENU_BG + " !important;"
+                    "border:1px solid " + ACCT_MENU_BORDER + " !important;"
+                    "color:" + ACCT_MENU_FG + " !important;"
+                    "box-shadow:none !important;"
+                    "border-radius:8px !important;"
+                    "}"
+                    ".st-key-acct_menu button:hover{"
+                    "background:" + ACCT_MENU_BG_HOVER + " !important;"
+                    "background-color:" + ACCT_MENU_BG_HOVER + " !important;"
+                    "color:#2C1F33 !important;"
+                    "}"
+                    ".st-key-acct_menu button svg{"
+                    "fill:" + ACCT_MENU_FG + " !important;"
+                    "color:" + ACCT_MENU_FG + " !important;"
+                    "}"
+                    "</style>"
+                )
+                st.markdown(gaya_acct, unsafe_allow_html=True)
+                with st.container(key="acct_menu"):
+                    with st.popover(":material/more_horiz:", use_container_width=False,
+                                    help="Menu akun"):
+                        if st.button(":material/settings:  Pengaturan", key="acct_pengaturan",
+                                     use_container_width=True):
+                            go("pengaturan")
+                        if st.button(":material/translate:  Bahasa", key="acct_bahasa",
+                                     use_container_width=True):
+                            go("bahasa")
+                        if st.button(":material/help:  Dapatkan bantuan", key="acct_bantuan",
+                                     use_container_width=True):
+                            go("bantuan")
+                        if st.button(":material/workspace_premium:  Tingkatkan paket",
+                                     key="acct_pro", use_container_width=True):
+                            go("tingkatkan")
+                        if st.button(":material/phone_iphone:  Dapatkan aplikasi",
+                                     key="acct_app", use_container_width=True):
+                            go("aplikasi")
+                        if st.button(":material/school:  Trinity kursus", key="acct_kursus",
+                                     use_container_width=True):
+                            go("kursus")
+                        if st.button(":material/menu_book:  Pelajari lebih lanjut",
+                                     key="acct_pelajari", use_container_width=True):
+                            go("pelajari")
+                        st.divider()
+                        if st.button(":material/logout:  Keluar", key="acct_keluar",
+                                     use_container_width=True):
+                            st.session_state.logged_out = True
+                            go("chat")
