@@ -3171,7 +3171,297 @@ button[class*="st-key-pel_pro"]::after {
         transform: scale(1) translateY(0);
     }
 }
+/* ====================================================================
+   LAYOUT DASHBOARD CHAT — mengikuti referensi, tetapi tetap memakai
+   warna tema Trinity yang sedang aktif (var(--tr-*)). Tidak ada gambar
+   baru; avatar aplikasi adalah huruf berbasis CSS.
+==================================================================== */
+.tr-chat-layout {
+    display: none !important;
+}
 
+[data-testid="stMainBlockContainer"]:has(.tr-chat-layout) {
+    max-width: none !important;
+    width: 100% !important;
+    padding-top: 96px !important;
+    padding-left: 28px !important;
+    padding-right: 340px !important;
+    padding-bottom: 10rem !important;
+}
+
+[data-testid="stMainBlockContainer"]:has(.tr-chat-layout) > [data-testid="stVerticalBlock"] {
+    max-width: min(880px, calc(100vw - 230px - 380px - 48px)) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+[data-testid="stMainBlockContainer"]:has(.tr-chat-layout.tr-fresh-home) {
+    padding-top: 84px !important;
+}
+
+/* Topbar utama */
+.st-key-chat_topbar {
+    position: fixed !important;
+    top: 16px !important;
+    left: 252px !important;
+    right: 320px !important;
+    z-index: 999990 !important;
+    margin: 0 !important;
+    padding: 10px !important;
+    border: 1px solid color-mix(in srgb, var(--tr-border, #DBCEB9) 78%, var(--tr-accent, #4A3559) 22%) !important;
+    border-radius: calc(var(--tr-radius, 12px) + 14px) !important;
+    background: color-mix(in srgb, var(--tr-surface, #F2E8D6) 88%, transparent) !important;
+    box-shadow: 0 16px 42px color-mix(in srgb, var(--tr-text, #2C1F33) 13%, transparent) !important;
+    backdrop-filter: blur(18px) saturate(1.15) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(1.15) !important;
+}
+
+.stApp:has(section[data-testid="stSidebar"][aria-expanded="false"]) .st-key-chat_topbar {
+    left: 76px !important;
+}
+
+.st-key-chat_topbar [data-testid="stHorizontalBlock"] {
+    align-items: center !important;
+    gap: 10px !important;
+}
+
+.st-key-chat_topbar [data-testid="stColumn"] {
+    min-width: 0 !important;
+}
+
+.tr-brand-profile,
+.tr-assistant-pill,
+.tr-user-pill {
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    border-radius: calc(var(--tr-radius, 12px) + 10px);
+}
+
+.tr-brand-profile {
+    gap: 10px;
+    padding: 5px 6px;
+}
+
+.tr-brand-avatar,
+.tr-pill-icon,
+.tr-user-avatar {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    border: 1px solid color-mix(in srgb, var(--tr-border, #DBCEB9) 70%, var(--tr-accent, #4A3559) 30%);
+    background: color-mix(in srgb, var(--tr-accent, #4A3559) 14%, var(--tr-surface, #F2E8D6));
+    color: var(--tr-accent, #4A3559);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, white 48%, transparent);
+}
+
+.tr-brand-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 14px;
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 1.35rem;
+    font-weight: 800;
+}
+
+.tr-brand-name {
+    color: var(--tr-text, #2C1F33);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    font-size: 1.05rem;
+}
+
+.tr-brand-sub,
+.tr-pill-sub,
+.tr-user-copy small {
+    color: var(--tr-text2, #6B6172);
+    font-size: .76rem;
+    margin-top: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tr-assistant-pill {
+    gap: 10px;
+    padding: 6px 13px;
+    border: 1px solid color-mix(in srgb, var(--tr-border, #DBCEB9) 72%, var(--tr-accent, #4A3559) 28%);
+    background: color-mix(in srgb, var(--tr-bg, #E8DCC8) 30%, var(--tr-surface, #F2E8D6) 70%);
+}
+
+.tr-pill-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 13px;
+}
+
+.tr-pill-title {
+    color: var(--tr-text, #2C1F33);
+    font-size: .93rem;
+    font-weight: 800;
+}
+
+.tr-user-pill {
+    gap: 8px;
+    padding: 6px 9px;
+    border: 1px solid color-mix(in srgb, var(--tr-border, #DBCEB9) 86%, transparent);
+    background: color-mix(in srgb, var(--tr-surface, #F2E8D6) 68%, transparent);
+}
+
+.tr-user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: .82rem;
+    font-weight: 800;
+}
+/* Panel fitur kanan */
+.st-key-chat_right_rail {
+    position: fixed !important;
+    top: 92px !important;
+    right: 18px !important;
+    bottom: 22px !important;
+    width: 286px !important;
+    z-index: 999980 !important;
+    margin: 0 !important;
+    padding: 14px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    border: 1px solid color-mix(in srgb, var(--tr-border, #DBCEB9) 80%, var(--tr-accent, #4A3559) 20%) !important;
+    border-radius: calc(var(--tr-radius, 12px) + 14px) !important;
+    background: color-mix(in srgb, var(--tr-surface, #F2E8D6) 90%, transparent) !important;
+    box-shadow: 0 16px 42px color-mix(in srgb, var(--tr-text, #2C1F33) 12%, transparent) !important;
+    backdrop-filter: blur(18px) saturate(1.12) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(1.12) !important;
+}
+
+.st-key-chat_right_rail [data-testid="stVerticalBlock"] {
+    gap: 8px !important;
+}
+
+.st-key-chat_right_rail [data-testid="stHorizontalBlock"] {
+    gap: 8px !important;
+}
+
+.tr-rail-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 2px 1px 8px;
+    color: var(--tr-text, #2C1F33);
+    font-size: .94rem;
+    font-weight: 800;
+}
+
+.tr-rail-title-row.with-link {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid color-mix(in srgb, var(--tr-border, #DBCEB9) 78%, transparent);
+}
+
+.tr-rail-title-row small {
+    color: var(--tr-accent, #4A3559);
+    font-size: .72rem;
+    font-weight: 700;
+}
+
+.tr-rail-empty {
+    padding: 12px;
+    border: 1px dashed var(--tr-border, #DBCEB9);
+    border-radius: var(--tr-radius, 12px);
+    color: var(--tr-text2, #6B6172);
+    font-size: .84rem;
+    text-align: center;
+}
+
+.st-key-chat_right_rail div.stButton > button {
+    width: 100% !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
+    white-space: normal !important;
+    border-radius: calc(var(--tr-radius, 12px) + 4px) !important;
+    border: 1px solid color-mix(in srgb, var(--tr-border, #DBCEB9) 78%, transparent) !important;
+    background: color-mix(in srgb, var(--tr-bg, #E8DCC8) 22%, var(--tr-surface, #F2E8D6) 78%) !important;
+    color: var(--tr-text, #2C1F33) !important;
+    box-shadow: none !important;
+    transition: transform .18s ease, border-color .18s ease, background .18s ease !important;
+}
+
+.st-key-chat_right_rail div.stButton > button:hover {
+    transform: translateY(-1px) !important;
+    border-color: var(--tr-accent, #4A3559) !important;
+    background: var(--tr-bubble, #E0D2BB) !important;
+}
+
+[class*="st-key-rail_quick_"] div.stButton > button {
+    min-height: 92px !important;
+    align-items: flex-start !important;
+    padding: 12px !important;
+}
+
+[class*="st-key-rail_model_"] div.stButton > button,
+[class*="st-key-rail_recent_"] div.stButton > button {
+    min-height: 50px !important;
+    padding: 9px 11px !important;
+}
+/* Sidebar lebih mendekati dashboard: brand terlihat sebagai profil app,
+   tanpa gambar/mascot tambahan. */
+.sb-brand {
+    padding: 12px 10px 14px !important;
+    margin: 0 0 8px !important;
+    border: 1px solid color-mix(in srgb, var(--tr-border, #DBCEB9) 82%, transparent);
+    border-radius: calc(var(--tr-radius, 12px) + 6px);
+    background: color-mix(in srgb, var(--tr-surface, #F2E8D6) 70%, transparent);
+}
+
+section[data-testid="stSidebar"] div.stButton > button[kind="primary"],
+section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] {
+    background: var(--tr-accent, #4A3559) !important;
+    border: 1px solid var(--tr-accent, #4A3559) !important;
+    color: var(--tr-on-accent, #FFFFFF) !important;
+}
+
+section[data-testid="stSidebar"] div.stButton > button[kind="primary"] p,
+section[data-testid="stSidebar"] div.stButton > button[kind="primary"] [data-testid="stIconMaterial"],
+section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] p,
+section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-testid="stIconMaterial"] {
+    color: var(--tr-on-accent, #FFFFFF) !important;
+}
+
+@media (max-width: 1180px) {
+    .st-key-chat_right_rail {
+        display: none !important;
+    }
+
+    .st-key-chat_topbar {
+        right: 18px !important;
+    }
+
+    [data-testid="stMainBlockContainer"]:has(.tr-chat-layout) {
+        padding-right: 28px !important;
+    }
+
+    [data-testid="stMainBlockContainer"]:has(.tr-chat-layout) > [data-testid="stVerticalBlock"] {
+        max-width: min(880px, calc(100vw - 230px - 56px)) !important;
+    }
+}
+
+@media (max-width: 820px) {
+    .st-key-chat_topbar {
+        display: none !important;
+    }
+
+    [data-testid="stMainBlockContainer"]:has(.tr-chat-layout),
+    [data-testid="stMainBlockContainer"]:has(.tr-chat-layout.tr-fresh-home) {
+        padding-top: 1.2rem !important;
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+    }
+
+    [data-testid="stMainBlockContainer"]:has(.tr-chat-layout) > [data-testid="stVerticalBlock"] {
+        max-width: 100% !important;
+    }
+}
 /* Aksesibilitas: matikan animasi bagi pengguna yang memintanya */
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
