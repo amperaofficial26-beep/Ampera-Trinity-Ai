@@ -295,24 +295,60 @@ def render_sidebar() -> None:
             # Menghentikan render menu sidebar biasa.
             return
         
-        # + Baru (latar krem menonjol seperti Claude)
+        # Room baru + menu utama dibuat lebih dekat dengan layout referensi:
+        # Chat AI, Multi AI, Generate Gambar, Riwayat Chat, Pengaturan.
         with st.container(key="sb_new"):
-            if st.button(":material/add: &nbsp;Baru", use_container_width=True):
+            if st.button(":material/add: &nbsp;Room baru", use_container_width=True):
                 reset_conversation()
                 st.rerun()
-
-        # Menu ala Claude (ikon garis tipis + teks rata kiri)
+        
+        page = st.session_state.get("page", "chat")
+        in_image_mode = bool(st.session_state.get("image_mode"))
+        
         with st.container(key="sb_menu_chat"):
-            if st.button(":material/chat_bubble: &nbsp;Chat", use_container_width=True):
+            if st.button(
+                ":material/chat_bubble: &nbsp;Chat AI",
+                use_container_width=True,
+                type="primary" if page == "chat" and not in_image_mode else "secondary",
+            ):
                 st.session_state.image_mode = False
-                st.rerun()
+                go("chat")
+        
+        with st.container(key="sb_menu_multi"):
+            if st.button(
+                ":material/groups: &nbsp;Multi AI",
+                use_container_width=True,
+                type="primary" if page == "multi_agent" else "secondary",
+            ):
+                go("multi_agent")
+        
         with st.container(key="sb_menu_img"):
-            if st.button(":material/palette: &nbsp;Gambar", use_container_width=True):
+            if st.button(
+                ":material/image: &nbsp;Generate Gambar",
+                use_container_width=True,
+                type="primary" if page == "chat" and in_image_mode else "secondary",
+            ):
                 st.session_state.image_mode = True
-                st.rerun()
-
+                go("chat")
+        
+        with st.container(key="sb_menu_history"):
+            if st.button(":material/history: &nbsp;Riwayat Chat", use_container_width=True):
+                jumlah = len(st.session_state.get("conversations", []))
+                st.toast(
+                    "Riwayat chat ada di bagian bawah sidebar."
+                    if jumlah else "Belum ada riwayat chat.",
+                    icon=":material/history:",
+                )
+        
+        with st.container(key="sb_menu_settings"):
+            if st.button(
+                ":material/settings: &nbsp;Pengaturan",
+                use_container_width=True,
+                type="primary" if page == "pengaturan" else "secondary",
+            ):
+                go("pengaturan")
+        
         st.markdown('<div class="sb-divider"></div>', unsafe_allow_html=True)
-
         with st.container(key="sb_menu_proyek"):
             # Proyek tampil sebagai POPOVER (muncul di samping tombolnya),
             # bukan dialog yang melayang di tengah halaman. Gaya tombolnya
