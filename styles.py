@@ -3748,10 +3748,10 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
 ==================================================================== */
 .stApp:has(.tr-chat-layout) {
     --dash-sidebar: 210px;
-    --dash-rail: 260px;
-    --dash-gap: 18px;
+    --dash-rail: 290px;
+    --dash-gap: 20px;
     --dash-top: 12px;
-    --dash-bottom: 16px;
+    --dash-bottom: 8px;
 
     --dash-center-left: calc(var(--dash-sidebar) + var(--dash-gap));
     --dash-center-right: calc(var(--dash-rail) + var(--dash-gap));
