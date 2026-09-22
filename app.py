@@ -48,7 +48,7 @@ from config import (
     CHAT_INPUT_SUPPORTS_AUDIO, CHAT_INPUT_SUPPORTS_FILE,
     CHAT_READY, COURSE_BY_KEY, COURSE_CATALOG,
     IMAGE_INPUT_TYPES, IMAGE_READY,
-    ARTIFACT_BY_KEY, ARTIFACT_CATEGORIES, DEFAULT_LANG_CODE, LANG_BY_CODE,
+    MODEL_CATALOG,ARTIFACT_BY_KEY, ARTIFACT_CATEGORIES, DEFAULT_LANG_CODE, LANG_BY_CODE,
     SUPPORTED_LANGUAGES, course_curriculum, CLARIFY_OPTIONS,
     AMPERA_BRAND, AMPERA_EMAIL, AMPERA_LOKASI, AMPERA_PRODUK_LAIN, PRO_HARGA,
 )
@@ -92,8 +92,10 @@ ROOM_CHAT_URL = "https://room-chat-ampera-group.streamlit.app/"
 def render_multi_agent_launcher() -> None:
     """Tombol Agent + kartu informasi animasi di samping sidebar."""
 
-    # Di dalam room, launcher disembunyikan agar tidak menutupi judul.
-    if st.session_state.get("page") == "multi_agent":
+    # Di dalam room dan halaman chat utama, launcher disembunyikan agar
+    # tidak menabrak topbar dashboard baru. Akses Multi AI tetap tersedia
+    # dari sidebar dan panel fitur kanan.
+    if st.session_state.get("page") in ("multi_agent", "chat"):
         return
 
     # _TAB_ICON sudah dipotong rapat dari margin transparan PNG.
@@ -666,9 +668,243 @@ _TAB_ICON = _buat_ikon_tab() or (
 st.set_page_config(
     page_title="Ampera Trinity AI",
     page_icon=_TAB_ICON,
-    layout="centered",
+    layout="wide",
     initial_sidebar_state="expanded",
 )
+
+def _clip_text(value: str, limit: int = 46) -> str:
+    """Potong teks untuk panel ringkas tanpa memecah layout."""
+    value = (value or "").strip()
+    if len(value) <= limit:
+        return value
+    return value[: max(0, limit - 1)].rstrip() + "…"
+
+
+def _render_chat_chrome(is_fresh: bool) -> None:
+    """Topbar dashboard chat seperti referensi, tetap memakai tema app.
+
+    Elemen ini sengaja tidak memakai gambar baru: avatar aplikasi dibuat dari
+    huruf "T" berbasis CSS, dan seluruh warna mengambil variabel tema
+    (var(--tr-*)).
+    """
+    s = get_settings()
+    display_name = (s.get("display_name") or "User").strip() or "User"
+    plan = (s.get("plan") or "Free").strip() or "Free"
+    initial = html.escape(display_name[:1].upper() or "U")
+
+    mode_title = "Generate Gambar" if st.session_state.get("image_mode") else "AI Assistant"
+    mode_hint = (
+        "Deskripsikan gambar yang ingin dibuat…"
+        if st.session_state.get("image_mode")
+        else "Tanyakan apa saja, kami siap membantumu…"
+    )
+    marker_class = "tr-chat-layout tr-fresh-home" if is_fresh else "tr-chat-layout"
+
+    st.markdown(
+        f"""
+        <div class="{marker_class}"></div>
+        <style>
+        .stApp:has(.tr-chat-layout) [class*="st-key-fd_toggle"] {{
+          top: 22px !important;
+          right: 334px !important;
+        }}
+        .stApp:has(.tr-chat-layout) .fd-dot {{
+          top: 16px !important;
+          right: 330px !important;
+        }}
+        .stApp:has(.tr-chat-layout) .fd-bubble {{
+          top: 30px !important;
+          right: 390px !important;
+        }}
+        .stApp:has(.tr-chat-layout) .st-key-fd_panel {{
+          top: 82px !important;
+          right: 334px !important;
+        }}
+        @media (max-width: 1180px) {{
+          .stApp:has(.tr-chat-layout) [class*="st-key-fd_toggle"] {{
+            top: 82px !important;
+            right: 16px !important;
+          }}
+          .stApp:has(.tr-chat-layout) .fd-dot {{
+            top: 76px !important;
+            right: 12px !important;
+          }}
+          .stApp:has(.tr-chat-layout) .fd-bubble {{
+            top: 90px !important;
+            right: 72px !important;
+          }}
+          .stApp:has(.tr-chat-layout) .st-key-fd_panel {{
+            top: 138px !important;
+            right: 16px !important;
+          }}
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    with st.container(key="chat_topbar"):
+        brand_col, status_col, user_col, out_col = st.columns(
+            [1.15, 2.85, 1.05, 0.82],
+            gap="small",
+        )
+
+        with brand_col:
+            st.markdown(
+                """
+                <div class="tr-brand-profile">
+                  <div class="tr-brand-avatar">T</div>
+                  <div class="tr-brand-copy">
+                    <div class="tr-brand-name">Trinity</div>
+                    <div class="tr-brand-sub">Room Chat AI</div>
+                  </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+        with status_col:
+            st.markdown(
+                (
+                    '<div class="tr-assistant-pill">'
+                    f'<div class="tr-pill-icon">{mi(":material/support_agent:")}</div>'
+                    '<div class="tr-pill-copy">'
+                    f'<div class="tr-pill-title">{html.escape(mode_title)}</div>'
+                    f'<div class="tr-pill-sub">{html.escape(mode_hint)}</div>'
+                    '</div></div>'
+                ),
+                unsafe_allow_html=True,
+            )
+
+        with user_col:
+            st.markdown(
+                (
+                    '<div class="tr-user-pill">'
+                    f'<span class="tr-user-avatar">{initial}</span>'
+                    '<span class="tr-user-copy">'
+                    f'<b>{html.escape(_clip_text(display_name, 18))}</b>'
+                    f'<small>{html.escape(plan)}</small>'
+                    '</span>'
+                    '</div>'
+                ),
+                unsafe_allow_html=True,
+            )
+
+        with out_col:
+            if st.button(
+                ":material/logout:  Keluar",
+                key="top_logout",
+                use_container_width=True,
+            ):
+                st.session_state.logged_out = True
+                go("chat")
+
+
+def _render_chat_right_rail() -> None:
+    """Panel fitur kanan untuk chat utama.
+
+    Semua kontrol tetap memakai fitur yang sudah ada, tanpa gambar baru.
+    """
+    with st.container(key="chat_right_rail"):
+        st.markdown(
+            '<div class="tr-rail-title-row"><span>Fitur Cepat</span></div>',
+            unsafe_allow_html=True,
+        )
+
+        q1, q2 = st.columns(2, gap="small")
+
+        with q1:
+            with st.container(key="rail_quick_chat"):
+                if st.button(
+                    ":material/chat_bubble:  \n**Chat AI**  \n:gray[Tanya apa saja]",
+                    key="rail_btn_chat",
+                    use_container_width=True,
+                ):
+                    st.session_state.image_mode = False
+                    go("chat")
+
+            with st.container(key="rail_quick_image"):
+                if st.button(
+                    ":material/image:  \n**Generate Gambar**  \n:gray[Buat visual cepat]",
+                    key="rail_btn_image",
+                    use_container_width=True,
+                ):
+                    st.session_state.image_mode = True
+                    go("chat")
+
+        with q2:
+            with st.container(key="rail_quick_multi"):
+                if st.button(
+                    ":material/groups:  \n**Multi AI**  \n:gray[Room agent]",
+                    key="rail_btn_multi",
+                    use_container_width=True,
+                ):
+                    go("multi_agent")
+
+            with st.container(key="rail_quick_upload"):
+                if st.button(
+                    ":material/upload_file:  \n**Upload File**  \n:gray[Pakai tombol +]",
+                    key="rail_btn_upload",
+                    use_container_width=True,
+                ):
+                    st.toast(
+                        "Upload file tersedia lewat tombol + di kotak chat.",
+                        icon=":material/attach_file:",
+                    )
+
+        st.markdown(
+            '<div class="tr-rail-title-row with-link"><span>Model AI Populer</span>'
+            '<small>Pilih</small></div>',
+            unsafe_allow_html=True,
+        )
+
+        popular_models = [
+            m for m in MODEL_CATALOG
+            if m.get("chat_selectable", True) and not m.get("premium")
+        ][:4]
+
+        for m in popular_models:
+            row_key = f"rail_model_{m['key']}"
+            active = m.get("key") == st.session_state.get("selected_model_key")
+
+            with st.container(key=row_key):
+                if st.button(
+                    f"**{m['name']}**  \n:gray[{_clip_text(m.get('desc', ''), 36)}]",
+                    key=f"rail_btn_model_{m['key']}",
+                    use_container_width=True,
+                    type="primary" if active else "secondary",
+                ):
+                    st.session_state.selected_model_key = m["key"]
+                    st.toast(f"Model dipilih: {m['name']}", icon=":material/check_circle:")
+                    st.rerun()
+
+        st.markdown(
+            '<div class="tr-rail-title-row with-link"><span>Chat Terbaru</span>'
+            '<small>Riwayat</small></div>',
+            unsafe_allow_html=True,
+        )
+
+        convs = st.session_state.get("conversations", [])[:3]
+
+        if not convs:
+            st.markdown(
+                '<div class="tr-rail-empty">Belum ada chat terbaru.</div>',
+                unsafe_allow_html=True,
+            )
+
+        for c in convs:
+            title = _clip_text(c.get("title") or "Chat baru", 30)
+            meta = c.get("time") or c.get("updated") or "Terbaru"
+            cid = c.get("id")
+
+            with st.container(key=f"rail_recent_{cid}"):
+                if st.button(
+                    f":material/forum:  **{title}**  \n:gray[{_clip_text(str(meta), 28)}]",
+                    key=f"rail_btn_recent_{cid}",
+                    use_container_width=True,
+                ):
+                    open_conversation(cid)
+                    st.rerun()
 
 
 # ============================================================================
@@ -677,10 +913,12 @@ st.set_page_config(
 def render_chat_page() -> None:
     is_fresh = len(main_thread()) == 0
 
+    _render_chat_chrome(is_fresh)
+    _render_chat_right_rail()
+
     if is_fresh:
         # ---------- HALAMAN AWAL ala Claude ----------
-        st.markdown(_FRESH_BOTTOM_CSS, unsafe_allow_html=True)
-        st.markdown(
+        st.markdown(_FRESH_BOTTOM_CSS, unsafe_allow_html=True)        st.markdown(
             '<div class="trinity-greeting" style="margin-top:18vh;">'
             f'{logo_img_html("logo-greeting")} {get_greeting()}'
             "</div>",
