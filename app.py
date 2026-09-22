@@ -918,7 +918,8 @@ def render_chat_page() -> None:
 
     if is_fresh:
         # ---------- HALAMAN AWAL ala Claude ----------
-        st.markdown(_FRESH_BOTTOM_CSS, unsafe_allow_html=True)        st.markdown(
+        st.markdown(_FRESH_BOTTOM_CSS, unsafe_allow_html=True)        
+        st.markdown(
             '<div class="trinity-greeting" style="margin-top:18vh;">'
             f'{logo_img_html("logo-greeting")} {get_greeting()}'
             "</div>",
