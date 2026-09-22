@@ -3204,7 +3204,7 @@ button[class*="st-key-pel_pro"]::after {
     position: fixed !important;
     top: 16px !important;
     left: 252px !important;
-    right: 430px !important;
+    right: 500px !important;
     z-index: 999990 !important;
     margin: 0 !important;
     padding: 10px !important;
