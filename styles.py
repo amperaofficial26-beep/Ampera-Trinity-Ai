@@ -3737,6 +3737,228 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
         ) !important;
     }
 }
+/* ====================================================================
+   PATOKAN FINAL DASHBOARD CHAT
+   --------------------------------------------------------------------
+   Satu sumber ukuran untuk halaman chat:
+   - sidebar tetap terbuka, lebih sempit, dan tidak scroll
+   - panel kanan mentok ke atas dan sedikit lebih sempit
+   - topbar, sapaan, area chat, dan input berada di tengah ruang antara
+     sidebar kiri dan panel kanan
+==================================================================== */
+.stApp:has(.tr-chat-layout) {
+    --dash-sidebar: 210px;
+    --dash-rail: 260px;
+    --dash-gap: 18px;
+    --dash-top: 12px;
+    --dash-bottom: 16px;
+
+    --dash-center-left: calc(var(--dash-sidebar) + var(--dash-gap));
+    --dash-center-right: calc(var(--dash-rail) + var(--dash-gap));
+    --dash-center-width: calc(
+        100vw - var(--dash-center-left) - var(--dash-center-right)
+    );
+
+    --dash-content-width: min(760px, var(--dash-center-width));
+    --chat-width: min(44rem, var(--dash-center-width));
+    --chat-shift: calc((var(--dash-sidebar) - var(--dash-rail)) / 2);
+}
+
+/* Sidebar: fixed terbuka, lebih kecil, dan tidak bisa scroll. */
+.stApp:has(.tr-chat-layout) section[data-testid="stSidebar"],
+.stApp:has(.tr-chat-layout) section[data-testid="stSidebar"][aria-expanded="false"] {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    width: var(--dash-sidebar) !important;
+    min-width: var(--dash-sidebar) !important;
+    max-width: var(--dash-sidebar) !important;
+
+    transform: none !important;
+    margin-left: 0 !important;
+    overflow: hidden !important;
+}
+
+.stApp:has(.tr-chat-layout) section[data-testid="stSidebar"] > div,
+.stApp:has(.tr-chat-layout) section[data-testid="stSidebar"] [data-testid="stSidebarUserContent"],
+.stApp:has(.tr-chat-layout) section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
+    overflow: hidden !important;
+    max-height: 100vh !important;
+}
+
+.stApp:has(.tr-chat-layout) section[data-testid="stSidebar"] > div {
+    padding-left: 0.55rem !important;
+    padding-right: 0.55rem !important;
+}
+
+/* Tombol collapse/expand disembunyikan supaya sidebar tetap terbuka. */
+.stApp:has(.tr-chat-layout) [data-testid="stSidebarCollapseButton"],
+.stApp:has(.tr-chat-layout) [data-testid="stSidebarCollapsedControl"],
+.stApp:has(.tr-chat-layout) [data-testid="collapsedControl"],
+.stApp:has(.tr-chat-layout) [data-testid="stExpandSidebarButton"],
+.stApp:has(.tr-chat-layout) button[kind="headerNoPadding"] {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+.stApp:has(.tr-chat-layout) .sb-account {
+    width: var(--dash-sidebar) !important;
+    max-width: var(--dash-sidebar) !important;
+}
+
+.stApp:has(.tr-chat-layout) .sb-account .name {
+    max-width: 116px !important;
+}
+
+/* Panel kanan: mentok ke atas, sedikit lebih sempit. */
+.stApp:has(.tr-chat-layout) .st-key-chat_right_rail {
+    top: var(--dash-top) !important;
+    right: var(--dash-gap) !important;
+    bottom: var(--dash-bottom) !important;
+
+    width: var(--dash-rail) !important;
+    padding: 12px !important;
+}
+
+/* Topbar: dipatok tepat di ruang tengah antara sidebar dan panel kanan. */
+.stApp:has(.tr-chat-layout) .st-key-chat_topbar,
+.stApp:has(.tr-chat-layout):has(section[data-testid="stSidebar"][aria-expanded="false"]) .st-key-chat_topbar {
+    position: fixed !important;
+
+    top: var(--dash-top) !important;
+    left: var(--dash-center-left) !important;
+    right: var(--dash-center-right) !important;
+
+    width: auto !important;
+    max-width: none !important;
+    min-width: 0 !important;
+
+    margin: 0 !important;
+    padding: 5px 7px !important;
+
+    border-radius: calc(var(--tr-radius, 12px) + 8px) !important;
+}
+
+.stApp:has(.tr-chat-layout) .st-key-chat_topbar [data-testid="stHorizontalBlock"] {
+    gap: 7px !important;
+}
+
+.stApp:has(.tr-chat-layout) .tr-brand-profile,
+.stApp:has(.tr-chat-layout) .tr-assistant-pill,
+.stApp:has(.tr-chat-layout) .tr-user-pill {
+    min-height: 34px !important;
+}
+
+.stApp:has(.tr-chat-layout) .tr-brand-avatar {
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 9px !important;
+    font-size: .92rem !important;
+}
+
+.stApp:has(.tr-chat-layout) .tr-pill-icon {
+    width: 27px !important;
+    height: 27px !important;
+    border-radius: 9px !important;
+}
+
+.stApp:has(.tr-chat-layout) .tr-pill-icon .mi {
+    font-size: 16px !important;
+}
+
+.stApp:has(.tr-chat-layout) .tr-brand-name,
+.stApp:has(.tr-chat-layout) .tr-pill-title {
+    font-size: .8rem !important;
+    line-height: 1.1 !important;
+}
+
+.stApp:has(.tr-chat-layout) .tr-brand-sub,
+.stApp:has(.tr-chat-layout) .tr-pill-sub {
+    font-size: .62rem !important;
+    line-height: 1.1 !important;
+}
+
+.stApp:has(.tr-chat-layout) .tr-brand-copy,
+.stApp:has(.tr-chat-layout) .tr-pill-copy {
+    min-width: 0 !important;
+    overflow: hidden !important;
+}
+
+.stApp:has(.tr-chat-layout) .tr-brand-name,
+.stApp:has(.tr-chat-layout) .tr-brand-sub,
+.stApp:has(.tr-chat-layout) .tr-pill-title,
+.stApp:has(.tr-chat-layout) .tr-pill-sub {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+/* Area chat + judul sapaan: benar-benar berada di tengah ruang antar panel. */
+.stApp:has(.tr-chat-layout) [data-testid="stMainBlockContainer"],
+.stApp:has(.tr-chat-layout) [data-testid="stMainBlockContainer"]:has(.tr-chat-layout),
+.stApp:has(.tr-chat-layout) [data-testid="stMainBlockContainer"]:has(.tr-chat-layout.tr-fresh-home) {
+    max-width: none !important;
+    width: 100% !important;
+
+    padding-top: 74px !important;
+    padding-left: var(--dash-center-left) !important;
+    padding-right: var(--dash-center-right) !important;
+    padding-bottom: 10rem !important;
+}
+
+.stApp:has(.tr-chat-layout) [data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"],
+.stApp:has(.tr-chat-layout) [data-testid="stMainBlockContainer"]:has(.tr-chat-layout) > [data-testid="stVerticalBlock"] {
+    width: var(--dash-content-width) !important;
+    max-width: var(--dash-content-width) !important;
+
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+.stApp:has(.tr-chat-layout) .trinity-greeting {
+    text-align: center !important;
+}
+
+/* Input chat mengikuti pusat ruang antara sidebar dan panel kanan. */
+.stApp:has(.tr-chat-layout) [data-testid="stBottomBlockContainer"] {
+    width: var(--chat-width) !important;
+    max-width: var(--chat-width) !important;
+
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+/* Saat halaman awal, transform posisi vertikal ada di [data-testid="stBottom"].
+   Kartu input bagian dalam tidak perlu geser dua kali. */
+.stApp:has(.tr-chat-layout.tr-fresh-home) [data-testid="stBottomBlockContainer"] {
+    transform: translateX(0) !important;
+}
+
+/* Layar yang panel kanannya disembunyikan: pusat dihitung dari sidebar saja. */
+@media (max-width: 1180px) {
+    .stApp:has(.tr-chat-layout) {
+        --dash-rail: 0px;
+        --dash-center-right: var(--dash-gap);
+
+        --dash-content-width: min(
+            760px,
+            calc(100vw - var(--dash-center-left) - var(--dash-center-right))
+        );
+
+        --chat-width: min(
+            44rem,
+            calc(100vw - var(--dash-center-left) - var(--dash-center-right))
+        );
+
+        --chat-shift: calc(var(--dash-sidebar) / 2);
+    }
+
+    .stApp:has(.tr-chat-layout) .st-key-chat_right_rail {
+        display: none !important;
+    }
+}
 /* Aksesibilitas: matikan animasi bagi pengguna yang memintanya */
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
