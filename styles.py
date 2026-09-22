@@ -3747,8 +3747,8 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
      sidebar kiri dan panel kanan
 ==================================================================== */
 .stApp:has(.tr-chat-layout) {
-    --dash-sidebar: 210px;
-    --dash-rail: 290px;
+    --dash-sidebar: 220px;
+    --dash-rail: 250px;
     --dash-gap: 20px;
     --dash-top: 12px;
     --dash-bottom: 8px;
