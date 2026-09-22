@@ -3462,6 +3462,112 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
         max-width: 100% !important;
     }
 }
+/* Penyesuaian setelah uji tampilan:
+   - Topbar dibuat lebih kecil/ringan.
+   - Dock input chat mengikuti ruang kosong antara sidebar kiri dan panel kanan.
+   - Saat sidebar ditutup, dock otomatis bergeser lebih ke kiri supaya tidak
+     tertutup panel kanan. */
+.stApp:has(.tr-chat-layout) {
+    --chat-width: min(42rem, calc(100vw - 230px - 356px - 72px));
+    --chat-shift: -60px;
+}
+
+.stApp:has(.tr-chat-layout):has(section[data-testid="stSidebar"][aria-expanded="false"]) {
+    --chat-width: min(42rem, calc(100vw - 76px - 356px - 72px));
+    --chat-shift: -140px;
+}
+
+.stApp:has(.tr-chat-layout) [data-testid="stBottomBlockContainer"] {
+    width: var(--chat-width) !important;
+    max-width: var(--chat-width) !important;
+}
+
+/* Saat belum ada chat, [data-testid="stBottom"] juga memakai --chat-shift.
+   Hindari geser ganda dengan menetralkan transform di kartu dalamnya. */
+.stApp:has(.tr-chat-layout.tr-fresh-home) [data-testid="stBottomBlockContainer"] {
+    transform: translateX(0) !important;
+}
+
+.stApp:has(.tr-chat-layout) .st-key-chat_topbar {
+    top: 12px !important;
+    padding: 6px 8px !important;
+    border-radius: calc(var(--tr-radius, 12px) + 10px) !important;
+}
+
+.stApp:has(.tr-chat-layout) .tr-brand-profile,
+.stApp:has(.tr-chat-layout) .tr-assistant-pill,
+.stApp:has(.tr-chat-layout) .tr-user-pill {
+    min-height: 38px !important;
+}
+
+.stApp:has(.tr-chat-layout) .tr-brand-avatar {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 11px !important;
+    font-size: 1.05rem !important;
+}
+
+.stApp:has(.tr-chat-layout) .tr-pill-icon {
+    width: 30px !important;
+    height: 30px !important;
+    border-radius: 10px !important;
+}
+
+.stApp:has(.tr-chat-layout) .tr-pill-icon .mi {
+    font-size: 18px !important;
+}
+
+.stApp:has(.tr-chat-layout) .tr-brand-name,
+.stApp:has(.tr-chat-layout) .tr-pill-title {
+    font-size: .86rem !important;
+}
+
+.stApp:has(.tr-chat-layout) .tr-brand-sub,
+.stApp:has(.tr-chat-layout) .tr-pill-sub,
+.stApp:has(.tr-chat-layout) .tr-user-copy small {
+    font-size: .68rem !important;
+}
+
+.stApp:has(.tr-chat-layout) .tr-user-avatar {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: .74rem !important;
+}
+
+.stApp:has(.tr-chat-layout) .tr-user-copy b {
+    font-size: .78rem !important;
+}
+
+.stApp:has(.tr-chat-layout) .st-key-chat_topbar div.stButton > button {
+    min-height: 38px !important;
+    height: 38px !important;
+    padding: 4px 10px !important;
+    border-radius: calc(var(--tr-radius, 12px) + 5px) !important;
+}
+
+.stApp:has(.tr-chat-layout) .st-key-chat_right_rail {
+    top: 76px !important;
+}
+
+[data-testid="stMainBlockContainer"]:has(.tr-chat-layout) {
+    padding-top: 78px !important;
+}
+
+[data-testid="stMainBlockContainer"]:has(.tr-chat-layout.tr-fresh-home) {
+    padding-top: 70px !important;
+}
+
+@media (max-width: 1180px) {
+    .stApp:has(.tr-chat-layout) {
+        --chat-width: min(42rem, calc(100vw - 230px - 72px));
+        --chat-shift: 0px;
+    }
+
+    .stApp:has(.tr-chat-layout):has(section[data-testid="stSidebar"][aria-expanded="false"]) {
+        --chat-width: min(42rem, calc(100vw - 76px - 72px));
+        --chat-shift: 0px;
+    }
+}
 /* Aksesibilitas: matikan animasi bagi pengguna yang memintanya */
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
