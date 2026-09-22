@@ -3568,6 +3568,175 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
         --chat-shift: 0px;
     }
 }
+/* ================================================================
+   OVERRIDE KOLOM ATAS / TOPBAR CHAT
+   Tempel blok ini di bawah CSS topbar lama supaya aturan ini menang.
+================================================================ */
+
+/* Angka utama yang bisa kamu atur */
+.stApp:has(.tr-chat-layout) {
+    --topbar-left-open: 252px;      /* posisi kiri saat sidebar terbuka */
+    --topbar-left-closed: 76px;     /* posisi kiri saat sidebar tertutup */
+    --topbar-right-safe: 430px;     /* jarak aman dari panel kanan */
+    --topbar-max-width: 600px;      /* panjang maksimal kolom atas */
+}
+
+/* TOPBAR saat sidebar terbuka */
+.stApp:has(.tr-chat-layout) .st-key-chat_topbar {
+    position: fixed !important;
+
+    top: 10px !important;
+    left: var(--topbar-left-open) !important;
+    right: auto !important;
+
+    width: min(
+        var(--topbar-max-width),
+        calc(100vw - var(--topbar-left-open) - var(--topbar-right-safe))
+    ) !important;
+
+    max-width: calc(
+        100vw - var(--topbar-left-open) - var(--topbar-right-safe)
+    ) !important;
+
+    min-width: 0 !important;
+
+    padding: 4px 6px !important;
+    margin: 0 !important;
+
+    border-radius: calc(var(--tr-radius, 12px) + 8px) !important;
+
+    z-index: 999990 !important;
+}
+
+/* TOPBAR saat sidebar tertutup */
+.stApp:has(.tr-chat-layout):has(section[data-testid="stSidebar"][aria-expanded="false"])
+.st-key-chat_topbar {
+    left: var(--topbar-left-closed) !important;
+    right: auto !important;
+
+    width: min(
+        var(--topbar-max-width),
+        calc(100vw - var(--topbar-left-closed) - var(--topbar-right-safe))
+    ) !important;
+
+    max-width: calc(
+        100vw - var(--topbar-left-closed) - var(--topbar-right-safe)
+    ) !important;
+}
+
+/* Isi topbar: kolom dan jarak antar elemen */
+.stApp:has(.tr-chat-layout)
+.st-key-chat_topbar [data-testid="stHorizontalBlock"] {
+    align-items: center !important;
+    gap: 6px !important;
+}
+
+.stApp:has(.tr-chat-layout)
+.st-key-chat_topbar [data-testid="stColumn"] {
+    min-width: 0 !important;
+}
+
+.stApp:has(.tr-chat-layout)
+.st-key-chat_topbar .element-container,
+.stApp:has(.tr-chat-layout)
+.st-key-chat_topbar [data-testid="stMarkdownContainer"] {
+    margin: 0 !important;
+}
+
+/* Kartu kecil di dalam topbar */
+.stApp:has(.tr-chat-layout) .tr-brand-profile,
+.stApp:has(.tr-chat-layout) .tr-assistant-pill,
+.stApp:has(.tr-chat-layout) .tr-user-pill {
+    min-height: 32px !important;
+    border-radius: calc(var(--tr-radius, 12px) + 5px) !important;
+}
+
+/* Avatar Trinity */
+.stApp:has(.tr-chat-layout) .tr-brand-avatar {
+    width: 26px !important;
+    height: 26px !important;
+    border-radius: 9px !important;
+    font-size: .88rem !important;
+}
+
+/* Ikon AI Assistant */
+.stApp:has(.tr-chat-layout) .tr-pill-icon {
+    width: 25px !important;
+    height: 25px !important;
+    border-radius: 8px !important;
+}
+
+.stApp:has(.tr-chat-layout) .tr-pill-icon .mi {
+    font-size: 15px !important;
+}
+
+/* Judul di topbar */
+.stApp:has(.tr-chat-layout) .tr-brand-name,
+.stApp:has(.tr-chat-layout) .tr-pill-title {
+    font-size: .76rem !important;
+    line-height: 1.1 !important;
+}
+
+/* Subjudul di topbar */
+.stApp:has(.tr-chat-layout) .tr-brand-sub,
+.stApp:has(.tr-chat-layout) .tr-pill-sub,
+.stApp:has(.tr-chat-layout) .tr-user-copy small {
+    font-size: .58rem !important;
+    line-height: 1.1 !important;
+}
+
+/* Supaya teks panjang tidak membuat topbar melebar */
+.stApp:has(.tr-chat-layout) .tr-brand-copy,
+.stApp:has(.tr-chat-layout) .tr-pill-copy,
+.stApp:has(.tr-chat-layout) .tr-user-copy {
+    min-width: 0 !important;
+    overflow: hidden !important;
+}
+
+.stApp:has(.tr-chat-layout) .tr-brand-name,
+.stApp:has(.tr-chat-layout) .tr-brand-sub,
+.stApp:has(.tr-chat-layout) .tr-pill-title,
+.stApp:has(.tr-chat-layout) .tr-pill-sub {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+/* Kalau layar lebih kecil dan panel kanan disembunyikan */
+@media (max-width: 1180px) {
+    .stApp:has(.tr-chat-layout) {
+        --topbar-right-safe: 28px;
+        --topbar-max-width: 620px;
+    }
+
+    .stApp:has(.tr-chat-layout) .st-key-chat_topbar {
+        left: var(--topbar-left-open) !important;
+        right: auto !important;
+
+        width: min(
+            var(--topbar-max-width),
+            calc(100vw - var(--topbar-left-open) - var(--topbar-right-safe))
+        ) !important;
+
+        max-width: calc(
+            100vw - var(--topbar-left-open) - var(--topbar-right-safe)
+        ) !important;
+    }
+
+    .stApp:has(.tr-chat-layout):has(section[data-testid="stSidebar"][aria-expanded="false"])
+    .st-key-chat_topbar {
+        left: var(--topbar-left-closed) !important;
+
+        width: min(
+            var(--topbar-max-width),
+            calc(100vw - var(--topbar-left-closed) - var(--topbar-right-safe))
+        ) !important;
+
+        max-width: calc(
+            100vw - var(--topbar-left-closed) - var(--topbar-right-safe)
+        ) !important;
+    }
+}
 /* Aksesibilitas: matikan animasi bagi pengguna yang memintanya */
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
