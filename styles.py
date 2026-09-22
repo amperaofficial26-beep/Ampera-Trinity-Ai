@@ -3575,10 +3575,10 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
 
 /* Angka utama yang bisa kamu atur */
 .stApp:has(.tr-chat-layout) {
-    --topbar-left-open: 252px;      /* posisi kiri saat sidebar terbuka */
+    --topbar-left-open: 200px;      /* posisi kiri saat sidebar terbuka */
     --topbar-left-closed: 76px;     /* posisi kiri saat sidebar tertutup */
     --topbar-right-safe: 200px;     /* jarak aman dari panel kanan */
-    --topbar-max-width: 700px;      /* panjang maksimal kolom atas */
+    --topbar-max-width: 6500px;      /* panjang maksimal kolom atas */
 }
 
 /* TOPBAR saat sidebar terbuka */
@@ -3749,7 +3749,7 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
 .stApp:has(.tr-chat-layout) {
     --dash-sidebar: 220px;
     --dash-rail: 250px;
-    --dash-gap: 1px;
+    --dash-gap: 15px;
     --dash-top: 18px;
     --dash-bottom: 8px;
 
