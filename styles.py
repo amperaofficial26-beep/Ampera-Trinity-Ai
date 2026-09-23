@@ -4546,61 +4546,104 @@ button svg {
     box-shadow: none !important;
 }
 /* ================================================================
-   MIC — HILANGKAN SELURUH BACKGROUND
+   MIC BUTTON — TRANSPARAN TOTAL
    ================================================================ */
 
-[data-testid="stChatInputMicButton"] {
-    background: none !important;
+/* Tombol mic */
+[data-testid="stChatInputMicButton"],
+[data-testid="stChatInputMicButton"][aria-pressed="true"],
+[data-testid="stChatInputMicButton"][aria-pressed="false"] {
+    width: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    max-height: 34px !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    background: transparent !important;
     background-color: transparent !important;
     background-image: none !important;
-    border: none !important;
+
+    border: 0 !important;
     border-color: transparent !important;
     box-shadow: none !important;
     outline: none !important;
+
+    border-radius: 50% !important;
+
     appearance: none !important;
     -webkit-appearance: none !important;
+
     color: #4E4553 !important;
 }
 
-/* Semua kondisi tombol */
+/* Semua state */
 [data-testid="stChatInputMicButton"]:hover,
 [data-testid="stChatInputMicButton"]:focus,
 [data-testid="stChatInputMicButton"]:focus-visible,
 [data-testid="stChatInputMicButton"]:active {
-    background: none !important;
+    background: transparent !important;
     background-color: transparent !important;
     background-image: none !important;
-    border: none !important;
+
+    border: 0 !important;
     border-color: transparent !important;
+
     box-shadow: none !important;
     outline: none !important;
 }
 
-/* Hilangkan layer/background internal */
-[data-testid="stChatInputMicButton"]::before,
-[data-testid="stChatInputMicButton"]::after {
+/* Hilangkan background dari elemen di dalam tombol */
+[data-testid="stChatInputMicButton"] *,
+[data-testid="stChatInputMicButton"] svg,
+[data-testid="stChatInputMicButton"] path {
     background: transparent !important;
     background-color: transparent !important;
     background-image: none !important;
     box-shadow: none !important;
-    border: none !important;
 }
 
-/* Ikon sound wave tetap ada */
+/* Ikon waveform */
+[data-testid="stChatInputMicButton"] svg {
+    display: none !important;
+}
+
 [data-testid="stChatInputMicButton"]::before {
-    content: "graphic_eq";
-    font-family: "Material Symbols Rounded",
-                 "Material Symbols",
-                 "Material Icons",
-                 sans-serif !important;
+    content: "graphic_eq" !important;
+
+    font-family:
+        "Material Symbols Rounded",
+        "Material Symbols",
+        "Material Icons",
+        sans-serif !important;
+
     font-size: 20px !important;
     line-height: 1 !important;
+
     width: 20px !important;
     height: 20px !important;
+
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
+
+    background: transparent !important;
     color: #4E4553 !important;
+
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Pseudo-element lain jangan memberi warna */
+[data-testid="stChatInputMicButton"]::after {
+    content: "" !important;
+    display: none !important;
+
+    background: transparent !important;
+    box-shadow: none !important;
 }
 </style>
 """,
