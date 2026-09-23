@@ -912,22 +912,47 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     pointer-events: auto !important;
 }
 /* ================================================================
-   KOLOM KETIK
-   Menghapus kotak terpisah bawaan Streamlit.
+   CHAT INPUT — TINGGI TETAP SAAT YUKI BERPIKIR
    ================================================================ */
+
 [data-testid="stBottomBlockContainer"]
 [data-testid="stChatInput"] {
-    width: 100% !important;
+    position: relative !important;
 
-    padding:
-        4px
-        6px
-        2px !important;
+    width: 100% !important;
+    min-height: 52px !important;
+    height: 52px !important;
+
+    padding: 4px 6px !important;
+    margin: 0 !important;
+
+    box-sizing: border-box !important;
 
     background: transparent !important;
     border: none !important;
     border-radius: 0 !important;
     box-shadow: none !important;
+
+    overflow: visible !important;
+}
+
+/* Pastikan wrapper dalam input tidak ikut gepeng */
+[data-testid="stBottomBlockContainer"]
+[data-testid="stChatInput"] > div {
+    min-height: 44px !important;
+    height: 44px !important;
+
+    box-sizing: border-box !important;
+}
+
+/* Area textarea tetap punya tinggi */
+[data-testid="stBottomBlockContainer"]
+[data-testid="stChatInput"]
+textarea {
+    min-height: 42px !important;
+    height: 42px !important;
+
+    box-sizing: border-box !important;
 }
 
 
