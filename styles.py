@@ -5282,7 +5282,7 @@ button[data-testid="stPopoverButton"]
     display: none !important;
 }
 /* =========================================================
-   MODEL BUTTON — BESARKAN AGAR SEJAJAR DENGAN FILE & MIC
+   MODEL BUTTON — ICON ONLY
    ========================================================= */
 
 .st-key-chat_controls
@@ -5300,10 +5300,6 @@ button[data-testid="stPopoverButton"] {
     padding: 0 !important;
     margin: 0 !important;
 
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-
     background: transparent !important;
     background-color: transparent !important;
     background-image: none !important;
@@ -5316,12 +5312,22 @@ button[data-testid="stPopoverButton"] {
 }
 
 
-/* Wrapper tombol model */
+/* Sembunyikan PANAH expand_more */
 .st-key-chat_controls
 [data-testid="stHorizontalBlock"]
 > [data-testid="stColumn"]:nth-child(3)
 button[data-testid="stPopoverButton"]
-> div {
+[aria-hidden="true"] {
+    display: none !important;
+}
+
+
+/* Besarkan ikon psychology */
+.st-key-chat_controls
+[data-testid="stHorizontalBlock"]
+> [data-testid="stColumn"]:nth-child(3)
+button[data-testid="stPopoverButton"]
+[aria-hidden="false"] {
     width: 34px !important;
     height: 34px !important;
 
@@ -5329,11 +5335,10 @@ button[data-testid="stPopoverButton"]
     align-items: center !important;
     justify-content: center !important;
 
-    padding: 0 !important;
     margin: 0 !important;
+    padding: 0 !important;
 
     background: transparent !important;
-    box-shadow: none !important;
 }
 
 
@@ -5342,20 +5347,15 @@ button[data-testid="stPopoverButton"]
 [data-testid="stHorizontalBlock"]
 > [data-testid="stColumn"]:nth-child(3)
 button[data-testid="stPopoverButton"]
+[aria-hidden="false"]
 [data-testid="stIconMaterial"] {
     display: inline-flex !important;
 
     width: 22px !important;
     height: 22px !important;
 
-    min-width: 22px !important;
-    min-height: 22px !important;
-
     align-items: center !important;
     justify-content: center !important;
-
-    margin: 0 !important;
-    padding: 0 !important;
 
     font-size: 22px !important;
     line-height: 22px !important;
