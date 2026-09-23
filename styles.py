@@ -4060,155 +4060,38 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
         transition-duration: 0.001ms !important;
     }
 }
-/* ================================================================
-   FIX FINAL — CHAT INPUT BENAR-BENAR DI TENGAH AREA KERJA
-   ----------------------------------------------------------------
-   Pusat input dihitung dari:
-   SIDEBAR KIRI  ←→  PANEL KANAN
-   bukan dari seluruh layar.
-================================================================ */
+/* ============================================================
+   FIX CHAT INPUT — POSISI TENGAH AREA KERJA
+   ============================================================ */
 
-.stApp:has(.tr-chat-layout) {
-
-    /* posisi area kerja utama */
-    --chat-center-left: var(--dash-center-left);
-    --chat-center-right: var(--dash-center-right);
-
-    /* lebar input */
-    --chat-input-width: min(
-        720px,
-        calc(
-            100vw
-            - var(--chat-center-left)
-            - var(--chat-center-right)
-        )
-    );
-
-    /* selisih pusat area kerja terhadap pusat layar */
-    --chat-center-shift: calc(
-        (
-            var(--chat-center-left)
-            - var(--chat-center-right)
-        ) / 2
-    );
-}
-
-
-/* ------------------------------------------------
-   DOK BAWAH STREAMLIT
-   Jangan lagi menggeser horizontal dari sini.
------------------------------------------------- */
-
+/* Matikan pergeseran horizontal dari dok Streamlit */
 .stApp:has(.tr-chat-layout) [data-testid="stBottom"] {
-    transform: translateY(
-        calc(-1 * var(--chat-lift, 0px))
-    ) !important;
-
-    left: 0 !important;
-    right: 0 !important;
-
-    width: 100% !important;
-}
-
-
-/* ------------------------------------------------
-   CONTAINER CHAT INPUT
-   Ini yang menentukan posisi horizontal sebenarnya.
------------------------------------------------- */
-
-.stApp:has(.tr-chat-layout)
-[data-testid="stBottomBlockContainer"] {
-
-    width: var(--chat-input-width) !important;
-    max-width: var(--chat-input-width) !important;
-
-    margin-left: auto !important;
-    margin-right: auto !important;
-
-    position: relative !important;
-
-    /* pindahkan dari pusat layar
-       ke pusat area antara sidebar + panel kanan */
-    left: var(--chat-center-shift) !important;
-
-    box-sizing: border-box !important;
-}
-
-
-/* ------------------------------------------------
-   KOTAK CHAT INPUT
------------------------------------------------- */
-
-.stApp:has(.tr-chat-layout)
-[data-testid="stBottomBlockContainer"]
-[data-testid="stChatInput"] {
-
-    width: 100% !important;
-    max-width: 100% !important;
-
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-
-    box-sizing: border-box !important;
-}
-
-
-/* Semua lapisan internal ikut lebar parent */
-
-.stApp:has(.tr-chat-layout)
-[data-testid="stBottomBlockContainer"]
-[data-testid="stChatInput"] > div {
-
-    width: 100% !important;
-    max-width: 100% !important;
-
-    box-sizing: border-box !important;
-}
-
-
-/* ------------------------------------------------
-   HALAMAN AWAL
-   Pertahankan posisi vertikal yang sudah ada.
------------------------------------------------- */
-
-.stApp:has(.tr-chat-layout.tr-fresh-home)
-[data-testid="stBottom"] {
-
     transform: translateY(
         calc(-1 * var(--chat-lift-fresh, 26vh))
     ) !important;
 }
 
+/* Geser SELURUH kolom chat ke kiri */
+.stApp:has(.tr-chat-layout)
+[data-testid="stBottomBlockContainer"] {
+    position: relative !important;
 
-/* ------------------------------------------------
-   RESPONSIVE
------------------------------------------------- */
+    left: -68px !important;
 
-@media (max-width: 1180px) {
+    margin-left: auto !important;
+    margin-right: auto !important;
 
-    .stApp:has(.tr-chat-layout)
-    [data-testid="stBottomBlockContainer"] {
+    box-sizing: border-box !important;
+}
 
-        left: 0 !important;
-
-        width: min(
-            720px,
-            calc(
-                100vw
-                - var(--dash-center-left)
-                - var(--dash-center-right)
-            )
-        ) !important;
-
-        max-width: min(
-            720px,
-            calc(
-                100vw
-                - var(--dash-center-left)
-                - var(--dash-center-right)
-            )
-        ) !important;
-    }
+/* Pastikan kotak chat mengikuti lebar wrapper */
+.stApp:has(.tr-chat-layout)
+[data-testid="stBottomBlockContainer"]
+[data-testid="stChatInput"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
 }
 </style>
 """,
