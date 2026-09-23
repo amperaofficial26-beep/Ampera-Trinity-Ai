@@ -1103,7 +1103,7 @@ _BOTTOM_RESET_CSS = """
 #   atribut style="..." inline — lihat catatan di dalam fungsi.
 # ----------------------------------------------------------------------------
 FOOTER_SIZE_PX = 12        # ukuran teks footer (halaman awal)
-FOOTER_X_PX = 0            # geser mendatar: minus = kiri, plus = kanan (0 = tengah)
+FOOTER_X_PX = -155            # geser mendatar: minus = kiri, plus = kanan (0 = tengah)
 FOOTER_Y_PX = 0            # geser tegak   : minus = naik, plus = turun
 FOOTER_TOP_GAP = "24vh"    # jarak dari sapaan di atasnya. Sengaja besar (satuan
                            # vh) supaya footer turun mendekati bawah layar dan
