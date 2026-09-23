@@ -4424,7 +4424,7 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
        ========================= */
 
     /* Geser kiri/kanan judul */
-    --greeting-x: -155px;
+    --greeting-x: -175px;
 
     /* Geser atas/bawah judul */
     --greeting-y: 0px;
@@ -4435,7 +4435,7 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
        ========================= */
 
     /* Geser seluruh bubble percakapan kiri/kanan */
-    --conversation-x: -190px;
+    --conversation-x: -250px;
 
     /* Geser seluruh bubble percakapan atas/bawah */
     --conversation-y: 20px;
