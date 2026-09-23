@@ -3836,21 +3836,25 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
      sidebar kiri dan panel kanan
 ==================================================================== */
 .stApp:has(.tr-chat-layout) {
-    --dash-sidebar: 220px;
-    --dash-rail: 250px;
-    --dash-gap: 15px;
-    --dash-top: 18px;
-    --dash-bottom: 8px;
+    --dash-sidebar: 210px;
+    --dash-rail: 260px;
+    --dash-gap: 18px;
+    --dash-top: 12px;
+    --dash-bottom: 16px;
 
+    /*
+       Ruang tengah dihitung dengan jarak yang sama:
+       sidebar | gap | area tengah | gap | panel kanan | gap layar.
+       Karena panel kanan sendiri sudah punya right: --dash-gap, sisi kanan
+       area tengah perlu menyisakan: lebar panel + 2x gap.
+    */
     --dash-center-left: calc(var(--dash-sidebar) + var(--dash-gap));
-    --dash-center-right: calc(var(--dash-rail) + var(--dash-gap));
-    --dash-center-width: calc(
-        100vw - var(--dash-center-left) - var(--dash-center-right)
-    );
+    --dash-center-right: calc(var(--dash-rail) + var(--dash-gap) + var(--dash-gap));
+    --dash-center-width: calc(100vw - var(--dash-center-left) - var(--dash-center-right));
 
-    --dash-content-width: min(760px, var(--dash-center-width));
-    --chat-width: min(44rem, var(--dash-center-width));
-    --chat-shift: calc((var(--dash-sidebar) - var(--dash-rail)) / 2);
+    --dash-content-width: min(720px, var(--dash-center-width));
+    --chat-width: min(42rem, var(--dash-center-width));
+    --chat-shift: calc((var(--dash-center-left) - var(--dash-center-right)) / 2);
 }
 
 /* Sidebar: fixed terbuka, lebih kecil, dan tidak bisa scroll. */
