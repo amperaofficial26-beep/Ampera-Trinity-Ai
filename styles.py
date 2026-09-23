@@ -4721,16 +4721,18 @@ button[data-testid="stPopoverButton"]
    FILE / MODEL / MIC / SEND
    ================================================================ */
 
-/* ------------------------------------------------
-   1. FILE + MODEL
-   Semua tombol popover = 34 x 34
-   ------------------------------------------------ */
+/* ================================================================
+   FILE + MODEL — MENYATU DENGAN CHAT INPUT
+   Tidak ada lingkaran / background / border
+   ================================================================ */
 
 .st-key-chat_controls
 [data-testid="stPopover"] > button,
 
 .st-key-chat_controls
 button[data-testid="stPopoverButton"] {
+
+    /* ukuran area tombol */
     width: 34px !important;
     min-width: 34px !important;
     max-width: 34px !important;
@@ -4742,20 +4744,76 @@ button[data-testid="stPopoverButton"] {
     padding: 0 !important;
     margin: 0 !important;
 
+    /* posisi icon */
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
 
-    border-radius: 50% !important;
+    /* HILANGKAN LINGKARAN */
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+
+    border: none !important;
+    border-color: transparent !important;
+
+    box-shadow: none !important;
+    outline: none !important;
+
+    border-radius: 0 !important;
+
+    /* jangan ada transform bawaan */
+    transform: none !important;
 
     font-size: 0 !important;
 }
 
 
 /* ------------------------------------------------
-   2. ICON FILE + MODEL
-   Tepat 20 x 20
+   Semua state juga transparan
    ------------------------------------------------ */
+
+.st-key-chat_controls
+[data-testid="stPopover"] > button:hover,
+
+.st-key-chat_controls
+[data-testid="stPopover"] > button:focus,
+
+.st-key-chat_controls
+[data-testid="stPopover"] > button:focus-visible,
+
+.st-key-chat_controls
+[data-testid="stPopover"] > button:active,
+
+.st-key-chat_controls
+button[data-testid="stPopoverButton"]:hover,
+
+.st-key-chat_controls
+button[data-testid="stPopoverButton"]:focus,
+
+.st-key-chat_controls
+button[data-testid="stPopoverButton"]:focus-visible,
+
+.st-key-chat_controls
+button[data-testid="stPopoverButton"]:active {
+
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+
+    border: none !important;
+    border-color: transparent !important;
+
+    box-shadow: none !important;
+    outline: none !important;
+
+    transform: none !important;
+}
+
+
+/* ================================================================
+   ICON FILE + MODEL
+   ================================================================ */
 
 .st-key-chat_controls
 [data-testid="stPopover"] > button
@@ -4764,49 +4822,45 @@ button[data-testid="stPopoverButton"] {
 .st-key-chat_controls
 button[data-testid="stPopoverButton"]
 [data-testid="stIconMaterial"] {
+
     width: 20px !important;
     min-width: 20px !important;
+    max-width: 20px !important;
 
     height: 20px !important;
     min-height: 20px !important;
+    max-height: 20px !important;
 
-    font-size: 20px !important;
-    line-height: 20px !important;
+    padding: 0 !important;
+    margin: 0 !important;
 
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
 
-    padding: 0 !important;
-    margin: 0 !important;
+    font-size: 20px !important;
+    line-height: 20px !important;
+
+    background: transparent !important;
+    background-color: transparent !important;
+
+    border: none !important;
+    box-shadow: none !important;
+
+    transform: none !important;
 }
 
 
-/* ------------------------------------------------
-   3. HILANGKAN CHEVRON MODEL
-   Jangan sembunyikan Material Icon
-   ------------------------------------------------ */
+/* ================================================================
+   HILANGKAN expand_more
+   ================================================================ */
 
-.st-key-chat_controls
-[data-testid="stPopover"] > button > svg:last-child,
-
-.st-key-chat_controls
-button[data-testid="stPopoverButton"] > svg:last-child {
-    display: none !important;
-}
-
-
-/* Jika chevron berupa svg di dalam wrapper */
 .st-key-chat_controls
 [data-testid="stPopover"] > button
-svg:last-of-type,
+[data-testid="stIconMaterial"].e1vmumty0 {
 
-.st-key-chat_controls
-button[data-testid="stPopoverButton"]
-svg:last-of-type {
     display: none !important;
 }
-
 
 /* ------------------------------------------------
    4. MIC
