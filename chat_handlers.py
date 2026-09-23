@@ -660,24 +660,29 @@ def chat_input_atau_hentikan(placeholder: str, **kwargs):
     kotak kirim kembali seperti biasa.
     """
     if stream_yuki_aktif():
+        # Tombol MUNGIL di tengah area input (pengganti kotak ketik
+        # selama Yuki menjawab): tidak melebar penuh lagi, dan font +
+        # padding-nya dirampingkan lewat _STOP_BTN_CSS.
         st.markdown(_STOP_BTN_CSS, unsafe_allow_html=True)
-    
-        with st.container(key="yuki_thinking_input"):
-            _kiri, _tombol, _kanan = st.columns([1, 0.8, 1])
-    
-            with _tombol:
-                if st.button(
-                    ":material/stop_circle:  Hentikan",
-                    key="yuki_stop_dok",
-                ):
-                    stop = st.session_state.get("_yuki_stop")
-                    if stop:
-                        stop.set()
-    
-                    stream_state = st.session_state.get("_yuki_stream")
-                    if stream_state is not None:
-                        stream_state["hentikan"] = True
-    
+        _kiri, _tombol, _kanan = st.columns([1, 0.8, 1])
+        with _tombol:
+            if st.button(":material/stop_circle:  Hentikan",
+                         key="yuki_stop_dok"):
+                # Hanya KIRIM PERINTAH berhenti — TIDAK memanggil
+                # st.rerun dan TIDAK membersihkan state di sini (dulu
+                # rerun dari dalam kotak bawah ini bikin catatan
+                # penghentian tidak muncul pas tombol ditekan).
+                # Finalisasi — simpan potongan teks + tulis catatan
+                # "anda menghentikan respon yuki..." + muat ulang —
+                # dikerjakan fragmen_jawaban_yuki() yang dipanggil
+                # halaman tepat setelah kotak input, di run yang sama
+                # dengan kliknya.
+                stop = st.session_state.get("_yuki_stop")
+                if stop:
+                    stop.set()
+                stream_state = st.session_state.get("_yuki_stream")
+                if stream_state is not None:
+                    stream_state["hentikan"] = True
         return None
     return st.chat_input(placeholder, **kwargs)
 
