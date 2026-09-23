@@ -873,39 +873,61 @@ textarea::placeholder {
 
 
 /* ================================================================
-   BARIS TOMBOL + DAN NAMA MODEL
-   Tetap berada di dalam kartu chat yang sama.
+   KONTROL CHAT — OVERLAY DI DALAM BARIS INPUT
    ================================================================ */
-.st-key-chat_controls {
-    position: relative !important;
 
-    width: 100% !important;
+.st-key-chat_controls {
+    position: absolute !important;
+
+    right: 12px !important;
+    bottom: 9px !important;
+
+    width: auto !important;
 
     margin: 0 !important;
+    padding: 0 !important;
 
-    padding:
-        3px
-        5px
-        2px !important;
+    z-index: 20 !important;
 
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
+
+    pointer-events: auto !important;
 }
 
-
-/* Susunan horizontal tombol. */
+/* Baris tombol tetap horizontal */
 .st-key-chat_controls
 [data-testid="stHorizontalBlock"] {
-    width: 100% !important;
+    width: auto !important;
+
+    display: flex !important;
 
     align-items: center !important;
 
-    gap: 4px !important;
+    gap: 6px !important;
 
     flex-wrap: nowrap !important;
 }
+/* ================================================================
+   HILANGKAN RUANG VERTIKAL BEKAS CHAT CONTROLS
+   ================================================================ */
 
+.st-key-chat_controls
+[data-testid="stHorizontalBlock"] {
+    margin: 0 !important;
+}
+
+.st-key-chat_controls
+[data-testid="stColumn"] {
+    padding: 0 !important;
+}
+
+.st-key-chat_controls
+.element-container {
+    margin: 0 !important;
+    padding: 0 !important;
+}
 
 /* Kolom tombol dibuat seramping isinya. */
 .st-key-chat_controls
