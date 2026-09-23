@@ -5342,23 +5342,25 @@ button[data-testid="stPopoverButton"]
 }
 
 
-/* Ikon psychology */
+/* ICON PSYCHOLOGY — BESARKAN */
 .st-key-chat_controls
 [data-testid="stHorizontalBlock"]
 > [data-testid="stColumn"]:nth-child(3)
 button[data-testid="stPopoverButton"]
-[aria-hidden="false"]
-[data-testid="stIconMaterial"] {
+span[role="img"] {
+    width: 24px !important;
+    height: 24px !important;
+
     display: inline-flex !important;
-
-    width: 22px !important;
-    height: 22px !important;
-
     align-items: center !important;
     justify-content: center !important;
 
-    font-size: 22px !important;
-    line-height: 22px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+
+    font-family: "Material Symbols Rounded" !important;
+    font-size: 24px !important;
+    line-height: 24px !important;
 
     color: #4E4553 !important;
 }
