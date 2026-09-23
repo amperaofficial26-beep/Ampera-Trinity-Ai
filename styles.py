@@ -4655,11 +4655,11 @@ button[data-testid="stChatInputMicButton"]::after {
     content: none !important;
 }
 /* ================================================================
-   MODEL POPOVER — HILANGKAN expand_more
+   MODEL POPOVER — REMOVE CHEVRON
    ================================================================ */
 
-/* Target span yang berisi "expand_more" */
 .st-key-chat_controls
+[data-testid="stPopover"] button
 [data-testid="stIconMaterial"].e1vmumty0 {
     display: none !important;
 }
