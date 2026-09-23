@@ -5367,26 +5367,6 @@ span[role="img"] {
 .st-key-chat_controls
 [data-testid="stHorizontalBlock"]
 > [data-testid="stColumn"]:nth-child(1)
-button[data-testid="stPopoverButton"] {
-    background: #F2EEF4 !important;
-    background-color: #F2EEF4 !important;
-    border: 1px solid rgba(78, 69, 83, 0.12) !important;
-    border-radius: 9px !important;
-    box-shadow: none !important;
-}
-.st-key-chat_controls
-[data-testid="stHorizontalBlock"]
-> [data-testid="stColumn"]:nth-child(3)
-button[data-testid="stPopoverButton"] {
-    background: #F2EEF4 !important;
-    background-color: #F2EEF4 !important;
-    border: 1px solid rgba(78, 69, 83, 0.12) !important;
-    border-radius: 9px !important;
-    box-shadow: none !important;
-}
-.st-key-chat_controls
-[data-testid="stHorizontalBlock"]
-> [data-testid="stColumn"]:nth-child(1)
 button[data-testid="stPopoverButton"]:hover,
 
 .st-key-chat_controls
