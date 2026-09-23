@@ -4424,7 +4424,7 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
        ========================= */
 
     /* Geser kiri/kanan judul */
-    --greeting-x: -175px;
+    --greeting-x: -200px;
 
     /* Geser atas/bawah judul */
     --greeting-y: 0px;
