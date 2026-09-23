@@ -1043,7 +1043,7 @@ def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> Non
 
     with ctrl_plus:
         with st.container(key=f"{kp}plus_menu"):
-            with st.popover(":material/add:", use_container_width=False,
+            with st.popover(":material/attach_file:", use_container_width=False,
                             help="Unggah file atau gambar"):
                 gen = st.session_state.get("plus_uploader_gen", 0)
 
@@ -1156,7 +1156,7 @@ def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> Non
         current_key = st.session_state.selected_model_key
         current_model = MODEL_BY_KEY.get(current_key, MODEL_BY_KEY[DEFAULT_MODEL_KEY])
         current_name = current_model["name"]
-        with st.popover(current_name, use_container_width=False):
+        with st.popover(":material/psychology:", use_container_width=False, help="Pilih model AI",):
             # Tampilan "DNA DOUBLE HELIX" (model_dna.py):
             # heliks DNA beranimasi di atas, daftar model = anak tangga DNA.
             st.markdown(DNA_CSS, unsafe_allow_html=True)
