@@ -5338,7 +5338,7 @@ button[data-testid="stPopoverButton"]
     display: none !important;
 }
 /* =========================================================
-   GLOBAL FONT — SERIF ITALIC
+   GLOBAL FONT — SPACE GROTESK
    ========================================================= */
 
 html,
@@ -5346,19 +5346,14 @@ body,
 .stApp,
 .stApp * {
     font-family:
-        "Source Serif 4",
-        Georgia,
-        "Times New Roman",
-        serif !important;
+        "Space Grotesk",
+        sans-serif !important;
 
-    font-style: italic !important;
+    font-style: normal !important;
 }
 
 
-/* =========================================================
-   MATERIAL ICON — TETAP NORMAL
-   ========================================================= */
-
+/* Material Icons tetap menggunakan font ikonnya */
 [data-testid="stIconMaterial"],
 span[role="img"],
 [class*="material-symbols"],
@@ -5370,39 +5365,6 @@ span[role="img"],
         sans-serif !important;
 
     font-style: normal !important;
-}
-
-
-/* =========================================================
-   INPUT CHAT
-   ========================================================= */
-
-[data-testid="stChatInput"] textarea {
-    font-family:
-        "Source Serif 4",
-        Georgia,
-        "Times New Roman",
-        serif !important;
-
-    font-style: italic !important;
-}
-
-
-/* =========================================================
-   BUTTON
-   ========================================================= */
-
-button,
-input,
-textarea,
-select {
-    font-family:
-        "Source Serif 4",
-        Georgia,
-        "Times New Roman",
-        serif !important;
-
-    font-style: italic !important;
 }
 </style>
 """,
