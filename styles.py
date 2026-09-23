@@ -4118,7 +4118,7 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
        ========================= */
 
     /* Geser seluruh bubble percakapan kiri/kanan */
-    --conversation-x: -150px;
+    --conversation-x: -170px;
 
     /* Geser seluruh bubble percakapan atas/bawah */
     --conversation-y: 0px;
