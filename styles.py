@@ -5369,6 +5369,61 @@ span[role="img"],
 
     font-style: normal !important;
 }
+/* =========================================================
+   YUKI THINKING INPUT — SAMAKAN TINGGI DENGAN CHAT INPUT
+   ========================================================= */
+
+.st-key-yuki_thinking_input {
+    min-height: 42px !important;
+    height: 42px !important;
+    max-height: 42px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+}
+
+.st-key-yuki_thinking_input
+[data-testid="stHorizontalBlock"] {
+    min-height: 42px !important;
+    height: 42px !important;
+    max-height: 42px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.st-key-yuki_thinking_input
+[data-testid="stColumn"] {
+    min-height: 42px !important;
+    height: 42px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.st-key-yuki_thinking_input
+.st-key-yuki_stop_dok {
+    height: 30px !important;
+    min-height: 30px !important;
+    max-height: 30px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
 </style>
 """,
         unsafe_allow_html=True,
