@@ -858,7 +858,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     position: absolute !important;
 
     left: 8px !important;
-    bottom: 0 !important;
+    bottom: -3px !important;
 
     width: 36px !important;
     min-width: 36px !important;
@@ -901,7 +901,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     position: absolute !important;
 
     right: 112px !important;
-    bottom: 0 !important;
+    bottom: -3px !important;
 
     width: auto !important;
     min-width: 0 !important;
