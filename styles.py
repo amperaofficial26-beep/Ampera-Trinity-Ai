@@ -4165,25 +4165,24 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
 /* ============================================================
    KONTROL POSISI FOOTER
    ------------------------------------------------------------
-   Khusus untuk footer aplikasi.
    Tidak mengubah judul, percakapan, atau kolom chat.
    ============================================================ */
 
 .stApp:has(.tr-chat-layout) {
 
-    /* Geser footer ke kiri/kanan */
-    --footer-x: -160px;
+    /* Geser footer ke kiri / kanan */
+    --footer-x: -165px;
 
-    /* Geser footer ke atas/bawah */
+    /* Geser footer ke atas / bawah */
     --footer-y: 0px;
 
-    /* Lebar footer */
-    --footer-width: 100%;
+    /* Lebar maksimum footer */
+    --footer-width: 720px;
 }
 
 
 /* ============================================================
-   FOOTER
+   FOOTER UTAMA
    ============================================================ */
 
 .stApp:has(.tr-chat-layout) footer {
@@ -4197,6 +4196,18 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
 
     margin-left: auto !important;
     margin-right: auto !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* ============================================================
+   FOOTER BAWAAN STREAMLIT
+   ============================================================ */
+
+.stApp:has(.tr-chat-layout) [data-testid="stBottom"] footer {
+    left: var(--footer-x) !important;
+    top: var(--footer-y) !important;
 }
 </style>
 """,
