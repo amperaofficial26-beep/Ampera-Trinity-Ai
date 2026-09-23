@@ -1337,6 +1337,19 @@ button:disabled {
     color: #4E4553 !important;
 }
 /* ================================================================
+   MIC — TANPA WARNA TOMBOL
+   ================================================================ */
+
+[data-testid="stChatInput"]
+[data-testid="stChatInputMicButton"] {
+
+    background: transparent !important;
+    background-color: transparent !important;
+
+    border: none !important;
+    box-shadow: none !important;
+}
+/* ================================================================
    CHAT INPUT — IKON KIRIM
    ================================================================ */
 
