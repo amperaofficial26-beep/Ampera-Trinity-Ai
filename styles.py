@@ -873,13 +873,14 @@ textarea::placeholder {
 
 
 /* ================================================================
-   KONTROL CHAT — OVERLAY DI DALAM BARIS INPUT
+   KONTROL CHAT — OVERLAY COMPACT
+   Diposisikan sebelum kontrol bawaan mic + kirim.
    ================================================================ */
 
 .st-key-chat_controls {
     position: absolute !important;
 
-    right: 12px !important;
+    right: 130px !important;
     bottom: 9px !important;
 
     width: auto !important;
