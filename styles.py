@@ -5281,6 +5281,87 @@ button[data-testid="stPopoverButton"]
 [data-testid="stIconMaterial"] {
     display: none !important;
 }
+/* =========================================================
+   MODEL BUTTON — BESARKAN AGAR SEJAJAR DENGAN FILE & MIC
+   ========================================================= */
+
+.st-key-chat_controls
+[data-testid="stHorizontalBlock"]
+> [data-testid="stColumn"]:nth-child(3)
+button[data-testid="stPopoverButton"] {
+    width: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+
+    height: 34px !important;
+    min-height: 34px !important;
+    max-height: 34px !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+
+    border-radius: 0 !important;
+}
+
+
+/* Wrapper tombol model */
+.st-key-chat_controls
+[data-testid="stHorizontalBlock"]
+> [data-testid="stColumn"]:nth-child(3)
+button[data-testid="stPopoverButton"]
+> div {
+    width: 34px !important;
+    height: 34px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+
+/* Ikon psychology */
+.st-key-chat_controls
+[data-testid="stHorizontalBlock"]
+> [data-testid="stColumn"]:nth-child(3)
+button[data-testid="stPopoverButton"]
+[data-testid="stIconMaterial"] {
+    display: inline-flex !important;
+
+    width: 22px !important;
+    height: 22px !important;
+
+    min-width: 22px !important;
+    min-height: 22px !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    font-size: 22px !important;
+    line-height: 22px !important;
+
+    color: #4E4553 !important;
+}
 </style>
 """,
         unsafe_allow_html=True,
