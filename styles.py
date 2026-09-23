@@ -997,7 +997,7 @@ textarea::placeholder {
     left: 0 !important;
     right: 0 !important;
 
-    bottom: 30px !important;
+    bottom: 25px !important;
 
     width: 100% !important;
 
