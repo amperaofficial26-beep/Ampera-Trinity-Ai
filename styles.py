@@ -8,7 +8,7 @@ import streamlit as st
 
 
 def inject_css() -> None:
-    st.markdown(
+    st.markdown()
         """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
@@ -4107,7 +4107,7 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
        ========================= */
 
     /* Geser kiri/kanan judul */
-    --greeting-x: 0px;
+    --greeting-x: -150px;
 
     /* Geser atas/bawah judul */
     --greeting-y: 0px;
