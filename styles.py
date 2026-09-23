@@ -704,43 +704,30 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 .claude-think .logo-shimmer { color: #2C1F33; }
 
 /* ================================================================
-   KARTU CHAT GABUNGAN
-   Kolom teks, tombol +, dan nama model menjadi satu kartu.
+   KARTU CHAT GABUNGAN — COMPACT HORIZONTAL
+   Bentuk mengikuti referensi: satu pill horizontal,
+   lebih tipis dan seluruh kontrol berada dalam satu baris.
    ================================================================ */
+
 [data-testid="stBottomBlockContainer"] {
     position: relative !important;
 
     display: flex !important;
     flex-direction: column !important;
 
-    width: min(760px, calc(100vw - 24px)) !important;
+    width: min(720px, calc(100vw - 32px)) !important;
+    max-width: 720px !important;
 
     margin-left: auto !important;
     margin-right: auto !important;
 
-    padding:
-        8px
-        8px
-        6px !important;
+    padding: 6px 8px !important;
 
-    background:
-        linear-gradient(
-            145deg,
-            rgba(248, 239, 222, 0.98),
-            rgba(239, 225, 202, 0.98)
-        ) !important;
-
-    border:
-        1px solid
-        rgba(159, 126, 72, 0.38) !important;
-
-    border-radius: 22px !important;
-
-    box-shadow:
-        0 8px 24px rgba(65, 46, 27, 0.12),
-        inset 0 1px 0 rgba(255, 255, 255, 0.78) !important;
+    border-radius: 999px !important;
 
     overflow: visible !important;
+
+    box-sizing: border-box !important;
 
     transition:
         border-color 0.2s ease,
@@ -4174,6 +4161,71 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
 
     left: var(--conversation-x) !important;
     top: var(--conversation-y) !important;
+}
+/* ================================================================
+   CHAT INPUT — CONTROL BAR COMPACT
+   Semua kontrol tetap satu baris dan tidak membuat kartu membesar.
+   ================================================================ */
+
+.st-key-chat_controls {
+    width: auto !important;
+
+    margin: 0 !important;
+
+    padding:
+        0
+        2px !important;
+
+    background: transparent !important;
+}
+
+.st-key-chat_controls
+[data-testid="stHorizontalBlock"] {
+    width: auto !important;
+
+    align-items: center !important;
+
+    gap: 6px !important;
+
+    flex-wrap: nowrap !important;
+}
+
+.st-key-chat_controls
+[data-testid="stColumn"] {
+    min-width: 0 !important;
+}
+
+/* Tombol compact */
+.st-key-chat_controls
+[data-testid="stPopover"] button,
+
+.st-key-chat_controls
+button[data-testid="stPopoverButton"],
+
+.st-key-chat_controls
+button[data-testid="stBaseButton-secondary"] {
+    width: 34px !important;
+    min-width: 34px !important;
+
+    height: 34px !important;
+    min-height: 34px !important;
+
+    padding: 0 !important;
+
+    border-radius: 50% !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    flex-shrink: 0 !important;
+}
+
+/* Ikon di tombol */
+.st-key-chat_controls
+button svg {
+    width: 18px !important;
+    height: 18px !important;
 }
 </style>
 """,
