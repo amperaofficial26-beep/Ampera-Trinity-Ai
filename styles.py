@@ -4162,31 +4162,6 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
     left: var(--conversation-x) !important;
     top: var(--conversation-y) !important;
 }
-/* ============================================================
-   KONTROL POSISI FOOTER SAPAAN
-   ------------------------------------------------------------
-   Khusus untuk:
-   © 2026 Ampera Trinity AI · by Ampera Official
-   Tidak mengubah judul, percakapan, atau kolom chat.
-   ============================================================ */
-
-.stApp:has(.tr-chat-layout) {
-
-    /* Geser footer kiri / kanan */
-    --footer-greeting-x: -160px;
-
-    /* Geser footer atas / bawah */
-    --footer-greeting-y: 0px;
-}
-
-
-/* FOOTER SAPAAN */
-.stApp:has(.tr-chat-layout) .greeting-footer {
-    position: relative !important;
-
-    left: var(--footer-greeting-x) !important;
-    top: var(--footer-greeting-y) !important;
-}
 </style>
 """,
         unsafe_allow_html=True,
