@@ -4365,35 +4365,14 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
     }
 }
 /* ============================================================
-   FIX CHAT INPUT — POSISI TENGAH AREA KERJA
+   POSISI HORIZONTAL CHAT INPUT
    ============================================================ */
 
-/* Kontrol animasi posisi vertikal chat input */
-.stApp:has(.tr-chat-layout) [data-testid="stBottom"] {
-    transition: transform 0.45s ease-in-out !important;
-}
-
-/* Saat halaman masih fresh */
-.stApp:has(.tr-chat-layout.tr-fresh-home)
-[data-testid="stBottom"] {
-    transform: translateY(
-        calc(-1 * var(--chat-lift-fresh, 26vh))
-    ) !important;
-}
-
-/* Setelah chat sudah dimulai */
-.stApp:has(.tr-chat-layout:not(.tr-fresh-home))
-[data-testid="stBottom"] {
-    transform: translateY(
-        calc(-1 * var(--chat-lift, 32px))
-    ) !important;
-}
-/* Geser SELURUH kolom chat ke kiri */
 .stApp:has(.tr-chat-layout)
 [data-testid="stBottomBlockContainer"] {
     position: relative !important;
 
-    left: -140px !important;
+    left: -90px !important;
 
     margin-left: auto !important;
     margin-right: auto !important;
@@ -4401,7 +4380,6 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
     box-sizing: border-box !important;
 }
 
-/* Pastikan kotak chat mengikuti lebar wrapper */
 .stApp:has(.tr-chat-layout)
 [data-testid="stBottomBlockContainer"]
 [data-testid="stChatInput"] {
