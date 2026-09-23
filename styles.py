@@ -5065,6 +5065,99 @@ button[type="submit"]:hover {
 
     transform: none !important;
 }
+/* ================================================================
+   FILE BUTTON — HILANGKAN LINGKARAN
+   ================================================================ */
+
+/* File = popover pertama */
+.st-key-chat_controls
+[data-testid="stHorizontalBlock"]
+> [data-testid="stColumn"]:nth-child(1)
+[data-testid="stPopover"] > button {
+
+    width: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+
+    height: 34px !important;
+    min-height: 34px !important;
+    max-height: 34px !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+
+    border: none !important;
+    border-color: transparent !important;
+
+    box-shadow: none !important;
+    outline: none !important;
+
+    border-radius: 0 !important;
+
+    transform: none !important;
+}
+
+
+/* Semua state */
+.st-key-chat_controls
+[data-testid="stHorizontalBlock"]
+> [data-testid="stColumn"]:nth-child(1)
+[data-testid="stPopover"] > button:hover,
+
+.st-key-chat_controls
+[data-testid="stHorizontalBlock"]
+> [data-testid="stColumn"]:nth-child(1)
+[data-testid="stPopover"] > button:focus,
+
+.st-key-chat_controls
+[data-testid="stHorizontalBlock"]
+> [data-testid="stColumn"]:nth-child(1)
+[data-testid="stPopover"] > button:active {
+
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+
+/* Icon attach_file */
+.st-key-chat_controls
+[data-testid="stHorizontalBlock"]
+> [data-testid="stColumn"]:nth-child(1)
+[data-testid="stPopover"] > button
+[data-testid="stIconMaterial"] {
+
+    width: 20px !important;
+    height: 20px !important;
+
+    min-width: 20px !important;
+    min-height: 20px !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    font-size: 20px !important;
+    line-height: 20px !important;
+
+    background: transparent !important;
+    box-shadow: none !important;
+}
 </style>
 """,
         unsafe_allow_html=True,
