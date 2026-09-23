@@ -5337,6 +5337,73 @@ button[data-testid="stPopoverButton"]
 [aria-hidden="true"] {
     display: none !important;
 }
+/* =========================================================
+   GLOBAL FONT — SERIF ITALIC
+   ========================================================= */
+
+html,
+body,
+.stApp,
+.stApp * {
+    font-family:
+        "Source Serif 4",
+        Georgia,
+        "Times New Roman",
+        serif !important;
+
+    font-style: italic !important;
+}
+
+
+/* =========================================================
+   MATERIAL ICON — TETAP NORMAL
+   ========================================================= */
+
+[data-testid="stIconMaterial"],
+span[role="img"],
+[class*="material-symbols"],
+[class*="material-icons"] {
+    font-family:
+        "Material Symbols Rounded",
+        "Material Symbols",
+        "Material Icons",
+        sans-serif !important;
+
+    font-style: normal !important;
+}
+
+
+/* =========================================================
+   INPUT CHAT
+   ========================================================= */
+
+[data-testid="stChatInput"] textarea {
+    font-family:
+        "Source Serif 4",
+        Georgia,
+        "Times New Roman",
+        serif !important;
+
+    font-style: italic !important;
+}
+
+
+/* =========================================================
+   BUTTON
+   ========================================================= */
+
+button,
+input,
+textarea,
+select {
+    font-family:
+        "Source Serif 4",
+        Georgia,
+        "Times New Roman",
+        serif !important;
+
+    font-style: italic !important;
+}
 </style>
 """,
         unsafe_allow_html=True,
