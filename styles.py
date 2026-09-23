@@ -1381,19 +1381,48 @@ button[type="submit"] svg {
 }
 
 
-/* Pesawat kertas */
+/* ================================================================
+   SEND BUTTON — PAPER PLANE
+   ================================================================ */
+
+[data-testid="stChatInput"]
+button[type="submit"] {
+    width: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+
+    height: 34px !important;
+    min-height: 34px !important;
+    max-height: 34px !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    position: relative !important;
+}
+
+/* Sembunyikan icon bawaan Streamlit */
+[data-testid="stChatInput"]
+button[type="submit"] svg {
+    display: none !important;
+}
+
+/* PAPER PLANE */
 [data-testid="stChatInput"]
 button[type="submit"]::before {
+    content: "send" !important;
 
-    content: "send";
-
-    font-family: "Material Symbols Rounded",
-                 "Material Symbols",
-                 "Material Icons",
-                 sans-serif !important;
+    font-family:
+        "Material Symbols Rounded",
+        "Material Symbols",
+        "Material Icons",
+        sans-serif !important;
 
     font-size: 20px !important;
-
     line-height: 1 !important;
 
     width: 20px !important;
@@ -1403,9 +1432,16 @@ button[type="submit"]::before {
     align-items: center !important;
     justify-content: center !important;
 
-    font-weight: normal !important;
+    margin: 0 !important;
+    padding: 0 !important;
 
     color: #4E4553 !important;
+
+    font-variation-settings:
+        "FILL" 0,
+        "wght" 400,
+        "GRAD" 0,
+        "opsz" 20 !important;
 }
 [data-testid="stChatInput"] [data-testid="stChatInputMicButton"]:hover {
     border-color: #2C1F33 !important;
@@ -4666,6 +4702,72 @@ button[data-testid="stChatInputMicButton"]::before {
 button[data-testid="stChatInputMicButton"]::after {
     display: none !important;
     content: none !important;
+}
+/* ================================================================
+   MODEL POPOVER — HILANGKAN CHEVRON / PANAH BAWAH
+   ================================================================ */
+
+.st-key-chat_controls
+[data-testid="stPopover"] > button svg {
+    display: none !important;
+}
+
+.st-key-chat_controls
+button[data-testid="stPopoverButton"] svg {
+    display: none !important;
+}
+/* ================================================================
+   SEMUA ICON CONTROL — UKURAN SAMA
+   ================================================================ */
+
+/* FILE + MODEL */
+.st-key-chat_controls
+[data-testid="stPopover"] > button,
+.st-key-chat_controls
+button[data-testid="stPopoverButton"] {
+    width: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+
+    height: 34px !important;
+    min-height: 34px !important;
+    max-height: 34px !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    border-radius: 50% !important;
+}
+
+/* ICON MATERIAL DI DALAMNYA */
+.st-key-chat_controls
+[data-testid="stPopover"] > button
+[data-testid="stIconMaterial"],
+
+.st-key-chat_controls
+button[data-testid="stPopoverButton"]
+[data-testid="stIconMaterial"] {
+    width: 20px !important;
+    min-width: 20px !important;
+    max-width: 20px !important;
+
+    height: 20px !important;
+    min-height: 20px !important;
+    max-height: 20px !important;
+
+    font-size: 20px !important;
+    line-height: 20px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
 }
 </style>
 """,
