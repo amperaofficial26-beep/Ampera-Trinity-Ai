@@ -4545,6 +4545,63 @@ button svg {
     background: transparent !important;
     box-shadow: none !important;
 }
+/* ================================================================
+   MIC — HILANGKAN SELURUH BACKGROUND
+   ================================================================ */
+
+[data-testid="stChatInputMicButton"] {
+    background: none !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    border: none !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    outline: none !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    color: #4E4553 !important;
+}
+
+/* Semua kondisi tombol */
+[data-testid="stChatInputMicButton"]:hover,
+[data-testid="stChatInputMicButton"]:focus,
+[data-testid="stChatInputMicButton"]:focus-visible,
+[data-testid="stChatInputMicButton"]:active {
+    background: none !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    border: none !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* Hilangkan layer/background internal */
+[data-testid="stChatInputMicButton"]::before,
+[data-testid="stChatInputMicButton"]::after {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+/* Ikon sound wave tetap ada */
+[data-testid="stChatInputMicButton"]::before {
+    content: "graphic_eq";
+    font-family: "Material Symbols Rounded",
+                 "Material Symbols",
+                 "Material Icons",
+                 sans-serif !important;
+    font-size: 20px !important;
+    line-height: 1 !important;
+    width: 20px !important;
+    height: 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #4E4553 !important;
+}
 </style>
 """,
         unsafe_allow_html=True,
