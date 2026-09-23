@@ -920,7 +920,8 @@ textarea::placeholder {
 
 
 /* ================================================================
-   TOMBOL +
+   PILIHAN MODEL
+   Model berada di kanan, sebelum mic + tombol kirim.
    ================================================================ */
 
 .st-key-chat_controls
@@ -928,11 +929,11 @@ textarea::placeholder {
 > [data-testid="stColumn"]:first-child {
     position: absolute !important;
 
-    left: 12px !important;
+    right: 72px !important;
     bottom: 0 !important;
 
-    width: 36px !important;
-    min-width: 36px !important;
+    width: auto !important;
+    min-width: 0 !important;
 
     padding: 0 !important;
 
@@ -941,7 +942,7 @@ textarea::placeholder {
 
 
 /* ================================================================
-   PILIHAN MODEL
+   TOMBOL +
    ================================================================ */
 
 .st-key-chat_controls
@@ -949,11 +950,11 @@ textarea::placeholder {
 > [data-testid="stColumn"]:nth-child(2) {
     position: absolute !important;
 
-    right: 72px !important;
+    left: 12px !important;
     bottom: 0 !important;
 
-    width: auto !important;
-    min-width: 0 !important;
+    width: 36px !important;
+    min-width: 36px !important;
 
     padding: 0 !important;
 
