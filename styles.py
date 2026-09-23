@@ -835,17 +835,36 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 }
 
 
-/* Tulisan di dalam kolom chat. */
+/* ================================================================
+   INPUT TEKS — COMPACT
+   ================================================================ */
+
+[data-testid="stBottomBlockContainer"]
+[data-testid="stChatInput"] {
+    width: 100% !important;
+
+    height: 46px !important;
+    min-height: 46px !important;
+
+    padding: 0 8px !important;
+
+    margin: 0 !important;
+
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
 [data-testid="stBottomBlockContainer"]
 [data-testid="stChatInput"] textarea {
-    min-height: 54px !important;
+    width: 100% !important;
+
+    min-height: 42px !important;
+    height: 42px !important;
 
     padding:
-        10px
         8px
-        4px !important;
-
-    color: #34271e !important;
+        6px !important;
 
     background: transparent !important;
     border: none !important;
@@ -856,9 +875,9 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
         "Inter",
         sans-serif !important;
 
-    font-size: 15px !important;
+    font-size: 14px !important;
     font-weight: 500 !important;
-    line-height: 1.5 !important;
+    line-height: 1.35 !important;
 
     resize: none !important;
 }
@@ -877,32 +896,34 @@ textarea::placeholder {
    BARIS TOMBOL + DAN NAMA MODEL
    Tetap berada di dalam kartu chat yang sama.
    ================================================================ */
+/* ================================================================
+   KONTROL KANAN — COMPACT
+   ================================================================ */
+
 .st-key-chat_controls {
     position: relative !important;
 
-    width: 100% !important;
+    width: auto !important;
 
     margin: 0 !important;
-
-    padding:
-        3px
-        5px
-        2px !important;
+    padding: 0 !important;
 
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
+
+    flex: 0 0 auto !important;
 }
 
-
-/* Susunan horizontal tombol. */
 .st-key-chat_controls
 [data-testid="stHorizontalBlock"] {
-    width: 100% !important;
+    width: auto !important;
+
+    display: flex !important;
 
     align-items: center !important;
 
-    gap: 4px !important;
+    gap: 6px !important;
 
     flex-wrap: nowrap !important;
 }
