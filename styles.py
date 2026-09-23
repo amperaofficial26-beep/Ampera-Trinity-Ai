@@ -873,17 +873,19 @@ textarea::placeholder {
 
 
 /* ================================================================
-   KONTROL CHAT — OVERLAY COMPACT
-   Diposisikan sebelum kontrol bawaan mic + kirim.
+   KONTROL CHAT — POSISI TERPISAH
+   + di kiri, model di kanan sebelum mic + kirim.
    ================================================================ */
 
 .st-key-chat_controls {
     position: absolute !important;
 
-    right: 130px !important;
+    left: 0 !important;
+    right: 0 !important;
+
     bottom: 9px !important;
 
-    width: auto !important;
+    width: 100% !important;
 
     margin: 0 !important;
     padding: 0 !important;
@@ -894,21 +896,68 @@ textarea::placeholder {
     border: none !important;
     box-shadow: none !important;
 
-    pointer-events: auto !important;
+    pointer-events: none !important;
 }
 
-/* Baris tombol tetap horizontal */
+
+/* Baris kontrol memenuhi lebar kartu */
 .st-key-chat_controls
 [data-testid="stHorizontalBlock"] {
-    width: auto !important;
+    position: relative !important;
+
+    width: 100% !important;
 
     display: flex !important;
 
     align-items: center !important;
 
-    gap: 6px !important;
+    gap: 0 !important;
 
     flex-wrap: nowrap !important;
+
+    pointer-events: none !important;
+}
+
+
+/* ================================================================
+   TOMBOL +
+   ================================================================ */
+
+.st-key-chat_controls
+[data-testid="stHorizontalBlock"]
+> [data-testid="stColumn"]:first-child {
+    position: absolute !important;
+
+    left: 12px !important;
+    bottom: 0 !important;
+
+    width: 36px !important;
+    min-width: 36px !important;
+
+    padding: 0 !important;
+
+    pointer-events: auto !important;
+}
+
+
+/* ================================================================
+   PILIHAN MODEL
+   ================================================================ */
+
+.st-key-chat_controls
+[data-testid="stHorizontalBlock"]
+> [data-testid="stColumn"]:nth-child(2) {
+    position: absolute !important;
+
+    right: 72px !important;
+    bottom: 0 !important;
+
+    width: auto !important;
+    min-width: 0 !important;
+
+    padding: 0 !important;
+
+    pointer-events: auto !important;
 }
 /* ================================================================
    HILANGKAN RUANG VERTIKAL BEKAS CHAT CONTROLS
