@@ -1037,7 +1037,7 @@ textarea::placeholder {
    TOMBOL + DAN MODEL
    ================================================================ */
 .st-key-chat_controls
-[data-testid="stPopover"] button,
+button[data-testid="stPopoverButton"],
 
 .st-key-chat_controls
 button[data-testid="stPopoverButton"],
