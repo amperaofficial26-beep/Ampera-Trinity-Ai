@@ -4163,51 +4163,29 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
     top: var(--conversation-y) !important;
 }
 /* ============================================================
-   KONTROL POSISI FOOTER
+   KONTROL POSISI FOOTER SAPAAN
    ------------------------------------------------------------
+   Khusus untuk:
+   © 2026 Ampera Trinity AI · by Ampera Official
    Tidak mengubah judul, percakapan, atau kolom chat.
    ============================================================ */
 
 .stApp:has(.tr-chat-layout) {
 
-    /* Geser footer ke kiri / kanan */
-    --footer-x: -165px;
+    /* Geser footer kiri / kanan */
+    --footer-greeting-x: -160px;
 
-    /* Geser footer ke atas / bawah */
-    --footer-y: 0px;
-
-    /* Lebar maksimum footer */
-    --footer-width: 720px;
+    /* Geser footer atas / bawah */
+    --footer-greeting-y: 0px;
 }
 
 
-/* ============================================================
-   FOOTER UTAMA
-   ============================================================ */
-
-.stApp:has(.tr-chat-layout) footer {
+/* FOOTER SAPAAN */
+.stApp:has(.tr-chat-layout) .greeting-footer {
     position: relative !important;
 
-    left: var(--footer-x) !important;
-    top: var(--footer-y) !important;
-
-    width: var(--footer-width) !important;
-    max-width: var(--footer-width) !important;
-
-    margin-left: auto !important;
-    margin-right: auto !important;
-
-    box-sizing: border-box !important;
-}
-
-
-/* ============================================================
-   FOOTER BAWAAN STREAMLIT
-   ============================================================ */
-
-.stApp:has(.tr-chat-layout) [data-testid="stBottom"] footer {
-    left: var(--footer-x) !important;
-    top: var(--footer-y) !important;
+    left: var(--footer-greeting-x) !important;
+    top: var(--footer-greeting-y) !important;
 }
 </style>
 """,
