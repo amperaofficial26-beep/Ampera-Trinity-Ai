@@ -5159,13 +5159,13 @@ button[type="submit"]:hover {
     box-shadow: none !important;
 }
 /* =========================================================
-   FILE BUTTON — REMOVE CIRCLE / TRANSPARENT
+   FILE BUTTON — TRANSPARENT / NO CIRCLE
    ========================================================= */
 
 .st-key-chat_controls
 [data-testid="stHorizontalBlock"]
 > [data-testid="stColumn"]:nth-child(1)
-[data-testid="stPopover"] > button {
+button[data-testid="stPopoverButton"] {
     width: 34px !important;
     min-width: 34px !important;
     max-width: 34px !important;
@@ -5197,38 +5197,60 @@ button[type="submit"]:hover {
     color: #4E4553 !important;
 }
 
-/* Hilangkan background ketika hover/focus */
+
+/* Hilangkan efek lingkaran saat hover/focus */
 .st-key-chat_controls
 [data-testid="stHorizontalBlock"]
 > [data-testid="stColumn"]:nth-child(1)
-[data-testid="stPopover"] > button:hover,
+button[data-testid="stPopoverButton"]:hover,
 .st-key-chat_controls
 [data-testid="stHorizontalBlock"]
 > [data-testid="stColumn"]:nth-child(1)
-[data-testid="stPopover"] > button:focus,
+button[data-testid="stPopoverButton"]:focus,
 .st-key-chat_controls
 [data-testid="stHorizontalBlock"]
 > [data-testid="stColumn"]:nth-child(1)
-[data-testid="stPopover"] > button:focus-visible,
+button[data-testid="stPopoverButton"]:focus-visible,
 .st-key-chat_controls
 [data-testid="stHorizontalBlock"]
 > [data-testid="stColumn"]:nth-child(1)
-[data-testid="stPopover"] > button:active {
+button[data-testid="stPopoverButton"]:active {
     background: transparent !important;
     background-color: transparent !important;
     background-image: none !important;
+
     border: none !important;
     border-color: transparent !important;
+
     box-shadow: none !important;
     outline: none !important;
 }
+
+
+/* Wrapper isi tombol */
+.st-key-chat_controls
+[data-testid="stHorizontalBlock"]
+> [data-testid="stColumn"]:nth-child(1)
+button[data-testid="stPopoverButton"]
+> div {
+    width: 100% !important;
+    height: 100% !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
 
 /* Ikon attach_file */
 .st-key-chat_controls
 [data-testid="stHorizontalBlock"]
 > [data-testid="stColumn"]:nth-child(1)
-[data-testid="stPopover"] > button
-span[role="img"][aria-label="attach_file"] {
+button[data-testid="stPopoverButton"]
+span[role="img"][aria-label="attach_file icon"] {
     width: 20px !important;
     height: 20px !important;
 
@@ -5248,6 +5270,16 @@ span[role="img"][aria-label="attach_file"] {
     box-shadow: none !important;
 
     color: #4E4553 !important;
+}
+
+
+/* Hilangkan chevron expand_more */
+.st-key-chat_controls
+[data-testid="stHorizontalBlock"]
+> [data-testid="stColumn"]:nth-child(1)
+button[data-testid="stPopoverButton"]
+[data-testid="stIconMaterial"] {
+    display: none !important;
 }
 </style>
 """,
