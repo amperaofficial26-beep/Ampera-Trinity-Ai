@@ -4508,6 +4508,43 @@ button svg {
     width: 18px !important;
     height: 18px !important;
 }
+/* ================================================================
+   MIC BUTTON — FULLY TRANSPARENT
+   ================================================================ */
+
+[data-testid="stChatInput"]
+[data-testid="stChatInputMicButton"],
+[data-testid="stChatInputMicButton"]:hover,
+[data-testid="stChatInputMicButton"]:focus,
+[data-testid="stChatInputMicButton"]:focus-visible,
+[data-testid="stChatInputMicButton"]:active {
+
+    background: transparent !important;
+    background-color: transparent !important;
+
+    border-color: transparent !important;
+    box-shadow: none !important;
+
+    outline: none !important;
+}
+
+
+/* Hilangkan background dari wrapper tombol */
+[data-testid="stChatInput"]
+[data-testid="stChatInputMicButton"]::after {
+
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+
+/* Pastikan ikon tetap terlihat */
+[data-testid="stChatInput"]
+[data-testid="stChatInputMicButton"]::before {
+
+    background: transparent !important;
+    box-shadow: none !important;
+}
 </style>
 """,
         unsafe_allow_html=True,
