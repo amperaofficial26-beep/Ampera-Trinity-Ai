@@ -4546,16 +4546,15 @@ button svg {
     box-shadow: none !important;
 }
 /* ================================================================
-   MIC BUTTON — TRANSPARAN TOTAL
+   MIC BUTTON — FORCE TRANSPARENT
+   Target langsung berdasarkan struktur DOM Streamlit
    ================================================================ */
 
-/* Tombol mic */
-[data-testid="stChatInputMicButton"],
-[data-testid="stChatInputMicButton"][aria-pressed="true"],
-[data-testid="stChatInputMicButton"][aria-pressed="false"] {
+button[data-testid="stChatInputMicButton"] {
     width: 34px !important;
     min-width: 34px !important;
     max-width: 34px !important;
+
     height: 34px !important;
     min-height: 34px !important;
     max-height: 34px !important;
@@ -4563,12 +4562,15 @@ button svg {
     padding: 0 !important;
     margin: 0 !important;
 
+    /* MATIKAN BACKGROUND STREAMLIT */
     background: transparent !important;
     background-color: transparent !important;
     background-image: none !important;
 
-    border: 0 !important;
+    border: none !important;
+    border-width: 0 !important;
     border-color: transparent !important;
+
     box-shadow: none !important;
     outline: none !important;
 
@@ -4580,38 +4582,56 @@ button svg {
     color: #4E4553 !important;
 }
 
-/* Semua state */
-[data-testid="stChatInputMicButton"]:hover,
-[data-testid="stChatInputMicButton"]:focus,
-[data-testid="stChatInputMicButton"]:focus-visible,
-[data-testid="stChatInputMicButton"]:active {
+/* ================================================================
+   SEMUA STATE TOMBOL
+   ================================================================ */
+
+button[data-testid="stChatInputMicButton"]:hover,
+button[data-testid="stChatInputMicButton"]:focus,
+button[data-testid="stChatInputMicButton"]:focus-visible,
+button[data-testid="stChatInputMicButton"]:active {
     background: transparent !important;
     background-color: transparent !important;
     background-image: none !important;
 
-    border: 0 !important;
+    border: none !important;
     border-color: transparent !important;
 
     box-shadow: none !important;
     outline: none !important;
 }
 
-/* Hilangkan background dari elemen di dalam tombol */
-[data-testid="stChatInputMicButton"] *,
-[data-testid="stChatInputMicButton"] svg,
-[data-testid="stChatInputMicButton"] path {
+/* ================================================================
+   HILANGKAN STYLE DARI CLASS EMOTION STREAMLIT
+   ================================================================ */
+
+button[data-testid="stChatInputMicButton"].st-emotion-cache-nmzvcc {
     background: transparent !important;
     background-color: transparent !important;
     background-image: none !important;
     box-shadow: none !important;
 }
 
-/* Ikon waveform */
-[data-testid="stChatInputMicButton"] svg {
+button[data-testid="stChatInputMicButton"].e1p9v2yr9 {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+}
+
+/* ================================================================
+   SVG ASLI MIC DISEMBUNYIKAN
+   ================================================================ */
+
+button[data-testid="stChatInputMicButton"] svg {
     display: none !important;
 }
 
-[data-testid="stChatInputMicButton"]::before {
+/* ================================================================
+   GANTI DENGAN ICON SOUND WAVE
+   ================================================================ */
+
+button[data-testid="stChatInputMicButton"]::before {
     content: "graphic_eq" !important;
 
     font-family:
@@ -4630,20 +4650,22 @@ button svg {
     align-items: center !important;
     justify-content: center !important;
 
+    padding: 0 !important;
+    margin: 0 !important;
+
     background: transparent !important;
+    background-color: transparent !important;
+
     color: #4E4553 !important;
 
     border: none !important;
     box-shadow: none !important;
 }
 
-/* Pseudo-element lain jangan memberi warna */
-[data-testid="stChatInputMicButton"]::after {
-    content: "" !important;
+/* Jangan biarkan pseudo-element lain membuat background */
+button[data-testid="stChatInputMicButton"]::after {
     display: none !important;
-
-    background: transparent !important;
-    box-shadow: none !important;
+    content: none !important;
 }
 </style>
 """,
