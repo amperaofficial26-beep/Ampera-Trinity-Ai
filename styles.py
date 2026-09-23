@@ -4162,6 +4162,42 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
     left: var(--conversation-x) !important;
     top: var(--conversation-y) !important;
 }
+/* ============================================================
+   KONTROL POSISI FOOTER
+   ------------------------------------------------------------
+   Khusus untuk footer aplikasi.
+   Tidak mengubah judul, percakapan, atau kolom chat.
+   ============================================================ */
+
+.stApp:has(.tr-chat-layout) {
+
+    /* Geser footer ke kiri/kanan */
+    --footer-x: -160px;
+
+    /* Geser footer ke atas/bawah */
+    --footer-y: 0px;
+
+    /* Lebar footer */
+    --footer-width: 100%;
+}
+
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+
+.stApp:has(.tr-chat-layout) footer {
+    position: relative !important;
+
+    left: var(--footer-x) !important;
+    top: var(--footer-y) !important;
+
+    width: var(--footer-width) !important;
+    max-width: var(--footer-width) !important;
+
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
 </style>
 """,
         unsafe_allow_html=True,
