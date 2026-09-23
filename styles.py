@@ -704,30 +704,41 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 .claude-think .logo-shimmer { color: #2C1F33; }
 
 /* ================================================================
-   KARTU CHAT INPUT — COMPACT HORIZONTAL
+   KARTU CHAT GABUNGAN
+   Kolom teks, tombol +, dan nama model menjadi satu kartu.
    ================================================================ */
-
 [data-testid="stBottomBlockContainer"] {
     position: relative !important;
 
     display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
+    flex-direction: column !important;
 
-    width: min(720px, calc(100vw - 32px)) !important;
-    max-width: 720px !important;
-
-    min-height: 58px !important;
-    height: 58px !important;
+    width: min(760px, calc(100vw - 24px)) !important;
 
     margin-left: auto !important;
     margin-right: auto !important;
 
-    padding: 6px 8px !important;
+    padding:
+        8px
+        8px
+        6px !important;
 
-    box-sizing: border-box !important;
+    background:
+        linear-gradient(
+            145deg,
+            rgba(248, 239, 222, 0.98),
+            rgba(239, 225, 202, 0.98)
+        ) !important;
 
-    border-radius: 999px !important;
+    border:
+        1px solid
+        rgba(159, 126, 72, 0.38) !important;
+
+    border-radius: 22px !important;
+
+    box-shadow:
+        0 8px 24px rgba(65, 46, 27, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.78) !important;
 
     overflow: visible !important;
 
@@ -752,19 +763,14 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 
 
 /* ================================================================
-   ELEMEN DALAM KARTU — SATU BARIS
+   URUTAN ELEMEN DI DALAM KARTU
+   1. Lampiran
+   2. Kolom teks
+   3. Tombol + dan nama model
    ================================================================ */
-
 [data-testid="stBottomBlockContainer"]
 > [data-testid="stVerticalBlock"] {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-
-    width: 100% !important;
-    height: 100% !important;
-
-    gap: 0 !important;
+    display: contents !important;
 }
 
 [data-testid="stBottomBlockContainer"]
@@ -776,26 +782,19 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     display: contents !important;
 }
 
-/* Lampiran */
 [data-testid="stBottomBlockContainer"]
 [class*="st-key-pending_strip"] {
     order: 1 !important;
-    flex: 0 0 auto !important;
 }
 
-/* Input */
 [data-testid="stBottomBlockContainer"]
 [data-testid="stChatInput"] {
     order: 2 !important;
-    flex: 1 1 auto !important;
-    min-width: 0 !important;
 }
 
-/* Kontrol kanan */
 [data-testid="stBottomBlockContainer"]
 .st-key-chat_controls {
     order: 3 !important;
-    flex: 0 0 auto !important;
 }
 
 /* ================================================================
@@ -835,36 +834,18 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 }
 
 
-/* ================================================================
-   INPUT TEKS — COMPACT
-   ================================================================ */
-
-[data-testid="stBottomBlockContainer"]
-[data-testid="stChatInput"] {
-    width: 100% !important;
-
-    height: 46px !important;
-    min-height: 46px !important;
-
-    padding: 0 8px !important;
-
-    margin: 0 !important;
-
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-}
-
+/* Tulisan di dalam kolom chat — COMPACT */
 [data-testid="stBottomBlockContainer"]
 [data-testid="stChatInput"] textarea {
-    width: 100% !important;
-
     min-height: 42px !important;
     height: 42px !important;
 
     padding:
+        7px
         8px
         6px !important;
+
+    color: #34271e !important;
 
     background: transparent !important;
     border: none !important;
@@ -875,13 +856,12 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
         "Inter",
         sans-serif !important;
 
-    font-size: 14px !important;
+    font-size: 15px !important;
     font-weight: 500 !important;
     line-height: 1.35 !important;
 
     resize: none !important;
 }
-
 
 /* Warna placeholder. */
 [data-testid="stBottomBlockContainer"]
@@ -896,34 +876,32 @@ textarea::placeholder {
    BARIS TOMBOL + DAN NAMA MODEL
    Tetap berada di dalam kartu chat yang sama.
    ================================================================ */
-/* ================================================================
-   KONTROL KANAN — COMPACT
-   ================================================================ */
-
 .st-key-chat_controls {
     position: relative !important;
 
-    width: auto !important;
+    width: 100% !important;
 
     margin: 0 !important;
-    padding: 0 !important;
+
+    padding:
+        3px
+        5px
+        2px !important;
 
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
-
-    flex: 0 0 auto !important;
 }
 
+
+/* Susunan horizontal tombol. */
 .st-key-chat_controls
 [data-testid="stHorizontalBlock"] {
-    width: auto !important;
-
-    display: flex !important;
+    width: 100% !important;
 
     align-items: center !important;
 
-    gap: 6px !important;
+    gap: 4px !important;
 
     flex-wrap: nowrap !important;
 }
