@@ -5159,13 +5159,22 @@ button[type="submit"]:hover {
     box-shadow: none !important;
 }
 /* =========================================================
-   FILE BUTTON — TRANSPARENT / NO CIRCLE
+   FILE + MODEL — SQUARE / CENTER
    ========================================================= */
 
+/* FILE */
 .st-key-chat_controls
 [data-testid="stHorizontalBlock"]
 > [data-testid="stColumn"]:nth-child(1)
+button[data-testid="stPopoverButton"],
+
+/* MODEL */
+.st-key-chat_controls
+[data-testid="stHorizontalBlock"]
+> [data-testid="stColumn"]:nth-child(3)
 button[data-testid="stPopoverButton"] {
+    position: relative !important;
+
     width: 34px !important;
     min-width: 34px !important;
     max-width: 34px !important;
@@ -5185,178 +5194,129 @@ button[data-testid="stPopoverButton"] {
     background-color: transparent !important;
     background-image: none !important;
 
-    border: none !important;
-    border-color: transparent !important;
+    border: 1px solid rgba(78, 69, 83, 0.12) !important;
+    border-radius: 9px !important;
+
     box-shadow: none !important;
     outline: none !important;
 
-    border-radius: 0 !important;
-    appearance: none !important;
-    -webkit-appearance: none !important;
-
-    color: #4E4553 !important;
+    transform: none !important;
 }
 
 
-/* Hilangkan efek lingkaran saat hover/focus */
+/* =========================================================
+   SEMUA STATE — TETAP TRANSPARAN
+   ========================================================= */
+
 .st-key-chat_controls
 [data-testid="stHorizontalBlock"]
 > [data-testid="stColumn"]:nth-child(1)
 button[data-testid="stPopoverButton"]:hover,
+
 .st-key-chat_controls
 [data-testid="stHorizontalBlock"]
 > [data-testid="stColumn"]:nth-child(1)
 button[data-testid="stPopoverButton"]:focus,
+
 .st-key-chat_controls
 [data-testid="stHorizontalBlock"]
 > [data-testid="stColumn"]:nth-child(1)
 button[data-testid="stPopoverButton"]:focus-visible,
+
 .st-key-chat_controls
 [data-testid="stHorizontalBlock"]
 > [data-testid="stColumn"]:nth-child(1)
+button[data-testid="stPopoverButton"]:active,
+
+.st-key-chat_controls
+[data-testid="stHorizontalBlock"]
+> [data-testid="stColumn"]:nth-child(3)
+button[data-testid="stPopoverButton"]:hover,
+
+.st-key-chat_controls
+[data-testid="stHorizontalBlock"]
+> [data-testid="stColumn"]:nth-child(3)
+button[data-testid="stPopoverButton"]:focus,
+
+.st-key-chat_controls
+[data-testid="stHorizontalBlock"]
+> [data-testid="stColumn"]:nth-child(3)
+button[data-testid="stPopoverButton"]:focus-visible,
+
+.st-key-chat_controls
+[data-testid="stHorizontalBlock"]
+> [data-testid="stColumn"]:nth-child(3)
 button[data-testid="stPopoverButton"]:active {
     background: transparent !important;
     background-color: transparent !important;
     background-image: none !important;
 
-    border: none !important;
-    border-color: transparent !important;
+    border-color: rgba(78, 69, 83, 0.18) !important;
 
     box-shadow: none !important;
     outline: none !important;
 }
 
 
-/* Wrapper isi tombol */
-.st-key-chat_controls
-[data-testid="stHorizontalBlock"]
-> [data-testid="stColumn"]:nth-child(1)
-button[data-testid="stPopoverButton"]
-> div {
-    width: 100% !important;
-    height: 100% !important;
+/* =========================================================
+   FILE ICON — BENAR-BENAR DI TENGAH
+   ========================================================= */
 
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-
-    background: transparent !important;
-    box-shadow: none !important;
-}
-
-
-/* Ikon attach_file */
 .st-key-chat_controls
 [data-testid="stHorizontalBlock"]
 > [data-testid="stColumn"]:nth-child(1)
 button[data-testid="stPopoverButton"]
 span[role="img"][aria-label="attach_file icon"] {
+    position: absolute !important;
+
+    left: 50% !important;
+    top: 50% !important;
+
+    transform: translate(-50%, -50%) !important;
+
     width: 20px !important;
     height: 20px !important;
 
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-
     margin: 0 !important;
     padding: 0 !important;
-
-    font-family: "Material Symbols Rounded" !important;
-    font-size: 20px !important;
-    line-height: 20px !important;
-
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-
-    color: #4E4553 !important;
-}
-
-
-/* Hilangkan chevron expand_more */
-.st-key-chat_controls
-[data-testid="stHorizontalBlock"]
-> [data-testid="stColumn"]:nth-child(1)
-button[data-testid="stPopoverButton"]
-[data-testid="stIconMaterial"] {
-    display: none !important;
-}
-/* =========================================================
-   MODEL BUTTON — ICON ONLY
-   ========================================================= */
-
-.st-key-chat_controls
-[data-testid="stHorizontalBlock"]
-> [data-testid="stColumn"]:nth-child(3)
-button[data-testid="stPopoverButton"] {
-    width: 34px !important;
-    min-width: 34px !important;
-    max-width: 34px !important;
-
-    height: 34px !important;
-    min-height: 34px !important;
-    max-height: 34px !important;
-
-    padding: 0 !important;
-    margin: 0 !important;
-
-    background: transparent !important;
-    background-color: transparent !important;
-    background-image: none !important;
-
-    border: none !important;
-    box-shadow: none !important;
-    outline: none !important;
-
-    border-radius: 0 !important;
-}
-
-
-/* Sembunyikan PANAH expand_more */
-.st-key-chat_controls
-[data-testid="stHorizontalBlock"]
-> [data-testid="stColumn"]:nth-child(3)
-button[data-testid="stPopoverButton"]
-[aria-hidden="true"] {
-    display: none !important;
-}
-
-
-/* Besarkan ikon psychology */
-.st-key-chat_controls
-[data-testid="stHorizontalBlock"]
-> [data-testid="stColumn"]:nth-child(3)
-button[data-testid="stPopoverButton"]
-[aria-hidden="false"] {
-    width: 34px !important;
-    height: 34px !important;
 
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
 
-    margin: 0 !important;
-    padding: 0 !important;
+    font-family: "Material Symbols Rounded" !important;
+    font-size: 20px !important;
+    line-height: 20px !important;
 
-    background: transparent !important;
+    color: #4E4553 !important;
 }
 
 
-/* ICON PSYCHOLOGY — BESARKAN */
+/* =========================================================
+   MODEL ICON — BENAR-BENAR DI TENGAH
+   ========================================================= */
+
 .st-key-chat_controls
 [data-testid="stHorizontalBlock"]
 > [data-testid="stColumn"]:nth-child(3)
 button[data-testid="stPopoverButton"]
 span[role="img"] {
+    position: absolute !important;
+
+    left: 50% !important;
+    top: 50% !important;
+
+    transform: translate(-50%, -50%) !important;
+
     width: 24px !important;
     height: 24px !important;
 
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-
     margin: 0 !important;
     padding: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 
     font-family: "Material Symbols Rounded" !important;
     font-size: 21px !important;
@@ -5364,19 +5324,18 @@ span[role="img"] {
 
     color: #4E4553 !important;
 }
-.st-key-chat_controls
-[data-testid="stHorizontalBlock"]
-> [data-testid="stColumn"]:nth-child(1)
-button[data-testid="stPopoverButton"]:hover,
+
+
+/* =========================================================
+   HILANGKAN CHEVRON MODEL
+   ========================================================= */
 
 .st-key-chat_controls
 [data-testid="stHorizontalBlock"]
 > [data-testid="stColumn"]:nth-child(3)
-button[data-testid="stPopoverButton"]:hover {
-    background: #EAE5ED !important;
-    background-color: #EAE5ED !important;
-    border-color: rgba(78, 69, 83, 0.18) !important;
-    box-shadow: none !important;
+button[data-testid="stPopoverButton"]
+[aria-hidden="true"] {
+    display: none !important;
 }
 </style>
 """,
