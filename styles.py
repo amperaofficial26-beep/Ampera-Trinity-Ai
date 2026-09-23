@@ -5158,6 +5158,97 @@ button[type="submit"]:hover {
     background: transparent !important;
     box-shadow: none !important;
 }
+/* =========================================================
+   FILE BUTTON — REMOVE CIRCLE / TRANSPARENT
+   ========================================================= */
+
+.st-key-chat_controls
+[data-testid="stHorizontalBlock"]
+> [data-testid="stColumn"]:nth-child(1)
+[data-testid="stPopover"] > button {
+    width: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+
+    height: 34px !important;
+    min-height: 34px !important;
+    max-height: 34px !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+
+    border: none !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    outline: none !important;
+
+    border-radius: 0 !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+
+    color: #4E4553 !important;
+}
+
+/* Hilangkan background ketika hover/focus */
+.st-key-chat_controls
+[data-testid="stHorizontalBlock"]
+> [data-testid="stColumn"]:nth-child(1)
+[data-testid="stPopover"] > button:hover,
+.st-key-chat_controls
+[data-testid="stHorizontalBlock"]
+> [data-testid="stColumn"]:nth-child(1)
+[data-testid="stPopover"] > button:focus,
+.st-key-chat_controls
+[data-testid="stHorizontalBlock"]
+> [data-testid="stColumn"]:nth-child(1)
+[data-testid="stPopover"] > button:focus-visible,
+.st-key-chat_controls
+[data-testid="stHorizontalBlock"]
+> [data-testid="stColumn"]:nth-child(1)
+[data-testid="stPopover"] > button:active {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    border: none !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* Ikon attach_file */
+.st-key-chat_controls
+[data-testid="stHorizontalBlock"]
+> [data-testid="stColumn"]:nth-child(1)
+[data-testid="stPopover"] > button
+span[role="img"][aria-label="attach_file"] {
+    width: 20px !important;
+    height: 20px !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    font-family: "Material Symbols Rounded" !important;
+    font-size: 20px !important;
+    line-height: 20px !important;
+
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+
+    color: #4E4553 !important;
+}
 </style>
 """,
         unsafe_allow_html=True,
