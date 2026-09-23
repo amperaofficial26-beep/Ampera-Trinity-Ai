@@ -4093,6 +4093,75 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
     margin-left: 0 !important;
     margin-right: 0 !important;
 }
+/* ============================================================
+   KONTROL POSISI JUDUL & PERCAKAPAN
+   ------------------------------------------------------------
+   KHUSUS untuk judul sapaan dan area percakapan.
+   TIDAK mengubah posisi kolom input.
+   ============================================================ */
+
+.stApp:has(.tr-chat-layout) {
+
+    /* =========================
+       JUDUL SAPAAN
+       ========================= */
+
+    /* Geser kiri/kanan judul */
+    --greeting-x: 0px;
+
+    /* Geser atas/bawah judul */
+    --greeting-y: 0px;
+
+
+    /* =========================
+       AREA PERCAKAPAN
+       ========================= */
+
+    /* Geser seluruh bubble percakapan kiri/kanan */
+    --conversation-x: -100px;
+
+    /* Geser seluruh bubble percakapan atas/bawah */
+    --conversation-y: 0px;
+}
+
+
+/* ============================================================
+   JUDUL SAPAAN
+   ============================================================ */
+
+.stApp:has(.tr-chat-layout) .trinity-greeting {
+    position: relative !important;
+
+    left: var(--greeting-x) !important;
+    top: var(--greeting-y) !important;
+
+    text-align: center !important;
+}
+
+
+/* ============================================================
+   BUBBLE PERCAKAPAN
+   ============================================================ */
+
+.stApp:has(.tr-chat-layout) .bubble-row {
+    position: relative !important;
+
+    left: var(--conversation-x) !important;
+    top: var(--conversation-y) !important;
+}
+
+
+/* ============================================================
+   TOMBOL AKSI DI BAWAH JAWABAN AI
+   Ikut bergerak bersama percakapan
+   ============================================================ */
+
+.stApp:has(.tr-chat-layout) [class*="st-key-msg_actions_"] {
+    position: relative !important;
+
+    left: var(--conversation-x) !important;
+    top: var(--conversation-y) !important;
+}
 </style>
 """,
         unsafe_allow_html=True,
