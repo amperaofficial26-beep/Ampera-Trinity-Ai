@@ -796,7 +796,121 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 .st-key-chat_controls {
     order: 3 !important;
 }
+/* ================================================================
+   BARIS KONTROL CHAT — COMPACT
+   Struktur asli:
+   1. +
+   2. spacer
+   3. model
+   ================================================================ */
 
+.st-key-chat_controls {
+    position: absolute !important;
+
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 8px !important;
+
+    width: 100% !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    z-index: 30 !important;
+
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+
+    pointer-events: none !important;
+}
+
+
+/* Baris kontrol memenuhi kartu */
+.st-key-chat_controls
+[data-testid="stHorizontalBlock"] {
+    position: relative !important;
+
+    width: 100% !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+
+    gap: 0 !important;
+
+    flex-wrap: nowrap !important;
+
+    pointer-events: none !important;
+}
+
+
+/* ================================================================
+   KOLOM 1 — TOMBOL +
+   ================================================================ */
+
+.st-key-chat_controls
+[data-testid="stHorizontalBlock"]
+> [data-testid="stColumn"]:nth-child(1) {
+    position: absolute !important;
+
+    left: 8px !important;
+    bottom: 0 !important;
+
+    width: 36px !important;
+    min-width: 36px !important;
+    max-width: 36px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    pointer-events: auto !important;
+}
+
+
+/* ================================================================
+   KOLOM 2 — SPACER
+   Jangan tampilkan sebagai kontrol.
+   ================================================================ */
+
+.st-key-chat_controls
+[data-testid="stHorizontalBlock"]
+> [data-testid="stColumn"]:nth-child(2) {
+    width: 100% !important;
+
+    min-width: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    pointer-events: none !important;
+}
+
+
+/* ================================================================
+   KOLOM 3 — PILIHAN MODEL
+   Berada sebelum mic + tombol kirim.
+   ================================================================ */
+
+.st-key-chat_controls
+[data-testid="stHorizontalBlock"]
+> [data-testid="stColumn"]:nth-child(3) {
+    position: absolute !important;
+
+    right: 112px !important;
+    bottom: 0 !important;
+
+    width: auto !important;
+    min-width: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    pointer-events: auto !important;
+}
 /* ================================================================
    KOLOM KETIK
    Menghapus kotak terpisah bawaan Streamlit.
