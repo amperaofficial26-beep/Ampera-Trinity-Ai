@@ -704,30 +704,32 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 .claude-think .logo-shimmer { color: #2C1F33; }
 
 /* ================================================================
-   KARTU CHAT GABUNGAN — COMPACT HORIZONTAL
-   Bentuk mengikuti referensi: satu pill horizontal,
-   lebih tipis dan seluruh kontrol berada dalam satu baris.
+   KARTU CHAT INPUT — COMPACT HORIZONTAL
    ================================================================ */
 
 [data-testid="stBottomBlockContainer"] {
     position: relative !important;
 
     display: flex !important;
-    flex-direction: column !important;
+    flex-direction: row !important;
+    align-items: center !important;
 
     width: min(720px, calc(100vw - 32px)) !important;
     max-width: 720px !important;
+
+    min-height: 58px !important;
+    height: 58px !important;
 
     margin-left: auto !important;
     margin-right: auto !important;
 
     padding: 6px 8px !important;
 
+    box-sizing: border-box !important;
+
     border-radius: 999px !important;
 
     overflow: visible !important;
-
-    box-sizing: border-box !important;
 
     transition:
         border-color 0.2s ease,
@@ -750,14 +752,19 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 
 
 /* ================================================================
-   URUTAN ELEMEN DI DALAM KARTU
-   1. Lampiran
-   2. Kolom teks
-   3. Tombol + dan nama model
+   ELEMEN DALAM KARTU — SATU BARIS
    ================================================================ */
+
 [data-testid="stBottomBlockContainer"]
 > [data-testid="stVerticalBlock"] {
-    display: contents !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    gap: 0 !important;
 }
 
 [data-testid="stBottomBlockContainer"]
@@ -769,21 +776,27 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     display: contents !important;
 }
 
+/* Lampiran */
 [data-testid="stBottomBlockContainer"]
 [class*="st-key-pending_strip"] {
     order: 1 !important;
+    flex: 0 0 auto !important;
 }
 
+/* Input */
 [data-testid="stBottomBlockContainer"]
 [data-testid="stChatInput"] {
     order: 2 !important;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
 }
 
+/* Kontrol kanan */
 [data-testid="stBottomBlockContainer"]
 .st-key-chat_controls {
     order: 3 !important;
+    flex: 0 0 auto !important;
 }
-
 
 /* ================================================================
    KOLOM KETIK
