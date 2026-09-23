@@ -1042,14 +1042,59 @@ button[data-testid="stPopoverButton"],
 .st-key-chat_controls
 button[data-testid="stPopoverButton"],
 
-.st-key-chat_controls
-button[data-testid="stBaseButton-secondary"] {
-    min-height: 32px !important;
-    height: 32px !important;
+/* ================================================================
+   IKON KONTROL CHAT — UKURAN SERAGAM
+   File + Model
+   ================================================================ */
 
-    padding:
-        3px
-        10px !important;
+.st-key-chat_controls
+[data-testid="stPopover"] > button,
+.st-key-chat_controls
+button[data-testid="stPopoverButton"] {
+
+    width: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+
+    height: 34px !important;
+    min-height: 34px !important;
+    max-height: 34px !important;
+
+    padding: 0 !important;
+
+    margin: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    border-radius: 50% !important;
+
+    font-size: 0 !important;
+}
+
+
+/* Ikon Material di dalam tombol */
+.st-key-chat_controls
+[data-testid="stPopover"] > button
+[data-testid="stIconMaterial"],
+
+.st-key-chat_controls
+button[data-testid="stPopoverButton"]
+[data-testid="stIconMaterial"] {
+
+    font-size: 20px !important;
+    font-weight: 700 !important;
+    
+    line-height: 1 !important;
+
+    width: 20px !important;
+    height: 20px !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
 
     color: #5a493a !important;
 
@@ -1069,7 +1114,6 @@ button[data-testid="stBaseButton-secondary"] {
         "Inter",
         sans-serif !important;
 
-    font-size: 12.5px !important;
     font-weight: 700 !important;
 
     white-space: nowrap !important;
@@ -1234,10 +1278,121 @@ button:disabled {
     color: #4E4553 !important;
     box-shadow: none !important;
 }
-[data-testid="stChatInput"] [data-testid="stChatInputMicButton"] svg,
-[data-testid="stChatInput"] [data-testid="stChatInputCancelButton"] svg,
-[data-testid="stChatInput"] [data-testid="stChatInputApproveButton"] svg {
-    fill: #4E4553 !important; color: #4E4553 !important;
+/* ================================================================
+   CHAT INPUT — IKON MIC / AUDIO
+   ================================================================ */
+
+[data-testid="stChatInput"]
+[data-testid="stChatInputMicButton"] {
+
+    width: 34px !important;
+    min-width: 34px !important;
+
+    height: 34px !important;
+    min-height: 34px !important;
+
+    padding: 0 !important;
+
+    border-radius: 50% !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    position: relative !important;
+}
+
+
+/* Sembunyikan ikon mic bawaan */
+[data-testid="stChatInput"]
+[data-testid="stChatInputMicButton"] svg {
+    display: none !important;
+}
+
+
+/* Ganti dengan ikon gelombang suara */
+[data-testid="stChatInput"]
+[data-testid="stChatInputMicButton"]::before{
+
+    content: "graphic_eq";
+
+    font-family: "Material Symbols Rounded",
+                 "Material Symbols",
+                 "Material Icons",
+                 sans-serif !important;
+
+    font-size: 20px !important;
+
+    line-height: 1 !important;
+
+    width: 20px !important;
+    height: 20px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    font-weight: normal !important;
+
+    color: #4E4553 !important;
+}
+/* ================================================================
+   CHAT INPUT — IKON KIRIM
+   ================================================================ */
+
+[data-testid="stChatInput"]
+button[type="submit"] {
+
+    width: 34px !important;
+    min-width: 34px !important;
+
+    height: 34px !important;
+    min-height: 34px !important;
+
+    padding: 0 !important;
+
+    border-radius: 50% !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    position: relative !important;
+}
+
+
+/* Sembunyikan ikon bawaan */
+[data-testid="stChatInput"]
+button[type="submit"] svg {
+    display: none !important;
+}
+
+
+/* Pesawat kertas */
+[data-testid="stChatInput"]
+button[type="submit"]::before {
+
+    content: "send";
+
+    font-family: "Material Symbols Rounded",
+                 "Material Symbols",
+                 "Material Icons",
+                 sans-serif !important;
+
+    font-size: 20px !important;
+
+    line-height: 1 !important;
+
+    width: 20px !important;
+    height: 20px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    font-weight: normal !important;
+
+    color: #4E4553 !important;
 }
 [data-testid="stChatInput"] [data-testid="stChatInputMicButton"]:hover {
     border-color: #2C1F33 !important;
