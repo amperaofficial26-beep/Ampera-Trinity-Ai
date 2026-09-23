@@ -4393,7 +4393,7 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
 [data-testid="stBottomBlockContainer"] {
     position: relative !important;
 
-    left: -150px !important;
+    left: -130px !important;
 
     margin-left: auto !important;
     margin-right: auto !important;
