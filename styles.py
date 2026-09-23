@@ -4495,55 +4495,6 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
 
     background: transparent !important;
 }
-
-.st-key-chat_controls
-[data-testid="stHorizontalBlock"] {
-    width: auto !important;
-
-    align-items: center !important;
-
-    gap: 6px !important;
-
-    flex-wrap: nowrap !important;
-}
-
-.st-key-chat_controls
-[data-testid="stColumn"] {
-    min-width: 0 !important;
-}
-
-/* Tombol compact */
-.st-key-chat_controls
-[data-testid="stPopover"] button,
-
-.st-key-chat_controls
-button[data-testid="stPopoverButton"],
-
-.st-key-chat_controls
-button[data-testid="stBaseButton-secondary"] {
-    width: 34px !important;
-    min-width: 34px !important;
-
-    height: 34px !important;
-    min-height: 34px !important;
-
-    padding: 0 !important;
-
-    border-radius: 50% !important;
-
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-
-    flex-shrink: 0 !important;
-}
-
-/* Ikon di tombol */
-.st-key-chat_controls
-button svg {
-    width: 18px !important;
-    height: 18px !important;
-}
 /* ================================================================
    MIC BUTTON — FULLY TRANSPARENT
    ================================================================ */
@@ -4768,6 +4719,301 @@ button[data-testid="stPopoverButton"]
 
     margin: 0 !important;
     padding: 0 !important;
+}
+/* ================================================================
+   CHAT CONTROL ICONS — FINAL
+   FILE / MODEL / MIC / SEND
+   ================================================================ */
+
+/* ------------------------------------------------
+   1. FILE + MODEL
+   Semua tombol popover = 34 x 34
+   ------------------------------------------------ */
+
+.st-key-chat_controls
+[data-testid="stPopover"] > button,
+
+.st-key-chat_controls
+button[data-testid="stPopoverButton"] {
+    width: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+
+    height: 34px !important;
+    min-height: 34px !important;
+    max-height: 34px !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    border-radius: 50% !important;
+
+    font-size: 0 !important;
+}
+
+
+/* ------------------------------------------------
+   2. ICON FILE + MODEL
+   Tepat 20 x 20
+   ------------------------------------------------ */
+
+.st-key-chat_controls
+[data-testid="stPopover"] > button
+[data-testid="stIconMaterial"],
+
+.st-key-chat_controls
+button[data-testid="stPopoverButton"]
+[data-testid="stIconMaterial"] {
+    width: 20px !important;
+    min-width: 20px !important;
+
+    height: 20px !important;
+    min-height: 20px !important;
+
+    font-size: 20px !important;
+    line-height: 20px !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+
+/* ------------------------------------------------
+   3. HILANGKAN CHEVRON MODEL
+   Jangan sembunyikan Material Icon
+   ------------------------------------------------ */
+
+.st-key-chat_controls
+[data-testid="stPopover"] > button > svg:last-child,
+
+.st-key-chat_controls
+button[data-testid="stPopoverButton"] > svg:last-child {
+    display: none !important;
+}
+
+
+/* Jika chevron berupa svg di dalam wrapper */
+.st-key-chat_controls
+[data-testid="stPopover"] > button
+svg:last-of-type,
+
+.st-key-chat_controls
+button[data-testid="stPopoverButton"]
+svg:last-of-type {
+    display: none !important;
+}
+
+
+/* ------------------------------------------------
+   4. MIC
+   34 x 34 — sama dengan file/model
+   ------------------------------------------------ */
+
+.st-key-chat_controls
+[data-testid="stChatInputMicButton"] {
+
+    width: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+
+    height: 34px !important;
+    min-height: 34px !important;
+    max-height: 34px !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+
+    border-radius: 50% !important;
+
+    position: relative !important;
+}
+
+
+/* Hilangkan SVG mic asli */
+.st-key-chat_controls
+[data-testid="stChatInputMicButton"] svg {
+    display: none !important;
+}
+
+
+/* Sound wave */
+.st-key-chat_controls
+[data-testid="stChatInputMicButton"]::before {
+
+    content: "graphic_eq" !important;
+
+    font-family:
+        "Material Symbols Rounded",
+        "Material Symbols",
+        "Material Icons",
+        sans-serif !important;
+
+    font-size: 20px !important;
+    line-height: 20px !important;
+
+    width: 20px !important;
+    height: 20px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    color: #4E4553 !important;
+
+    background: transparent !important;
+
+    border: none !important;
+    box-shadow: none !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+
+/* Semua state mic tetap transparan */
+.st-key-chat_controls
+[data-testid="stChatInputMicButton"]:hover,
+
+.st-key-chat_controls
+[data-testid="stChatInputMicButton"]:focus,
+
+.st-key-chat_controls
+[data-testid="stChatInputMicButton"]:active {
+
+    background: transparent !important;
+    background-color: transparent !important;
+
+    border: none !important;
+    box-shadow: none !important;
+}
+
+
+/* ------------------------------------------------
+   5. SEND
+   34 x 34
+   ------------------------------------------------ */
+
+[data-testid="stChatInput"]
+button[type="submit"] {
+
+    width: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+
+    height: 34px !important;
+    min-height: 34px !important;
+    max-height: 34px !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    border-radius: 50% !important;
+
+    position: relative !important;
+}
+
+
+/* Hilangkan panah bawaan */
+[data-testid="stChatInput"]
+button[type="submit"] svg {
+    display: none !important;
+}
+
+
+/* ------------------------------------------------
+   6. PAPER PLANE
+   ------------------------------------------------ */
+
+[data-testid="stChatInput"]
+button[type="submit"]::before {
+
+    content: "send" !important;
+
+    font-family:
+        "Material Symbols Rounded",
+        "Material Symbols",
+        "Material Icons",
+        sans-serif !important;
+
+    font-size: 20px !important;
+    line-height: 20px !important;
+
+    width: 20px !important;
+    height: 20px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    color: #4E4553 !important;
+
+    background: transparent !important;
+
+    font-variation-settings:
+        "FILL" 1,
+        "wght" 400,
+        "GRAD" 0,
+        "opsz" 20 !important;
+}
+
+
+/* ------------------------------------------------
+   7. SEMUA ICON CONTROL — TIDAK BOLEH MEMBESAR
+   ------------------------------------------------ */
+
+.st-key-chat_controls
+[data-testid="stPopover"] > button,
+.st-key-chat_controls
+button[data-testid="stPopoverButton"],
+.st-key-chat_controls
+[data-testid="stChatInputMicButton"],
+[data-testid="stChatInput"] button[type="submit"] {
+
+    transform-origin: center center !important;
+}
+
+
+/* Hilangkan efek hover yang mengubah ukuran */
+.st-key-chat_controls
+[data-testid="stPopover"] > button:hover,
+
+.st-key-chat_controls
+button[data-testid="stPopoverButton"]:hover,
+
+.st-key-chat_controls
+[data-testid="stChatInputMicButton"]:hover,
+
+[data-testid="stChatInput"]
+button[type="submit"]:hover {
+
+    transform: none !important;
 }
 </style>
 """,
