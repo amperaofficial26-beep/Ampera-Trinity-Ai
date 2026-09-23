@@ -3469,7 +3469,7 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
      tertutup panel kanan. */
 .stApp:has(.tr-chat-layout) {
     --chat-width: min(42rem, calc(100vw - 230px - 356px - 72px));
-    --chat-shift: -60px;
+    --chat-shift: 100px;
 }
 
 .stApp:has(.tr-chat-layout):has(section[data-testid="stSidebar"][aria-expanded="false"]) {
