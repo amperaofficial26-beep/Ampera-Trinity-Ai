@@ -5359,8 +5359,8 @@ span[role="img"] {
     padding: 0 !important;
 
     font-family: "Material Symbols Rounded" !important;
-    font-size: 24px !important;
-    line-height: 24px !important;
+    font-size: 21px !important;
+    line-height: 21px !important;
 
     color: #4E4553 !important;
 }
