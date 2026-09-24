@@ -7994,18 +7994,16 @@ div.stDownloadButton > button,
 
 .stApp:has(.tr-multi-ai-layout)
 .agent-hero {
+    box-sizing: border-box !important;
 
     width:
-        min(
-            760px,
-            calc(100vw - 264px)
-        ) !important;
+        var(--multi-chat-width) !important;
+
+    min-width:
+        var(--multi-chat-width) !important;
 
     max-width:
-        min(
-            760px,
-            calc(100vw - 264px)
-        ) !important;
+        var(--multi-chat-width) !important;
 
     margin-left:
         auto !important;
@@ -8013,11 +8011,243 @@ div.stDownloadButton > button,
     margin-right:
         auto !important;
 
+    margin-bottom:
+        18px !important;
+
+    padding:
+        20px 24px !important;
+
+    display:
+        flex !important;
+
+    align-items:
+        center !important;
+
+    gap:
+        16px !important;
+
+    background:
+        var(--tr-surface-premium) !important;
+
+    border:
+        1px solid
+        var(--tr-border-premium) !important;
+
+    border-radius:
+        22px !important;
+
+    box-shadow:
+        0 10px 30px
+        rgba(48, 40, 58, 0.055) !important;
+
     transform:
         translate(
-            var(--multi-hero-x),
-            var(--multi-hero-y)
+            var(--multi-chat-x),
+            var(--multi-chat-y)
         ) !important;
+
+    overflow:
+        hidden !important;
+
+    box-sizing:
+        border-box !important;
+
+    transition:
+        transform .28s ease,
+        width .28s ease !important;
+}
+
+
+/* ============================================================
+   ICON HERO
+   ============================================================ */
+
+.stApp:has(.tr-multi-ai-layout)
+.agent-hero-icon {
+    width:
+        48px !important;
+
+    height:
+        48px !important;
+
+    min-width:
+        48px !important;
+
+    flex:
+        0 0 48px !important;
+
+    display:
+        flex !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        center !important;
+
+    border-radius:
+        15px !important;
+
+    background:
+        linear-gradient(
+            145deg,
+            #f3d47d,
+            #bd8125
+        ) !important;
+
+    color:
+        #2d2115 !important;
+
+    box-shadow:
+        0 7px 18px
+        rgba(111, 74, 23, 0.18),
+        0 0 18px
+        rgba(218, 166, 55, 0.20) !important;
+
+    overflow:
+        hidden !important;
+}
+
+
+/* ============================================================
+   MATERIAL ICON
+   ============================================================ */
+
+.stApp:has(.tr-multi-ai-layout)
+.agent-hero-icon
+.material-symbols-rounded {
+    font-size:
+        25px !important;
+
+    line-height:
+        1 !important;
+
+    font-weight:
+        500 !important;
+
+    font-variation-settings:
+        'FILL' 1,
+        'wght' 500,
+        'GRAD' 0,
+        'opsz' 24 !important;
+}
+
+
+/* ============================================================
+   KONTEN JUDUL + DESKRIPSI
+   ============================================================ */
+
+.stApp:has(.tr-multi-ai-layout)
+.agent-hero-content {
+    min-width:
+        0 !important;
+
+    flex:
+        1 1 auto !important;
+
+    overflow:
+        hidden !important;
+}
+
+
+/* ============================================================
+   JUDUL
+   ============================================================ */
+
+.stApp:has(.tr-multi-ai-layout)
+.agent-hero h1 {
+    margin:
+        0 !important;
+
+    padding:
+        0 !important;
+
+    color:
+        var(--tr-text) !important;
+
+    font-size:
+        1.55rem !important;
+
+    line-height:
+        1.2 !important;
+
+    font-weight:
+        700 !important;
+
+    letter-spacing:
+        -0.025em !important;
+
+    font-family:
+        "Space Grotesk",
+        sans-serif !important;
+}
+
+
+/* ============================================================
+   DESKRIPSI
+   ============================================================ */
+
+.stApp:has(.tr-multi-ai-layout)
+.agent-hero p {
+    margin:
+        7px 0 0 !important;
+
+    padding:
+        0 !important;
+
+    color:
+        var(--tr-text2) !important;
+
+    font-size:
+        0.92rem !important;
+
+    line-height:
+        1.5 !important;
+
+    font-weight:
+        400 !important;
+
+    font-family:
+        "Space Grotesk",
+        sans-serif !important;
+
+    max-width:
+        100% !important;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 900px) {
+
+    .stApp:has(.tr-multi-ai-layout)
+    .agent-hero {
+        width:
+            calc(100vw - 48px) !important;
+
+        min-width:
+            0 !important;
+
+        max-width:
+            calc(100vw - 48px) !important;
+
+        padding:
+            18px 20px !important;
+    }
+
+    .stApp:has(.tr-multi-ai-layout)
+    .agent-hero h1 {
+        font-size:
+            1.35rem !important;
+    }
+
+    .stApp:has(.tr-multi-ai-layout)
+    .agent-hero p {
+        font-size:
+            0.88rem !important;
+    }
 }
 
 
