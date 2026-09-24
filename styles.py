@@ -7973,6 +7973,366 @@ div.stDownloadButton > button,
             !important;
     }
 }
+/* ================================================================
+   TRINITY DASHBOARD — FINAL GEOMETRY LOCK
+   ------------------------------------------------
+   Mengunci:
+   - panel kanan kembali lebar
+   - area tengah benar-benar terpusat
+   - sapaan berada di tengah area kerja
+   - kolom chat/input mengikuti pusat area kerja
+   - menghapus efek left:-140px dari override sebelumnya
+================================================================ */
+
+.stApp:has(.tr-chat-layout) {
+
+    /* ===== LAYOUT UTAMA ===== */
+    --final-sidebar: 210px;
+    --final-rail: 286px;
+    --final-gap: 18px;
+
+    /* ruang kiri area kerja */
+    --final-left:
+        calc(
+            var(--final-sidebar)
+            + var(--final-gap)
+        );
+
+    /* ruang kanan area kerja:
+       gap + panel kanan + gap */
+    --final-right:
+        calc(
+            var(--final-rail)
+            + (var(--final-gap) * 2)
+        );
+
+    /* lebar area kerja sebenarnya */
+    --final-center-width:
+        calc(
+            100vw
+            - var(--final-left)
+            - var(--final-right)
+        );
+
+    /* lebar isi chat */
+    --final-content-width:
+        min(
+            760px,
+            var(--final-center-width)
+        );
+
+    /* pergeseran dari tengah viewport
+       menuju tengah area kerja */
+    --final-center-shift:
+        calc(
+            (var(--final-left) - var(--final-right))
+            / 2
+        );
+}
+
+
+/* ================================================================
+   1. PANEL KANAN
+================================================================ */
+
+.stApp:has(.tr-chat-layout)
+.st-key-chat_right_rail {
+
+    position: fixed !important;
+
+    top: 84px !important;
+    right: var(--final-gap) !important;
+    bottom: 16px !important;
+
+    width: var(--final-rail) !important;
+    min-width: var(--final-rail) !important;
+    max-width: var(--final-rail) !important;
+
+    margin: 0 !important;
+    padding: 15px !important;
+
+    box-sizing: border-box !important;
+
+    transform: none !important;
+}
+
+
+/* ================================================================
+   2. TOPBAR
+================================================================ */
+
+.stApp:has(.tr-chat-layout)
+.st-key-chat_topbar {
+
+    position: fixed !important;
+
+    top: 12px !important;
+
+    left: var(--final-left) !important;
+    right: var(--final-right) !important;
+
+    width: auto !important;
+    max-width: none !important;
+    min-width: 0 !important;
+
+    margin: 0 !important;
+
+    transform: none !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* ================================================================
+   3. AREA UTAMA
+================================================================ */
+
+.stApp:has(.tr-chat-layout)
+[data-testid="stMainBlockContainer"] {
+
+    width: 100% !important;
+    max-width: none !important;
+
+    padding-top: 92px !important;
+
+    padding-left:
+        var(--final-left) !important;
+
+    padding-right:
+        var(--final-right) !important;
+
+    padding-bottom: 9rem !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* ================================================================
+   4. KOLOM ISI CHAT
+================================================================ */
+
+.stApp:has(.tr-chat-layout)
+[data-testid="stMainBlockContainer"]
+> [data-testid="stVerticalBlock"] {
+
+    width:
+        var(--final-content-width) !important;
+
+    max-width:
+        var(--final-content-width) !important;
+
+    margin-left: auto !important;
+    margin-right: auto !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* ================================================================
+   5. SAPAAN
+================================================================ */
+
+.stApp:has(.tr-chat-layout)
+.trinity-greeting {
+
+    width: 100% !important;
+
+    position: relative !important;
+
+    left: 0 !important;
+    right: auto !important;
+
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    text-align: center !important;
+
+    transform: none !important;
+}
+
+
+/* ================================================================
+   6. CHAT INPUT / BOTTOM DOCK
+   ------------------------------------------------
+   Jangan gunakan left:-140px lagi.
+================================================================ */
+
+.stApp:has(.tr-chat-layout)
+[data-testid="stBottomBlockContainer"] {
+
+    position: relative !important;
+
+    width:
+        var(--final-content-width) !important;
+
+    max-width:
+        var(--final-content-width) !important;
+
+    margin-left: auto !important;
+    margin-right: auto !important;
+
+    left:
+        var(--final-center-shift) !important;
+
+    transform: none !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* Kotak input mengikuti lebar dock */
+
+.stApp:has(.tr-chat-layout)
+[data-testid="stBottomBlockContainer"]
+[data-testid="stChatInput"] {
+
+    width: 100% !important;
+    max-width: 100% !important;
+
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* ================================================================
+   7. SAAT FRESH HOME
+================================================================ */
+
+.stApp:has(.tr-chat-layout.tr-fresh-home)
+[data-testid="stBottomBlockContainer"] {
+
+    left:
+        var(--final-center-shift) !important;
+
+    transform: none !important;
+}
+
+
+/* ================================================================
+   8. CONVERSATION
+================================================================ */
+
+.stApp:has(.tr-chat-layout)
+.bubble-row {
+
+    width: 100% !important;
+    max-width: 100% !important;
+
+    left: 0 !important;
+
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+
+/* ================================================================
+   9. RESPONSIVE
+================================================================ */
+
+@media (max-width: 1180px) {
+
+    .stApp:has(.tr-chat-layout) {
+
+        --final-rail: 0px;
+
+        --final-right: 18px;
+
+        --final-center-width:
+            calc(
+                100vw
+                - var(--final-left)
+                - var(--final-right)
+            );
+
+        --final-content-width:
+            min(
+                760px,
+                var(--final-center-width)
+            );
+
+        --final-center-shift:
+            calc(
+                (var(--final-left) - var(--final-right))
+                / 2
+            );
+    }
+
+
+    .stApp:has(.tr-chat-layout)
+    .st-key-chat_right_rail {
+
+        display: none !important;
+    }
+
+
+    .stApp:has(.tr-chat-layout)
+    .st-key-chat_topbar {
+
+        left: var(--final-left) !important;
+        right: 18px !important;
+    }
+
+
+    .stApp:has(.tr-chat-layout)
+    [data-testid="stMainBlockContainer"] {
+
+        padding-left:
+            var(--final-left) !important;
+
+        padding-right:
+            18px !important;
+    }
+}
+
+
+/* ================================================================
+   10. MOBILE
+================================================================ */
+
+@media (max-width: 820px) {
+
+    .stApp:has(.tr-chat-layout) {
+
+        --final-sidebar: 76px;
+
+        --final-left: 92px;
+
+        --final-right: 16px;
+
+        --final-content-width:
+            calc(
+                100vw
+                - var(--final-left)
+                - var(--final-right)
+            );
+
+        --final-center-shift: 0px;
+    }
+
+
+    .stApp:has(.tr-chat-layout)
+    [data-testid="stMainBlockContainer"] {
+
+        padding-left: 92px !important;
+        padding-right: 16px !important;
+    }
+
+
+    .stApp:has(.tr-chat-layout)
+    [data-testid="stBottomBlockContainer"] {
+
+        left: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+}
 </style>
 """,
         unsafe_allow_html=True,
