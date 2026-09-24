@@ -26,7 +26,7 @@ MULTI_MESSAGE_Y = 0
 
 # KOLOM INPUT CHAT
 MULTI_INPUT_WIDTH = 760
-MULTI_INPUT_X = 0
+MULTI_INPUT_X = 150
 MULTI_INPUT_Y = 0
 
 # ============================================================
