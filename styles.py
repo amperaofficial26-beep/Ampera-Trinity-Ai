@@ -8042,8 +8042,8 @@ div.stDownloadButton > button,
 
     transform:
         translate(
-            var(--multi-chat-x),
-            var(--multi-chat-y)
+            var(--multi-hero-x),
+            var(--multi-hero-y)
         ) !important;
 
     overflow:
