@@ -65,9 +65,9 @@ def _css(terbuka: bool) -> str:
         "z-index:999998!important;}"
         
         "body [class*='st-key-fd_toggle'] button{"
-        "width:250px!important;"
-        "min-width:250px!important;"
-        "max-width:250px!important;"
+        "width:260px!important;"
+        "min-width:260px!important;"
+        "max-width:260px!important;"
         "height:60px!important;"
         "min-height:60px!important;"
         "padding:0 12px!important;"
