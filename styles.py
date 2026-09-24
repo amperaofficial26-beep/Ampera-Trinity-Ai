@@ -142,7 +142,7 @@ section[data-testid="stSidebar"] div.stButton > button {
     text-align: left !important;
     justify-content: flex-start !important;
     align-items: center !important;
-    gap: 5px !important;
+    gap: 0px !important;
 
     padding: 0 !important;
     min-height: 23px !important;
