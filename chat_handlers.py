@@ -1191,19 +1191,18 @@ canvas {
     const button = {
         w: 126,
         h: 30,
+    
         x: (W - 126) / 2,
-
+    
         /*
-         * Sedikit lebih ke bawah agar terasa seperti
-         * partikel benar-benar turun ke tombol.
+         * Pusat tombol HARUS sama dengan pusat
+         * area morph supaya partikel menyatu
+         * tepat ke tombol asli.
          */
-        y: (H - 30) / 2 + 10,
-
+        y: (H - 30) / 2,
+    
         r: 999
     };
-
-
-    /*
      * ============================================================
      * UTILITAS PARTIKEL
      * ============================================================
