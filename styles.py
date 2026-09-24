@@ -7835,11 +7835,6 @@ div.stDownloadButton > button,
             !important;
     }
 }
-
-/* ================================================================
-   🎛️ KONTROL POSISI KOLOM CHAT
-   Hanya ubah angka di sini.
-================================================================ */
 /* ================================================================
    🎛️ KONTROL POSISI KOLOM CHAT
    Hanya ubah angka di sini.
@@ -7852,7 +7847,7 @@ div.stDownloadButton > button,
        - kiri  = nilai negatif
        - kanan = nilai positif
        ------------------------------------------------ */
-    --chat-shift: -190px;
+    --chat-shift: -150px;
 
 
     /* ------------------------------------------------
