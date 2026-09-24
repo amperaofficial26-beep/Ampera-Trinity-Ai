@@ -6201,7 +6201,7 @@ section[data-testid="stSidebar"]
 div.stButton {
 
     margin:
-        0px 0
+        1px 0
         !important;
 }
 
