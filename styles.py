@@ -4152,7 +4152,7 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
         100vw - var(--dash-center-left) - var(--dash-center-right)
     );
 
-    --dash-content-width: min(720px, var(--dash-center-width));
+    --dash-content-width: min(-100px, var(--dash-center-width));
     --chat-width: min(42rem, var(--dash-center-width));
 
     /* Bottom dock bawaan Streamlit selalu menghitung dari tengah viewport.
