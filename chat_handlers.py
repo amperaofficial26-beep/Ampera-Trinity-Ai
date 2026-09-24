@@ -528,6 +528,9 @@ def fragmen_jawaban_yuki() -> None:
 
     # Thread sudah selesai ATAU pengguna menekan tombol "Hentikan":
     # susun balasannya jadi pesan biasa, lalu muat ulang halaman.
+    # Penanda satu-kali ini membuat input yang kembali tampil menjalankan
+    # animasi partikel dari tombol Hentikan menjadi kolom chat.
+    st.session_state["_yuki_morph_return"] = True
     st.session_state.pop("_yuki_stream", None)
     st.session_state.pop("_yuki_stop", None)
     st.session_state.pop("_yuki_thread", None)
@@ -660,10 +663,14 @@ def chat_input_atau_hentikan(placeholder: str, **kwargs):
     kotak kirim kembali seperti biasa.
     """
     if stream_yuki_aktif():
-        # Tombol MUNGIL di tengah area input (pengganti kotak ketik
-        # selama Yuki menjawab): tidak melebar penuh lagi, dan font +
-        # padding-nya dirampingkan lewat _STOP_BTN_CSS.
-        st.markdown(_STOP_BTN_CSS, unsafe_allow_html=True)
+        # Marker CSS mengganti seluruh dok input menjadi satu tombol. Saat
+        # marker pertama muncul, kartu input seolah pecah menjadi partikel
+        # lalu partikel menyatu menjadi tombol Hentikan.
+        st.markdown(
+            '<div class="yuki-input-morph yuki-input-morph--stop" '
+            'aria-hidden="true"></div>' + _STOP_BTN_CSS,
+            unsafe_allow_html=True,
+        )
         _kiri, _tombol, _kanan = st.columns([1, 0.8, 1])
         with _tombol:
             if st.button(":material/stop_circle:  Hentikan",
@@ -684,7 +691,18 @@ def chat_input_atau_hentikan(placeholder: str, **kwargs):
                 if stream_state is not None:
                     stream_state["hentikan"] = True
         return None
+
+    # Setelah stream selesai, marker hanya hidup untuk satu render. Kolom
+    # chat masuk kembali dengan arah animasi kebalikan: partikel menyatu
+    # dari posisi tombol Hentikan menjadi kartu input utuh.
+    if st.session_state.pop("_yuki_morph_return", False):
+        st.markdown(
+            '<div class="yuki-input-morph yuki-input-morph--return" '
+            'aria-hidden="true"></div>',
+            unsafe_allow_html=True,
+        )
     return st.chat_input(placeholder, **kwargs)
+
 
 def handle_chat_request(answer_slot, request_text: str = "") -> None:
     thread = active_thread()
