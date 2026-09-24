@@ -8715,11 +8715,11 @@ hr {
 /* Tombol */
 
 .stApp [class*="st-key-settings_float_"] button {
-    width: 46px !important;
-    height: 46px !important;
+    width: 36px !important;
+    height: 36px !important;
 
-    min-width: 46px !important;
-    min-height: 46px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
 
     padding: 0 !important;
     margin: 0 !important;
