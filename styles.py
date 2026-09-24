@@ -6211,7 +6211,7 @@ section[data-testid="stSidebar"]
 div.stButton > button {
 
     min-height:
-        36px
+        12px
         !important;
 
     padding:
