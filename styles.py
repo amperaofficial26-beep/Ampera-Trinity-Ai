@@ -5370,109 +5370,77 @@ span[role="img"],
     white-space: nowrap !important;
 }
 /* =========================================================
-   INPUT <-> TOMBOL HENTIKAN — MORPH PARTIKEL 5 DETIK
+   YUKI PARTICLE MORPH
+   DELAY 3 DETIK + MORPH 2 DETIK
+   TOTAL 5 DETIK
    ========================================================= */
 
-/*
-   Saat morph berjalan, kartu Streamlit asli dibuat transparan.
-   Ukuran/layout TIDAK berubah.
-*/
+
+/* =========================================================
+   SAAT MORPH:
+   parent tidak boleh meninggalkan background kartu besar.
+   ========================================================= */
+
 [data-testid="stBottomBlockContainer"]:has(.yuki-input-morph--stop),
 [data-testid="stBottomBlockContainer"]:has(.yuki-input-morph--return) {
     background: transparent !important;
+
     border-color: transparent !important;
+
     box-shadow: none !important;
 }
 
 
-/*
-   Clone visual kartu.
-   Inilah yang melakukan fade:
-   - STOP   : terlihat -> hilang
-   - RETURN : hilang -> terlihat
-*/
-[data-testid="stBottomBlockContainer"]:has(.yuki-input-morph--stop)::before,
-[data-testid="stBottomBlockContainer"]:has(.yuki-input-morph--return)::before {
-    content: "";
-
-    position: absolute !important;
-
-    inset: 0 !important;
-
-    width: 100% !important;
-    height: 100% !important;
-
-    border-radius: 22px !important;
-
-    pointer-events: none !important;
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(248, 239, 222, 0.98),
-            rgba(239, 225, 202, 0.98)
-        ) !important;
-
-    border:
-        1px solid
-        rgba(159, 126, 72, 0.38) !important;
-
-    box-shadow:
-        0 8px 24px rgba(65, 46, 27, 0.12),
-        inset 0 1px 0 rgba(255, 255, 255, 0.78) !important;
-
-    z-index: 0 !important;
-}
-
-
-/*
-   STOP:
-   kartu benar-benar fade out pada 0–1.2 detik.
-*/
-[data-testid="stBottomBlockContainer"]:has(.yuki-input-morph--stop)::before {
-    animation:
-        yuki-dock-fade-stop
-        5000ms
-        linear
-        both !important;
-}
-
-
-/*
-   RETURN:
-   kartu tetap hilang sampai partikel hampir selesai,
-   lalu fade in pada fase akhir.
-*/
-[data-testid="stBottomBlockContainer"]:has(.yuki-input-morph--return)::before {
-    animation:
-        yuki-dock-fade-return
-        5000ms
-        linear
-        both !important;
-}
-
-
 /* =========================================================
-   INPUT NORMAL SAAT KEMBALI
+   STOP STATE
    ========================================================= */
 
-/*
-   Tidak mengubah width / height / transform input.
-   Hanya membuatnya transparan selama partikel bekerja.
-*/
-[data-testid="stBottomBlockContainer"]:has(.yuki-input-morph--return)
-[data-testid="stChatInput"] {
-    opacity: 0 !important;
+[data-testid="stBottomBlockContainer"]:has(.yuki-input-morph--stop)
+.st-key-pending_preview,
 
-    transform: none !important;
+[data-testid="stBottomBlockContainer"]:has(.yuki-input-morph--stop)
+.st-key-chat_controls {
+    display: none !important;
+}
 
-    filter: none !important;
 
-    animation:
-        yuki-input-rematerialize
-        5000ms
-        linear
-        both !important;
+/* Posisi tombol tetap di tengah. */
+
+[data-testid="stBottomBlockContainer"]:has(.yuki-input-morph--stop)
+[data-testid="stHorizontalBlock"]:has(.st-key-yuki_stop_dok) {
+    width: 100% !important;
+
+    min-height: 64px !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+
+    justify-content: center !important;
+}
+
+
+/* Sembunyikan kolom lain. */
+
+[data-testid="stBottomBlockContainer"]:has(.yuki-input-morph--stop)
+[data-testid="stHorizontalBlock"]:has(.st-key-yuki_stop_dok)
+> [data-testid="stColumn"] {
+    display: none !important;
+}
+
+
+/* Kolom tombol tetap aktif. */
+
+[data-testid="stBottomBlockContainer"]:has(.yuki-input-morph--stop)
+[data-testid="stHorizontalBlock"]:has(.st-key-yuki_stop_dok)
+> [data-testid="stColumn"]:has(.st-key-yuki_stop_dok) {
+    display: block !important;
+
+    flex: 0 0 auto !important;
+
+    width: auto !important;
+
+    min-width: 0 !important;
 }
 
 
@@ -5486,103 +5454,65 @@ button.st-key-yuki_stop_dok {
 
     overflow: visible !important;
 
-    /*
-       Tombol tidak muncul dulu.
-       Baru aktif secara visual ketika partikel sudah
-       hampir selesai menyusunnya.
-    */
     animation:
-        yuki-stop-materialize
+        yuki-stop-fade-in
         5000ms
         linear
         both !important;
 }
 
 
-/* =========================================================
-   FASE FADE KARTU INPUT
-   ========================================================= */
+/*
+ * Selama 3 detik pertama:
+ * tombol belum muncul.
+ *
+ * 3 - 4.7 detik:
+ * particle sedang menyusun bentuk tombol.
+ *
+ * 4.7 - 5 detik:
+ * tombol fade in.
+ */
 
-@keyframes yuki-dock-fade-stop {
-
-    0% {
-        opacity: 1;
-    }
-
-    24% {
-        opacity: 0;
-    }
-
-    100% {
-        opacity: 0;
-    }
-}
-
-
-@keyframes yuki-dock-fade-return {
-
-    0% {
-        opacity: 0;
-    }
-
-    80% {
-        opacity: 0;
-    }
-
-    94% {
-        opacity: 1;
-    }
-
-    100% {
-        opacity: 1;
-    }
-}
-
-
-/* =========================================================
-   TOMBOL HENTIKAN FADE IN
-   ========================================================= */
-
-@keyframes yuki-stop-materialize {
+@keyframes yuki-stop-fade-in {
 
     0% {
         opacity: 0;
 
         visibility: hidden;
 
-        filter: blur(6px);
+        filter: blur(5px);
     }
 
-    78% {
+    60% {
         opacity: 0;
 
         visibility: hidden;
 
-        filter: blur(6px);
+        filter: blur(5px);
     }
 
-    82% {
-        opacity: 0.12;
+    88% {
+        opacity: 0;
 
-        visibility: visible;
+        visibility: hidden;
 
         filter: blur(4px);
     }
 
-    88% {
-        opacity: 0.48;
+    92% {
+        opacity: 0.45;
 
         visibility: visible;
 
         filter: blur(2px);
     }
 
-    94% {
-        opacity: 0.88;
+    95% {
+        opacity: 0.82;
 
         visibility: visible;
 
-        filter: blur(0.5px);
+        filter: blur(0.8px);
     }
 
     100% {
@@ -5594,31 +5524,70 @@ button.st-key-yuki_stop_dok {
     }
 }
 
+[data-testid="stBottomBlockContainer"]:has(.yuki-input-morph--stop)
+.st-key-yuki_stop_dok button {
+    animation:
+        yuki-stop-fade-in
+        5000ms
+        linear
+        both !important;
+}
+
 
 /* =========================================================
-   INPUT KEMBALI FADE IN
+   RETURN STATE
    ========================================================= */
 
-@keyframes yuki-input-rematerialize {
+
+/*
+ * Input asli sudah dirender lagi oleh Streamlit,
+ * tetapi kita sembunyikan secara visual selama morph.
+ *
+ * Tidak ada scaleX / scaleY.
+ * Jadi ukuran normal input sama sekali tidak berubah.
+ */
+
+[data-testid="stBottomBlockContainer"]:has(.yuki-input-morph--return)
+[data-testid="stChatInput"] {
+    opacity: 0 !important;
+
+    transform: none !important;
+
+    filter: none !important;
+
+    animation:
+        yuki-input-fade-in
+        5000ms
+        linear
+        both !important;
+}
+
+
+/*
+ * Input fade-in hanya setelah partikel
+ * selesai menyusun bentuknya.
+ */
+
+@keyframes yuki-input-fade-in {
 
     0% {
         opacity: 0;
     }
 
-    80% {
+    60% {
         opacity: 0;
     }
 
-    86% {
-        opacity: 0.18;
+    88% {
+        opacity: 0;
     }
 
     92% {
-        opacity: 0.62;
+        opacity: 0.45;
     }
 
-    96% {
-        opacity: 0.92;
+    95% {
+        opacity: 0.82;
     }
 
     100% {
@@ -5628,7 +5597,7 @@ button.st-key-yuki_stop_dok {
 
 
 /* =========================================================
-   CANVAS PARTIKEL
+   CANVAS PARTICLE
    ========================================================= */
 
 [data-testid="stBottomBlockContainer"] {
@@ -5640,10 +5609,13 @@ button.st-key-yuki_stop_dok {
     position: absolute !important;
 
     left: 0 !important;
+
     right: 0 !important;
+
     bottom: 0 !important;
 
     width: 100% !important;
+
     height: 120px !important;
 
     z-index: 999990 !important;
@@ -5660,6 +5632,7 @@ button.st-key-yuki_stop_dok {
     display: block !important;
 
     width: 100% !important;
+
     height: 120px !important;
 
     border: 0 !important;
@@ -5678,12 +5651,17 @@ button.st-key-yuki_stop_dok {
 
     .st-key-yuki_stop_dok button,
     button.st-key-yuki_stop_dok,
+
     [data-testid="stBottomBlockContainer"]
-    [data-testid="stChatInput"],
-    [data-testid="stBottomBlockContainer"]:has(.yuki-input-morph--stop)::before,
-    [data-testid="stBottomBlockContainer"]:has(.yuki-input-morph--return)::before {
+    [data-testid="stChatInput"] {
 
         animation: none !important;
+
+        opacity: 1 !important;
+
+        filter: none !important;
+
+        transform: none !important;
     }
 }
 </style>
