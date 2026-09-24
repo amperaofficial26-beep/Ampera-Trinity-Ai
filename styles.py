@@ -5453,15 +5453,27 @@ button.st-key-yuki_stop_dok {
 }
 @keyframes yuki-input-rematerialize {
     0% {
-        opacity: .12;
-        transform: scaleX(.10) scaleY(.46);
+        opacity: 0;
+        transform: scale(0.72);
         filter: blur(5px);
     }
 
-    58% {
-        opacity: .82;
-        transform: scaleX(1.02) scaleY(.94);
+    72% {
+        opacity: 0;
+        transform: scale(0.82);
+        filter: blur(3px);
+    }
+
+    84% {
+        opacity: 0.55;
+        transform: scale(0.96);
         filter: blur(1px);
+    }
+
+    94% {
+        opacity: 0.92;
+        transform: scale(1.015);
+        filter: blur(0);
     }
 
     100% {
@@ -5470,7 +5482,6 @@ button.st-key-yuki_stop_dok {
         filter: blur(0);
     }
 }
-
 @keyframes yuki-particles-out {
     0% {
         opacity: 0;
