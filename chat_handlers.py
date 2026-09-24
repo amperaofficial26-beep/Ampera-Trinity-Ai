@@ -1077,19 +1077,11 @@ def _dialog_premium() -> None:
             st.rerun()
 
 def _render_input_particle_morph(direction: str) -> None:
-    """
-    Particle morph ala Claude:
-    INPUT -> menyebar -> melengkung turun -> tombol
-    TOMBOL -> menyebar -> melengkung naik -> INPUT
-
-    Timing:
-    0.0 - 3.0 detik : delay, bentuk awal tetap terlihat
-    3.0 - 5.0 detik : particle morph
-    """
+    """Particle morph input <-> tombol Hentikan."""
 
     reverse = direction == "return"
 
-    html_fx = """
+    html_fx = f"""
 <!doctype html>
 <html>
 <head>
@@ -1097,45 +1089,71 @@ def _render_input_particle_morph(direction: str) -> None:
 
 <style>
 html,
-body {
+body {{
     margin: 0;
+    padding: 0;
     width: 100%;
     height: 100%;
     overflow: hidden;
     background: transparent;
-}
+}}
 
-canvas {
+canvas {{
     position: absolute;
-    inset: 0;
+    left: 0;
+    top: 0;
     width: 100%;
-    height: 100%;
+    height: 120px;
+    display: block;
     pointer-events: none;
-}
+}}
 </style>
 </head>
 
 <body>
+
 <canvas id="morph"></canvas>
 
 <script>
-(() => {
+(() => {{
 
-    const canvas = document.getElementById("morph");
-    const ctx = canvas.getContext("2d");
+    const canvas =
+        document.getElementById("morph");
 
-    const reverse = __REVERSE__;
+    const ctx =
+        canvas.getContext("2d");
 
-    const DPR = Math.min(
-        window.devicePixelRatio || 1,
-        2
-    );
+    const reverse = {str(reverse).lower()};
 
-    const W = window.innerWidth;
-    const H = window.innerHeight;
+    const WIDTH =
+        Math.max(
+            1,
+            document.documentElement.clientWidth
+        );
 
-    canvas.width = W * DPR;
-    canvas.height = H * DPR;
+    const HEIGHT = 120;
+
+    const DPR =
+        Math.min(
+            window.devicePixelRatio || 1,
+            2
+        );
+
+
+    /*
+     * Canvas HARUS punya ukuran pixel nyata.
+     */
+    canvas.width =
+        WIDTH * DPR;
+
+    canvas.height =
+        HEIGHT * DPR;
+
+    canvas.style.width =
+        WIDTH + "px";
+
+    canvas.style.height =
+        HEIGHT + "px";
 
     ctx.setTransform(
         DPR,
@@ -1146,79 +1164,86 @@ canvas {
         0
     );
 
-    /*
-     * ============================================================
-     * TIMING
-     * ============================================================
-     */
-
-    const MORPH = 3000;
-    const TOTAL = MORPH;
-    const start = performance.now();
-
 
     /*
      * ============================================================
-     * INPUT
+     * POSISI
      * ============================================================
      */
 
-    const cardW = Math.min(
-        760,
-        Math.max(0, W - 24)
-    );
+    const centerX =
+        WIDTH / 2;
 
-    const morphCenterY = H / 2;
+    const centerY =
+        HEIGHT / 2;
 
-    const input = {
-        x: (W - cardW) / 2,
-    
-        y: morphCenterY - cardH / 2,
-    
-        w: cardW,
-        h: cardH,
-    
+
+    /*
+     * Ukuran input mengikuti kartu asli.
+     */
+    const inputWidth =
+        Math.min(
+            760,
+            WIDTH - 24
+        );
+
+    const inputHeight = 56;
+
+    const input = {{
+        x:
+            (WIDTH - inputWidth) / 2,
+
+        y:
+            centerY -
+            inputHeight / 2,
+
+        w:
+            inputWidth,
+
+        h:
+            inputHeight,
+
         r: 22
-    };
+    }};
 
 
     /*
-     * ============================================================
-     * TOMBOL HENTIKAN
-     * ============================================================
+     * Tombol asli Hentikan.
      */
-
-    const button = {
+    const button = {{
         w: 126,
         h: 30,
-    
-        x: (W - 126) / 2,
-    
-        /*
-         * Pusat tombol HARUS sama dengan pusat
-         * area morph supaya partikel menyatu
-         * tepat ke tombol asli.
-         */
-        y: (H - 30) / 2,
-    
+
+        x:
+            centerX -
+            63,
+
+        y:
+            centerY -
+            15,
+
         r: 999
-    };
+    }};
+
+
+    /*
      * ============================================================
-     * UTILITAS PARTIKEL
+     * PARTICLES
      * ============================================================
      */
 
-    const inputPoints = [];
-    const buttonPoints = [];
+    const source = [];
+    const target = [];
 
-    function addPoint(
-        array,
+
+    function add(
+        list,
         x,
         y,
         color,
         size
-    ) {
-        array.push({
+    ) {{
+        list.push({{
             x,
             y,
             color,
@@ -1230,82 +1255,74 @@ canvas {
                 2,
 
             spread:
-                18 +
-                Math.random() * 28,
-
-            drift:
-                (Math.random() - 0.5) * 14
-        });
-    }
+                12 +
+                Math.random() * 30
+        }});
+    }}
 
 
-    /*
-     * ============================================================
-     * ROUNDED RECTANGLE
-     * ============================================================
-     */
-
-    function roundedOutline(
-        array,
+    function roundedRect(
+        list,
         rect,
         step,
         color,
         size
-    ) {
+    ) {{
 
         const x = rect.x;
         const y = rect.y;
         const w = rect.w;
         const h = rect.h;
-        const r = Math.min(
-            rect.r,
-            w / 2,
-            h / 2
-        );
+        const r = rect.r;
+
 
         for (
             let px = x + r;
             px <= x + w - r;
             px += step
-        ) {
-            addPoint(
-                array,
+        ) {{
+
+            add(
+                list,
                 px,
                 y,
                 color,
                 size
             );
 
-            addPoint(
-                array,
+            add(
+                list,
                 px,
                 y + h,
                 color,
                 size
             );
-        }
+        }}
+
 
         for (
             let py = y + r;
             py <= y + h - r;
             py += step
-        ) {
-            addPoint(
-                array,
+        ) {{
+
+            add(
+                list,
                 x,
                 py,
                 color,
                 size
             );
 
-            addPoint(
-                array,
+            add(
+                list,
                 x + w,
                 py,
                 color,
                 size
             );
-        }
+        }}
+
 
         const corners = [
             [
@@ -1334,16 +1351,17 @@ canvas {
             ]
         ];
 
-        for (const c of corners) {
+
+        for (const c of corners) {{
 
             for (
                 let a = c[2];
                 a < c[3];
-                a += 0.11
-            ) {
+                a += 0.12
+            ) {{
 
-                addPoint(
-                    array,
+                add(
+                    list,
 
                     c[0] +
                     Math.cos(a) * r,
@@ -1352,170 +1370,124 @@ canvas {
                     Math.sin(a) * r,
 
                     color,
+
                     size
                 );
-            }
-        }
-    }
+            }}
+        }}
+    }}
 
 
     /*
      * ============================================================
-     * INPUT PARTICLES
+     * INPUT
      * ============================================================
      */
 
-    roundedOutline(
-        inputPoints,
+    roundedRect(
+        source,
         input,
         6,
         "#9b8d86",
-        2.0
+        2
     );
 
 
     /*
-     * Permukaan input.
+     * Isi ringan.
      */
-
     for (
-        let y = input.y + 8;
+        let y = input.y + 9;
         y < input.y + input.h - 8;
-        y += 7
-    ) {
+        y += 8
+    ) {{
 
         for (
-            let x = input.x + 14;
-            x < input.x + input.w - 14;
-            x += 11
-        ) {
+            let x = input.x + 15;
+            x < input.x + input.w - 15;
+            x += 12
+        ) {{
 
-            if (Math.random() < 0.20) {
+            if (
+                Math.random() < 0.16
+            ) {{
 
-                addPoint(
-                    inputPoints,
+                add(
+                    source,
                     x,
                     y,
-                    "#d0c1af",
-                    1.2
+                    "#d2c3b0",
+                    1.3
                 );
-            }
-        }
-    }
+            }}
+        }}
+    }}
 
 
     /*
-     * Placeholder teks.
+     * Placeholder.
      */
-
     for (
         let x = input.x + 70;
-        x < Math.min(
-            input.x + 330,
-            input.x + input.w - 220
-        );
+        x < input.x + 320;
         x += 6
-    ) {
-
-        const wave =
-            Math.sin(x * 0.08) * 1.5;
+    ) {{
 
         for (
-            let y =
-                input.y +
-                input.h / 2 -
-                5 +
-                wave;
-
-            y <=
-                input.y +
-                input.h / 2 +
-                5 +
-                wave;
-
+            let y = centerY - 5;
+            y <= centerY + 5;
             y += 4
-        ) {
+        ) {{
 
-            if (Math.random() < 0.62) {
+            if (
+                Math.random() < 0.60
+            ) {{
 
-                addPoint(
-                    inputPoints,
+                add(
+                    source,
                     x,
                     y,
                     "#756a70",
                     1.5
                 );
-            }
-        }
-    }
-
-
-    /*
-     * Ikon input.
-     */
-
-    const icons = [
-        input.x + 32,
-        input.x + input.w - 112,
-        input.x + input.w - 74,
-        input.x + input.w - 34
-    ];
-
-    for (const px of icons) {
-
-        for (
-            let a = 0;
-            a < Math.PI * 2;
-            a += 0.25
-        ) {
-
-            addPoint(
-                inputPoints,
-
-                px +
-                Math.cos(a) * 8,
-
-                input.y +
-                input.h / 2 +
-                Math.sin(a) * 8,
-
-                "#756a70",
-                1.7
-            );
-        }
-    }
+            }}
+        }}
+    }}
 
 
     /*
      * ============================================================
-     * TOMBOL PARTICLES
+     * TOMBOL
      * ============================================================
      */
 
-    roundedOutline(
-        buttonPoints,
+    roundedRect(
+        target,
         button,
         4,
         "#857462",
-        2.0
+        2
     );
 
 
     /*
      * Ikon stop.
      */
+    const stopX =
+        button.x + 20;
 
-    const stopX = button.x + 20;
-    const stopY = button.y + button.h / 2;
+    const stopY =
+        button.y + 15;
+
 
     for (
         let a = 0;
         a < Math.PI * 2;
-        a += 0.20
-    ) {
+        a += 0.25
+    ) {{
 
-        addPoint(
-            buttonPoints,
+        add(
+            target,
 
             stopX +
             Math.cos(a) * 7,
@@ -1524,173 +1496,155 @@ canvas {
             Math.sin(a) * 7,
 
             "#514653",
+
             1.8
         );
-    }
+    }}
 
 
     /*
-     * Teks Hentikan sebagai titik.
+     * Teks tombol.
      */
-
     const textCanvas =
-        document.createElement("canvas");
+        document.createElement(
+            "canvas"
+        );
 
-    textCanvas.width = 180;
-    textCanvas.height = 50;
+    textCanvas.width = 100;
+    textCanvas.height = 32;
 
     const textCtx =
-        textCanvas.getContext("2d");
+        textCanvas.getContext(
+            "2d"
+        );
+
+    textCtx.clearRect(
+        0,
+        0,
+        100,
+        32
+    );
 
     textCtx.font =
         '500 13px "Space Grotesk", sans-serif';
 
-    textCtx.textBaseline = "middle";
-    textCtx.fillStyle = "#514653";
+    textCtx.fillStyle =
+        "#514653";
+
+    textCtx.textBaseline =
+        "middle";
 
     textCtx.fillText(
         "Hentikan",
         0,
-        25
+        16
     );
 
     const pixels =
         textCtx.getImageData(
             0,
             0,
-            textCanvas.width,
-            textCanvas.height
+            100,
+            32
         ).data;
+
 
     for (
         let y = 0;
-        y < textCanvas.height;
+        y < 32;
         y += 2
-    ) {
+    ) {{
 
         for (
             let x = 0;
-            x < textCanvas.width;
+            x < 100;
             x += 2
-        ) {
+        ) {{
 
             const index =
                 (
-                    y *
-                    textCanvas.width +
-                    x
+                    y * 100 + x
                 ) * 4;
 
             if (
                 pixels[index + 3] > 100
-            ) {
+            ) {{
 
-                addPoint(
-                    buttonPoints,
+                add(
+                    target,
 
-                    button.x + 34 + x,
-                    button.y + y - 10,
+                    button.x +
+                    34 +
+                    x,
+
+                    button.y +
+                    16 +
+                    (y - 16),
 
                     "#514653",
-                    1.4
+
+                    1.45
                 );
-            }
-        }
-    }
+            }}
+        }}
+    }}
 
 
     /*
      * ============================================================
-     * NORMALISASI JUMLAH PARTIKEL
-     * ============================================================
-     *
-     * Target sekitar 460 partikel,
-     * mengikuti konsep demo yang kamu kirim.
-     */
-
-    const TARGET_COUNT = 460;
-
-    function normalize(
-        source
-    ) {
-
-        const result = [];
-
-        for (
-            let i = 0;
-            i < TARGET_COUNT;
-            i++
-        ) {
-
-            result.push(
-                source[
-                    i % source.length
-                ]
-            );
-        }
-
-        return result;
-    }
-
-    const sources =
-        normalize(inputPoints);
-
-    const targets =
-        normalize(buttonPoints);
-
-
-    /*
-     * ============================================================
-     * PAIR PARTICLES
+     * JUMLAH PARTICLE
      * ============================================================
      */
+
+    const COUNT = 460;
 
     const particles = [];
 
     for (
         let i = 0;
-        i < TARGET_COUNT;
+        i < COUNT;
         i++
-    ) {
+    ) {{
 
-        const a = sources[i];
-        const b = targets[i];
+        const s =
+            source[
+                i % source.length
+            ];
 
-        particles.push({
+        const t =
+            target[
+                i % target.length
+            ];
 
-            sx: a.x,
-            sy: a.y,
 
-            tx: b.x,
-            ty: b.y,
+        particles.push({{
 
-            color: a.color,
-            targetColor: b.color,
+            sx: s.x,
+            sy: s.y,
+
+            tx: t.x,
+            ty: t.y,
+
+            color:
+                s.color,
+
+            targetColor:
+                t.color,
 
             size:
-                Math.max(
-                    1.15,
-                    (
-                        a.size +
-                        b.size
-                    ) / 2
-                ),
+                s.size,
 
             angle:
-                a.angle,
+                s.angle,
 
             spread:
-                a.spread,
-
-            drift:
-                a.drift,
+                s.spread,
 
             phase:
                 Math.random() *
-                Math.PI *
-                2
-        });
-    }
+                Math.PI * 2
+        }});
+    }}
 
 
     /*
@@ -1699,23 +1653,14 @@ canvas {
      * ============================================================
      */
 
-    function clamp(v) {
+    function clamp(v) {{
         return Math.max(
             0,
             Math.min(1, v)
         );
-    }
+    }}
 
-    function easeOutCubic(t) {
-        return 1 -
-            Math.pow(
-                1 - t,
-                3
-            );
-    }
-
-    function easeInOutCubic(t) {
-
+    function ease(t) {{
         return t < 0.5
             ? 4 * t * t * t
             : 1 -
@@ -1723,524 +1668,206 @@ canvas {
                   -2 * t + 2,
                   3
               ) / 2;
-    }
-
-    function mix(a, b, t) {
-        return a +
-            (b - a) * t;
-    }
+    }}
 
 
     /*
      * ============================================================
-     * WARNA
-     * ============================================================
-     */
-
-    function hexToRgb(hex) {
-
-        const value =
-            hex.replace("#", "");
-
-        return {
-            r: parseInt(
-                value.substring(0, 2),
-                16
-            ),
-            g: parseInt(
-                value.substring(2, 4),
-                16
-            ),
-            b: parseInt(
-                value.substring(4, 6),
-                16
-            )
-        };
-    }
-
-    function rgbToHex(
-        r,
-        g,
-        b
-    ) {
-
-        const toHex = v =>
-            Math.round(v)
-                .toString(16)
-                .padStart(2, "0");
-
-        return "#" +
-            toHex(r) +
-            toHex(g) +
-            toHex(b);
-    }
-
-
-    /*
-     * ============================================================
-     * GHOST INPUT
+     * ANIMASI
      * ============================================================
      *
-     * Ini membuat bentuk asli tetap terlihat
-     * selama delay 3 detik.
+     * TOTAL 3 DETIK.
      */
+    const duration = 3000;
 
-    function drawInputGhost(alpha) {
-
-        if (alpha <= 0) {
-            return;
-        }
-
-        ctx.save();
-
-        ctx.globalAlpha = alpha;
-
-        ctx.beginPath();
-
-        ctx.roundRect(
-            input.x,
-            input.y,
-            input.w,
-            input.h,
-            input.r
-        );
-
-        ctx.fillStyle =
-            "rgba(248,239,222,0.98)";
-
-        ctx.fill();
-
-        ctx.strokeStyle =
-            "rgba(159,126,72,0.38)";
-
-        ctx.lineWidth = 1;
-
-        ctx.stroke();
-
-        ctx.restore();
-    }
+    const start =
+        performance.now();
 
 
-    /*
-     * ============================================================
-     * GHOST BUTTON
-     * ============================================================
-     */
+    function frame(now) {{
 
-    function drawButtonGhost(alpha) {
-
-        if (alpha <= 0) {
-            return;
-        }
-
-        ctx.save();
-
-        ctx.globalAlpha = alpha;
-
-        ctx.beginPath();
-
-        ctx.roundRect(
-            button.x,
-            button.y,
-            button.w,
-            button.h,
-            button.r
-        );
-
-        ctx.fillStyle =
-            "rgba(248,239,222,0.98)";
-
-        ctx.fill();
-
-        ctx.strokeStyle =
-            "rgba(159,126,72,0.38)";
-
-        ctx.lineWidth = 1;
-
-        ctx.stroke();
-
-        ctx.restore();
-    }
-
-
-    /*
-     * ============================================================
-     * FRAME
-     * ============================================================
-     */
-
-    function frame(now) {
-
-        const elapsed =
-            now - start;
-
-        const progress =
+        const raw =
             clamp(
-                elapsed / TOTAL
+                (
+                    now - start
+                ) /
+                duration
             );
+
+
+        /*
+         * 0 → 0.15
+         * Pecah / menyebar
+         */
+        const spread =
+            clamp(
+                raw / 0.15
+            );
+
+
+        /*
+         * 0.15 → 1
+         * Bergerak ke target.
+         */
+        const travel =
+            ease(
+                clamp(
+                    (raw - 0.15) /
+                    0.85
+                )
+            );
+
 
         ctx.clearRect(
             0,
             0,
-            W,
-            H
+            WIDTH,
+            HEIGHT
         );
 
-        /*
-         * ========================================================
-         * MORPH 0 -> 1
-         * ========================================================
-         */
 
-       const morphProgress =
-           clamp(
-               elapsed / MORPH
-           );
-
-
-        /*
-         * 0.00 - 0.18
-         *
-         * Partikel keluar dari bentuk awal.
-         */
-
-        let spreadProgress =
-            clamp(
-                morphProgress / 0.18
-            );
-
-
-        /*
-         * 0.18 - 1.00
-         *
-         * Partikel menuju bentuk target.
-         */
-
-        let travelProgress =
-            clamp(
-                (
-                    morphProgress -
-                    0.18
-                ) / 0.82
-            );
-
-        travelProgress =
-            easeInOutCubic(
-                travelProgress
-            );
-
-
-        /*
-         * Input ghost / button ghost
-         */
-
-        if (!reverse) {
-
-            /*
-             * Input menghilang
-             * lebih dulu.
-             */
-
-            const ghost =
-                1 -
-                clamp(
-                    morphProgress / 0.18
-                );
-
-            drawInputGhost(
-                ghost * 0.95
-            );
-
-        } else {
-
-            const ghost =
-                1 -
-                clamp(
-                    morphProgress / 0.18
-                );
-
-            drawButtonGhost(
-                ghost * 0.95
-            );
-        }
-
-
-        /*
-         * ========================================================
-         * PARTICLES
-         * ========================================================
-         */
-
-        for (const p of particles) {
+        for (
+            const p of particles
+        ) {{
 
             let x;
             let y;
 
-            let targetColor =
-                hexToRgb(
-                    p.targetColor
-                );
 
-            let sourceColor =
-                hexToRgb(
-                    p.color
-                );
+            if (!reverse) {{
 
+                const spreadX =
+                    p.sx +
+                    Math.cos(
+                        p.angle
+                    ) *
+                    p.spread *
+                    spread;
 
-            /*
-             * ====================================================
-             * STOP
-             * ====================================================
-             */
+                const spreadY =
+                    p.sy +
+                    Math.sin(
+                        p.angle
+                    ) *
+                    p.spread *
+                    spread;
 
-            if (!reverse) {
 
                 /*
-                 * FASE 1:
-                 * partikel menyebar
+                 * Lengkungan turun
+                 * menuju tombol.
                  */
-
-                if (
-                    morphProgress <
-                    0.18
-                ) {
-
-                    const spread =
-                        easeOutCubic(
-                            spreadProgress
-                        );
-
-                    x =
-                        p.sx +
-                        Math.cos(
-                            p.angle
-                        ) *
-                        p.spread *
-                        spread;
-
-                    y =
-                        p.sy +
-                        Math.sin(
-                            p.angle
-                        ) *
-                        p.spread *
-                        spread;
-
-                } else {
-
-                    /*
-                     * Posisi setelah menyebar.
-                     */
-
-                    const spreadX =
-                        p.sx +
-                        Math.cos(
-                            p.angle
-                        ) *
-                        p.spread;
-
-                    const spreadY =
-                        p.sy +
-                        Math.sin(
-                            p.angle
-                        ) *
-                        p.spread;
+                const curve =
+                    Math.sin(
+                        travel *
+                        Math.PI
+                    );
 
 
-                    /*
-                     * Kurva turun menuju tombol.
-                     */
-
-                    const curve =
-                        Math.sin(
-                            travelProgress *
-                            Math.PI
-                        );
-
-                    x =
-                        mix(
-                            spreadX,
-                            p.tx,
-                            travelProgress
-                        );
-
-                    y =
-                        mix(
-                            spreadY,
-                            p.ty,
-                            travelProgress
-                        )
-                        +
-                        curve *
-                        18;
-                }
-
-            }
+                x =
+                    spreadX +
+                    (
+                        p.tx -
+                        spreadX
+                    ) *
+                    travel;
 
 
-            /*
-             * ====================================================
-             * RETURN
-             * ====================================================
-             */
+                y =
+                    spreadY +
+                    (
+                        p.ty -
+                        spreadY
+                    ) *
+                    travel +
+                    curve *
+                    16;
 
-            else {
+            }} else {{
 
-                /*
-                 * Mulai dari tombol.
-                 */
-
-                const startX =
+                const spreadX =
                     p.tx +
                     Math.cos(
                         p.angle
                     ) *
-                    p.spread;
+                    p.spread *
+                    spread;
 
-                const startY =
+                const spreadY =
                     p.ty +
                     Math.sin(
                         p.angle
                     ) *
-                    p.spread;
+                    p.spread *
+                    spread;
 
 
-                if (
-                    morphProgress <
-                    0.18
-                ) {
+                /*
+                 * Lengkungan naik
+                 * menuju input.
+                 */
+                const curve =
+                    Math.sin(
+                        travel *
+                        Math.PI
+                    );
 
-                    const spread =
-                        easeOutCubic(
-                            spreadProgress
-                        );
 
-                    x =
-                        p.tx +
-                        Math.cos(
-                            p.angle
-                        ) *
-                        p.spread *
-                        spread;
+                x =
+                    spreadX +
+                    (
+                        p.sx -
+                        spreadX
+                    ) *
+                    travel;
 
-                    y =
-                        p.ty +
-                        Math.sin(
-                            p.angle
-                        ) *
-                        p.spread *
-                        spread;
 
-                } else {
-
-                    /*
-                     * Kurva naik menuju input.
-                     */
-
-                    const curve =
-                        Math.sin(
-                            travelProgress *
-                            Math.PI
-                        );
-
-                    x =
-                        mix(
-                            startX,
-                            p.sx,
-                            travelProgress
-                        );
-
-                    y =
-                        mix(
-                            startY,
-                            p.sy,
-                            travelProgress
-                        )
-                        -
-                        curve *
-                        18;
-                }
-            }
+                y =
+                    spreadY +
+                    (
+                        p.sy -
+                        spreadY
+                    ) *
+                    travel -
+                    curve *
+                    16;
+            }}
 
 
             /*
-             * Sedikit floating motion.
+             * Sedikit organic movement.
              */
-
             x +=
                 Math.sin(
                     now * 0.004 +
                     p.phase
                 ) *
-                p.drift *
-                0.12;
+                0.8;
 
             y +=
                 Math.cos(
                     now * 0.003 +
                     p.phase
                 ) *
-                p.drift *
-                0.08;
+                0.5;
 
 
             /*
-             * Warna berubah ketika
-             * partikel mendekati target.
+             * Fade particle di 10% terakhir.
              */
-
-            const colorT =
-                Math.max(
-                    0,
-                    (morphProgress - 0.35) /
-                    0.65
-                );
-
-            const r =
-                mix(
-                    sourceColor.r,
-                    targetColor.r,
-                    colorT
-                );
-
-            const g =
-                mix(
-                    sourceColor.g,
-                    targetColor.g,
-                    colorT
-                );
-
-            const b =
-                mix(
-                    sourceColor.b,
-                    targetColor.b,
-                    colorT
-                );
-
-
-            /*
-             * Partikel fade setelah
-             * bentuk target sudah terbentuk.
-             */
-
-            let alpha = 0.95;
+            let alpha = 1;
 
             if (
-                morphProgress >
-                0.94
-            ) {
+                raw > 0.90
+            ) {{
 
                 alpha =
-                    0.95 *
+                    1 -
                     (
-                        1 -
-                        (
-                            morphProgress -
-                            0.94
-                        ) /
-                        0.06
-                    );
-            }
+                        raw - 0.90
+                    ) /
+                    0.10;
+            }}
 
 
             ctx.globalAlpha =
@@ -2250,11 +1877,7 @@ canvas {
                 );
 
             ctx.fillStyle =
-                rgbToHex(
-                    r,
-                    g,
-                    b
-                );
+                p.color;
 
             ctx.beginPath();
 
@@ -2267,44 +1890,49 @@ canvas {
             );
 
             ctx.fill();
-        }
+        }}
 
 
         ctx.globalAlpha = 1;
 
 
-        /*
-         * Selesai
-         */
-
-        if (elapsed < TOTAL) {
+        if (
+            raw < 1
+        ) {{
 
             requestAnimationFrame(
                 frame
             );
 
-        } else {
+        }} else {{
 
             ctx.clearRect(
                 0,
                 0,
-                W,
-                H
+                WIDTH,
+                HEIGHT
             );
-        }
-    }
+        }}
+    }}
 
 
-    requestAnimationFrame(frame);
+    /*
+     * Beri browser satu frame untuk
+     * menyelesaikan layout iframe.
+     */
+    requestAnimationFrame(() => {{
+        requestAnimationFrame(frame);
+    }});
 
-})();
+}})();
 </script>
+
 </body>
 </html>
 """
 
     html_fx = html_fx.replace(
-        "__REVERSE__",
+        "{reverse}",
         "true" if reverse else "false"
     )
 
