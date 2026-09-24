@@ -8046,6 +8046,9 @@ div.stDownloadButton > button,
             var(--multi-hero-y)
         ) !important;
 
+    position: relative !important;
+    top: 0 !important;
+
     overflow:
         hidden !important;
 
