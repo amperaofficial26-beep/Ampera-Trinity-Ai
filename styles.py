@@ -7926,45 +7926,300 @@ div.stDownloadButton > button,
     overflow-x: hidden !important;
 }
 /* =========================================================
-   MULTI AI — LAYOUT UTAMA TANPA PANEL KANAN
+   MULTI AI — LAYOUT FINAL
    ========================================================= */
+
+/*
+ * Multi AI tetap memakai tr-chat-layout sebagai marker,
+ * tetapi GEOMETRI Multi AI dibuat independen.
+ */
 
 .stApp:has(.tr-multi-ai-layout) {
     overflow-x: hidden !important;
 }
 
-/* Area utama Multi AI */
+
+/* =========================================================
+   MAIN AREA
+   Jangan diberi width 760px.
+   Hero + chat akan mengatur width masing-masing.
+   ========================================================= */
+
 .stApp:has(.tr-multi-ai-layout)
 [data-testid="stMainBlockContainer"] {
+
     width: 100% !important;
+
     max-width: none !important;
 
     padding-top: 92px !important;
-    padding-left: calc(210px + 18px) !important;
-    padding-right: 36px !important;
-    padding-bottom: 9rem !important;
+
+    padding-left:
+        calc(210px + 18px) !important;
+
+    padding-right:
+        36px !important;
+
+    padding-bottom:
+        9rem !important;
 }
 
-/* =========================================================
-   KONTEN MULTI AI
-   ========================================================= */
+
+/*
+ * PENTING:
+ * Parent utama dibuat full width.
+ *
+ * Sebelumnya parent ini dikunci 760px sehingga
+ * hero, chat dan elemen lain ikut terikat pada
+ * satu geometri.
+ */
 
 .stApp:has(.tr-multi-ai-layout)
 [data-testid="stMainBlockContainer"]
 > [data-testid="stVerticalBlock"] {
-    width: min(
-        760px,
-        calc(100vw - 264px)
-    ) !important;
 
-    max-width: min(
-        760px,
-        calc(100vw - 264px)
-    ) !important;
+    width: 100% !important;
 
-    margin-left: auto !important;
-    margin-right: auto !important;
+    max-width: none !important;
+
+    margin-left: 0 !important;
+
+    margin-right: 0 !important;
 }
+
+
+/* =========================================================
+   HERO — JUDUL + DESKRIPSI
+   ========================================================= */
+
+.stApp:has(.tr-multi-ai-layout)
+.agent-hero {
+
+    width:
+        min(
+            760px,
+            calc(100vw - 264px)
+        ) !important;
+
+    max-width:
+        min(
+            760px,
+            calc(100vw - 264px)
+        ) !important;
+
+    margin-left:
+        auto !important;
+
+    margin-right:
+        auto !important;
+
+    transform:
+        translate(
+            var(--multi-hero-x),
+            var(--multi-hero-y)
+        ) !important;
+}
+
+
+/* =========================================================
+   PRO NOTE
+   Tetap mengikuti posisi hero.
+   ========================================================= */
+
+.stApp:has(.tr-multi-ai-layout)
+.agent-pro-note {
+
+    width:
+        min(
+            760px,
+            calc(100vw - 264px)
+        ) !important;
+
+    max-width:
+        min(
+            760px,
+            calc(100vw - 264px)
+        ) !important;
+
+    margin-left:
+        auto !important;
+
+    margin-right:
+        auto !important;
+}
+
+
+/* =========================================================
+   CHAT SURFACE
+   =========================================================
+
+   INI ADALAH LAYER UTAMA CHAT.
+
+   Background
+   +
+   padding
+   +
+   border
+   +
+   shadow
+   +
+   seluruh pesan
+
+   bergerak BERSAMA.
+   ========================================================= */
+
+.stApp:has(.tr-multi-ai-layout)
+.st-key-multi_chat_area {
+
+    box-sizing:
+        border-box !important;
+
+    width:
+        var(--multi-chat-width) !important;
+
+    max-width:
+        calc(100vw - 264px) !important;
+
+    margin-left:
+        auto !important;
+
+    margin-right:
+        auto !important;
+
+    padding:
+        18px !important;
+
+    transform:
+        translate(
+            var(--multi-chat-x),
+            var(--multi-chat-y)
+        ) !important;
+
+    background:
+        var(--tr-surface-premium) !important;
+
+    border:
+        1px solid
+        var(--tr-border-premium) !important;
+
+    border-radius:
+        22px !important;
+
+    box-shadow:
+        0 10px 30px
+        rgba(48, 40, 58, 0.055) !important;
+
+    transition:
+        transform .28s ease,
+        width .28s ease !important;
+}
+
+
+/* =========================================================
+   PESAN DI DALAM CHAT SURFACE
+   ========================================================= */
+
+.stApp:has(.tr-multi-ai-layout)
+.st-key-multi_chat_area
+[data-testid="stVerticalBlock"] {
+
+    width:
+        100% !important;
+
+    max-width:
+        100% !important;
+}
+
+
+/* =========================================================
+   CHAT INPUT — LAYER TERPISAH
+   ========================================================= */
+
+/*
+ * Bottom container dibuat full-width supaya input
+ * tidak terikat pada lebar 760px milik main content.
+ */
+
+.stApp:has(.tr-multi-ai-layout)
+[data-testid="stBottomBlockContainer"] {
+
+    width:
+        100% !important;
+
+    max-width:
+        none !important;
+
+    left:
+        0 !important;
+
+    right:
+        0 !important;
+
+    padding-left:
+        210px !important;
+
+    padding-right:
+        36px !important;
+
+    box-sizing:
+        border-box !important;
+}
+
+
+/*
+ * Input memiliki width + X/Y sendiri.
+ */
+
+.stApp:has(.tr-multi-ai-layout)
+[data-testid="stBottomBlockContainer"]
+[data-testid="stChatInput"] {
+
+    width:
+        var(--multi-input-width) !important;
+
+    max-width:
+        calc(100vw - 264px) !important;
+
+    margin-left:
+        auto !important;
+
+    margin-right:
+        auto !important;
+
+    transform:
+        translate(
+            var(--multi-input-x),
+            var(--multi-input-y)
+        ) !important;
+
+    transition:
+        transform .28s ease,
+        width .28s ease !important;
+}
+
+
+/* =========================================================
+   CHAT INPUT VISUAL
+   ========================================================= */
+
+.stApp:has(.tr-multi-ai-layout)
+[data-testid="stChatInput"] {
+
+    border:
+        1px solid
+        var(--tr-border-premium) !important;
+
+    border-radius:
+        21px !important;
+
+    background:
+        var(--tr-surface-premium) !important;
+
+    box-shadow:
+        0 8px 24px
+        rgba(48, 40, 58, 0.055) !important;
+}
+
 
 /* =========================================================
    TOPBAR
@@ -7972,38 +8227,60 @@ div.stDownloadButton > button,
 
 .stApp:has(.tr-multi-ai-layout)
 .st-key-chat_topbar {
-    position: fixed !important;
 
-    top: 12px !important;
-    left: calc(210px + 18px) !important;
-    right: 36px !important;
+    position:
+        fixed !important;
 
-    width: auto !important;
-    max-width: none !important;
-    min-width: 0 !important;
+    top:
+        12px !important;
 
-    margin: 0 !important;
-    transform: none !important;
+    left:
+        calc(210px + 18px) !important;
 
-    z-index: 1000 !important;
+    right:
+        36px !important;
+
+    width:
+        auto !important;
+
+    max-width:
+        none !important;
+
+    min-width:
+        0 !important;
+
+    margin:
+        0 !important;
+
+    transform:
+        none !important;
+
+    z-index:
+        1000 !important;
 }
 
+
 /* =========================================================
-   PANEL KANAN — MATIKAN DI MULTI AI
+   RIGHT PANEL MATI DI MULTI AI
    ========================================================= */
 
 .stApp:has(.tr-multi-ai-layout)
 .st-key-chat_right_rail {
-    display: none !important;
+
+    display:
+        none !important;
 }
 
+
 /* =========================================================
-   HORIZONTAL OVERFLOW
+   HORIZONTAL BLOCK
    ========================================================= */
 
 .stApp:has(.tr-multi-ai-layout)
 [data-testid="stHorizontalBlock"] {
-    overflow-x: hidden !important;
+
+    overflow-x:
+        hidden !important;
 }
 </style>
 """,
