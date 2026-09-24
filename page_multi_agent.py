@@ -867,7 +867,7 @@ def page_multi_agent() -> None:
     )
 
     if not thread:
-        st.markdown(unsafe_allow_html=True,)
+        st.markdown( unsafe_allow_html=True,)
         
     with st.container(key="multi_chat_area"):
         for message in thread:
