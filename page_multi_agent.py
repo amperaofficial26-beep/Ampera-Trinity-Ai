@@ -19,14 +19,18 @@ WIB = ZoneInfo("Asia/Jakarta")
 # PENGATURAN POSISI MULTI AI
 # ============================================================
 
-# AREA PESAN / CHAT
-MULTI_MESSAGE_WIDTH = 760
-MULTI_MESSAGE_X = -100
-MULTI_MESSAGE_Y = 0
+# JUDUL + DESKRIPSI
+MULTI_HERO_X = -80
+MULTI_HERO_Y = 0
 
-# KOLOM INPUT CHAT
+# AREA CHAT + BACKGROUND
+MULTI_CHAT_WIDTH = 760
+MULTI_CHAT_X = 0
+MULTI_CHAT_Y = 0
+
+# KOLOM INPUT
 MULTI_INPUT_WIDTH = 760
-MULTI_INPUT_X = 150
+MULTI_INPUT_X = 0
 MULTI_INPUT_Y = 0
 
 # ============================================================
@@ -808,54 +812,55 @@ def page_multi_agent() -> None:
 
     thread = mode_thread("multi_agent")
 
-    # ============================================================
-    # POSISI PESAN & INPUT MULTI AI
-    # Judul/hero TIDAK ikut terpengaruh.
-    # ============================================================
-
     st.markdown(
         f"""
         <style>
-
+    
         /* ========================================================
-           AREA PESAN MULTI AI
+           JUDUL + DESKRIPSI MULTI AI
            ======================================================== */
-
-        .stApp:has(.tr-multi-ai-layout)
-        .multi-message-area {{
-            width: {MULTI_MESSAGE_WIDTH}px !important;
+    
+        .stApp:has(.tr-multi-ai-layout) .agent-hero {{
+            transform: translate(
+                {MULTI_HERO_X}px,
+                {MULTI_HERO_Y}px
+            ) !important;
+        }}
+    
+    
+        /* ========================================================
+           SELURUH AREA CHAT
+           Background + pesan bergerak sebagai SATU LAYER
+           ======================================================== */
+    
+        .stApp:has(.tr-multi-ai-layout) .st-key-multi_chat_area {{
+            width: {MULTI_CHAT_WIDTH}px !important;
             max-width: calc(100vw - 280px) !important;
-
+    
             margin-left: auto !important;
             margin-right: auto !important;
-
-            transform:
-                translate(
-                    {MULTI_MESSAGE_X}px,
-                    {MULTI_MESSAGE_Y}px
-                ) !important;
+    
+            transform: translate(
+                {MULTI_CHAT_X}px,
+                {MULTI_CHAT_Y}px
+            ) !important;
         }}
-
-
+    
+    
         /* ========================================================
-           INPUT CHAT MULTI AI
+           INPUT CHAT — LAYER TERPISAH
            ======================================================== */
-
+    
         .stApp:has(.tr-multi-ai-layout)
-        .stChatInput {{
+        [data-testid="stChatInput"] {{
             width: {MULTI_INPUT_WIDTH}px !important;
-            max-width: calc(100vw - 280px) !important;
-
-            margin-left: auto !important;
-            margin-right: auto !important;
-
-            transform:
-                translate(
-                    {MULTI_INPUT_X}px,
-                    {MULTI_INPUT_Y}px
-                ) !important;
+    
+            transform: translate(
+                {MULTI_INPUT_X}px,
+                {MULTI_INPUT_Y}px
+            ) !important;
         }}
-
+    
         </style>
         """,
         unsafe_allow_html=True,
@@ -890,8 +895,9 @@ def page_multi_agent() -> None:
             unsafe_allow_html=True,
         )
 
-    for message in thread:
-        render_message(message)
+    with st.container(key="multi_chat_area"):
+        for message in thread:
+            render_message(message)
 
     prompt = st.chat_input(
         "Tanyakan sesuatu kepada Multi Trinity Agent…"
