@@ -1152,10 +1152,8 @@ canvas {
      * ============================================================
      */
 
-    const DELAY = 3000;
-    const MORPH = 2000;
-    const TOTAL = DELAY + MORPH;
-
+    const MORPH = 3000;
+    const TOTAL = MORPH;
     const start = performance.now();
 
 
@@ -1889,55 +1887,16 @@ canvas {
             H
         );
 
-
-        /*
-         * ========================================================
-         * DELAY
-         * ========================================================
-         */
-
-        if (elapsed < DELAY) {
-
-            if (!reverse) {
-
-                /*
-                 * STOP:
-                 * input tetap terlihat penuh.
-                 */
-
-                drawInputGhost(1);
-
-            } else {
-
-                /*
-                 * RETURN:
-                 * tombol tetap terlihat penuh.
-                 */
-
-                drawButtonGhost(1);
-            }
-
-            requestAnimationFrame(
-                frame
-            );
-
-            return;
-        }
-
-
         /*
          * ========================================================
          * MORPH 0 -> 1
          * ========================================================
          */
 
-        const morphProgress =
-            clamp(
-                (
-                    elapsed -
-                    DELAY
-                ) / MORPH
-            );
+       const morphProgress =
+           clamp(
+               elapsed / MORPH
+           );
 
 
         /*
