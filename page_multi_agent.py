@@ -23,7 +23,7 @@ WIB = ZoneInfo("Asia/Jakarta")
 # JUDUL + DESKRIPSI
 # ------------------------------------------------------------
 MULTI_HERO_X = -220
-MULTI_HERO_Y = -50
+MULTI_HERO_Y = -25
 
 # ------------------------------------------------------------
 # CHAT SURFACE
