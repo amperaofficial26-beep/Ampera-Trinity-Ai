@@ -1900,36 +1900,70 @@ def page_pengaturan() -> None:
         unsafe_allow_html=True,
     )
 
-    tabs = st.tabs([
-        ":material/tune:  Umum",
-        ":material/palette:  Tampilan",
-        ":material/person:  Akun",
-        ":material/shield:  Privasi",
-        ":material/receipt_long:  Penagihan",
-        ":material/bolt:  Kemampuan",
-        ":material/history_edu:  Memori",
-        ":material/self_improvement:  Refleksi",
-        ":material/schedule:  Waktu dan fokus",
-    ])
-    with tabs[0]:
+    # ============================================================
+    # FLOATING SETTINGS NAVIGATION
+    # ============================================================
+    
+    settings_items = [
+        ("umum", ":material/tune:", "Umum"),
+        ("tampilan", ":material/palette:", "Tampilan"),
+        ("akun", ":material/person:", "Akun"),
+        ("privasi", ":material/shield:", "Privasi"),
+        ("penagihan", ":material/receipt_long:", "Penagihan"),
+        ("kemampuan", ":material/bolt:", "Kemampuan"),
+        ("memori", ":material/history_edu:", "Memori"),
+        ("refleksi", ":material/self_improvement:", "Refleksi"),
+        ("waktu", ":material/schedule:", "Waktu dan fokus"),
+    ]
+    
+    if "settings_section" not in st.session_state:
+        st.session_state.settings_section = "umum"
+    
+    with st.container(key="settings_floating_nav"):
+        for key, icon, label in settings_items:
+            if st.button(
+                icon,
+                key=f"settings_nav_{key}",
+                help=label,
+                use_container_width=False,
+            ):
+                st.session_state.settings_section = key
+                st.rerun()
+    
+    
+    # ============================================================
+    # ISI PENGATURAN
+    # ============================================================
+    
+    section = st.session_state.settings_section
+    
+    if section == "umum":
         _set_umum()
-    with tabs[1]:
+    
+    elif section == "tampilan":
         _set_tampilan()
-    with tabs[2]:
+    
+    elif section == "akun":
         _set_akun()
-    with tabs[3]:
+    
+    elif section == "privasi":
         _set_privasi()
-    with tabs[4]:
+    
+    elif section == "penagihan":
         _set_penagihan()
-    with tabs[5]:
+    
+    elif section == "kemampuan":
         _set_kemampuan()
-    with tabs[6]:
+    
+    elif section == "memori":
         _set_memori()
-    with tabs[7]:
+    
+    elif section == "refleksi":
         _set_refleksi()
-    with tabs[8]:
+    
+    elif section == "waktu":
         _set_waktu_fokus()
-
+      
     _page_footer()
   # ============================================================================
 # HALAMAN: BAHASA
