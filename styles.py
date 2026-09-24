@@ -951,7 +951,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
        UKURAN TEKS
        ========================================================= */
 
-    font-size: 13px !important;
+    font-size: 15px !important;
     font-weight: 500 !important;
 
     line-height: 1.35 !important;
