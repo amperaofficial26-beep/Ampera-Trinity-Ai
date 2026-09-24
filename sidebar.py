@@ -217,17 +217,12 @@ def render_sidebar() -> None:
     with st.sidebar:
         # Brand serif ala "Claude"
         st.markdown(
-            f'''
-            <div class="sb-brand">
-                <span class="sb-brand-logo">
-                    {logo_img_html("logo-sidebar")}
-                </span>
-        
-                <span class="sb-brand-title">
-                    Trinity
-                </span>
-            </div>
-            ''',
+            f'<div class="sb-brand">'
+            f'<span class="sb-brand-logo">'
+            f'{logo_img_html("logo-sidebar")}'
+            f'</span>'
+            f'<span class="sb-brand-title">Trinity</span>'
+            f'</div>',
             unsafe_allow_html=True,
         )
         
