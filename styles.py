@@ -136,24 +136,19 @@ section[data-testid="stSidebar"] div.stButton > button {
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
-    border-radius: 7px !important;
+    border-radius: 8px !important;
     width: 100% !important;
     display: flex !important;
     text-align: left !important;
     justify-content: flex-start !important;
     align-items: center !important;
-    gap: 5px !important;
-
-    padding: 0 8px !important;
-    min-height: 25px !important;
-    height: 25px !important;
-
-    line-height: 1 !important;
+    gap: 6px !important;
+    padding: 3px 10px !important;
+    min-height: 30px !important;
+    line-height: 1.2 !important;
     color: #2C1F33 !important;
-    font-size: 1.04rem !important;
+    font-size: 1.06rem !important;
     font-weight: 500 !important;
-
-    margin: 0 !important;
 }
 section[data-testid="stSidebar"] div.stButton > button:hover {
     background: #E2D6C1 !important;
