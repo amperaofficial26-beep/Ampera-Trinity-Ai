@@ -112,13 +112,25 @@ def _css(terbuka: bool) -> str:
         "white-space:nowrap!important;"
         "overflow:hidden!important;"
         "text-overflow:ellipsis!important;"
-        "animation:fd-text-scroll .65s cubic-bezier(.22,.61,.36,1)!important;"
+        "margin:0!important;"
         "}"
-        "@keyframes fd-text-scroll{"
-        "0%{opacity:0;transform:translateY(-22px);}"
-        "45%{opacity:.55;transform:translateY(8px);}"
-        "75%{opacity:.9;transform:translateY(-3px);}"
-        "100%{opacity:1;transform:translateY(0);}"
+        
+        "body [class*='st-key-fd_toggle'] button "
+        "[data-testid='stMarkdownContainer'] strong{"
+        "animation:fd-text-glow 2.6s ease-in-out infinite!important;"
+        "}"
+        
+        "@keyframes fd-text-glow{"
+        "0%,100%{"
+        "text-shadow:0 0 0 rgba(246,238,223,0);"
+        "opacity:.88;"
+        "}"
+        "50%{"
+        "text-shadow:"
+        "0 0 5px rgba(246,238,223,.30),"
+        "0 0 12px rgba(232,176,75,.18);"
+        "opacity:1;"
+        "}"
         "}"
         # ---- titik merah penghitung file baru -------------------------
         ".fd-dot{"
@@ -209,30 +221,30 @@ def render_file_dock() -> None:
     st.markdown(_css(terbuka), unsafe_allow_html=True)
 
         # Tombol file dengan teks yang berganti otomatis
-    @st.fragment(run_every=2.0)
+    @st.fragment(run_every=5.0)
     def _render_file_toggle():
         current_files = _files()
         current_open = bool(st.session_state.get("file_dock_open"))
 
+        # Ganti teks setiap 5 detik
+        fase = int(time.monotonic() / 5.0)
+
         if not current_files:
-            fase = int(time.monotonic() / 2.0) % 2
             teks_tombol = (
                 "Belum ada file"
-                if fase == 0
+                if fase % 2 == 0
                 else "Minta Yuki buat file"
             )
         else:
-            indeks = int(time.monotonic() / 2.0) % len(current_files)
+            indeks = fase % len(current_files)
             nama_file = current_files[indeks].get("title", "File")
             teks_tombol = f"File kamu ada disini · {nama_file}"
 
+        icon = ":material/close:" if current_open else ":material/folder_open:"
+
         with st.container(key="fd_toggle"):
             if st.button(
-                (
-                    ":material/close:  "
-                    if current_open
-                    else ":material/folder_open:  "
-                ) + teks_tombol,
+                f"**{teks_tombol}**  {icon}",
                 key="fd_btn",
                 help="Tutup daftar file" if current_open else "File buatan Yuki",
             ):
@@ -241,7 +253,6 @@ def render_file_dock() -> None:
                 st.rerun()
 
     _render_file_toggle()
-
     # Gelembung + titik merah: hanya saat ada file BARU dan dok tertutup.
     if baru and not terbuka:
         st.markdown(
