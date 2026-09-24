@@ -8058,12 +8058,16 @@ div.stDownloadButton > button,
 .st-key-multi_chat_area {
 
     /* ukuran FIX */
-    width: 760px !important;
-    min-width: 760px !important;
-    max-width: 760px !important;
+    .stApp:has(.tr-multi-ai-layout)
+.st-key-multi_chat_area {
+
+    /* ukuran mengikuti MULTI_CHAT_WIDTH */
+    width: var(--multi-chat-width) !important;
+    min-width: var(--multi-chat-width) !important;
+    max-width: var(--multi-chat-width) !important;
 
     flex:
-        0 0 760px !important;
+        0 0 var(--multi-chat-width) !important;
 
     box-sizing:
         border-box !important;
