@@ -22,7 +22,7 @@ WIB = ZoneInfo("Asia/Jakarta")
 # ------------------------------------------------------------
 # JUDUL + DESKRIPSI
 # ------------------------------------------------------------
-MULTI_HERO_X = 0
+MULTI_HERO_X = -100
 MULTI_HERO_Y = 0
 
 # ------------------------------------------------------------
@@ -30,7 +30,7 @@ MULTI_HERO_Y = 0
 # Background + seluruh pesan bergerak sebagai SATU LAYER
 # ------------------------------------------------------------
 MULTI_CHAT_WIDTH = 760
-MULTI_CHAT_X = 0
+MULTI_CHAT_X = 100
 MULTI_CHAT_Y = 0
 
 # ------------------------------------------------------------
@@ -38,7 +38,7 @@ MULTI_CHAT_Y = 0
 # Hanya kolom mengetik yang bergerak
 # ------------------------------------------------------------
 MULTI_INPUT_WIDTH = 760
-MULTI_INPUT_X = 0
+MULTI_INPUT_X = 100
 MULTI_INPUT_Y = 0
 # ============================================================
 
