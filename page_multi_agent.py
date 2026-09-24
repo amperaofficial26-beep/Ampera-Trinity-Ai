@@ -29,7 +29,7 @@ MULTI_HERO_Y = -30
 # CHAT SURFACE
 # Background + seluruh pesan bergerak sebagai SATU LAYER
 # ------------------------------------------------------------
-MULTI_CHAT_WIDTH = 650
+MULTI_CHAT_WIDTH = 750
 MULTI_CHAT_X = 80
 MULTI_CHAT_Y = 0
 
