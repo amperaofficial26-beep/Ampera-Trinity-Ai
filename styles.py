@@ -5561,7 +5561,7 @@ button.st-key-yuki_stop_dok {
 
     animation:
         yuki-input-fade-in
-        3000ms
+        1000ms
         linear
         both !important;
 }
@@ -5575,7 +5575,7 @@ button.st-key-yuki_stop_dok {
 .st-key-chat_controls {
     animation:
         yuki-controls-fade-in
-        5000ms
+        1000ms
         linear
         both !important;
 }
