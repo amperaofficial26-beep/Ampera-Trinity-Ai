@@ -1359,7 +1359,7 @@ canvas {{
     with st.container(key="yuki_morph_fx"):
         components.html(
             html_fx,
-            height=900,
+            height=0,
             scrolling=False,
         )
 
