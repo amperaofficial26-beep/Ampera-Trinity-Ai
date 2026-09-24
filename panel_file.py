@@ -40,7 +40,7 @@ WARNA_REDUP = "#B8A9C0"       # teks sekunder
 WARNA_AKSEN = "#E8B04B"       # emas: chip ekstensi & hover tombol
 MAKS_FILE_TAMPIL = 12         # dok itu kecil; sisanya cukup disebut jumlahnya
 
-TOMBOL_ATAS_PX = 10           # posisi ikon folder dari atas layar
+TOMBOL_ATAS_PX = 12           # posisi ikon folder dari atas layar
 TOMBOL_KANAN_PX = 18         # posisi ikon folder dari kanan layar
 TEKS_GELEMBUNG = "File kamu ada di sini"
 
