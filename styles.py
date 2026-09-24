@@ -4795,46 +4795,29 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
     }
 }
 /* ============================================================
-   FIX CHAT INPUT — POSISI + ANIMASI
-   Satu sumber posisi untuk horizontal dan vertikal.
+   CHAT INPUT — POSISI NYATA
+   Menggeser elemen input yang benar-benar terlihat.
+   Berlaku:
+   1. saat loading / tombol Hentikan
+   2. saat chat sudah berjalan
    ============================================================ */
 
-.stApp:has(.tr-chat-layout) [data-testid="stBottom"] {
-    transition: transform 0.45s ease-in-out !important;
-}
-
-/* Belum mulai chat */
-.stApp:has(.tr-chat-layout.tr-fresh-home)
-[data-testid="stBottom"] {
-    transform:
-        translate(
-            var(--chat-shift, 0px),
-            calc(-1 * var(--chat-lift-fresh, 26vh))
-        ) !important;
-}
-
-/* Sudah mulai chat */
-.stApp:has(.tr-chat-layout:not(.tr-fresh-home))
-[data-testid="stBottom"] {
-    transform:
-        translate(
-            var(--chat-shift, -145px),
-            calc(-1 * var(--chat-lift, -100px))
-        ) !important;
-}
-
-/* Container mengikuti posisi parent, tidak mengunci kiri */
 .stApp:has(.tr-chat-layout)
 [data-testid="stBottomBlockContainer"] {
     position: relative !important;
-    left: 0 !important;
+
+    left: var(--chat-shift, 0px) !important;
 
     margin-left: auto !important;
     margin-right: auto !important;
 
     box-sizing: border-box !important;
+
+    transition:
+        left 0.45s ease-in-out !important;
 }
-/* Pastikan kotak chat mengikuti lebar wrapper */
+
+/* Kolom chat normal */
 .stApp:has(.tr-chat-layout)
 [data-testid="stBottomBlockContainer"]
 [data-testid="stChatInput"] {
@@ -4842,6 +4825,17 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
     max-width: 100% !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
+}
+
+/* Saat Yuki sedang berpikir / loading */
+.stApp:has(.tr-chat-layout)
+.st-key-yuki_thinking_input {
+    position: relative !important;
+
+    left: var(--chat-shift, 0px) !important;
+
+    transition:
+        left 0.45s ease-in-out !important;
 }
 /* ============================================================
    KONTROL POSISI JUDUL & PERCAKAPAN
