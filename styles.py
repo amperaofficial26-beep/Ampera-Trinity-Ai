@@ -967,7 +967,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
        atas/bawah  -> padding-top
        
        Contoh:
-       padding-left: 14px  = makin ke kanan
+       padding-left: 12px  = makin ke kanan
        padding-left: 4px   = makin ke kiri
 
        padding-top: 9px    = makin ke bawah
@@ -975,9 +975,9 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
        ========================================================= */
 
     padding:
+        10px
         8px
-        8px
-        6px
+        9px
         10px !important;
 
 
@@ -1028,7 +1028,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 [data-testid="stChatInput"]
 textarea::placeholder {
 
-    font-size: 13px !important;
+    font-size: 10px !important;
 
     font-weight: 500 !important;
 
