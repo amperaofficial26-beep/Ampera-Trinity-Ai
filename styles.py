@@ -946,32 +946,98 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 /* Tulisan di dalam kolom chat — COMPACT */
 [data-testid="stBottomBlockContainer"]
 [data-testid="stChatInput"] textarea {
+
+    /* =========================================================
+       UKURAN TEKS
+       ========================================================= */
+
+    font-size: 13px !important;
+    font-weight: 500 !important;
+
+    line-height: 1.35 !important;
+
+
+    /* =========================================================
+       POSISI TEKS
+       =========================================================
+       
+       Atur angka ini untuk memindahkan tulisan.
+       
+       kiri/kanan  -> padding-left
+       atas/bawah  -> padding-top
+       
+       Contoh:
+       padding-left: 14px  = makin ke kanan
+       padding-left: 4px   = makin ke kiri
+
+       padding-top: 9px    = makin ke bawah
+       padding-top: 5px    = makin ke atas
+       ========================================================= */
+
+    padding:
+        8px
+        8px
+        6px
+        10px !important;
+
+
+    /* =========================================================
+       UKURAN DAN DIMENSI INPUT — TETAP
+       ========================================================= */
+
     min-height: 42px !important;
     height: 42px !important;
 
-    padding:
-        7px
-        8px
-        6px !important;
+
+    /* =========================================================
+       WARNA TEKS
+       ========================================================= */
 
     color: #34271e !important;
 
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
+
+    /* =========================================================
+       FONT
+       ========================================================= */
 
     font-family:
         "Manrope",
         "Inter",
         sans-serif !important;
 
-    font-size: 15px !important;
-    font-weight: 500 !important;
-    line-height: 1.35 !important;
+
+    /* =========================================================
+       BACKGROUND
+       ========================================================= */
+
+    background: transparent !important;
+
+    border: none !important;
+
+    box-shadow: none !important;
 
     resize: none !important;
 }
 
+
+/* =========================================================
+   PLACEHOLDER — "Tulis pesan..."
+   ========================================================= */
+
+[data-testid="stBottomBlockContainer"]
+[data-testid="stChatInput"]
+textarea::placeholder {
+
+    font-size: 13px !important;
+
+    font-weight: 500 !important;
+
+    line-height: 1.35 !important;
+
+    color: #8a7969 !important;
+
+    opacity: 1 !important;
+}
 /* Warna placeholder. */
 [data-testid="stBottomBlockContainer"]
 [data-testid="stChatInput"]
