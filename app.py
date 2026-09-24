@@ -771,10 +771,12 @@ def _render_chat_right_rail() -> None:
     """
     with st.container(key="chat_right_rail"):
         st.markdown(
-            '<div class="tr-rail-title-row"><span>Fitur Cepat</span></div>',
+            '<div class="tr-rail-title-row">'
+            f'<span class="rail-heading-icon">{mi(":material/bolt:")}</span>'
+            '<span>Fitur Cepat</span>'
+            '</div>',
             unsafe_allow_html=True,
         )
-
         q1, q2 = st.columns(2, gap="small")
 
         with q1:
