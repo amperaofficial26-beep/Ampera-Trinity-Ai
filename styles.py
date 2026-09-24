@@ -5503,27 +5503,35 @@ button.st-key-yuki_stop_dok {
         animation: none !important;
     }
 }
-/* Canvas partikel asli. Iframe komponen dibentangkan ke viewport agar
-   partikel dapat mengikuti ukuran kartu input, bukan terkurung di dok. */
-.st-key-yuki_morph_fx {
-    position: fixed !important;
-    inset: 0 !important;
+/* Canvas partikel ditempel pada bottom dock. Jangan gunakan position:fixed
+   atau 100vh: koordinat iframe berbeda dari viewport utama dan membuat
+   partikel tergambar di tepi bawah layar, bukan di atas kolom chat. */
+[data-testid="stBottomBlockContainer"] {
+    position: relative !important;
+}
 
-    width: 100vw !important;
-    height: 100vh !important;
+.st-key-yuki_morph_fx {
+    position: absolute !important;
+
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+
+    width: 100% !important;
+    height: 120px !important;
 
     z-index: 999990 !important;
 
     pointer-events: none !important;
     background: transparent !important;
+    overflow: visible !important;
 }
 
 .st-key-yuki_morph_fx iframe {
-    position: absolute !important;
-    inset: 0 !important;
+    display: block !important;
 
-    width: 100vw !important;
-    height: 100vh !important;
+    width: 100% !important;
+    height: 120px !important;
 
     border: 0 !important;
 
