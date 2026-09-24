@@ -8572,7 +8572,20 @@ div.stDownloadButton > button,
     background: transparent !important;
 }
 
+/* ============================================================
+   PENGATURAN — BACKGROUND
+   ============================================================ */
 
+.stApp:has([class*="st-key-settings_float_"]) {
+    background: #F3E8D7 !important;
+}
+
+.stApp:has([class*="st-key-settings_float_"])
+[data-testid="stAppViewContainer"],
+.stApp:has([class*="st-key-settings_float_"])
+[data-testid="stMain"] {
+    background: transparent !important;
+}
 /* ============================================================
    HEADER SETTINGS
    ============================================================ */
@@ -8632,57 +8645,6 @@ textarea,
 
     border-color: #DBCEB9 !important;
 }
-
-
-/* ============================================================
-   FLOATING ICON
-   ============================================================ */
-
-.stApp [class*="st-key-settings_float_"] button {
-
-    background: #F2E8D6 !important;
-
-    color: #2C1F33 !important;
-
-    border:
-        1px solid #DBCEB9 !important;
-
-    box-shadow:
-        0 6px 18px rgba(48, 40, 58, 0.09),
-        inset 0 1px 0 rgba(255,255,255,0.65) !important;
-}
-
-
-/* Icon Material */
-
-.stApp [class*="st-key-settings_float_"]
-button span {
-    color: #4A3559 !important;
-}
-
-
-/* Hover */
-
-.stApp [class*="st-key-settings_float_"]
-button:hover {
-
-    background: #EDE2D1 !important;
-
-    border-color: #CDBFA8 !important;
-
-    box-shadow:
-        0 8px 22px rgba(48, 40, 58, 0.13) !important;
-}
-
-
-/* Klik */
-
-.stApp [class*="st-key-settings_float_"]
-button:active {
-    transform: scale(0.93) !important;
-}
-
-
 /* ============================================================
    DIVIDER
    ============================================================ */
