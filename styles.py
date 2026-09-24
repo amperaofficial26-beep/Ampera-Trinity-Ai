@@ -977,7 +977,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
     padding:
         10px
         8px
-        9px
+        13px
         10px !important;
 
 
@@ -1028,7 +1028,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 [data-testid="stChatInput"]
 textarea::placeholder {
 
-    font-size: 10px !important;
+    font-size: 12px !important;
 
     font-weight: 500 !important;
 
