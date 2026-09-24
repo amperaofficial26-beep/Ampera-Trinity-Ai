@@ -1144,10 +1144,28 @@ button[data-testid="stPopoverButton"]:hover {
    KETERANGAN AI DI TENGAH
    ================================================================ */
 .input-disclaimer {
+    position: absolute !important;
+
+    left: 50% !important;
+
+    /*
+     * Keluar dari kartu chat.
+     * Nilai negatif = turun ke bawah kartu.
+     */
+    bottom: -24px !important;
+
+    transform: translateX(-50%) !important;
+
+    width: min(
+        760px,
+        calc(100vw - 40px)
+    ) !important;
+
     padding:
-        5px
-        8px
-        1px !important;
+        0
+        8px !important;
+
+    margin: 0 !important;
 
     color: #8a7969 !important;
 
@@ -1158,13 +1176,21 @@ button[data-testid="stPopoverButton"]:hover {
         sans-serif !important;
 
     font-size: 11px !important;
+
     font-weight: 400 !important;
 
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-}
+    line-height: 1.3 !important;
 
+    white-space: nowrap !important;
+
+    overflow: hidden !important;
+
+    text-overflow: ellipsis !important;
+
+    pointer-events: none !important;
+
+    z-index: 5 !important;
+}
  /* ================================================================
     YUKI THINKING — KARTU HENTIKAN
     Saat Yuki berpikir, hanya tombol Hentikan yang ditampilkan.
