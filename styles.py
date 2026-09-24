@@ -8549,6 +8549,89 @@ div.stDownloadButton > button,
 
     transform: none !important;
 }
+/* ============================================================
+   SETTINGS — FLOATING RIGHT NAVIGATION
+   ============================================================ */
+
+.stApp .st-key-settings_floating_nav {
+    position: fixed !important;
+    right: 8px !important;
+    top: 50% !important;
+
+    transform: translateY(-50%) !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+
+    gap: 10px !important;
+
+    z-index: 9999 !important;
+}
+
+
+/* Container setiap tombol */
+
+.stApp .st-key-settings_floating_nav [data-testid="stButton"] {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+
+/* Tombol lingkaran */
+
+.stApp .st-key-settings_floating_nav button {
+    width: 46px !important;
+    height: 46px !important;
+
+    min-width: 46px !important;
+    min-height: 46px !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    border-radius: 50% !important;
+
+    border: 1px solid rgba(90, 80, 105, 0.18) !important;
+
+    background: rgba(255, 255, 255, 0.84) !important;
+
+    box-shadow:
+        0 6px 18px rgba(40, 34, 48, 0.10) !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    transition:
+        transform 0.22s ease,
+        box-shadow 0.22s ease,
+        background 0.22s ease !important;
+}
+
+
+/* Icon */
+
+.stApp .st-key-settings_floating_nav button span {
+    font-size: 21px !important;
+}
+
+
+/* Hover */
+
+.stApp .st-key-settings_floating_nav button:hover {
+    transform: scale(1.10) !important;
+
+    box-shadow:
+        0 8px 22px rgba(40, 34, 48, 0.16) !important;
+}
+
+
+/* Saat ditekan */
+
+.stApp .st-key-settings_floating_nav button:active {
+    transform: scale(0.94) !important;
+}
 </style>
 """,
         unsafe_allow_html=True,
