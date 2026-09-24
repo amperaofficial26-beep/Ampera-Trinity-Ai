@@ -33,7 +33,7 @@ def _files() -> list[dict]:
 # >>> ATUR TAMPILAN DOK DI SINI <<<
 # ============================================================================
 DOK_LEBAR_PX = 336            # lebar kartu daftar file
-DOK_MAKS_TINGGI = "90vh"      # tinggi maksimum sebelum daftar discroll
+DOK_MAKS_TINGGI = "85vh"      # tinggi maksimum sebelum daftar discroll
 WARNA_KARTU = "#2C1F33"       # latar kartu (ungu gelap)
 WARNA_TEKS = "#F6EEDF"        # teks utama (krem terang)
 WARNA_REDUP = "#B8A9C0"       # teks sekunder
