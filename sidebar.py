@@ -225,78 +225,29 @@ def render_sidebar() -> None:
             unsafe_allow_html=True,
         )
         
-        # Di room Multi Trinity Agent, sidebar sengaja dibersihkan.
-        # Hanya navigasi kembali dan riwayat room yang ditampilkan.
+        # ============================================================
+        # SIDEBAR KHUSUS MULTI AI
+        # ============================================================
         if st.session_state.get("page") == "multi_agent":
+
+            # Kembali ke halaman Chat
             if st.button(
                 ":material/arrow_back: &nbsp;Kembali ke Chat",
                 key="agent_back_chat",
                 use_container_width=True,
             ):
                 go("chat")
-        
-            agent_messages = st.session_state.get(
-                "mode_msgs_multi_agent",
-                [],
-            )
-        
-            questions = [
-                message
-                for message in agent_messages
-                if message.get("role") == "user"
-            ]
-        
-            st.markdown(
-                '<div class="sb-divider"></div>',
-                unsafe_allow_html=True,
-            )
-        
-            st.markdown(
-                '<div class="sb-group">'
-                'Riwayat Multi Agent'
-                '</div>',
-                unsafe_allow_html=True,
-            )
-        
-            if not questions:
-                st.caption(
-                    "Belum ada percakapan."
-                )
-        
-            else:
-                # Ambil maksimal 15 pertanyaan terbaru.
-                for message in reversed(questions[-15:]):
-                    title = " ".join(
-                        str(
-                            message.get("content") or ""
-                        ).split()
-                    )
-        
-                    title = (
-                        title[:42]
-                        + ("…" if len(title) > 42 else "")
-                    )
-        
-                    st.markdown(
-                        '<div class="mem-item" '
-                        'style="margin-bottom:6px">'
-                        + html.escape(title)
-                        + '</div>',
-                        unsafe_allow_html=True,
-                    )
-        
+
+            # Membuat room Multi AI baru
             if st.button(
-                ":material/add: &nbsp;Room baru",
+                ":material/add: &nbsp;Obrolan Baru",
                 key="agent_new_room",
                 use_container_width=True,
             ):
-                st.session_state[
-                    "mode_msgs_multi_agent"
-                ] = []
-        
+                st.session_state["mode_msgs_multi_agent"] = []
                 st.rerun()
-        
-            # Menghentikan render menu sidebar biasa.
+
+            # Jangan render menu sidebar normal.
             return
         
         # Room baru + menu utama dibuat lebih dekat dengan layout referensi:
