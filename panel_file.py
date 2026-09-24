@@ -81,6 +81,12 @@ def _css(terbuka: bool) -> str:
         "box-shadow:0 6px 18px rgba(44,31,51,.20)!important;}"
         "body [class*='st-key-fd_toggle'] button:hover{"
         f"background:{WARNA_AKSEN}!important;color:{WARNA_KARTU}!important;}}"
+
+        "body [class*='st-key-fd_toggle'] button [data-testid='stIconMaterial']{"
+        "margin-left:auto!important;"
+        "margin-right:2px!important;"
+        "font-size:20px!important;"
+        "}"
         # ---- titik merah penghitung file baru -------------------------
         ".fd-dot{"
         f"position:fixed;top:{TOMBOL_ATAS_PX - 6}px;"
