@@ -84,7 +84,7 @@ def _css(terbuka: bool) -> str:
 
         "body [class*='st-key-fd_toggle'] button [data-testid='stIconMaterial']{"
         "margin-left:auto!important;"
-        "margin-right:2px!important;"
+        "margin-right:10px!important;"
         "font-size:20px!important;"
         "}"
         # ---- titik merah penghitung file baru -------------------------
