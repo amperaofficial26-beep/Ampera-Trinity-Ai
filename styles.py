@@ -8766,6 +8766,61 @@ hr {
 .stApp [class*="st-key-settings_float_"] button:active {
     transform: scale(0.92) !important;
 }
+/* ============================================================
+   PENGATURAN — KOLOM PILIHAN LEBIH TERANG
+   ============================================================ */
+
+/* Input teks */
+.stApp:has([class*="st-key-settings_float_"]) input,
+.stApp:has([class*="st-key-settings_float_"]) textarea {
+    background: #FFF9F0 !important;
+    color: #2C1F33 !important;
+    border-color: #E4D7C4 !important;
+}
+
+/* Selectbox / dropdown */
+.stApp:has([class*="st-key-settings_float_"])
+[data-baseweb="select"] > div {
+    background: #FFF9F0 !important;
+    color: #2C1F33 !important;
+    border-color: #E4D7C4 !important;
+}
+
+/* Kolom angka / number input */
+.stApp:has([class*="st-key-settings_float_"])
+[data-testid="stNumberInput"] input {
+    background: #FFF9F0 !important;
+}
+
+/* Slider */
+.stApp:has([class*="st-key-settings_float_"])
+[data-testid="stSlider"] {
+    background: transparent !important;
+}
+
+/* Checkbox */
+.stApp:has([class*="st-key-settings_float_"])
+[data-testid="stCheckbox"] {
+    background: #FFF9F0 !important;
+    border: 1px solid #E4D7C4 !important;
+    border-radius: 12px !important;
+    padding: 8px 12px !important;
+}
+
+/* Radio / pilihan */
+.stApp:has([class*="st-key-settings_float_"])
+[data-testid="stRadio"] {
+    background: #FFF9F0 !important;
+    border: 1px solid #E4D7C4 !important;
+    border-radius: 12px !important;
+    padding: 10px 14px !important;
+}
+
+/* Tombol pilihan / action */
+.stApp:has([class*="st-key-settings_float_"])
+button {
+    border-color: #E4D7C4 !important;
+}
 </style>
 """,
         unsafe_allow_html=True,
