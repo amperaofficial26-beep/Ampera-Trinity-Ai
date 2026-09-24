@@ -142,11 +142,11 @@ section[data-testid="stSidebar"] div.stButton > button {
     text-align: left !important;
     justify-content: flex-start !important;
     align-items: center !important;
-    gap: 0px !important;
+    gap: 5px !important;
 
-    padding: 0 !important;
-    min-height: 23px !important;
-    height: 23px !important;
+    padding: 0 8px !important;
+    min-height: 25px !important;
+    height: 25px !important;
 
     line-height: 1 !important;
     color: #2C1F33 !important;
