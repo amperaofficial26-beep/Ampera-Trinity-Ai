@@ -14,7 +14,7 @@ import html
 import streamlit as st
 
 from state import get_settings, open_conversation, reset_conversation
-from ui_helpers import get_chat_export_text
+from ui_helpers import get_chat_export_text, logo_img_html
 
 HAS_DIALOG = hasattr(st, "dialog")
 
@@ -217,7 +217,17 @@ def render_sidebar() -> None:
     with st.sidebar:
         # Brand serif ala "Claude"
         st.markdown(
-            '<div class="sb-brand">Trinity</div>',
+            f'''
+            <div class="sb-brand">
+                <span class="sb-brand-logo">
+                    {logo_img_html("logo-sidebar")}
+                </span>
+        
+                <span class="sb-brand-title">
+                    Trinity
+                </span>
+            </div>
+            ''',
             unsafe_allow_html=True,
         )
         
