@@ -8058,12 +8058,12 @@ div.stDownloadButton > button,
 .st-key-multi_chat_area {
 
     /* ukuran FIX */
-    width: 850px !important;
-    min-width: 850px !important;
-    max-width: 850px !important;
+    width: 1000px !important;
+    min-width: 1000px !important;
+    max-width: 1000px !important;
 
     flex:
-        0 0 850px !important;
+        0 0 1000px !important;
 
     box-sizing:
         border-box !important;
