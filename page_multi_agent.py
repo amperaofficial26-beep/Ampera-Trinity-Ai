@@ -744,7 +744,12 @@ def _assembly_html() -> str:
 
 def page_multi_agent() -> None:
     """Render room khusus Multi Trinity Agent."""
-
+    # Marker layout Multi AI.
+    # Menggunakan layout utama Trinity tanpa panel kanan.
+    st.markdown(
+        '<div class="tr-chat-layout tr-multi-ai-layout"></div>',
+        unsafe_allow_html=True,
+    )
     # Pengaman server-side. Halaman tetap tertutup jika pengguna
     # mencoba mengubah session state secara manual.
     from chat_handlers import _boleh_premium
