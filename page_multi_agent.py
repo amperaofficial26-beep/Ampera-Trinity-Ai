@@ -19,20 +19,27 @@ WIB = ZoneInfo("Asia/Jakarta")
 # PENGATURAN POSISI MULTI AI
 # ============================================================
 
+# ------------------------------------------------------------
 # JUDUL + DESKRIPSI
-MULTI_HERO_X = -100
+# ------------------------------------------------------------
+MULTI_HERO_X = 0
 MULTI_HERO_Y = 0
 
-# AREA CHAT + BACKGROUND
+# ------------------------------------------------------------
+# CHAT SURFACE
+# Background + seluruh pesan bergerak sebagai SATU LAYER
+# ------------------------------------------------------------
 MULTI_CHAT_WIDTH = 760
-MULTI_CHAT_X = -100
+MULTI_CHAT_X = 0
 MULTI_CHAT_Y = 0
 
-# KOLOM INPUT
+# ------------------------------------------------------------
+# CHAT INPUT
+# Hanya kolom mengetik yang bergerak
+# ------------------------------------------------------------
 MULTI_INPUT_WIDTH = 760
-MULTI_INPUT_X = 100
+MULTI_INPUT_X = 0
 MULTI_INPUT_Y = 0
-
 # ============================================================
 
 _AGENT_CSS = """
@@ -811,60 +818,32 @@ def page_multi_agent() -> None:
         return
 
     thread = mode_thread("multi_agent")
-
+    # ============================================================
+    # VARIABEL POSISI MULTI AI
+    # CSS utama berada di styles.py.
+    # Di sini hanya dikirim nilai konfigurasinya.
+    # ============================================================
+    
     st.markdown(
         f"""
         <style>
+        .stApp:has(.tr-multi-ai-layout) {{
+            --multi-hero-x: {MULTI_HERO_X}px;
+            --multi-hero-y: {MULTI_HERO_Y}px;
     
-        /* ========================================================
-           JUDUL + DESKRIPSI MULTI AI
-           ======================================================== */
+            --multi-chat-width: {MULTI_CHAT_WIDTH}px;
+            --multi-chat-x: {MULTI_CHAT_X}px;
+            --multi-chat-y: {MULTI_CHAT_Y}px;
     
-        .stApp:has(.tr-multi-ai-layout) .agent-hero {{
-            transform: translate(
-                {MULTI_HERO_X}px,
-                {MULTI_HERO_Y}px
-            ) !important;
+            --multi-input-width: {MULTI_INPUT_WIDTH}px;
+            --multi-input-x: {MULTI_INPUT_X}px;
+            --multi-input-y: {MULTI_INPUT_Y}px;
         }}
-    
-    
-        /* ========================================================
-           SELURUH AREA CHAT
-           Background + pesan bergerak sebagai SATU LAYER
-           ======================================================== */
-    
-        .stApp:has(.tr-multi-ai-layout) .st-key-multi_chat_area {{
-            width: {MULTI_CHAT_WIDTH}px !important;
-            max-width: calc(100vw - 280px) !important;
-    
-            margin-left: auto !important;
-            margin-right: auto !important;
-    
-            transform: translate(
-                {MULTI_CHAT_X}px,
-                {MULTI_CHAT_Y}px
-            ) !important;
-        }}
-    
-    
-        /* ========================================================
-           INPUT CHAT — LAYER TERPISAH
-           ======================================================== */
-    
-        .stApp:has(.tr-multi-ai-layout)
-        [data-testid="stChatInput"] {{
-            width: {MULTI_INPUT_WIDTH}px !important;
-    
-            transform: translate(
-                {MULTI_INPUT_X}px,
-                {MULTI_INPUT_Y}px
-            ) !important;
-        }}
-    
         </style>
         """,
         unsafe_allow_html=True,
     )
+   
     # HTML dirapatkan menjadi rangkaian string.
     # Ini mencegah Markdown menganggap tag <p> sebagai blok kode.
     hero = (
