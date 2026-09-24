@@ -1919,16 +1919,25 @@ def page_pengaturan() -> None:
     if "settings_section" not in st.session_state:
         st.session_state.settings_section = "umum"
     
-    with st.container(key="settings_floating_nav"):
-        for key, icon, label in settings_items:
-            if st.button(
-                icon,
-                key=f"settings_nav_{key}",
-                help=label,
-                use_container_width=False,
-            ):
-                st.session_state.settings_section = key
-                st.rerun()
+    st.markdown(
+        '<div class="settings-floating-nav">',
+        unsafe_allow_html=True,
+    )
+    
+    for key, icon, label in settings_items:
+        if st.button(
+            icon,
+            key=f"settings_nav_{key}",
+            help=label,
+            use_container_width=False,
+        ):
+            st.session_state.settings_section = key
+            st.rerun()
+    
+    st.markdown(
+        '</div>',
+        unsafe_allow_html=True,
+    )
     
     
     # ============================================================
