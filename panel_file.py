@@ -83,7 +83,7 @@ def _css(terbuka: bool) -> str:
         f"background:{WARNA_AKSEN}!important;color:{WARNA_KARTU}!important;}}"
 
         "body [class*='st-key-fd_toggle'] button [data-testid='stIconMaterial']{"
-        "margin-left:auto!important;"
+        "margin-left: 5px !important;"
         "margin-right:10px!important;"
         "font-size:20px!important;"
         "}"
