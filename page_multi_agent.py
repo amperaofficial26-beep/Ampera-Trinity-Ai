@@ -30,7 +30,7 @@ MULTI_CHAT_Y = 0
 
 # KOLOM INPUT
 MULTI_INPUT_WIDTH = 760
-MULTI_INPUT_X = -100
+MULTI_INPUT_X = 100
 MULTI_INPUT_Y = 0
 
 # ============================================================
