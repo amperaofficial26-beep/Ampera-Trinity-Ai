@@ -703,49 +703,6 @@ def _render_chat_chrome(is_fresh: bool) -> None:
     st.markdown(
         f"""
         <div class="{marker_class}"></div>
-       <style>
-        .stApp:has(.tr-chat-layout) [class*="st-key-fd_toggle"] {{
-          top: 16px !important;
-          right: 286px !important;
-        }}
-        
-        .stApp:has(.tr-chat-layout) .fd-dot {{
-          top: 10px !important;
-          right: 266px !important;
-        }}
-        
-        .stApp:has(.tr-chat-layout) .fd-bubble {{
-          top: 64px !important;
-          right: 286px !important;
-        }}
-        
-        .stApp:has(.tr-chat-layout) .st-key-fd_panel {{
-          top: 68px !important;
-          right: 286px !important;
-        }}
-        
-        @media (max-width: 1180px) {{
-          .stApp:has(.tr-chat-layout) [class*="st-key-fd_toggle"] {{
-            top: 82px !important;
-            right: 16px !important;
-          }}
-        
-          .stApp:has(.tr-chat-layout) .fd-dot {{
-            top: 76px !important;
-            right: 12px !important;
-          }}
-        
-          .stApp:has(.tr-chat-layout) .fd-bubble {{
-            top: 90px !important;
-            right: 72px !important;
-          }}
-
-          .stApp:has(.tr-chat-layout) .st-key-fd_panel {{
-            top: 138px !important;
-            right: 16px !important;
-          }}
-        }}
-        </style>
         """,
         unsafe_allow_html=True,
     )
