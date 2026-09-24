@@ -4818,7 +4818,7 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
 [data-testid="stBottom"] {
     transform:
         translate(
-            var(--chat-shift, 0px),
+            var(--chat-shift, -145px),
             calc(-1 * var(--chat-lift, -100px))
         ) !important;
 }
