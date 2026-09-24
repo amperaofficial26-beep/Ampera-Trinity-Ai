@@ -763,6 +763,100 @@ def _render_chat_chrome(is_fresh: bool) -> None:
                 st.session_state.logged_out = True
                 go("chat")
 
+# ============================================================================
+# AKSI RIWAYAT CHAT PANEL KANAN
+# ============================================================================
+
+def _export_conversation_text(conv: dict) -> str:
+    lines = [
+        "# Riwayat Obrolan — Ampera Trinity AI",
+        f"# Percakapan: {conv.get('title') or 'Percakapan baru'}",
+        f"# Tanggal Ekspor: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}",
+        "# by Ampera Official",
+        "",
+        "---",
+        "",
+    ]
+
+    for m in conv.get("messages") or []:
+        role_label = "Pengguna" if m.get("role") == "user" else "Yuki"
+        time_tag = f" [{m.get('time', '')}]" if m.get("time") else ""
+
+        lines.append(f"### {role_label}{time_tag}")
+        lines.append("")
+
+        if m.get("type") == "image":
+            lines.append(
+                f"*(gambar dihasilkan — prompt: {m.get('prompt', '')})*"
+            )
+        else:
+            body = (m.get("content") or "").strip()
+
+            if m.get("images"):
+                body += "\n*(dengan lampiran gambar)*"
+
+            if m.get("via_voice"):
+                body += "\n*(dikirim via suara)*"
+
+            lines.append(body)
+
+        lines.extend(["", "---", ""])
+
+    return "\n".join(lines)
+
+
+def _hapus_percakapan_panel(conv_id: int) -> None:
+    convs = st.session_state.get("conversations") or []
+
+    st.session_state.conversations = [
+        c for c in convs
+        if c.get("id") != conv_id
+    ]
+
+    if st.session_state.get("active_conv_id") == conv_id:
+        st.session_state.messages = []
+        st.session_state.active_conv_id = None
+
+        import uuid
+        st.session_state.conv_key = uuid.uuid4().hex
+
+        st.session_state.pop("_db_synced", None)
+
+    st.rerun()
+
+
+_RIGHT_HISTORY_MENU_CSS = """
+<style>
+
+[class*="st-key-right_hist_menu_"] button {
+    min-width: 30px !important;
+    width: 30px !important;
+    height: 30px !important;
+    min-height: 30px !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+
+    border-radius: 8px !important;
+    color: #766F7A !important;
+}
+
+[class*="st-key-right_hist_menu_"] button:hover {
+    background: #E8DDF0 !important;
+    color: #49315C !important;
+}
+
+[class*="st-key-right_hist_menu_"]
+[data-testid="stIconMaterial"] {
+    font-size: 19px !important;
+}
+
+</style>
+"""
 
 def _render_chat_right_rail() -> None:
     """Panel fitur kanan untuk chat utama.
@@ -844,34 +938,168 @@ def _render_chat_right_rail() -> None:
                     st.toast(f"Model dipilih: {m['name']}", icon=":material/check_circle:")
                     st.rerun()
 
+        st.markdown(_RIGHT_HISTORY_MENU_CSS, unsafe_allow_html=True)
+
         st.markdown(
-            '<div class="tr-rail-title-row with-link"><span>Chat Terbaru</span>'
-            '<small>Riwayat</small></div>',
+            '<div class="tr-rail-title-row with-link">'
+            '<span>Chat Terbaru</span>'
+            '<small>Riwayat</small>'
+            '</div>',
             unsafe_allow_html=True,
         )
-
+        
         convs = st.session_state.get("conversations", [])[:3]
-
+        
         if not convs:
             st.markdown(
                 '<div class="tr-rail-empty">Belum ada chat terbaru.</div>',
                 unsafe_allow_html=True,
             )
-
+        
         for c in convs:
-            title = _clip_text(c.get("title") or "Chat baru", 30)
-            meta = c.get("time") or c.get("updated") or "Terbaru"
+        
             cid = c.get("id")
-
-            with st.container(key=f"rail_recent_{cid}"):
-                if st.button(
-                    f":material/forum:  **{title}**  \n:gray[{_clip_text(str(meta), 28)}]",
-                    key=f"rail_btn_recent_{cid}",
-                    use_container_width=True,
+            title = _clip_text(
+                c.get("title") or "Chat baru",
+                30,
+            )
+            meta = c.get("time") or c.get("updated") or "Terbaru"
+        
+            col_chat, col_menu = st.columns(
+                [1, 0.15],
+                gap="small",
+            )
+        
+            # ================================================================
+            # CHAT
+            # ================================================================
+            with col_chat:
+        
+                with st.container(
+                    key=f"right_recent_{cid}"
                 ):
-                    open_conversation(cid)
-                    st.rerun()
-
+        
+                    if st.button(
+                        f":material/forum:  **{title}**  \n"
+                        f":gray[{_clip_text(str(meta), 28)}]",
+                        key=f"right_btn_recent_{cid}",
+                        use_container_width=True,
+                    ):
+                        open_conversation(cid)
+                        st.rerun()
+        
+            # ================================================================
+            # TITIK TIGA
+            # ================================================================
+            with col_menu:
+        
+                with st.container(
+                    key=f"right_hist_menu_{cid}"
+                ):
+        
+                    with st.popover(
+                        ":material/more_horiz:",
+                        use_container_width=True,
+                        help="Opsi chat",
+                    ):
+        
+                        st.markdown(
+                            f"**{html.escape(title)}**",
+                            unsafe_allow_html=True,
+                        )
+        
+                        # ----------------------------------------------------
+                        # RENAME
+                        # ----------------------------------------------------
+                        nama_baru = st.text_input(
+                            "Nama chat",
+                            value=c.get("title") or "Chat baru",
+                            key=f"right_rename_input_{cid}",
+                            placeholder="Nama chat…",
+                            label_visibility="collapsed",
+                        )
+        
+                        if st.button(
+                            ":material/edit:  Rename",
+                            key=f"right_rename_{cid}",
+                            use_container_width=True,
+                        ):
+                            nama_bersih = " ".join(
+                                (nama_baru or "").split()
+                            ).strip()
+        
+                            if nama_bersih:
+                                c["title"] = nama_bersih[:80]
+                                st.rerun()
+        
+                        # ----------------------------------------------------
+                        # HAPUS
+                        # ----------------------------------------------------
+                        confirm_key = (
+                            f"_right_delete_confirm_{cid}"
+                        )
+        
+                        if not st.session_state.get(confirm_key):
+        
+                            if st.button(
+                                ":material/delete:  Hapus",
+                                key=f"right_delete_{cid}",
+                                use_container_width=True,
+                            ):
+                                st.session_state[
+                                    confirm_key
+                                ] = True
+        
+                                st.rerun()
+        
+                        else:
+        
+                            st.warning(
+                                "Hapus chat ini?",
+                                icon=":material/warning:",
+                            )
+        
+                            d1, d2 = st.columns(
+                                2,
+                                gap="small",
+                            )
+        
+                            with d1:
+        
+                                if st.button(
+                                    "Batal",
+                                    key=f"right_delete_cancel_{cid}",
+                                    use_container_width=True,
+                                ):
+                                    st.session_state.pop(
+                                        confirm_key,
+                                        None,
+                                    )
+                                    st.rerun()
+        
+                            with d2:
+        
+                                if st.button(
+                                    ":material/delete_forever:  Hapus",
+                                    key=f"right_delete_yes_{cid}",
+                                    type="primary",
+                                    use_container_width=True,
+                                ):
+                                    _hapus_percakapan_panel(
+                                        cid
+                                    )
+        
+                        # ----------------------------------------------------
+                        # UNDUH
+                        # ----------------------------------------------------
+                        st.download_button(
+                            label=":material/download:  Unduh",
+                            data=_export_conversation_text(c),
+                            file_name=f"trinity-chat-{cid}.md",
+                            mime="text/markdown",
+                            use_container_width=True,
+                            key=f"right_download_{cid}",
+                        )
 
 # ============================================================================
 # HALAMAN: CHAT UTAMA
