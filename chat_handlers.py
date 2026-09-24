@@ -1059,13 +1059,19 @@ def _dialog_premium() -> None:
             st.rerun()
 
 def _render_input_particle_morph(direction: str) -> None:
-    """Morph partikel dua arah:
-    input -> titik tengah -> tombol Hentikan
-    tombol Hentikan -> titik tengah -> input.
     """
+    Particle morph ala Claude:
+    INPUT -> menyebar -> melengkung turun -> tombol
+    TOMBOL -> menyebar -> melengkung naik -> INPUT
+
+    Timing:
+    0.0 - 3.0 detik : delay, bentuk awal tetap terlihat
+    3.0 - 5.0 detik : particle morph
+    """
+
     reverse = direction == "return"
 
-    html_fx = f"""
+    html_fx = """
 <!doctype html>
 <html>
 <head>
@@ -1073,21 +1079,21 @@ def _render_input_particle_morph(direction: str) -> None:
 
 <style>
 html,
-body {{
+body {
     margin: 0;
     width: 100%;
     height: 100%;
     overflow: hidden;
     background: transparent;
-}}
+}
 
-canvas {{
+canvas {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     pointer-events: none;
-}}
+}
 </style>
 </head>
 
@@ -1095,177 +1101,688 @@ canvas {{
 <canvas id="morph"></canvas>
 
 <script>
-(() => {{
+(() => {
+
     const canvas = document.getElementById("morph");
     const ctx = canvas.getContext("2d");
 
-    const reverse = {str(reverse).lower()};
+    const reverse = __REVERSE__;
 
-    const dpr = Math.min(
+    const DPR = Math.min(
         window.devicePixelRatio || 1,
         2
     );
 
-    let W = window.innerWidth;
-    let H = window.innerHeight;
+    const W = window.innerWidth;
+    const H = window.innerHeight;
 
-    function resize() {{
-        W = window.innerWidth;
-        H = window.innerHeight;
+    canvas.width = W * DPR;
+    canvas.height = H * DPR;
 
-        canvas.width = W * dpr;
-        canvas.height = H * dpr;
-
-        canvas.style.width = W + "px";
-        canvas.style.height = H + "px";
-
-        ctx.setTransform(
-            dpr,
-            0,
-            0,
-            dpr,
-            0,
-            0
-        );
-    }}
-
-    resize();
-    window.addEventListener("resize", resize);
+    ctx.setTransform(
+        DPR,
+        0,
+        0,
+        DPR,
+        0,
+        0
+    );
 
     /*
-       Ukuran sumber mengikuti bentuk input sebenarnya.
-       Tidak lagi memakai tinggi 104px.
-    */
-    const input = {{
-        x: 8,
-        y: Math.max(8, (H - 54) / 2),
-        w: W - 16,
-        h: 54,
+     * ============================================================
+     * TIMING
+     * ============================================================
+     */
+
+    const DELAY = 3000;
+    const MORPH = 2000;
+    const TOTAL = DELAY + MORPH;
+
+    const start = performance.now();
+
+
+    /*
+     * ============================================================
+     * INPUT
+     * ============================================================
+     */
+
+    const cardW = Math.min(
+        760,
+        Math.max(0, W - 24)
+    );
+
+    const cardH =
+        W <= 600
+            ? 62
+            : 56;
+
+    const input = {
+        x: (W - cardW) / 2,
+        y: (H - cardH) / 2,
+        w: cardW,
+        h: cardH,
         r: 22
-    }};
+    };
+
 
     /*
-       Titik tujuan berada di tengah bawah dock.
-       Ini adalah posisi tombol Hentikan.
-    */
-    const target = {{
-        x: W / 2,
-        y: H / 2
-    }};
+     * ============================================================
+     * TOMBOL HENTIKAN
+     * ============================================================
+     */
 
-    const particles = [];
+    const button = {
+        w: 126,
+        h: 30,
+        x: (W - 126) / 2,
 
-    function addParticle(
+        /*
+         * Sedikit lebih ke bawah agar terasa seperti
+         * partikel benar-benar turun ke tombol.
+         */
+        y: (H - 30) / 2 + 10,
+
+        r: 999
+    };
+
+
+    /*
+     * ============================================================
+     * UTILITAS PARTIKEL
+     * ============================================================
+     */
+
+    const inputPoints = [];
+    const buttonPoints = [];
+
+    function addPoint(
+        array,
         x,
         y,
-        size,
-        opacity,
-        type = "edge"
-    ) {{
-        const angle =
-            Math.random() * Math.PI * 2;
-
-        const spread =
-            type === "edge"
-                ? 10
-                : 16;
-
-        const centerX =
-            target.x +
-            Math.cos(angle) *
-            (Math.random() * spread);
-
-        const centerY =
-            target.y +
-            Math.sin(angle) *
-            (Math.random() * spread);
-
-        particles.push({{
-            sx: reverse ? centerX : x,
-            sy: reverse ? centerY : y,
-
-            ex: reverse ? x : centerX,
-            ey: reverse ? y : centerY,
-
+        color,
+        size
+    ) {
+        array.push({
+            x,
+            y,
+            color,
             size,
-            opacity,
+
+            angle:
+                Math.random() *
+                Math.PI *
+                2,
+
+            spread:
+                18 +
+                Math.random() * 28,
 
             drift:
-                (Math.random() - 0.5) *
-                18,
+                (Math.random() - 0.5) * 14
+        });
+    }
 
-            delay:
-                Math.random() * 0.12
-        }});
-    }}
 
     /*
-       Rounded rectangle.
-    */
-    function roundedRectPoints(
-        x,
-        y,
-        w,
-        h,
-        r
-    ) {{
-        const points = [];
+     * ============================================================
+     * ROUNDED RECTANGLE
+     * ============================================================
+     */
 
-        const step = 5;
+    function roundedOutline(
+        array,
+        rect,
+        step,
+        color,
+        size
+    ) {
+
+        const x = rect.x;
+        const y = rect.y;
+        const w = rect.w;
+        const h = rect.h;
+        const r = Math.min(
+            rect.r,
+            w / 2,
+            h / 2
+        );
 
         for (
             let px = x + r;
             px <= x + w - r;
             px += step
-        ) {{
-            points.push([px, y]);
-            points.push([px, y + h]);
-        }}
+        ) {
+            addPoint(
+                array,
+                px,
+                y,
+                color,
+                size
+            );
+
+            addPoint(
+                array,
+                px,
+                y + h,
+                color,
+                size
+            );
+        }
 
         for (
             let py = y + r;
             py <= y + h - r;
             py += step
-        ) {{
-            points.push([x, py]);
-            points.push([x + w, py]);
-        }}
+        ) {
+            addPoint(
+                array,
+                x,
+                py,
+                color,
+                size
+            );
+
+            addPoint(
+                array,
+                x + w,
+                py,
+                color,
+                size
+            );
+        }
 
         const corners = [
-            [x + r, y + r, Math.PI, Math.PI * 1.5],
-            [x + w - r, y + r, Math.PI * 1.5, Math.PI * 2],
-            [x + w - r, y + h - r, 0, Math.PI * .5],
-            [x + r, y + h - r, Math.PI * .5, Math.PI]
+            [
+                x + r,
+                y + r,
+                Math.PI,
+                Math.PI * 1.5
+            ],
+            [
+                x + w - r,
+                y + r,
+                Math.PI * 1.5,
+                Math.PI * 2
+            ],
+            [
+                x + w - r,
+                y + h - r,
+                0,
+                Math.PI * 0.5
+            ],
+            [
+                x + r,
+                y + h - r,
+                Math.PI * 0.5,
+                Math.PI
+            ]
         ];
 
-        for (const corner of corners) {{
-            const [
-                cx,
-                cy,
-                start,
-                end
-            ] = corner;
+        for (const c of corners) {
 
             for (
-                let a = start;
-                a <= end;
-                a += 0.12
-            ) {{
-                points.push([
-                    cx + Math.cos(a) * r,
-                    cy + Math.sin(a) * r
-                ]);
-            }}
-        }}
+                let a = c[2];
+                a < c[3];
+                a += 0.11
+            ) {
 
-        return points;
-    }}
+                addPoint(
+                    array,
+
+                    c[0] +
+                    Math.cos(a) * r,
+
+                    c[1] +
+                    Math.sin(a) * r,
+
+                    color,
+                    size
+                );
+            }
+        }
+    }
+
 
     /*
-       Bentuk utama input.
-    */
-    const borderPoints =
-        roundedRectPoints(
+     * ============================================================
+     * INPUT PARTICLES
+     * ============================================================
+     */
+
+    roundedOutline(
+        inputPoints,
+        input,
+        6,
+        "#9b8d86",
+        2.0
+    );
+
+
+    /*
+     * Permukaan input.
+     */
+
+    for (
+        let y = input.y + 8;
+        y < input.y + input.h - 8;
+        y += 7
+    ) {
+
+        for (
+            let x = input.x + 14;
+            x < input.x + input.w - 14;
+            x += 11
+        ) {
+
+            if (Math.random() < 0.20) {
+
+                addPoint(
+                    inputPoints,
+                    x,
+                    y,
+                    "#d0c1af",
+                    1.2
+                );
+            }
+        }
+    }
+
+
+    /*
+     * Placeholder teks.
+     */
+
+    for (
+        let x = input.x + 70;
+        x < Math.min(
+            input.x + 330,
+            input.x + input.w - 220
+        );
+        x += 6
+    ) {
+
+        const wave =
+            Math.sin(x * 0.08) * 1.5;
+
+        for (
+            let y =
+                input.y +
+                input.h / 2 -
+                5 +
+                wave;
+
+            y <=
+                input.y +
+                input.h / 2 +
+                5 +
+                wave;
+
+            y += 4
+        ) {
+
+            if (Math.random() < 0.62) {
+
+                addPoint(
+                    inputPoints,
+                    x,
+                    y,
+                    "#756a70",
+                    1.5
+                );
+            }
+        }
+    }
+
+
+    /*
+     * Ikon input.
+     */
+
+    const icons = [
+        input.x + 32,
+        input.x + input.w - 112,
+        input.x + input.w - 74,
+        input.x + input.w - 34
+    ];
+
+    for (const px of icons) {
+
+        for (
+            let a = 0;
+            a < Math.PI * 2;
+            a += 0.25
+        ) {
+
+            addPoint(
+                inputPoints,
+
+                px +
+                Math.cos(a) * 8,
+
+                input.y +
+                input.h / 2 +
+                Math.sin(a) * 8,
+
+                "#756a70",
+                1.7
+            );
+        }
+    }
+
+
+    /*
+     * ============================================================
+     * TOMBOL PARTICLES
+     * ============================================================
+     */
+
+    roundedOutline(
+        buttonPoints,
+        button,
+        4.5,
+        "#857462",
+        2.0
+    );
+
+
+    /*
+     * Ikon stop.
+     */
+
+    const stopX = button.x + 20;
+    const stopY = button.y + button.h / 2;
+
+    for (
+        let a = 0;
+        a < Math.PI * 2;
+        a += 0.20
+    ) {
+
+        addPoint(
+            buttonPoints,
+
+            stopX +
+            Math.cos(a) * 7,
+
+            stopY +
+            Math.sin(a) * 7,
+
+            "#514653",
+            1.8
+        );
+    }
+
+
+    /*
+     * Teks Hentikan sebagai titik.
+     */
+
+    const textCanvas =
+        document.createElement("canvas");
+
+    textCanvas.width = 180;
+    textCanvas.height = 50;
+
+    const textCtx =
+        textCanvas.getContext("2d");
+
+    textCtx.font =
+        '500 13px "Space Grotesk", sans-serif';
+
+    textCtx.textBaseline = "middle";
+    textCtx.fillStyle = "#514653";
+
+    textCtx.fillText(
+        "Hentikan",
+        0,
+        25
+    );
+
+    const pixels =
+        textCtx.getImageData(
+            0,
+            0,
+            textCanvas.width,
+            textCanvas.height
+        ).data;
+
+    for (
+        let y = 0;
+        y < textCanvas.height;
+        y += 2
+    ) {
+
+        for (
+            let x = 0;
+            x < textCanvas.width;
+            x += 2
+        ) {
+
+            const index =
+                (
+                    y *
+                    textCanvas.width +
+                    x
+                ) * 4;
+
+            if (
+                pixels[index + 3] > 100
+            ) {
+
+                addPoint(
+                    buttonPoints,
+
+                    button.x + 34 + x,
+                    button.y + y - 10,
+
+                    "#514653",
+                    1.4
+                );
+            }
+        }
+    }
+
+
+    /*
+     * ============================================================
+     * NORMALISASI JUMLAH PARTIKEL
+     * ============================================================
+     *
+     * Target sekitar 460 partikel,
+     * mengikuti konsep demo yang kamu kirim.
+     */
+
+    const TARGET_COUNT = 460;
+
+    function normalize(
+        source
+    ) {
+
+        const result = [];
+
+        for (
+            let i = 0;
+            i < TARGET_COUNT;
+            i++
+        ) {
+
+            result.push(
+                source[
+                    i % source.length
+                ]
+            );
+        }
+
+        return result;
+    }
+
+    const sources =
+        normalize(inputPoints);
+
+    const targets =
+        normalize(buttonPoints);
+
+
+    /*
+     * ============================================================
+     * PAIR PARTICLES
+     * ============================================================
+     */
+
+    const particles = [];
+
+    for (
+        let i = 0;
+        i < TARGET_COUNT;
+        i++
+    ) {
+
+        const a = sources[i];
+        const b = targets[i];
+
+        particles.push({
+
+            sx: a.x,
+            sy: a.y,
+
+            tx: b.x,
+            ty: b.y,
+
+            color: a.color,
+            targetColor: b.color,
+
+            size:
+                Math.max(
+                    1.15,
+                    (
+                        a.size +
+                        b.size
+                    ) / 2
+                ),
+
+            angle:
+                a.angle,
+
+            spread:
+                a.spread,
+
+            drift:
+                a.drift,
+
+            phase:
+                Math.random() *
+                Math.PI *
+                2
+        });
+    }
+
+
+    /*
+     * ============================================================
+     * EASING
+     * ============================================================
+     */
+
+    function clamp(v) {
+        return Math.max(
+            0,
+            Math.min(1, v)
+        );
+    }
+
+    function easeOutCubic(t) {
+        return 1 -
+            Math.pow(
+                1 - t,
+                3
+            );
+    }
+
+    function easeInOutCubic(t) {
+
+        return t < 0.5
+            ? 4 * t * t * t
+            : 1 -
+              Math.pow(
+                  -2 * t + 2,
+                  3
+              ) / 2;
+    }
+
+    function mix(a, b, t) {
+        return a +
+            (b - a) * t;
+    }
+
+
+    /*
+     * ============================================================
+     * WARNA
+     * ============================================================
+     */
+
+    function hexToRgb(hex) {
+
+        const value =
+            hex.replace("#", "");
+
+        return {
+            r: parseInt(
+                value.substring(0, 2),
+                16
+            ),
+            g: parseInt(
+                value.substring(2, 4),
+                16
+            ),
+            b: parseInt(
+                value.substring(4, 6),
+                16
+            )
+        };
+    }
+
+    function rgbToHex(
+        r,
+        g,
+        b
+    ) {
+
+        const toHex = v =>
+            Math.round(v)
+                .toString(16)
+                .padStart(2, "0");
+
+        return "#" +
+            toHex(r) +
+            toHex(g) +
+            toHex(b);
+    }
+
+
+    /*
+     * ============================================================
+     * GHOST INPUT
+     * ============================================================
+     *
+     * Ini membuat bentuk asli tetap terlihat
+     * selama delay 3 detik.
+     */
+
+    function drawInputGhost(alpha) {
+
+        if (alpha <= 0) {
+            return;
+        }
+
+        ctx.save();
+
+        ctx.globalAlpha = alpha;
+
+        ctx.beginPath();
+
+        ctx.roundRect(
             input.x,
             input.y,
             input.w,
@@ -1273,128 +1790,78 @@ canvas {{
             input.r
         );
 
-    for (const [x, y] of borderPoints) {{
-        addParticle(
-            x,
-            y,
-            1.7 + Math.random() * 1.1,
-            .95,
-            "edge"
-        );
-    }}
+        ctx.fillStyle =
+            "rgba(248,239,222,0.98)";
+
+        ctx.fill();
+
+        ctx.strokeStyle =
+            "rgba(159,126,72,0.38)";
+
+        ctx.lineWidth = 1;
+
+        ctx.stroke();
+
+        ctx.restore();
+    }
+
 
     /*
-       Partikel isi input supaya benar-benar
-       terlihat seperti kolom pecah, bukan cuma
-       garis luarnya.
-    */
-    for (
-        let y = input.y + 10;
-        y < input.y + input.h - 8;
-        y += 7
-    ) {{
-        for (
-            let x = input.x + 18;
-            x < input.x + input.w - 18;
-            x += 9
-        ) {{
-            if (Math.random() < .22) {{
-                addParticle(
-                    x,
-                    y,
-                    1.1 + Math.random() * .8,
-                    .48,
-                    "fill"
-                );
-            }}
-        }}
-    }}
+     * ============================================================
+     * GHOST BUTTON
+     * ============================================================
+     */
 
-    /*
-       Placeholder / area teks.
-    */
-    const textStart = input.x + 76;
-    const textEnd =
-        Math.min(
-            input.x + input.w - 220,
-            textStart + 330
+    function drawButtonGhost(alpha) {
+
+        if (alpha <= 0) {
+            return;
+        }
+
+        ctx.save();
+
+        ctx.globalAlpha = alpha;
+
+        ctx.beginPath();
+
+        ctx.roundRect(
+            button.x,
+            button.y,
+            button.w,
+            button.h,
+            button.r
         );
 
-    for (
-        let x = textStart;
-        x < textEnd;
-        x += 6
-    ) {{
-        for (
-            let y = target.y - 5;
-            y <= target.y + 5;
-            y += 5
-        ) {{
-            if (Math.random() < .65) {{
-                addParticle(
-                    x,
-                    y,
-                    1.1,
-                    .72,
-                    "text"
-                );
-            }}
-        }}
-    }}
+        ctx.fillStyle =
+            "rgba(248,239,222,0.98)";
+
+        ctx.fill();
+
+        ctx.strokeStyle =
+            "rgba(159,126,72,0.38)";
+
+        ctx.lineWidth = 1;
+
+        ctx.stroke();
+
+        ctx.restore();
+    }
+
 
     /*
-       Empat area ikon input.
-       Tidak lagi dipakai sebagai lingkaran besar
-       20px seperti versi lama; dibuat lebih kecil
-       supaya pecahannya natural.
-    */
-    const iconPositions = [
-        input.x + 28,
-        input.x + input.w - 154,
-        input.x + input.w - 92,
-        input.x + input.w - 38
-    ];
+     * ============================================================
+     * FRAME
+     * ============================================================
+     */
 
-    for (const px of iconPositions) {{
-        for (
-            let a = 0;
-            a < Math.PI * 2;
-            a += .30
-        ) {{
-            const radius =
-                6 + Math.random() * 4;
+    function frame(now) {
 
-            addParticle(
-                px + Math.cos(a) * radius,
-                target.y + Math.sin(a) * radius,
-                1.5,
-                .78,
-                "icon"
-            );
-        }}
-    }}
+        const elapsed =
+            now - start;
 
-    const start =
-        performance.now();
-
-    const duration = 880;
-
-    function ease(t) {{
-        return t < .5
-            ? 4 * t * t * t
-            : 1 -
-                Math.pow(
-                    -2 * t + 2,
-                    3
-                ) / 2;
-    }}
-
-    function frame(now) {{
-        const raw =
-            Math.min(
-                1,
-                (now - start) /
-                duration
+        const progress =
+            clamp(
+                elapsed / TOTAL
             );
 
         ctx.clearRect(
@@ -1404,102 +1871,466 @@ canvas {{
             H
         );
 
-        for (const p of particles) {{
-            const local =
-                Math.max(
-                    0,
-                    Math.min(
-                        1,
-                        (raw - p.delay) /
-                        (1 - p.delay)
-                    )
-                );
 
-            const t =
-                ease(local);
+        /*
+         * ========================================================
+         * DELAY
+         * ========================================================
+         */
 
-            const x =
-                p.sx +
-                (p.ex - p.sx) * t +
-                Math.sin(
-                    t * Math.PI
-                ) *
-                p.drift;
+        if (elapsed < DELAY) {
 
-            const y =
-                p.sy +
-                (p.ey - p.sy) * t +
-                Math.cos(
-                    t * Math.PI * 2
-                ) *
-                p.drift *
-                .18;
+            if (!reverse) {
+
+                /*
+                 * STOP:
+                 * input tetap terlihat penuh.
+                 */
+
+                drawInputGhost(1);
+
+            } else {
+
+                /*
+                 * RETURN:
+                 * tombol tetap terlihat penuh.
+                 */
+
+                drawButtonGhost(1);
+            }
+
+            requestAnimationFrame(
+                frame
+            );
+
+            return;
+        }
+
+
+        /*
+         * ========================================================
+         * MORPH 0 -> 1
+         * ========================================================
+         */
+
+        const morphProgress =
+            clamp(
+                (
+                    elapsed -
+                    DELAY
+                ) / MORPH
+            );
+
+
+        /*
+         * 0.00 - 0.18
+         *
+         * Partikel keluar dari bentuk awal.
+         */
+
+        let spreadProgress =
+            clamp(
+                morphProgress / 0.18
+            );
+
+
+        /*
+         * 0.18 - 1.00
+         *
+         * Partikel menuju bentuk target.
+         */
+
+        let travelProgress =
+            clamp(
+                (
+                    morphProgress -
+                    0.18
+                ) / 0.82
+            );
+
+        travelProgress =
+            easeInOutCubic(
+                travelProgress
+            );
+
+
+        /*
+         * Input ghost / button ghost
+         */
+
+        if (!reverse) {
 
             /*
-               Partikel muncul penuh,
-               kemudian sedikit mengecil
-               saat mencapai tujuan.
-            */
-            const radius =
-                p.size *
-                (
-                    1 -
-                    .45 * t
+             * Input menghilang
+             * lebih dulu.
+             */
+
+            const ghost =
+                1 -
+                clamp(
+                    morphProgress / 0.18
                 );
 
-            let alpha =
-                p.opacity;
+            drawInputGhost(
+                ghost * 0.95
+            );
 
-            if (local < .12) {{
-                alpha *=
-                    local / .12;
-            }}
+        } else {
 
-            if (local > .82) {{
-                alpha *=
-                    1 -
+            const ghost =
+                1 -
+                clamp(
+                    morphProgress / 0.18
+                );
+
+            drawButtonGhost(
+                ghost * 0.95
+            );
+        }
+
+
+        /*
+         * ========================================================
+         * PARTICLES
+         * ========================================================
+         */
+
+        for (const p of particles) {
+
+            let x;
+            let y;
+
+            let targetColor =
+                hexToRgb(
+                    p.targetColor
+                );
+
+            let sourceColor =
+                hexToRgb(
+                    p.color
+                );
+
+
+            /*
+             * ====================================================
+             * STOP
+             * ====================================================
+             */
+
+            if (!reverse) {
+
+                /*
+                 * FASE 1:
+                 * partikel menyebar
+                 */
+
+                if (
+                    morphProgress <
+                    0.18
+                ) {
+
+                    const spread =
+                        easeOutCubic(
+                            spreadProgress
+                        );
+
+                    x =
+                        p.sx +
+                        Math.cos(
+                            p.angle
+                        ) *
+                        p.spread *
+                        spread;
+
+                    y =
+                        p.sy +
+                        Math.sin(
+                            p.angle
+                        ) *
+                        p.spread *
+                        spread;
+
+                } else {
+
+                    /*
+                     * Posisi setelah menyebar.
+                     */
+
+                    const spreadX =
+                        p.sx +
+                        Math.cos(
+                            p.angle
+                        ) *
+                        p.spread;
+
+                    const spreadY =
+                        p.sy +
+                        Math.sin(
+                            p.angle
+                        ) *
+                        p.spread;
+
+
+                    /*
+                     * Kurva turun menuju tombol.
+                     */
+
+                    const curve =
+                        Math.sin(
+                            travelProgress *
+                            Math.PI
+                        );
+
+                    x =
+                        mix(
+                            spreadX,
+                            p.tx,
+                            travelProgress
+                        );
+
+                    y =
+                        mix(
+                            spreadY,
+                            p.ty,
+                            travelProgress
+                        )
+                        +
+                        curve *
+                        18;
+                }
+
+            }
+
+
+            /*
+             * ====================================================
+             * RETURN
+             * ====================================================
+             */
+
+            else {
+
+                /*
+                 * Mulai dari tombol.
+                 */
+
+                const startX =
+                    p.tx +
+                    Math.cos(
+                        p.angle
+                    ) *
+                    p.spread;
+
+                const startY =
+                    p.ty +
+                    Math.sin(
+                        p.angle
+                    ) *
+                    p.spread;
+
+
+                if (
+                    morphProgress <
+                    0.18
+                ) {
+
+                    const spread =
+                        easeOutCubic(
+                            spreadProgress
+                        );
+
+                    x =
+                        p.tx +
+                        Math.cos(
+                            p.angle
+                        ) *
+                        p.spread *
+                        spread;
+
+                    y =
+                        p.ty +
+                        Math.sin(
+                            p.angle
+                        ) *
+                        p.spread *
+                        spread;
+
+                } else {
+
+                    /*
+                     * Kurva naik menuju input.
+                     */
+
+                    const curve =
+                        Math.sin(
+                            travelProgress *
+                            Math.PI
+                        );
+
+                    x =
+                        mix(
+                            startX,
+                            p.sx,
+                            travelProgress
+                        );
+
+                    y =
+                        mix(
+                            startY,
+                            p.sy,
+                            travelProgress
+                        )
+                        -
+                        curve *
+                        18;
+                }
+            }
+
+
+            /*
+             * Sedikit floating motion.
+             */
+
+            x +=
+                Math.sin(
+                    now * 0.004 +
+                    p.phase
+                ) *
+                p.drift *
+                0.12;
+
+            y +=
+                Math.cos(
+                    now * 0.003 +
+                    p.phase
+                ) *
+                p.drift *
+                0.08;
+
+
+            /*
+             * Warna berubah ketika
+             * partikel mendekati target.
+             */
+
+            const colorT =
+                Math.max(
+                    0,
+                    (morphProgress - 0.35) /
+                    0.65
+                );
+
+            const r =
+                mix(
+                    sourceColor.r,
+                    targetColor.r,
+                    colorT
+                );
+
+            const g =
+                mix(
+                    sourceColor.g,
+                    targetColor.g,
+                    colorT
+                );
+
+            const b =
+                mix(
+                    sourceColor.b,
+                    targetColor.b,
+                    colorT
+                );
+
+
+            /*
+             * Partikel fade setelah
+             * bentuk target sudah terbentuk.
+             */
+
+            let alpha = 0.95;
+
+            if (
+                morphProgress >
+                0.94
+            ) {
+
+                alpha =
+                    0.95 *
                     (
-                        (local - .82) /
-                        .18
-                    ) * .15;
-            }}
+                        1 -
+                        (
+                            morphProgress -
+                            0.94
+                        ) /
+                        0.06
+                    );
+            }
 
-            ctx.globalAlpha = alpha;
+
+            ctx.globalAlpha =
+                Math.max(
+                    0,
+                    alpha
+                );
 
             ctx.fillStyle =
-                "#9b8d86";
+                rgbToHex(
+                    r,
+                    g,
+                    b
+                );
 
             ctx.beginPath();
 
             ctx.arc(
                 x,
                 y,
-                radius,
+                p.size,
                 0,
                 Math.PI * 2
             );
 
             ctx.fill();
-        }}
+        }
 
-        if (raw < 1) {{
-            requestAnimationFrame(frame);
-        }} else {{
+
+        ctx.globalAlpha = 1;
+
+
+        /*
+         * Selesai
+         */
+
+        if (elapsed < TOTAL) {
+
+            requestAnimationFrame(
+                frame
+            );
+
+        } else {
+
             ctx.clearRect(
                 0,
                 0,
                 W,
                 H
             );
-        }}
-    }}
+        }
+    }
+
 
     requestAnimationFrame(frame);
-}})();
+
+})();
 </script>
 </body>
 </html>
 """
+
+    html_fx = html_fx.replace(
+        "__REVERSE__",
+        "true" if reverse else "false"
+    )
 
     with st.container(key="yuki_morph_fx"):
         components.html(
