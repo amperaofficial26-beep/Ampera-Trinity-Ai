@@ -136,19 +136,24 @@ section[data-testid="stSidebar"] div.stButton > button {
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
-    border-radius: 8px !important;
+    border-radius: 7px !important;
     width: 100% !important;
     display: flex !important;
     text-align: left !important;
     justify-content: flex-start !important;
     align-items: center !important;
-    gap: 6px !important;
-    padding: 1px 10px !important;
-    min-height: 27px !important;
-    line-height: 1.15 !important;
+    gap: 5px !important;
+
+    padding: 0 !important;
+    min-height: 23px !important;
+    height: 23px !important;
+
+    line-height: 1 !important;
     color: #2C1F33 !important;
-    font-size: 1.06rem !important;
+    font-size: 1.04rem !important;
     font-weight: 500 !important;
+
+    margin: 0 !important;
 }
 section[data-testid="stSidebar"] div.stButton > button:hover {
     background: #E2D6C1 !important;
@@ -200,10 +205,15 @@ section[data-testid="stSidebar"] .st-key-sb_new button:hover {
 section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] button {
     font-weight: 400 !important;
     color: #4E4553 !important;
-    min-height: 27px !important;
-    padding: 1px 10px !important;
-    line-height: 1.15 !important;
+
+    min-height: 23px !important;
+    height: 23px !important;
+
+    padding: 0 10px !important;
+    line-height: 1 !important;
+
     position: relative;
+    margin: 0 !important;
 }
 section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] button::before {
     content: "";
