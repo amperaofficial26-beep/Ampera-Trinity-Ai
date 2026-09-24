@@ -17,6 +17,7 @@ Sumber data: st.session_state.artifacts (diisi artifacts.ambil_artefak()).
 
 from __future__ import annotations
 
+import time
 import html
 
 import streamlit as st
@@ -107,9 +108,15 @@ def _css(terbuka: bool) -> str:
         "}"
         
         "body [class*='st-key-fd_toggle'] button "
-        "[data-testid='stIconMaterial']{"
-        "margin:0!important;"
-        "font-size:20px!important;"
+        "[data-testid='stMarkdownContainer'] p{"
+        "animation:fd-text-in .45s ease!important;"
+        "white-space:nowrap!important;"
+        "overflow:hidden!important;"
+        "text-overflow:ellipsis!important;"
+        "}"
+        "@keyframes fd-text-in{"
+        "0%{opacity:.25;transform:translateX(8px);}"
+        "100%{opacity:1;transform:translateX(0);}"
         "}"
         # ---- titik merah penghitung file baru -------------------------
         ".fd-dot{"
@@ -199,16 +206,34 @@ def render_file_dock() -> None:
 
     st.markdown(_css(terbuka), unsafe_allow_html=True)
 
-    # Ikon folder: SELALU tampil. Membuka dok menandai semua file "dilihat".
-    with st.container(key="fd_toggle"):
-        if st.button(
-            ":material/close:" if terbuka else ":material/folder_open:",
-            key="fd_btn",
-            help="Tutup daftar file" if terbuka else "File buatan Yuki",
-        ):
-            st.session_state["file_dock_open"] = not terbuka
-            st.session_state["file_dock_seen"] = len(files)
-            st.rerun()
+        # Tombol file dengan teks yang berganti otomatis
+    @st.fragment(run_every=2.0)
+    def _render_file_toggle():
+        current_files = _files()
+        current_open = bool(st.session_state.get("file_dock_open"))
+
+        if not current_files:
+            teks_tombol = "Belum ada file, minta Yuki buat file"
+        else:
+            indeks = int(time.monotonic() / 2.0) % len(current_files)
+            nama_file = current_files[indeks].get("title", "File")
+            teks_tombol = f"File kamu ada disini · {nama_file}"
+
+        with st.container(key="fd_toggle"):
+            if st.button(
+                (
+                    ":material/close:  "
+                    if current_open
+                    else ":material/folder_open:  "
+                ) + teks_tombol,
+                key="fd_btn",
+                help="Tutup daftar file" if current_open else "File buatan Yuki",
+            ):
+                st.session_state["file_dock_open"] = not current_open
+                st.session_state["file_dock_seen"] = len(current_files)
+                st.rerun()
+
+    _render_file_toggle()
 
     # Gelembung + titik merah: hanya saat ada file BARU dan dok tertutup.
     if baru and not terbuka:
