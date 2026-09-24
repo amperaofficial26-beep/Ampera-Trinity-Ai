@@ -1070,7 +1070,7 @@ _FRESH_BOTTOM_CSS = """
    (turun sedikit agar tidak menutupi judul sapaan) */
 [data-testid="stBottom"] {
   /* angka posisinya diatur lewat --chat-lift-fresh & --chat-shift di styles.py */
-  transform: translate(var(--chat-shift, 0px), calc(-1 * var(--chat-lift-fresh, 26vh)));
+  transform: translate(var(--chat-shift, 0px), calc(-1 * var(--chat-lift-fresh, 190vh)));
   background: transparent !important;
   transition: transform 0.35s ease;
 }
