@@ -5348,9 +5348,13 @@ body,
 }
 
 
-/* Material Icons tetap menggunakan font ikonnya */
+/* Material Icons tetap menggunakan font ikonnya.
+   .mi wajib ikut dikecualikan: helper mi() di icons.py menghasilkan span.mi.
+   Tanpa selector ini, aturan `.stApp *` di atas (yang memakai !important)
+   menimpa font ligature ikon dan teks seperti "support_agent" tampil mentah. */
 [data-testid="stIconMaterial"],
 span[role="img"],
+.mi,
 [class*="material-symbols"],
 [class*="material-icons"] {
     font-family:
@@ -5360,6 +5364,10 @@ span[role="img"],
         sans-serif !important;
 
     font-style: normal !important;
+    font-weight: normal !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    white-space: nowrap !important;
 }
 </style>
 """,
