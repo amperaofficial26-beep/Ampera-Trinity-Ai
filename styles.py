@@ -4823,7 +4823,7 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
 [data-testid="stBottomBlockContainer"] {
     position: relative !important;
 
-    left: -200px !important;
+    left: -20px !important;
 
     margin-left: auto !important;
     margin-right: auto !important;
