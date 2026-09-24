@@ -6359,19 +6359,31 @@ section[data-testid="stSidebar"]
 .sb-account {
 
     width:
-        100%
+        var(--dash-sidebar, 230px)
         !important;
 
     max-width:
-        100%
+        var(--dash-sidebar, 230px)
+        !important;
+
+    left:
+        0
+        !important;
+
+    bottom:
+        0
         !important;
 
     padding:
         9px 10px
         !important;
 
+    box-sizing:
+        border-box
+        !important;
+
     border-radius:
-        14px
+        0
         !important;
 
     background:
