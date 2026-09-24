@@ -8050,56 +8050,65 @@ div.stDownloadButton > button,
 
 
 /* =========================================================
-   CHAT SURFACE
-   =========================================================
-
-   INI ADALAH LAYER UTAMA CHAT.
-
-   Background
-   +
-   padding
-   +
-   border
-   +
-   shadow
-   +
-   seluruh pesan
-
-   bergerak BERSAMA.
+   MULTI AI — CHAT SURFACE
+   Background + pesan = SATU BOX
    ========================================================= */
 
 .stApp:has(.tr-multi-ai-layout)
 .st-key-multi_chat_area {
-    box-sizing: border-box !important;
 
-    width: var(--multi-chat-width) !important;
-    max-width: var(--multi-chat-width) !important;
+    /* ukuran FIX */
+    width: 760px !important;
+    min-width: 760px !important;
+    max-width: 760px !important;
 
-    margin-left: auto !important;
-    margin-right: auto !important;
+    flex:
+        0 0 760px !important;
 
-    padding: 18px !important;
+    box-sizing:
+        border-box !important;
 
-    transform: translate(
-        var(--multi-chat-x),
-        var(--multi-chat-y)
-    ) !important;
+    /* posisi */
+    margin-left:
+        auto !important;
 
-    background: var(--tr-surface-premium) !important;
-    border: 1px solid var(--tr-border-premium) !important;
-    border-radius: 22px !important;
+    margin-right:
+        auto !important;
+
+    transform:
+        translate(
+            var(--multi-chat-x),
+            var(--multi-chat-y)
+        ) !important;
+
+    /* background */
+    background:
+        var(--tr-surface-premium) !important;
+
+    border:
+        1px solid
+        var(--tr-border-premium) !important;
+
+    border-radius:
+        22px !important;
 
     box-shadow:
-        0 10px 30px rgba(48, 40, 58, 0.055) !important;
+        0 10px 30px
+        rgba(48, 40, 58, 0.055) !important;
+
+    padding:
+        18px !important;
+
+    overflow:
+        hidden !important;
 
     transition:
-        transform .28s ease,
-        width .28s ease !important;
+        transform .28s ease !important;
 }
 
-/* =========================================================
-   PESAN DI DALAM CHAT SURFACE
-   ========================================================= */
+
+/* Paksa isi container mengikuti box,
+   bukan melebar ke parent */
 
 .stApp:has(.tr-multi-ai-layout)
 .st-key-multi_chat_area
@@ -8108,40 +8117,35 @@ div.stDownloadButton > button,
     width:
         100% !important;
 
+    min-width:
+        0 !important;
+
     max-width:
         100% !important;
+
+    flex:
+        0 0 100% !important;
+
+    box-sizing:
+        border-box !important;
+
+    margin:
+        0 !important;
 }
 
 
-/* =========================================================
-   CHAT INPUT — LAYER TERPISAH
-   ========================================================= */
-
-/*
- * Bottom container dibuat full-width supaya input
- * tidak terikat pada lebar 760px milik main content.
- */
+/* Semua wrapper Streamlit di dalam chat
+   tidak boleh menciptakan lebar tambahan */
 
 .stApp:has(.tr-multi-ai-layout)
-[data-testid="stBottomBlockContainer"] {
+.st-key-multi_chat_area
+.element-container {
 
     width:
         100% !important;
 
     max-width:
-        none !important;
-
-    left:
-        0 !important;
-
-    right:
-        0 !important;
-
-    padding-left:
-        210px !important;
-
-    padding-right:
-        36px !important;
+        100% !important;
 
     box-sizing:
         border-box !important;
