@@ -40,8 +40,8 @@ WARNA_REDUP = "#B8A9C0"       # teks sekunder
 WARNA_AKSEN = "#E8B04B"       # emas: chip ekstensi & hover tombol
 MAKS_FILE_TAMPIL = 12         # dok itu kecil; sisanya cukup disebut jumlahnya
 
-TOMBOL_ATAS_PX = 95           # posisi ikon folder dari atas layar
-TOMBOL_KANAN_PX = 295         # posisi ikon folder dari kanan layar
+TOMBOL_ATAS_PX = 10           # posisi ikon folder dari atas layar
+TOMBOL_KANAN_PX = 18         # posisi ikon folder dari kanan layar
 TEKS_GELEMBUNG = "File kamu ada di sini"
 
 
@@ -54,15 +54,24 @@ def _css(terbuka: bool) -> str:
         "<style>"
         # ---- ikon folder melayang -------------------------------------
         "body [class*='st-key-fd_toggle']{"
-        f"position:fixed!important;top:{TOMBOL_ATAS_PX}px!important;"
-        f"right:{TOMBOL_KANAN_PX}px!important;left:auto!important;"
-        "width:46px!important;margin:0!important;z-index:999998!important;}"
+        f"position:fixed!important;"
+        f"top:{TOMBOL_ATAS_PX}px!important;"
+        f"right:{TOMBOL_KANAN_PX}px!important;"
+        "left:auto!important;"
+        "width:var(--dash-rail,250px)!important;"
+        "margin:0!important;"
+        "z-index:999998!important;}"
+        
         "body [class*='st-key-fd_toggle'] button{"
-        "width:46px!important;height:46px!important;min-width:46px!important;"
-        "padding:0!important;border-radius:50%!important;"
-        f"background:{WARNA_KARTU}!important;color:{WARNA_TEKS}!important;"
+        "width:100%!important;"
+        "height:46px!important;"
+        "min-width:0!important;"
+        "padding:0 16px!important;"
+        "border-radius:14px!important;"
+        f"background:{WARNA_KARTU}!important;"
+        f"color:{WARNA_TEKS}!important;"
         "border:1px solid rgba(255,255,255,.16)!important;"
-        "box-shadow:0 6px 18px rgba(44,31,51,.30)!important;}"
+        "box-shadow:0 6px 18px rgba(44,31,51,.20)!important;}"
         "body [class*='st-key-fd_toggle'] button:hover{"
         f"background:{WARNA_AKSEN}!important;color:{WARNA_KARTU}!important;}}"
         # ---- titik merah penghitung file baru -------------------------
@@ -89,9 +98,12 @@ def _css(terbuka: bool) -> str:
         "50%{transform:translateX(-5px)}}"
         # ---- kartu dok ------------------------------------------------
         "body .st-key-fd_panel{"
-        f"position:fixed!important;top:{panel_atas}px!important;"
-        f"right:{TOMBOL_KANAN_PX}px!important;left:auto!important;"
-        f"width:{DOK_LEBAR_PX}px!important;"
+        f"position:fixed!important;"
+        f"top:{TOMBOL_ATAS_PX + 56}px!important;"
+        f"right:{TOMBOL_KANAN_PX}px!important;"
+        "left:auto!important;"
+        "width:var(--dash-rail,250px)!important;"
+        f"max-height:{DOK_MAKS_TINGGI}!important;"
         f"max-height:{DOK_MAKS_TINGGI}!important;overflow-y:auto!important;"
         f"background:{WARNA_KARTU}!important;"
         "border:1px solid rgba(255,255,255,.10)!important;"
