@@ -8550,87 +8550,88 @@ div.stDownloadButton > button,
     transform: none !important;
 }
 /* ============================================================
-   SETTINGS — FLOATING RIGHT NAVIGATION
+   SETTINGS — FLOATING RIGHT ICONS
    ============================================================ */
 
-.stApp .st-key-settings_floating_nav {
+.stApp .settings-floating-nav {
     position: fixed !important;
-    right: 8px !important;
-    top: 50% !important;
+
+    top: 50vh !important;
+    right: 6px !important;
 
     transform: translateY(-50%) !important;
+
+    width: 50px !important;
 
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
 
-    gap: 10px !important;
+    gap: 9px !important;
 
-    z-index: 9999 !important;
+    z-index: 999999 !important;
+
+    pointer-events: none !important;
 }
 
 
-/* Container setiap tombol */
+/* Tombol */
 
-.stApp .st-key-settings_floating_nav [data-testid="stButton"] {
-    margin: 0 !important;
-    padding: 0 !important;
-}
+.stApp .settings-floating-nav button {
+    pointer-events: auto !important;
 
+    width: 44px !important;
+    height: 44px !important;
 
-/* Tombol lingkaran */
-
-.stApp .st-key-settings_floating_nav button {
-    width: 46px !important;
-    height: 46px !important;
-
-    min-width: 46px !important;
-    min-height: 46px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
 
     padding: 0 !important;
     margin: 0 !important;
 
     border-radius: 50% !important;
 
-    border: 1px solid rgba(90, 80, 105, 0.18) !important;
-
-    background: rgba(255, 255, 255, 0.84) !important;
-
-    box-shadow:
-        0 6px 18px rgba(40, 34, 48, 0.10) !important;
-
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
 
+    border: 1px solid rgba(100, 90, 110, 0.20) !important;
+
+    background: rgba(255, 255, 255, 0.90) !important;
+
+    box-shadow:
+        0 5px 16px rgba(30, 25, 40, 0.12) !important;
+
     transition:
-        transform 0.22s ease,
-        box-shadow 0.22s ease,
-        background 0.22s ease !important;
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease !important;
 }
 
 
 /* Icon */
 
-.stApp .st-key-settings_floating_nav button span {
-    font-size: 21px !important;
+.stApp .settings-floating-nav button span {
+    font-size: 20px !important;
 }
 
 
 /* Hover */
 
-.stApp .st-key-settings_floating_nav button:hover {
-    transform: scale(1.10) !important;
+.stApp .settings-floating-nav button:hover {
+    transform: scale(1.12) !important;
+
+    background: rgba(255, 255, 255, 1) !important;
 
     box-shadow:
-        0 8px 22px rgba(40, 34, 48, 0.16) !important;
+        0 8px 22px rgba(30, 25, 40, 0.18) !important;
 }
 
 
-/* Saat ditekan */
+/* Klik */
 
-.stApp .st-key-settings_floating_nav button:active {
-    transform: scale(0.94) !important;
+.stApp .settings-floating-nav button:active {
+    transform: scale(0.92) !important;
 }
 </style>
 """,
