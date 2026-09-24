@@ -7844,7 +7844,7 @@ div.stDownloadButton > button,
        - = kiri
        ========================================================= */
 
-    --greeting-x: 140px;
+    --greeting-x: 0px;
     --greeting-y: 0px;
 
 
