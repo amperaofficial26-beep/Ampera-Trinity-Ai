@@ -7998,11 +7998,6 @@ div.stDownloadButton > button,
             var(--multi-input-y)
         ) !important;
 }
-.stApp:has(.tr-multi-ai-layout)
-.st-key-multi_chat_area {
-    position: relative !important;
-    left: -100px !important;
-}
 
 /* =========================================================
    HERO — JUDUL + DESKRIPSI
