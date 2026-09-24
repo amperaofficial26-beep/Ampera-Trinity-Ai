@@ -6215,7 +6215,7 @@ div.stButton > button {
         !important;
 
     padding:
-        6px 11px
+        2px 11px
         !important;
 
     border:
