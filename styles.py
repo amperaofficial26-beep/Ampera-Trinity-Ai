@@ -1715,7 +1715,7 @@ button[type="submit"]::before {
    --chat-lift-fresh : posisi saat halaman awal (belum ada chat).
 ==================================================================== */
 :root {
-    --chat-lift: 32px;
+    --chat-lift: -145px;
     --chat-shift: 0px;
     --chat-width: 46rem;
     --chat-lift-fresh: 26vh;
