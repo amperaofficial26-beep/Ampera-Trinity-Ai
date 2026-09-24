@@ -5621,6 +5621,159 @@ span[role="img"],
     letter-spacing: normal !important;
     white-space: nowrap !important;
 }
+/* ================================================================
+   CHAT FIRST-LOAD FIX
+   KHUSUS dashboard chat — TIDAK menyentuh welcome/login
+================================================================ */
+
+.stApp:has(.tr-chat-layout) .st-key-chat_topbar {
+    position: fixed !important;
+
+    top: 12px !important;
+
+    left: var(--dash-center-left) !important;
+
+    right: var(--dash-center-right) !important;
+
+    width: auto !important;
+
+    max-width: none !important;
+
+    min-width: 0 !important;
+
+    margin: 0 !important;
+
+    transform: none !important;
+}
+
+
+.stApp:has(.tr-chat-layout) .st-key-chat_right_rail {
+    position: fixed !important;
+
+    top: 12px !important;
+
+    right: 18px !important;
+
+    bottom: 16px !important;
+
+    width: 250px !important;
+
+    max-width: 250px !important;
+
+    min-width: 250px !important;
+
+    margin: 0 !important;
+
+    transform: none !important;
+}
+
+
+/* Area utama tetap dihitung dari sidebar + panel kanan. */
+
+.stApp:has(.tr-chat-layout) [data-testid="stMainBlockContainer"] {
+    width: 100% !important;
+
+    max-width: none !important;
+
+    padding-left:
+        calc(210px + 18px) !important;
+
+    padding-right:
+        calc(250px + 36px) !important;
+}
+
+
+/* Lebar isi tengah. */
+
+.stApp:has(.tr-chat-layout)
+[data-testid="stMainBlockContainer"]
+> [data-testid="stVerticalBlock"] {
+
+    width:
+        min(
+            720px,
+            calc(
+                100vw
+                - 210px
+                - 250px
+                - 54px
+            )
+        ) !important;
+
+    max-width:
+        min(
+            720px,
+            calc(
+                100vw
+                - 210px
+                - 250px
+                - 54px
+            )
+        ) !important;
+
+    margin-left: auto !important;
+
+    margin-right: auto !important;
+}
+
+
+/* Fresh maupun chat berjalan memakai geometri horizontal
+   yang sama. Hanya posisi vertikal bottom dock yang berbeda. */
+
+.stApp:has(.tr-chat-layout.tr-fresh-home)
+.st-key-chat_topbar,
+.stApp:has(.tr-chat-layout)
+.st-key-chat_topbar {
+
+    left:
+        var(--dash-center-left) !important;
+
+    right:
+        var(--dash-center-right) !important;
+}
+
+
+@media (max-width: 1180px) {
+
+    .stApp:has(.tr-chat-layout)
+    .st-key-chat_right_rail {
+
+        display: none !important;
+    }
+
+    .stApp:has(.tr-chat-layout)
+    .st-key-chat_topbar {
+
+        left: 230px !important;
+
+        right: 18px !important;
+    }
+
+    .stApp:has(.tr-chat-layout)
+    [data-testid="stMainBlockContainer"] {
+
+        padding-left: 230px !important;
+
+        padding-right: 18px !important;
+    }
+
+    .stApp:has(.tr-chat-layout)
+    [data-testid="stMainBlockContainer"]
+    > [data-testid="stVerticalBlock"] {
+
+        width:
+            min(
+                760px,
+                calc(100vw - 248px)
+            ) !important;
+
+        max-width:
+            min(
+                760px,
+                calc(100vw - 248px)
+            ) !important;
+    }
+}
 </style>
 """,
         unsafe_allow_html=True,
