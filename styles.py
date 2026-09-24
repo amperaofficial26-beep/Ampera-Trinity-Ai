@@ -206,8 +206,8 @@ section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] button {
     font-weight: 400 !important;
     color: #4E4553 !important;
 
-    min-height: 23px !important;
-    height: 23px !important;
+    min-height: 27 !important;
+    height: 27px !important;
 
     padding: 0 10px !important;
     line-height: 1 !important;
@@ -326,7 +326,7 @@ section[data-testid="stSidebar"] > div:first-child {
 }
 /* rapatkan jarak antar elemen sidebar (0 = benar-benar rapat;
    ruang antar baris menu cukup datang dari padding tombolnya sendiri) */
-section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] { gap: 0 !important; }
+section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] { gap: 4px !important; }
 section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 [data-testid="stMainBlockContainer"] {
     max-width: 768px;
