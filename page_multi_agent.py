@@ -16,15 +16,18 @@ from ui_helpers import _page_footer, render_message
 WIB = ZoneInfo("Asia/Jakarta")
 
 # ============================================================
-# PENGATURAN POSISI KONTEN MULTI AI
+# PENGATURAN POSISI MULTI AI
 # ============================================================
 
-MULTI_CHAT_WIDTH = 760       # Lebar area chat
-MULTI_CHAT_X = 100             # Geser horizontal: kiri (-) / kanan (+)
-MULTI_CHAT_Y = 0             # Geser vertikal: atas (-) / bawah (+)
+# AREA PESAN / CHAT
+MULTI_MESSAGE_WIDTH = 760
+MULTI_MESSAGE_X = 0
+MULTI_MESSAGE_Y = 0
 
-MULTI_CHAT_TOP = 0           # Jarak tambahan dari atas
-MULTI_CHAT_BOTTOM = 0        # Jarak tambahan dari bawah
+# KOLOM INPUT CHAT
+MULTI_INPUT_WIDTH = 760
+MULTI_INPUT_X = 0
+MULTI_INPUT_Y = 0
 
 # ============================================================
 
@@ -805,53 +808,54 @@ def page_multi_agent() -> None:
 
     thread = mode_thread("multi_agent")
 
+    # ============================================================
+    # POSISI PESAN & INPUT MULTI AI
+    # Judul/hero TIDAK ikut terpengaruh.
+    # ============================================================
+
     st.markdown(
         f"""
         <style>
-        :root {{
-            --multi-chat-width: {MULTI_CHAT_WIDTH}px;
-            --multi-chat-x: {MULTI_CHAT_X}px;
-            --multi-chat-y: {MULTI_CHAT_Y}px;
-            --multi-chat-top: {MULTI_CHAT_TOP}px;
-            --multi-chat-bottom: {MULTI_CHAT_BOTTOM}px;
-        }}
-    
+
+        /* ========================================================
+           AREA PESAN MULTI AI
+           ======================================================== */
+
         .stApp:has(.tr-multi-ai-layout)
-        [data-testid="stMainBlockContainer"] {{
-            padding-top:
-                calc(92px + var(--multi-chat-top))
-            !important;
-    
-            padding-bottom:
-                calc(9rem + var(--multi-chat-bottom))
-            !important;
-        }}
-    
-        .stApp:has(.tr-multi-ai-layout)
-        [data-testid="stMainBlockContainer"]
-        > [data-testid="stVerticalBlock"] {{
-            width:
-                min(
-                    var(--multi-chat-width),
-                    calc(100vw - 264px)
-                )
-            !important;
-    
-            max-width:
-                min(
-                    var(--multi-chat-width),
-                    calc(100vw - 264px)
-                )
-            !important;
-    
+        .multi-message-area {{
+            width: {MULTI_MESSAGE_WIDTH}px !important;
+            max-width: calc(100vw - 280px) !important;
+
             margin-left: auto !important;
             margin-right: auto !important;
-    
+
             transform:
-                translateX(var(--multi-chat-x))
-                translateY(var(--multi-chat-y))
-            !important;
+                translate(
+                    {MULTI_MESSAGE_X}px,
+                    {MULTI_MESSAGE_Y}px
+                ) !important;
         }}
+
+
+        /* ========================================================
+           INPUT CHAT MULTI AI
+           ======================================================== */
+
+        .stApp:has(.tr-multi-ai-layout)
+        .stChatInput {{
+            width: {MULTI_INPUT_WIDTH}px !important;
+            max-width: calc(100vw - 280px) !important;
+
+            margin-left: auto !important;
+            margin-right: auto !important;
+
+            transform:
+                translate(
+                    {MULTI_INPUT_X}px,
+                    {MULTI_INPUT_Y}px
+                ) !important;
+        }}
+
         </style>
         """,
         unsafe_allow_html=True,
