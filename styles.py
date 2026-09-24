@@ -8063,7 +8063,7 @@ div.stDownloadButton > button,
     max-width: 850px !important;
 
     flex:
-        0 0 760px !important;
+        0 0 850px !important;
 
     box-sizing:
         border-box !important;
