@@ -7972,6 +7972,128 @@ div.stDownloadButton > button,
             none
             !important;
     }
+    /* ================================================================
+   🎛️ TRINITY — MANUAL POSITION CONTROL
+   HANYA UBAH ANGKA DI BAGIAN ATAS
+================================================================ */
+
+.stApp:has(.tr-chat-layout) {
+
+    /* =========================================================
+       SAPAAN
+       + = kanan
+       - = kiri
+       ========================================================= */
+
+    --greeting-x: 140px;
+    --greeting-y: 0px;
+
+
+    /* =========================================================
+       PERCAKAPAN / BUBBLE
+       ========================================================= */
+
+    --conversation-x: 0px;
+    --conversation-y: 0px;
+
+
+    /* =========================================================
+       CHAT INPUT
+       ========================================================= */
+
+    --chat-input-x: 0px;
+    --chat-input-y: 0px;
+
+
+    /* =========================================================
+       PANEL KANAN
+       ========================================================= */
+
+    --right-panel-top: 84px;
+    --right-panel-bottom: 16px;
+    --right-panel-width: 286px;
+}
+
+
+/* ================================================================
+   SAPAAN
+================================================================ */
+
+.stApp:has(.tr-chat-layout)
+.trinity-greeting {
+
+    position: relative !important;
+
+    left: var(--greeting-x) !important;
+    top: var(--greeting-y) !important;
+
+    transform: none !important;
+}
+
+
+/* ================================================================
+   PERCAKAPAN
+================================================================ */
+
+.stApp:has(.tr-chat-layout)
+.bubble-row {
+
+    position: relative !important;
+
+    left: var(--conversation-x) !important;
+    top: var(--conversation-y) !important;
+
+    transform: none !important;
+}
+
+
+/* Tombol aksi jawaban AI ikut bergerak */
+.stApp:has(.tr-chat-layout)
+[class*="st-key-msg_actions_"] {
+
+    position: relative !important;
+
+    left: var(--conversation-x) !important;
+    top: var(--conversation-y) !important;
+
+    transform: none !important;
+}
+
+
+/* ================================================================
+   CHAT INPUT
+================================================================ */
+
+.stApp:has(.tr-chat-layout)
+[data-testid="stBottomBlockContainer"] {
+
+    position: relative !important;
+
+    left: var(--chat-input-x) !important;
+    top: var(--chat-input-y) !important;
+
+    transform: none !important;
+
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+
+/* ================================================================
+   PANEL KANAN
+================================================================ */
+
+.stApp:has(.tr-chat-layout)
+.st-key-chat_right_rail {
+
+    top: var(--right-panel-top) !important;
+
+    bottom: var(--right-panel-bottom) !important;
+
+    width: var(--right-panel-width) !important;
+    min-width: var(--right-panel-width) !important;
+    max-width: var(--right-panel-width) !important;
+}
 </style>
 """,
         unsafe_allow_html=True,
