@@ -7987,6 +7987,17 @@ div.stDownloadButton > button,
     margin-right: 0 !important;
 }
 
+.stApp:has(.tr-multi-ai-layout)
+[data-testid="stBottomBlockContainer"]
+[data-testid="stChatInput"] {
+    position: relative !important;
+
+    transform:
+        translate(
+            var(--multi-input-x),
+            var(--multi-input-y)
+        ) !important;
+}
 
 /* =========================================================
    HERO — JUDUL + DESKRIPSI
