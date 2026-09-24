@@ -5410,7 +5410,14 @@ span[role="img"],
 button.st-key-yuki_stop_dok {
     position: relative !important;
     overflow: visible !important;
-    animation: yuki-stop-materialize 680ms cubic-bezier(.2,.8,.2,1) both;
+
+    /* !important diperlukan karena styles.py memiliki aturan animasi global
+       `div.stButton > button` yang juga memakai !important. */
+    animation:
+        yuki-stop-materialize
+        680ms
+        cubic-bezier(.2,.8,.2,1)
+        both !important;
 }
 
 /* Awan partikel saat kartu input runtuh menuju tombol. */
@@ -5432,16 +5439,19 @@ button.st-key-yuki_stop_dok::after {
       34px -18px #9f8d83, 72px 24px #c6aa79,
       118px -20px #746979, 164px 16px #a99b8d,
       212px -14px #c6aa79, 258px 20px #746979;
-    animation: yuki-particles-in 680ms ease-out both;
+    animation: yuki-particles-in 680ms ease-out both !important;
 }
 
 /* Input yang kembali selesai terbentuk dari posisi tombol di tengah. */
 [data-testid="stBottomBlockContainer"]:has(.yuki-input-morph--return)
 [data-testid="stChatInput"] {
     transform-origin: center center !important;
-    animation: yuki-input-rematerialize 760ms cubic-bezier(.16,.84,.24,1) both;
+    animation:
+        yuki-input-rematerialize
+        760ms
+        cubic-bezier(.16,.84,.24,1)
+        both !important;
 }
-
 .yuki-input-morph--return {
     position: absolute;
     pointer-events: none;
@@ -5459,7 +5469,7 @@ button.st-key-yuki_stop_dok::after {
       25px -16px #9f8d83, 65px 22px #c6aa79,
       108px -19px #746979, 154px 15px #a99b8d,
       198px -12px #c6aa79, 238px 18px #746979;
-    animation: yuki-particles-out 760ms ease-in both;
+    animation: yuki-particles-out 760ms ease-in both !important;
 }
 
 @keyframes yuki-stop-materialize {
