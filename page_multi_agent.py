@@ -38,7 +38,7 @@ MULTI_CHAT_Y = 0
 # Hanya kolom mengetik yang bergerak
 # ------------------------------------------------------------
 MULTI_INPUT_WIDTH = 760
-MULTI_INPUT_X = 60
+MULTI_INPUT_X = 0
 MULTI_INPUT_Y = 0
 # ============================================================
 
