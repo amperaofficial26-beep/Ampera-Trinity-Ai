@@ -186,6 +186,8 @@ def init_state() -> None:
         st.session_state.file_dock_open = False
     if "file_dock_seen" not in st.session_state:
         st.session_state.file_dock_seen = 0  # jumlah file yang sudah dilihat
+    if "right_panel_mode" not in st.session_state:
+        st.session_state.right_panel_mode = "models"
         
 def next_msg_id() -> int:
     st.session_state.msg_counter += 1
