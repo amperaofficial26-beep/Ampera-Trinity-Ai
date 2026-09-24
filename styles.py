@@ -8675,42 +8675,42 @@ hr {
 
 /* Posisi vertikal setiap icon */
 
+/* Posisi icon — dibuat lebih rapat */
 .stApp .st-key-settings_float_umum {
-    top: calc(50% - 215px) !important;
+    top: calc(50% - 176px) !important;
 }
 
 .stApp .st-key-settings_float_tampilan {
-    top: calc(50% - 162px) !important;
+    top: calc(50% - 132px) !important;
 }
 
 .stApp .st-key-settings_float_akun {
-    top: calc(50% - 109px) !important;
+    top: calc(50% - 88px) !important;
 }
 
 .stApp .st-key-settings_float_privasi {
-    top: calc(50% - 56px) !important;
+    top: calc(50% - 44px) !important;
 }
 
 .stApp .st-key-settings_float_penagihan {
-    top: calc(50% - 3px) !important;
+    top: 50% !important;
 }
 
 .stApp .st-key-settings_float_kemampuan {
-    top: calc(50% + 50px) !important;
+    top: calc(50% + 44px) !important;
 }
 
 .stApp .st-key-settings_float_memori {
-    top: calc(50% + 103px) !important;
+    top: calc(50% + 88px) !important;
 }
 
 .stApp .st-key-settings_float_refleksi {
-    top: calc(50% + 156px) !important;
+    top: calc(50% + 132px) !important;
 }
 
 .stApp .st-key-settings_float_waktu {
-    top: calc(50% + 209px) !important;
+    top: calc(50% + 176px) !important;
 }
-
 
 /* Tombol */
 
