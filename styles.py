@@ -8520,6 +8520,41 @@ div.stDownloadButton > button,
     overflow-x:
         hidden !important;
 }
+/* ============================================================
+   MULTI AI — GERAKKAN KARTU INPUT + ISINYA BERSAMA
+   ============================================================ */
+
+.stApp:has(.tr-multi-ai-layout)
+[data-testid="stBottomBlockContainer"] {
+    width:
+        var(--multi-input-width) !important;
+
+    max-width:
+        var(--multi-input-width) !important;
+
+    margin-left:
+        auto !important;
+
+    margin-right:
+        auto !important;
+
+    transform:
+        translate(
+            var(--multi-input-x),
+            var(--multi-input-y)
+        ) !important;
+}
+
+
+/* Input mengikuti kartu.
+   Jangan digeser dua kali. */
+
+.stApp:has(.tr-multi-ai-layout)
+[data-testid="stBottomBlockContainer"]
+[data-testid="stChatInput"] {
+    transform:
+        none !important;
+}
 </style>
 """,
         unsafe_allow_html=True,
