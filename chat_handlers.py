@@ -1059,14 +1059,11 @@ def _dialog_premium() -> None:
             st.rerun()
 
 def _render_input_particle_morph(direction: str) -> None:
-    """Canvas transparan yang memecah/menyusun siluet kolom chat.
-
-    Berbeda dari efek titik CSS, partikel di sini benar-benar ditempatkan
-    mengikuti bentuk kartu, garis tepi, placeholder, dan ikon input. Pada
-    arah ``stop`` bentuk itu runtuh ke tengah; pada arah ``return`` geraknya
-    dibalik untuk menyusun kembali kolom chat.
+    """Morph partikel dua arah:
+    input -> titik tengah -> tombol Hentikan
+    tombol Hentikan -> titik tengah -> input.
     """
-    reverse = "true" if direction == "return" else "false"
+    reverse = direction == "return"
 
     html_fx = f"""
 <!doctype html>
@@ -1075,10 +1072,6 @@ def _render_input_particle_morph(direction: str) -> None:
 <meta charset="utf-8">
 
 <style>
-* {{
-    box-sizing: border-box;
-}}
-
 html,
 body {{
     margin: 0;
@@ -1089,7 +1082,7 @@ body {{
 }}
 
 canvas {{
-    position: fixed;
+    position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
@@ -1105,238 +1098,383 @@ canvas {{
 (() => {{
     const canvas = document.getElementById("morph");
     const ctx = canvas.getContext("2d");
-    const reverse = {reverse};
 
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const reverse = {str(reverse).lower()};
 
-    let W = innerWidth;
-    let H = innerHeight;
-
-    canvas.width = W * dpr;
-    canvas.height = H * dpr;
-
-    ctx.scale(dpr, dpr);
-
-    // Canvas ditempel langsung pada bottom dock, bukan pada viewport. Dengan
-    // begitu koordinat partikel selalu mengikuti posisi kolom chat sebenarnya.
-    const margin = 10;
-    
-    const cardHeight = Math.min(
-        104,
-        H - 16
+    const dpr = Math.min(
+        window.devicePixelRatio || 1,
+        2
     );
-    
-    const card = {
-        x: margin,
-        y: (H - cardHeight) / 2,
-        w: W - margin * 2,
-        h: cardHeight,
-        r: 30
-    };
-    
-    const cx = W / 2;
-    const cy = card.y + card.h / 2;
-    const dots = [];
 
-    const add = (x, y, color, size = 2) => dots.push({{
-        sx: reverse
-            ? cx + (Math.random() - .5) * 20
-            : x,
+    let W = window.innerWidth;
+    let H = window.innerHeight;
 
-        sy: reverse
-            ? cy + (Math.random() - .5) * 12
-            : y,
+    function resize() {{
+        W = window.innerWidth;
+        H = window.innerHeight;
 
-        ex: reverse
-            ? x
-            : cx + (Math.random() - .5) * 18,
+        canvas.width = W * dpr;
+        canvas.height = H * dpr;
 
-        ey: reverse
-            ? y
-            : cy + (Math.random() - .5) * 10,
+        canvas.style.width = W + "px";
+        canvas.style.height = H + "px";
 
-        color,
+        ctx.setTransform(
+            dpr,
+            0,
+            0,
+            dpr,
+            0,
+            0
+        );
+    }}
+
+    resize();
+    window.addEventListener("resize", resize);
+
+    /*
+       Ukuran sumber mengikuti bentuk input sebenarnya.
+       Tidak lagi memakai tinggi 104px.
+    */
+    const input = {{
+        x: 8,
+        y: Math.max(8, (H - 54) / 2),
+        w: W - 16,
+        h: 54,
+        r: 22
+    }};
+
+    /*
+       Titik tujuan berada di tengah bawah dock.
+       Ini adalah posisi tombol Hentikan.
+    */
+    const target = {{
+        x: W / 2,
+        y: H / 2
+    }};
+
+    const particles = [];
+
+    function addParticle(
+        x,
+        y,
         size,
-        spin: (Math.random() - .5) * 16
-    }});
-
-    // Partikel garis rounded rectangle.
-    const step = 7;
-    const edge = "#9b8d86";
-    const fill = "#efe4d0";
-
-    for (
-        let x = card.x + card.r;
-        x <= card.x + card.w - card.r;
-        x += step
+        opacity,
+        type = "edge"
     ) {{
-        add(x, card.y, edge, 2.2);
-        add(x, card.y + card.h, edge, 2.2);
+        const angle =
+            Math.random() * Math.PI * 2;
+
+        const spread =
+            type === "edge"
+                ? 10
+                : 16;
+
+        const centerX =
+            target.x +
+            Math.cos(angle) *
+            (Math.random() * spread);
+
+        const centerY =
+            target.y +
+            Math.sin(angle) *
+            (Math.random() * spread);
+
+        particles.push({{
+            sx: reverse ? centerX : x,
+            sy: reverse ? centerY : y,
+
+            ex: reverse ? x : centerX,
+            ey: reverse ? y : centerY,
+
+            size,
+            opacity,
+
+            drift:
+                (Math.random() - 0.5) *
+                18,
+
+            delay:
+                Math.random() * 0.12
+        }});
     }}
 
-    for (
-        let y = card.y + card.r;
-        y <= card.y + card.h - card.r;
-        y += step
+    /*
+       Rounded rectangle.
+    */
+    function roundedRectPoints(
+        x,
+        y,
+        w,
+        h,
+        r
     ) {{
-        add(card.x, y, edge, 2.2);
-        add(card.x + card.w, y, edge, 2.2);
+        const points = [];
+
+        const step = 5;
+
+        for (
+            let px = x + r;
+            px <= x + w - r;
+            px += step
+        ) {{
+            points.push([px, y]);
+            points.push([px, y + h]);
+        }}
+
+        for (
+            let py = y + r;
+            py <= y + h - r;
+            py += step
+        ) {{
+            points.push([x, py]);
+            points.push([x + w, py]);
+        }}
+
+        const corners = [
+            [x + r, y + r, Math.PI, Math.PI * 1.5],
+            [x + w - r, y + r, Math.PI * 1.5, Math.PI * 2],
+            [x + w - r, y + h - r, 0, Math.PI * .5],
+            [x + r, y + h - r, Math.PI * .5, Math.PI]
+        ];
+
+        for (const corner of corners) {{
+            const [
+                cx,
+                cy,
+                start,
+                end
+            ] = corner;
+
+            for (
+                let a = start;
+                a <= end;
+                a += 0.12
+            ) {{
+                points.push([
+                    cx + Math.cos(a) * r,
+                    cy + Math.sin(a) * r
+                ]);
+            }}
+        }}
+
+        return points;
     }}
 
-    for (
-        let a = Math.PI;
-        a < Math.PI * 1.5;
-        a += .10
-    ) {{
-        add(
-            card.x + card.r + Math.cos(a) * card.r,
-            card.y + card.r + Math.sin(a) * card.r,
-            edge,
-            2.2
+    /*
+       Bentuk utama input.
+    */
+    const borderPoints =
+        roundedRectPoints(
+            input.x,
+            input.y,
+            input.w,
+            input.h,
+            input.r
+        );
+
+    for (const [x, y] of borderPoints) {{
+        addParticle(
+            x,
+            y,
+            1.7 + Math.random() * 1.1,
+            .95,
+            "edge"
         );
     }}
 
+    /*
+       Partikel isi input supaya benar-benar
+       terlihat seperti kolom pecah, bukan cuma
+       garis luarnya.
+    */
     for (
-        let a = Math.PI * 1.5;
-        a < Math.PI * 2;
-        a += .10
-    ) {{
-        add(
-            card.x + card.w - card.r + Math.cos(a) * card.r,
-            card.y + card.r + Math.sin(a) * card.r,
-            edge,
-            2.2
-        );
-    }}
-
-    for (
-        let a = 0;
-        a < Math.PI * .5;
-        a += .10
-    ) {{
-        add(
-            card.x + card.w - card.r + Math.cos(a) * card.r,
-            card.y + card.h - card.r + Math.sin(a) * card.r,
-            edge,
-            2.2
-        );
-    }}
-
-    for (
-        let a = Math.PI * .5;
-        a < Math.PI;
-        a += .10
-    ) {{
-        add(
-            card.x + card.r + Math.cos(a) * card.r,
-            card.y + card.h - card.r + Math.sin(a) * card.r,
-            edge,
-            2.2
-        );
-    }}
-
-    // Partikel permukaan kartu.
-    for (
-        let y = card.y + 12;
-        y < card.y + card.h - 10;
-        y += 10
+        let y = input.y + 10;
+        y < input.y + input.h - 8;
+        y += 7
     ) {{
         for (
-            let x = card.x + 18;
-            x < card.x + card.w - 18;
-            x += 12
+            let x = input.x + 18;
+            x < input.x + input.w - 18;
+            x += 9
         ) {{
-            if (Math.random() < .32) {{
-                add(x, y, fill, 1.7);
+            if (Math.random() < .22) {{
+                addParticle(
+                    x,
+                    y,
+                    1.1 + Math.random() * .8,
+                    .48,
+                    "fill"
+                );
             }}
         }}
     }}
 
-    // Partikel placeholder.
-    for (
-        let x = card.x + 72;
-        x < Math.min(
-            card.x + 390,
-            card.x + card.w - 230
+    /*
+       Placeholder / area teks.
+    */
+    const textStart = input.x + 76;
+    const textEnd =
+        Math.min(
+            input.x + input.w - 220,
+            textStart + 330
         );
+
+    for (
+        let x = textStart;
+        x < textEnd;
         x += 6
     ) {{
         for (
-            let y = cy - 7;
-            y <= cy + 7;
-            y += 7
+            let y = target.y - 5;
+            y <= target.y + 5;
+            y += 5
         ) {{
-            if (Math.random() < .72) {{
-                add(x, y, "#756a70", 1.8);
+            if (Math.random() < .65) {{
+                addParticle(
+                    x,
+                    y,
+                    1.1,
+                    .72,
+                    "text"
+                );
             }}
         }}
     }}
 
-    // Partikel posisi ikon.
-    [
-        card.x + 38,
-        card.x + card.w - 190,
-        card.x + card.w - 118,
-        card.x + card.w - 48
-    ].forEach(px => {{
+    /*
+       Empat area ikon input.
+       Tidak lagi dipakai sebagai lingkaran besar
+       20px seperti versi lama; dibuat lebih kecil
+       supaya pecahannya natural.
+    */
+    const iconPositions = [
+        input.x + 28,
+        input.x + input.w - 154,
+        input.x + input.w - 92,
+        input.x + input.w - 38
+    ];
+
+    for (const px of iconPositions) {{
         for (
             let a = 0;
             a < Math.PI * 2;
-            a += .24
+            a += .30
         ) {{
-            add(
-                px + Math.cos(a) * 20,
-                cy + Math.sin(a) * 20,
-                "#756a70",
-                2
+            const radius =
+                6 + Math.random() * 4;
+
+            addParticle(
+                px + Math.cos(a) * radius,
+                target.y + Math.sin(a) * radius,
+                1.5,
+                .78,
+                "icon"
             );
         }}
-    }});
+    }}
 
-    const start = performance.now();
-    const duration = 920;
+    const start =
+        performance.now();
 
-    const ease = t => (
-        t < .5
+    const duration = 880;
+
+    function ease(t) {{
+        return t < .5
             ? 4 * t * t * t
-            : 1 - Math.pow(-2 * t + 2, 3) / 2
-    );
+            : 1 -
+                Math.pow(
+                    -2 * t + 2,
+                    3
+                ) / 2;
+    }}
 
     function frame(now) {{
-        const raw = Math.min(
-            1,
-            (now - start) / duration
+        const raw =
+            Math.min(
+                1,
+                (now - start) /
+                duration
+            );
+
+        ctx.clearRect(
+            0,
+            0,
+            W,
+            H
         );
 
-        const t = ease(raw);
+        for (const p of particles) {{
+            const local =
+                Math.max(
+                    0,
+                    Math.min(
+                        1,
+                        (raw - p.delay) /
+                        (1 - p.delay)
+                    )
+                );
 
-        ctx.clearRect(0, 0, W, H);
+            const t =
+                ease(local);
 
-        for (const p of dots) {{
             const x =
                 p.sx +
                 (p.ex - p.sx) * t +
-                Math.sin(t * Math.PI) * p.spin;
+                Math.sin(
+                    t * Math.PI
+                ) *
+                p.drift;
 
             const y =
                 p.sy +
                 (p.ey - p.sy) * t +
-                Math.sin(t * Math.PI) *
-                (Math.random() - .5) * 12;
+                Math.cos(
+                    t * Math.PI * 2
+                ) *
+                p.drift *
+                .18;
 
-            ctx.globalAlpha =
-                Math.sin(
-                    Math.PI *
-                    Math.min(1, raw * 1.08)
-                ) * .92;
+            /*
+               Partikel muncul penuh,
+               kemudian sedikit mengecil
+               saat mencapai tujuan.
+            */
+            const radius =
+                p.size *
+                (
+                    1 -
+                    .45 * t
+                );
 
-            ctx.fillStyle = p.color;
+            let alpha =
+                p.opacity;
+
+            if (local < .12) {{
+                alpha *=
+                    local / .12;
+            }}
+
+            if (local > .82) {{
+                alpha *=
+                    1 -
+                    (
+                        (local - .82) /
+                        .18
+                    ) * .15;
+            }}
+
+            ctx.globalAlpha = alpha;
+
+            ctx.fillStyle =
+                "#9b8d86";
+
             ctx.beginPath();
 
             ctx.arc(
                 x,
                 y,
-                p.size * (1 - .38 * t),
+                radius,
                 0,
                 Math.PI * 2
             );
@@ -1347,7 +1485,12 @@ canvas {{
         if (raw < 1) {{
             requestAnimationFrame(frame);
         }} else {{
-            ctx.clearRect(0, 0, W, H);
+            ctx.clearRect(
+                0,
+                0,
+                W,
+                H
+            );
         }}
     }}
 
