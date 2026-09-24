@@ -1117,23 +1117,25 @@ canvas {{
 
     ctx.scale(dpr, dpr);
 
-    // Geometri mengikuti kartu input pada bottom dock.
-    const margin = Math.max(
-        18,
-        Math.min(50, W * .045)
+    // Canvas ditempel langsung pada bottom dock, bukan pada viewport. Dengan
+    // begitu koordinat partikel selalu mengikuti posisi kolom chat sebenarnya.
+    const margin = 10;
+    
+    const cardHeight = Math.min(
+        104,
+        H - 16
     );
-
-    const card = {{
+    
+    const card = {
         x: margin,
-        y: H - 154,
+        y: (H - cardHeight) / 2,
         w: W - margin * 2,
-        h: 104,
+        h: cardHeight,
         r: 30
-    }};
-
+    };
+    
     const cx = W / 2;
     const cy = card.y + card.h / 2;
-
     const dots = [];
 
     const add = (x, y, color, size = 2) => dots.push({{
@@ -1359,7 +1361,7 @@ canvas {{
     with st.container(key="yuki_morph_fx"):
         components.html(
             html_fx,
-            height=0,
+            height=120,
             scrolling=False,
         )
 
