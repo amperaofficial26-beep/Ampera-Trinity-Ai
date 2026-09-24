@@ -108,13 +108,238 @@ def inject_anim_css() -> None:
 
 
 def inject_page_anim() -> None:
-    """Animasi perpindahan halaman. Dipanggil HANYA saat halaman berganti,
-    supaya tidak terputar ulang tiap kali kirim chat atau klik tombol."""
+    """Animasi perpindahan halaman tanpa mengubah containing block layout.
+
+    Jangan menganimasikan transform pada stMainBlockContainer karena di
+    dalamnya terdapat elemen position:fixed seperti topbar dan right rail.
+    Transform pada parent dapat membuat elemen fixed menghitung posisi
+    relatif terhadap parent dan menyebabkan layout menyempit/bergeser.
+    """
     if not ANIM_ON:
         return
+
     st.markdown(
-        "<style>[data-testid='stMainBlockContainer']{"
-        "animation:iosPageIn " + str(DURASI_MS) + "ms " + KURVA + " both;"
-        "transform-origin:left center;}</style>",
+        "<style>"
+        "[data-testid='stMainBlockContainer']{"
+        "animation:iosPageFade "
+        + str(DURASI_MS)
+        + "ms "
+        + KURVA
+        + " both;"
+        "}"
+        "@keyframes iosPageFade{"
+        "0%{opacity:0;}"
+        "100%{opacity:1;}"
+        "}"
+        "</style>",
+        unsafe_allow_html=True,
+    )def inject_page_anim() -> None:
+    """Animasi perpindahan halaman tanpa mengubah containing block layout.
+
+    Jangan menganimasikan transform pada stMainBlockContainer karena di
+    dalamnya terdapat elemen position:fixed seperti topbar dan right rail.
+    Transform pada parent dapat membuat elemen fixed menghitung posisi
+    relatif terhadap parent dan menyebabkan layout menyempit/bergeser.
+    """
+    if not ANIM_ON:
+        return
+
+    st.markdown(
+        "<style>"
+        "[data-testid='stMainBlockContainer']{"
+        "animation:iosPageFade "
+        + str(DURASI_MS)
+        + "ms "
+        + KURVA
+        + " both;"
+        "}"
+        "@keyframes iosPageFade{"
+        "0%{opacity:0;}"
+        "100%{opacity:1;}"
+        "}"
+        "</style>",
+        unsafe_allow_html=True,
+    )def inject_page_anim() -> None:
+    """Animasi perpindahan halaman tanpa mengubah containing block layout.
+
+    Jangan menganimasikan transform pada stMainBlockContainer karena di
+    dalamnya terdapat elemen position:fixed seperti topbar dan right rail.
+    Transform pada parent dapat membuat elemen fixed menghitung posisi
+    relatif terhadap parent dan menyebabkan layout menyempit/bergeser.
+    """
+    if not ANIM_ON:
+        return
+
+    st.markdown(
+        "<style>"
+        "[data-testid='stMainBlockContainer']{"
+        "animation:iosPageFade "
+        + str(DURASI_MS)
+        + "ms "
+        + KURVA
+        + " both;"
+        "}"
+        "@keyframes iosPageFade{"
+        "0%{opacity:0;}"
+        "100%{opacity:1;}"
+        "}"
+        "</style>",
+        unsafe_allow_html=True,
+    )def inject_page_anim() -> None:
+    """Animasi perpindahan halaman tanpa mengubah containing block layout.
+
+    Jangan menganimasikan transform pada stMainBlockContainer karena di
+    dalamnya terdapat elemen position:fixed seperti topbar dan right rail.
+    Transform pada parent dapat membuat elemen fixed menghitung posisi
+    relatif terhadap parent dan menyebabkan layout menyempit/bergeser.
+    """
+    if not ANIM_ON:
+        return
+
+    st.markdown(
+        "<style>"
+        "[data-testid='stMainBlockContainer']{"
+        "animation:iosPageFade "
+        + str(DURASI_MS)
+        + "ms "
+        + KURVA
+        + " both;"
+        "}"
+        "@keyframes iosPageFade{"
+        "0%{opacity:0;}"
+        "100%{opacity:1;}"
+        "}"
+        "</style>",
+        unsafe_allow_html=True,
+    )def inject_page_anim() -> None:
+    """Animasi perpindahan halaman tanpa mengubah containing block layout.
+
+    Jangan menganimasikan transform pada stMainBlockContainer karena di
+    dalamnya terdapat elemen position:fixed seperti topbar dan right rail.
+    Transform pada parent dapat membuat elemen fixed menghitung posisi
+    relatif terhadap parent dan menyebabkan layout menyempit/bergeser.
+    """
+    if not ANIM_ON:
+        return
+
+    st.markdown(
+        "<style>"
+        "[data-testid='stMainBlockContainer']{"
+        "animation:iosPageFade "
+        + str(DURASI_MS)
+        + "ms "
+        + KURVA
+        + " both;"
+        "}"
+        "@keyframes iosPageFade{"
+        "0%{opacity:0;}"
+        "100%{opacity:1;}"
+        "}"
+        "</style>",
+        unsafe_allow_html=True,
+    )def inject_page_anim() -> None:
+    """Animasi perpindahan halaman tanpa mengubah containing block layout.
+
+    Jangan menganimasikan transform pada stMainBlockContainer karena di
+    dalamnya terdapat elemen position:fixed seperti topbar dan right rail.
+    Transform pada parent dapat membuat elemen fixed menghitung posisi
+    relatif terhadap parent dan menyebabkan layout menyempit/bergeser.
+    """
+    if not ANIM_ON:
+        return
+
+    st.markdown(
+        "<style>"
+        "[data-testid='stMainBlockContainer']{"
+        "animation:iosPageFade "
+        + str(DURASI_MS)
+        + "ms "
+        + KURVA
+        + " both;"
+        "}"
+        "@keyframes iosPageFade{"
+        "0%{opacity:0;}"
+        "100%{opacity:1;}"
+        "}"
+        "</style>",
+        unsafe_allow_html=True,
+    )def inject_page_anim() -> None:
+    """Animasi perpindahan halaman tanpa mengubah containing block layout.
+
+    Jangan menganimasikan transform pada stMainBlockContainer karena di
+    dalamnya terdapat elemen position:fixed seperti topbar dan right rail.
+    Transform pada parent dapat membuat elemen fixed menghitung posisi
+    relatif terhadap parent dan menyebabkan layout menyempit/bergeser.
+    """
+    if not ANIM_ON:
+        return
+
+    st.markdown(
+        "<style>"
+        "[data-testid='stMainBlockContainer']{"
+        "animation:iosPageFade "
+        + str(DURASI_MS)
+        + "ms "
+        + KURVA
+        + " both;"
+        "}"
+        "@keyframes iosPageFade{"
+        "0%{opacity:0;}"
+        "100%{opacity:1;}"
+        "}"
+        "</style>",
+        unsafe_allow_html=True,
+    )def inject_page_anim() -> None:
+    """Animasi perpindahan halaman tanpa mengubah containing block layout.
+
+    Jangan menganimasikan transform pada stMainBlockContainer karena di
+    dalamnya terdapat elemen position:fixed seperti topbar dan right rail.
+    Transform pada parent dapat membuat elemen fixed menghitung posisi
+    relatif terhadap parent dan menyebabkan layout menyempit/bergeser.
+    """
+    if not ANIM_ON:
+        return
+
+    st.markdown(
+        "<style>"
+        "[data-testid='stMainBlockContainer']{"
+        "animation:iosPageFade "
+        + str(DURASI_MS)
+        + "ms "
+        + KURVA
+        + " both;"
+        "}"
+        "@keyframes iosPageFade{"
+        "0%{opacity:0;}"
+        "100%{opacity:1;}"
+        "}"
+        "</style>",
+        unsafe_allow_html=True,
+    )
+def inject_page_anim() -> None:
+    """Animasi perpindahan halaman tanpa mengubah containing block layout.
+
+    Jangan menganimasikan transform pada stMainBlockContainer karena di
+    dalamnya terdapat elemen position:fixed seperti topbar dan right rail.
+    Transform pada parent dapat membuat elemen fixed menghitung posisi
+    relatif terhadap parent dan menyebabkan layout menyempit/bergeser.
+    """
+    if not ANIM_ON:
+        return
+
+    st.markdown(
+        "<style>"
+        "[data-testid='stMainBlockContainer']{"
+        "animation:iosPageFade "
+        + str(DURASI_MS)
+        + "ms "
+        + KURVA
+        + " both;"
+        "}"
+        "@keyframes iosPageFade{"
+        "0%{opacity:0;}"
+        "100%{opacity:1;}"
+        "}"
+        "</style>",
         unsafe_allow_html=True,
     )
