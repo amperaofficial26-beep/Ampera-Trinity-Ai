@@ -8303,11 +8303,10 @@ div.stDownloadButton > button,
    Background + pesan = SATU BOX
    ========================================================= */
 
-.stApp:has(.tr-multi-ai-layout)
-.st-key-multi_chat_area {
+
 
     /* ukuran FIX */
-    .stApp:has(.tr-multi-ai-layout)
+.stApp:has(.tr-multi-ai-layout)
 .st-key-multi_chat_area {
 
     /* ukuran mengikuti MULTI_CHAT_WIDTH */
