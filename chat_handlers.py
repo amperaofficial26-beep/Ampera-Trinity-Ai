@@ -474,7 +474,7 @@ def _hentikan_dan_finalisasi_stream_lama() -> None:
 # 0,15 detik ≈ 7 pembaruan/detik: teks terasa MENGALIR, bukan muncul
 # per blok tiap 0,4 detik. Masih cukup longgar supaya Streamlit tidak
 # kebanjiran rerun (0,1 detik ke bawah mulai membebani server).
-@st.fragment(run_every=0.15)
+@st.fragment(run_every=0.5)
 def fragmen_jawaban_yuki() -> None:
     """Teks jawaban Yuki yang mengalir (fase setelah animasi berpikir).
 
@@ -511,20 +511,26 @@ def fragmen_jawaban_yuki() -> None:
             st.markdown(_CATATAN_DIHENTIKAN_HTML, unsafe_allow_html=True)
 
     stream_state = st.session_state.get("_yuki_stream")
+
     if not stream_state:
         return
-
+    
     pekerja = st.session_state.get("_yuki_thread")
-    hidup = bool(pekerja and pekerja.is_alive())
-    teks = "".join(stream_state.get("buf") or [])
-    minta_henti = bool(stream_state.get("hentikan"))
-
+    
+    hidup = bool(
+        pekerja and pekerja.is_alive()
+    )
+    
+    minta_henti = bool(
+        stream_state.get("hentikan")
+    )
+    
     if hidup and not minta_henti:
-        # Jawaban tetap dikumpulkan di background, tetapi tidak lagi
-        # ditampilkan karakter demi karakter. Loader berpikir tetap terlihat
-        # sampai respons selesai; jawaban kemudian muncul sekaligus dengan
-        # animasi fade-blur dari render_message().
         return
+    
+    teks = "".join(
+        stream_state.get("buf") or []
+    )
 
     # Thread sudah selesai ATAU pengguna menekan tombol "Hentikan":
     # susun balasannya jadi pesan biasa, lalu muat ulang halaman.
