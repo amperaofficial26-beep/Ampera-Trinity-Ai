@@ -29,7 +29,7 @@ MULTI_HERO_Y = -30
 # CHAT SURFACE
 # Background + seluruh pesan bergerak sebagai SATU LAYER
 # ------------------------------------------------------------
-MULTI_CHAT_WIDTH = 760
+MULTI_CHAT_WIDTH = 750
 MULTI_CHAT_X = 80
 MULTI_CHAT_Y = 0
 
@@ -38,7 +38,7 @@ MULTI_CHAT_Y = 0
 # Hanya kolom mengetik yang bergerak
 # ------------------------------------------------------------
 MULTI_INPUT_WIDTH = 760
-MULTI_INPUT_X = 60
+MULTI_INPUT_X = 40
 MULTI_INPUT_Y = 0
 # ============================================================
 
