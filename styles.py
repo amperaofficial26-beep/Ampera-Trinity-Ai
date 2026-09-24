@@ -7887,28 +7887,43 @@ div.stDownloadButton > button,
 }
 
 /* =========================================================
-   FIX TOPBAR COLLAPSE & TEXT WRAPPING
+   TOPBAR — JANGAN BUAT HORIZONTAL PAGE OVERFLOW
    ========================================================= */
 
-/* Mencegah kolom topbar menyusut dan membuat teks terlipat secara vertikal */
-[data-testid="stHorizontalBlock"] > div {
-    min-width: max-content !important;
-    flex-shrink: 0 !important;
-}
-
-/* Memastikan kartu topbar & profil pengguna tidak memotong teks */
-.topbar-card, .user-profile-card, .topbar-item {
-    white-space: nowrap !important;
-    min-width: fit-content !important;
-    flex-shrink: 0 !important;
-}
-
-/* Mengatur alur fleksibel topbar agar rapi secara horisontal */
-div[data-testid="stHorizontalBlock"] {
+.stApp:has(.tr-chat-layout)
+.st-key-chat_topbar
+[data-testid="stHorizontalBlock"] {
     align-items: center !important;
     gap: 10px !important;
     flex-wrap: nowrap !important;
-    overflow-x: auto !important;
+    overflow-x: hidden !important;
+}
+
+/* Kolom topbar boleh mengecil mengikuti viewport */
+.stApp:has(.tr-chat-layout)
+.st-key-chat_topbar
+[data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {
+    min-width: 0 !important;
+    flex-shrink: 1 !important;
+}
+
+/* Teks kartu tetap satu baris tanpa memaksa seluruh layout melebar */
+.stApp:has(.tr-chat-layout)
+.topbar-card,
+.stApp:has(.tr-chat-layout)
+.user-profile-card,
+.stApp:has(.tr-chat-layout)
+.topbar-item {
+    white-space: nowrap !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+/* Pastikan halaman chat tidak punya scroll horizontal */
+.stApp:has(.tr-chat-layout) {
+    overflow-x: hidden !important;
 }
 </style>
 """,
