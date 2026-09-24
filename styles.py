@@ -143,9 +143,9 @@ section[data-testid="stSidebar"] div.stButton > button {
     justify-content: flex-start !important;
     align-items: center !important;
     gap: 6px !important;
-    padding: 3px 10px !important;
-    min-height: 30px !important;
-    line-height: 1.2 !important;
+    padding: 1px 10px !important;
+    min-height: 27px !important;
+    line-height: 1.15 !important;
     color: #2C1F33 !important;
     font-size: 1.06rem !important;
     font-weight: 500 !important;
@@ -200,9 +200,9 @@ section[data-testid="stSidebar"] .st-key-sb_new button:hover {
 section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] button {
     font-weight: 400 !important;
     color: #4E4553 !important;
-    min-height: 30px !important;
-    padding: 3px 10px !important;
-    line-height: 1.2 !important;
+    min-height: 27px !important;
+    padding: 1px 10px !important;
+    line-height: 1.15 !important;
     position: relative;
 }
 section[data-testid="stSidebar"] [class*="st-key-sb_hist_"] button::before {
