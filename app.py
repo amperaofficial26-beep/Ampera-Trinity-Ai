@@ -1919,25 +1919,20 @@ def page_pengaturan() -> None:
     if "settings_section" not in st.session_state:
         st.session_state.settings_section = "umum"
     
-    st.markdown(
-        '<div class="settings-floating-nav">',
-        unsafe_allow_html=True,
-    )
     
+    # Buat tombol navigasi
     for key, icon, label in settings_items:
-        if st.button(
-            icon,
-            key=f"settings_nav_{key}",
-            help=label,
-            use_container_width=False,
-        ):
-            st.session_state.settings_section = key
-            st.rerun()
     
-    st.markdown(
-        '</div>',
-        unsafe_allow_html=True,
-    )
+        with st.container(key=f"settings_float_{key}"):
+    
+            if st.button(
+                icon,
+                key=f"settings_nav_{key}",
+                help=label,
+                use_container_width=False,
+            ):
+                st.session_state.settings_section = key
+                st.rerun()
     
     
     # ============================================================
