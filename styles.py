@@ -8516,39 +8516,38 @@ div.stDownloadButton > button,
         hidden !important;
 }
 /* ============================================================
-   MULTI AI — GERAKKAN KARTU INPUT + ISINYA BERSAMA
+   MULTI AI — INPUT CARD + CHAT INPUT HARUS PRESISI
    ============================================================ */
 
 .stApp:has(.tr-multi-ai-layout)
 [data-testid="stBottomBlockContainer"] {
-    width:
-        var(--multi-input-width) !important;
+    width: var(--multi-input-width) !important;
+    max-width: var(--multi-input-width) !important;
 
-    max-width:
-        var(--multi-input-width) !important;
-
-    margin-left:
-        auto !important;
-
-    margin-right:
-        auto !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
 
     transform:
         translate(
             var(--multi-input-x),
             var(--multi-input-y)
         ) !important;
+
+    box-sizing: border-box !important;
 }
 
 
-/* Input mengikuti kartu.
-   Jangan digeser dua kali. */
-
+/* Kolom chat mengikuti ukuran kartu */
 .stApp:has(.tr-multi-ai-layout)
 [data-testid="stBottomBlockContainer"]
 [data-testid="stChatInput"] {
-    transform:
-        none !important;
+    width: 100% !important;
+    max-width: none !important;
+
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+
+    transform: none !important;
 }
 </style>
 """,
