@@ -5419,29 +5419,6 @@ button.st-key-yuki_stop_dok {
         cubic-bezier(.2,.8,.2,1)
         both !important;
 }
-
-/* Awan partikel saat kartu input runtuh menuju tombol. */
-.st-key-yuki_stop_dok button::after,
-button.st-key-yuki_stop_dok::after {
-    content: "";
-    pointer-events: none;
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: #746979;
-    box-shadow:
-      -250px -20px #8e8387, -205px 18px #c6aa79,
-      -155px -13px #746979, -108px 22px #a99b8d,
-      -62px -24px #c6aa79, -28px 18px #746979,
-      34px -18px #9f8d83, 72px 24px #c6aa79,
-      118px -20px #746979, 164px 16px #a99b8d,
-      212px -14px #c6aa79, 258px 20px #746979;
-    animation: yuki-particles-in 680ms ease-out both !important;
-}
-
 /* Input yang kembali selesai terbentuk dari posisi tombol di tengah. */
 [data-testid="stBottomBlockContainer"]:has(.yuki-input-morph--return)
 [data-testid="stChatInput"] {
@@ -5452,26 +5429,6 @@ button.st-key-yuki_stop_dok::after {
         cubic-bezier(.16,.84,.24,1)
         both !important;
 }
-.yuki-input-morph--return {
-    position: absolute;
-    pointer-events: none;
-    left: 50%;
-    top: 50%;
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: #746979;
-    z-index: 20;
-    box-shadow:
-      -230px -18px #8e8387, -185px 19px #c6aa79,
-      -140px -12px #746979, -95px 21px #a99b8d,
-      -48px -22px #c6aa79, -18px 14px #746979,
-      25px -16px #9f8d83, 65px 22px #c6aa79,
-      108px -19px #746979, 154px 15px #a99b8d,
-      198px -12px #c6aa79, 238px 18px #746979;
-    animation: yuki-particles-out 760ms ease-in both !important;
-}
-
 @keyframes yuki-stop-materialize {
     0% {
         width: min(92vw, 980px);
@@ -5494,28 +5451,6 @@ button.st-key-yuki_stop_dok::after {
         filter: blur(0);
     }
 }
-
-@keyframes yuki-particles-in {
-    0% {
-        opacity: 0;
-        transform: translate(-50%,-50%) scale(1.35);
-    }
-
-    24% {
-        opacity: .9;
-    }
-
-    82% {
-        opacity: .75;
-        transform: translate(-50%,-50%) scale(.12);
-    }
-
-    100% {
-        opacity: 0;
-        transform: translate(-50%,-50%) scale(0);
-    }
-}
-
 @keyframes yuki-input-rematerialize {
     0% {
         opacity: .12;
@@ -5567,6 +5502,33 @@ button.st-key-yuki_stop_dok::after {
     .yuki-input-morph--return {
         animation: none !important;
     }
+}
+/* Canvas partikel asli. Iframe komponen dibentangkan ke viewport agar
+   partikel dapat mengikuti ukuran kartu input, bukan terkurung di dok. */
+.st-key-yuki_morph_fx {
+    position: fixed !important;
+    inset: 0 !important;
+
+    width: 100vw !important;
+    height: 100vh !important;
+
+    z-index: 999990 !important;
+
+    pointer-events: none !important;
+    background: transparent !important;
+}
+
+.st-key-yuki_morph_fx iframe {
+    position: absolute !important;
+    inset: 0 !important;
+
+    width: 100vw !important;
+    height: 100vh !important;
+
+    border: 0 !important;
+
+    pointer-events: none !important;
+    background: transparent !important;
 }
 </style>
 """,
