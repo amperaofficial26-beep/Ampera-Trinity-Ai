@@ -71,11 +71,10 @@ def _css(terbuka: bool) -> str:
         "max-width:270px!important;"
         "height:60px!important;"
         "min-height:60px!important;"
-        "padding:0 12px!important;"
+        "padding:0 14px!important;"
         "border-radius:12px!important;"
         "display:flex!important;"
         "align-items:center!important;"
-        "justify-content:space-between!important;"
         f"background:{WARNA_KARTU}!important;"
         f"color:{WARNA_TEKS}!important;"
         "border:1px solid rgba(255,255,255,.16)!important;"
@@ -87,7 +86,6 @@ def _css(terbuka: bool) -> str:
         "width:100%!important;"
         "display:flex!important;"
         "align-items:center!important;"
-        "justify-content:space-between!important;"
         "}"
         
         "body [class*='st-key-fd_toggle'] button "
@@ -118,16 +116,7 @@ def _css(terbuka: bool) -> str:
         "padding-right:48px!important;"
         "}"
         
-        "body [class*='st-key-fd_toggle'] button "
-        "[data-testid='stIconMaterial']{"
-        "position:absolute!important;"
-        "right:14px!important;"
-        "top:50%!important;"
-        "transform:translateY(-50%)!important;"
-        "margin:0!important;"
-        "font-size:20px!important;"
-        "z-index:2!important;"
-        "}"    
+           
         "body [class*='st-key-fd_toggle'] button "
         "[data-testid='stMarkdownContainer'] strong{"
         "animation:fd-text-glow 2.6s ease-in-out infinite!important;"
@@ -257,8 +246,9 @@ def render_file_dock() -> None:
 
         with st.container(key="fd_toggle"):
             if st.button(
-                f"**{teks_tombol}**  {icon}",
+                teks_tombol,
                 key="fd_btn",
+                icon=icon,
                 help="Tutup daftar file" if current_open else "File buatan Yuki",
             ):
                 st.session_state["file_dock_open"] = not current_open
