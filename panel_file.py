@@ -109,14 +109,16 @@ def _css(terbuka: bool) -> str:
         
         "body [class*='st-key-fd_toggle'] button "
         "[data-testid='stMarkdownContainer'] p{"
-        "animation:fd-text-in .45s ease!important;"
         "white-space:nowrap!important;"
         "overflow:hidden!important;"
         "text-overflow:ellipsis!important;"
+        "animation:fd-text-scroll .65s cubic-bezier(.22,.61,.36,1)!important;"
         "}"
-        "@keyframes fd-text-in{"
-        "0%{opacity:.25;transform:translateX(8px);}"
-        "100%{opacity:1;transform:translateX(0);}"
+        "@keyframes fd-text-scroll{"
+        "0%{opacity:0;transform:translateY(-22px);}"
+        "45%{opacity:.55;transform:translateY(8px);}"
+        "75%{opacity:.9;transform:translateY(-3px);}"
+        "100%{opacity:1;transform:translateY(0);}"
         "}"
         # ---- titik merah penghitung file baru -------------------------
         ".fd-dot{"
@@ -213,7 +215,12 @@ def render_file_dock() -> None:
         current_open = bool(st.session_state.get("file_dock_open"))
 
         if not current_files:
-            teks_tombol = "Belum ada file, minta Yuki buat file"
+            fase = int(time.monotonic() / 2.0) % 2
+            teks_tombol = (
+                "Belum ada file"
+                if fase == 0
+                else "Minta Yuki buat file"
+            )
         else:
             indeks = int(time.monotonic() / 2.0) % len(current_files)
             nama_file = current_files[indeks].get("title", "File")
