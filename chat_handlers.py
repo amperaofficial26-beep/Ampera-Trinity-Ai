@@ -1168,16 +1168,16 @@ canvas {
         Math.max(0, W - 24)
     );
 
-    const cardH =
-        W <= 600
-            ? 62
-            : 56;
+    const morphCenterY = H / 2;
 
     const input = {
         x: (W - cardW) / 2,
-        y: (H - cardH) / 2,
+    
+        y: morphCenterY - cardH / 2,
+    
         w: cardW,
         h: cardH,
+    
         r: 22
     };
 
@@ -1495,7 +1495,7 @@ canvas {
     roundedOutline(
         buttonPoints,
         button,
-        4.5,
+        4,
         "#857462",
         2.0
     );
