@@ -8550,57 +8550,88 @@ div.stDownloadButton > button,
     transform: none !important;
 }
 /* ============================================================
-   SETTINGS — FLOATING RIGHT ICONS
+   SETTINGS — FLOATING ICON NAVIGATION
    ============================================================ */
 
-.stApp .settings-floating-nav {
+/* Semua tombol settings */
+.stApp [class*="st-key-settings_float_"] {
     position: fixed !important;
 
-    top: 50vh !important;
-    right: 6px !important;
+    right: 8px !important;
 
-    transform: translateY(-50%) !important;
-
-    width: 50px !important;
-
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-
-    gap: 9px !important;
+    width: 46px !important;
+    height: 46px !important;
 
     z-index: 999999 !important;
 
-    pointer-events: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+
+/* Posisi vertikal setiap icon */
+
+.stApp .st-key-settings_float_umum {
+    top: calc(50% - 215px) !important;
+}
+
+.stApp .st-key-settings_float_tampilan {
+    top: calc(50% - 162px) !important;
+}
+
+.stApp .st-key-settings_float_akun {
+    top: calc(50% - 109px) !important;
+}
+
+.stApp .st-key-settings_float_privasi {
+    top: calc(50% - 56px) !important;
+}
+
+.stApp .st-key-settings_float_penagihan {
+    top: calc(50% - 3px) !important;
+}
+
+.stApp .st-key-settings_float_kemampuan {
+    top: calc(50% + 50px) !important;
+}
+
+.stApp .st-key-settings_float_memori {
+    top: calc(50% + 103px) !important;
+}
+
+.stApp .st-key-settings_float_refleksi {
+    top: calc(50% + 156px) !important;
+}
+
+.stApp .st-key-settings_float_waktu {
+    top: calc(50% + 209px) !important;
 }
 
 
 /* Tombol */
 
-.stApp .settings-floating-nav button {
-    pointer-events: auto !important;
+.stApp [class*="st-key-settings_float_"] button {
+    width: 46px !important;
+    height: 46px !important;
 
-    width: 44px !important;
-    height: 44px !important;
-
-    min-width: 44px !important;
-    min-height: 44px !important;
+    min-width: 46px !important;
+    min-height: 46px !important;
 
     padding: 0 !important;
     margin: 0 !important;
 
     border-radius: 50% !important;
 
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-
-    border: 1px solid rgba(100, 90, 110, 0.20) !important;
+    border: 1px solid rgba(100, 90, 110, 0.18) !important;
 
     background: rgba(255, 255, 255, 0.90) !important;
 
     box-shadow:
-        0 5px 16px rgba(30, 25, 40, 0.12) !important;
+        0 6px 18px rgba(30, 25, 40, 0.12) !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 
     transition:
         transform 0.2s ease,
@@ -8611,26 +8642,24 @@ div.stDownloadButton > button,
 
 /* Icon */
 
-.stApp .settings-floating-nav button span {
+.stApp [class*="st-key-settings_float_"] button span {
     font-size: 20px !important;
 }
 
 
 /* Hover */
 
-.stApp .settings-floating-nav button:hover {
-    transform: scale(1.12) !important;
-
-    background: rgba(255, 255, 255, 1) !important;
+.stApp [class*="st-key-settings_float_"] button:hover {
+    transform: scale(1.10) !important;
 
     box-shadow:
-        0 8px 22px rgba(30, 25, 40, 0.18) !important;
+        0 8px 24px rgba(30, 25, 40, 0.18) !important;
 }
 
 
 /* Klik */
 
-.stApp .settings-floating-nav button:active {
+.stApp [class*="st-key-settings_float_"] button:active {
     transform: scale(0.92) !important;
 }
 </style>
