@@ -4809,7 +4809,7 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
     transform:
         translate(
             var(--chat-shift, 0px),
-            calc(-1 * var(--chat-lift-fresh, -190vh))
+            calc(-1 * var(--chat-lift-fresh, 26vh))
         ) !important;
 }
 
@@ -7834,6 +7834,12 @@ div.stDownloadButton > button,
             none
             !important;
     }
+}
+
+/* ================================================================
+   🎛️ KONTROL POSISI KOLOM CHAT
+   Hanya ubah angka di sini.
+================================================================ */
 /* ================================================================
    🎛️ KONTROL POSISI KOLOM CHAT
    Hanya ubah angka di sini.
@@ -7846,7 +7852,7 @@ div.stDownloadButton > button,
        - kiri  = nilai negatif
        - kanan = nilai positif
        ------------------------------------------------ */
-    --chat-shift: -700px;
+    --chat-shift: -190px;
 
 
     /* ------------------------------------------------
