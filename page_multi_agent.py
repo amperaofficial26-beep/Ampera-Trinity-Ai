@@ -15,6 +15,18 @@ from ui_helpers import _page_footer, render_message
 
 WIB = ZoneInfo("Asia/Jakarta")
 
+# ============================================================
+# PENGATURAN POSISI KONTEN MULTI AI
+# ============================================================
+
+MULTI_CHAT_WIDTH = 760       # Lebar area chat
+MULTI_CHAT_X = 100             # Geser horizontal: kiri (-) / kanan (+)
+MULTI_CHAT_Y = 0             # Geser vertikal: atas (-) / bawah (+)
+
+MULTI_CHAT_TOP = 0           # Jarak tambahan dari atas
+MULTI_CHAT_BOTTOM = 0        # Jarak tambahan dari bawah
+
+# ============================================================
 
 _AGENT_CSS = """
 <style>
@@ -654,6 +666,28 @@ _AGENT_CSS = """
       46px;
   }
 }
+/* ================================================================
+   POSISI KONTEN MULTI AI
+   ================================================================ */
+
+.stApp:has(.tr-multi-ai-layout)
+.multi-agent-content {
+  width: min(
+    var(--multi-chat-width),
+    calc(100vw - 264px)
+  ) !important;
+
+  max-width: var(--multi-chat-width) !important;
+
+  margin-left: auto !important;
+  margin-right: auto !important;
+
+  transform:
+    translate(
+      var(--multi-chat-x),
+      var(--multi-chat-y)
+    ) !important;
+}
 </style>
 """
 
@@ -772,10 +806,56 @@ def page_multi_agent() -> None:
     thread = mode_thread("multi_agent")
 
     st.markdown(
-        _AGENT_CSS,
+        f"""
+        <style>
+        :root {{
+            --multi-chat-width: {MULTI_CHAT_WIDTH}px;
+            --multi-chat-x: {MULTI_CHAT_X}px;
+            --multi-chat-y: {MULTI_CHAT_Y}px;
+            --multi-chat-top: {MULTI_CHAT_TOP}px;
+            --multi-chat-bottom: {MULTI_CHAT_BOTTOM}px;
+        }}
+    
+        .stApp:has(.tr-multi-ai-layout)
+        [data-testid="stMainBlockContainer"] {{
+            padding-top:
+                calc(92px + var(--multi-chat-top))
+            !important;
+    
+            padding-bottom:
+                calc(9rem + var(--multi-chat-bottom))
+            !important;
+        }}
+    
+        .stApp:has(.tr-multi-ai-layout)
+        [data-testid="stMainBlockContainer"]
+        > [data-testid="stVerticalBlock"] {{
+            width:
+                min(
+                    var(--multi-chat-width),
+                    calc(100vw - 264px)
+                )
+            !important;
+    
+            max-width:
+                min(
+                    var(--multi-chat-width),
+                    calc(100vw - 264px)
+                )
+            !important;
+    
+            margin-left: auto !important;
+            margin-right: auto !important;
+    
+            transform:
+                translateX(var(--multi-chat-x))
+                translateY(var(--multi-chat-y))
+            !important;
+        }}
+        </style>
+        """,
         unsafe_allow_html=True,
     )
-
     # HTML dirapatkan menjadi rangkaian string.
     # Ini mencegah Markdown menganggap tag <p> sebagai blok kode.
     hero = (
