@@ -8070,50 +8070,32 @@ div.stDownloadButton > button,
 
 .stApp:has(.tr-multi-ai-layout)
 .st-key-multi_chat_area {
+    box-sizing: border-box !important;
 
-    box-sizing:
-        border-box !important;
+    width: var(--multi-chat-width) !important;
+    max-width: var(--multi-chat-width) !important;
 
-    width:
-        var(--multi-chat-width) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
 
-    max-width:
-        calc(100vw - 264px) !important;
+    padding: 18px !important;
 
-    margin-left:
-        auto !important;
+    transform: translate(
+        var(--multi-chat-x),
+        var(--multi-chat-y)
+    ) !important;
 
-    margin-right:
-        auto !important;
-
-    padding:
-        18px !important;
-
-    transform:
-        translate(
-            var(--multi-chat-x),
-            var(--multi-chat-y)
-        ) !important;
-
-    background:
-        var(--tr-surface-premium) !important;
-
-    border:
-        1px solid
-        var(--tr-border-premium) !important;
-
-    border-radius:
-        22px !important;
+    background: var(--tr-surface-premium) !important;
+    border: 1px solid var(--tr-border-premium) !important;
+    border-radius: 22px !important;
 
     box-shadow:
-        0 10px 30px
-        rgba(48, 40, 58, 0.055) !important;
+        0 10px 30px rgba(48, 40, 58, 0.055) !important;
 
     transition:
         transform .28s ease,
         width .28s ease !important;
 }
-
 
 /* =========================================================
    PESAN DI DALAM CHAT SURFACE
