@@ -3925,6 +3925,15 @@ button[class*="st-key-pel_pro"]::after {
     text-align: center;
 }
 
+/* ================================================================
+   PANEL KANAN — SEMUA KARTU LEBIH TERANG DARI LATAR
+================================================================ */
+
+
+/* ================================================================
+   BASE SEMUA KARTU
+================================================================ */
+
 .st-key-chat_right_rail div.stButton > button {
     width: 100% !important;
 
@@ -3938,17 +3947,18 @@ button[class*="st-key-pel_pro"]::after {
         calc(var(--tr-radius, 12px) + 4px)
         !important;
 
-    border:
-        1px solid
-        rgba(78, 69, 83, 0.12)
-        !important;
-
     color:
         var(--tr-text, #2C1F33)
         !important;
 
+    border:
+        1px solid
+        rgba(107, 97, 114, 0.10)
+        !important;
+
     box-shadow:
-        0 2px 8px rgba(44, 31, 51, 0.035)
+        0 2px 8px
+        rgba(44, 31, 51, 0.035)
         !important;
 
     transition:
@@ -3960,113 +3970,157 @@ button[class*="st-key-pel_pro"]::after {
 }
 
 
-/* =========================================================
-   CHAT AI
-   ========================================================= */
+/* ================================================================
+   FITUR CEPAT
+================================================================ */
 
+
+/* Chat AI — soft violet */
 .st-key-rail_quick_chat div.stButton > button {
-    background:
-        #E8DDF0
-        !important;
-
-    border-color:
-        #D6C8E0
-        !important;
+    background: #F1EAF5 !important;
+    border-color: #E3D7EA !important;
 }
 
 
-/* =========================================================
-   MULTI AI
-   ========================================================= */
-
+/* Multi AI — soft blue */
 .st-key-rail_quick_multi div.stButton > button {
-    background:
-        #DDE8F1
-        !important;
-
-    border-color:
-        #C8D8E4
-        !important;
+    background: #EAF0F5 !important;
+    border-color: #DCE6ED !important;
 }
 
 
-/* =========================================================
-   GENERATE GAMBAR
-   ========================================================= */
-
+/* Generate Gambar — soft peach */
 .st-key-rail_quick_image div.stButton > button {
-    background:
-        #F0E1D5
-        !important;
-
-    border-color:
-        #E2CDBD
-        !important;
+    background: #F5ECE4 !important;
+    border-color: #E9DDD3 !important;
 }
 
 
-/* =========================================================
-   UPLOAD FILE
-   ========================================================= */
-
+/* Upload File — soft green */
 .st-key-rail_quick_upload div.stButton > button {
-    background:
-        #E0EBDD
-        !important;
+    background: #EBF2E8 !important;
+    border-color: #DDE8D8 !important;
+}
 
-    border-color:
-        #CDDCC8
+
+/* ================================================================
+   MODEL AI POPULER
+   ------------------------------------------------
+   Setiap kartu model dibuat terang, tetapi sedikit berbeda
+   supaya panel tidak terlihat monoton.
+================================================================ */
+
+
+/* Model 1 — warm cream */
+[class*="st-key-rail_model_"]:nth-of-type(1)
+div.stButton > button {
+    background: #F3ECDD !important;
+    border-color: #E7DDCB !important;
+}
+
+
+/* Model 2 — soft violet */
+[class*="st-key-rail_model_"]:nth-of-type(2)
+div.stButton > button {
+    background: #F0EAF4 !important;
+    border-color: #E2D8E8 !important;
+}
+
+
+/* Model 3 — soft blue */
+[class*="st-key-rail_model_"]:nth-of-type(3)
+div.stButton > button {
+    background: #EAF0F4 !important;
+    border-color: #DCE4EA !important;
+}
+
+
+/* Model 4 — soft green */
+[class*="st-key-rail_model_"]:nth-of-type(4)
+div.stButton > button {
+    background: #ECF1E9 !important;
+    border-color: #DDE5D9 !important;
+}
+
+
+/* ================================================================
+   CHAT TERBARU
+================================================================ */
+
+
+/* Recent 1 */
+[class*="st-key-rail_recent_"]:nth-of-type(1)
+div.stButton > button {
+    background: #F1EBDD !important;
+    border-color: #E5DCCB !important;
+}
+
+
+/* Recent 2 */
+[class*="st-key-rail_recent_"]:nth-of-type(2)
+div.stButton > button {
+    background: #EEEAF2 !important;
+    border-color: #E0D8E6 !important;
+}
+
+
+/* Recent 3 */
+[class*="st-key-rail_recent_"]:nth-of-type(3)
+div.stButton > button {
+    background: #EAEFF3 !important;
+    border-color: #DCE4EA !important;
+}
+
+
+/* ================================================================
+   HOVER
+================================================================ */
+
+.st-key-chat_right_rail div.stButton > button:hover {
+    transform: translateY(-1px) !important;
+
+    box-shadow:
+        0 5px 14px
+        rgba(44, 31, 51, 0.07)
         !important;
 }
 
 
-/* =========================================================
-   HOVER — masing-masing mempertahankan warnanya
-   ========================================================= */
+/* Quick feature hover */
 
 .st-key-rail_quick_chat div.stButton > button:hover {
-    background:
-        #DED0E9
-        !important;
-
-    border-color:
-        #C4B0D2
-        !important;
+    background: #E9DEF0 !important;
+    border-color: #D6C5E0 !important;
 }
-
 
 .st-key-rail_quick_multi div.stButton > button:hover {
-    background:
-        #CFDDEA
-        !important;
-
-    border-color:
-        #B6CBDC
-        !important;
+    background: #DEE9F1 !important;
+    border-color: #CADCE8 !important;
 }
-
 
 .st-key-rail_quick_image div.stButton > button:hover {
-    background:
-        #E7D2C2
-        !important;
-
-    border-color:
-        #D3B7A3
-        !important;
+    background: #F0DFD2 !important;
+    border-color: #DEC7B8 !important;
 }
-
 
 .st-key-rail_quick_upload div.stButton > button:hover {
-    background:
-        #D1E0CC
-        !important;
-
-    border-color:
-        #B9CEB2
-        !important;
+    background: #DFEADB !important;
+    border-color: #CDDCC7 !important;
 }
 
+
+/* ================================================================
+   MODEL + CHAT TERBARU — HOVER
+================================================================ */
+
+[class*="st-key-rail_model_"] div.stButton > button:hover,
+[class*="st-key-rail_recent_"] div.stButton > button:hover {
+    background: #E8DFD2 !important;
+
+    border-color:
+        rgba(74, 53, 89, 0.16)
+        !important;
+}
 .st-key-chat_right_rail div.stButton > button:hover {
     transform: translateY(-1px) !important;
     border-color: var(--tr-accent, #4A3559) !important;
