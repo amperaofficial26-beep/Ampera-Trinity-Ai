@@ -7847,7 +7847,7 @@ div.stDownloadButton > button,
        - kiri  = nilai negatif
        - kanan = nilai positif
        ------------------------------------------------ */
-    --chat-shift: -150px;
+    --chat-shift: -145px;
 
 
     /* ------------------------------------------------
