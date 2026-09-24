@@ -1165,7 +1165,167 @@ button[data-testid="stPopoverButton"]:hover {
     text-overflow: ellipsis !important;
 }
 
+ /* ================================================================
+    YUKI THINKING — KARTU HENTIKAN
+    Saat Yuki berpikir, hanya tombol Hentikan yang ditampilkan.
+    ================================================================ */
 
+[data-testid="stBottomBlockContainer"]:has(.st-key-yuki_thinking_input) {
+
+    /*
+     * Tetap memakai ukuran kartu yang sama,
+     * tetapi isi dirapikan menjadi satu tombol di tengah.
+     */
+    display: flex !important;
+
+    align-items: center !important;
+
+    justify-content: center !important;
+
+    min-height: 56px !important;
+
+    padding:
+        8px
+        8px
+        8px !important;
+}
+
+
+/* Hilangkan baris kontrol normal saat thinking. */
+
+[data-testid="stBottomBlockContainer"]:has(.st-key-yuki_thinking_input)
+.st-key-chat_controls {
+
+    display: none !important;
+}
+
+
+/* Hilangkan disclaimer saat thinking. */
+
+[data-testid="stBottomBlockContainer"]:has(.st-key-yuki_thinking_input)
+.input-disclaimer {
+
+    display: none !important;
+}
+
+
+/* Hilangkan preview/lampiran yang mungkin masih ada. */
+
+[data-testid="stBottomBlockContainer"]:has(.st-key-yuki_thinking_input)
+.st-key-pending_preview {
+
+    display: none !important;
+}
+
+
+/* ================================================================
+   WRAPPER TOMBOL HENTIKAN
+   ================================================================ */
+
+[data-testid="stBottomBlockContainer"]:has(.st-key-yuki_thinking_input)
+.st-key-yuki_thinking_input {
+
+    width: 100% !important;
+
+    margin: 0 !important;
+
+    padding: 0 !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+
+    justify-content: center !important;
+}
+
+
+/* Baris columns tempat tombol berada. */
+
+[data-testid="stBottomBlockContainer"]:has(.st-key-yuki_thinking_input)
+.st-key-yuki_thinking_input
+[data-testid="stHorizontalBlock"] {
+
+    width: 100% !important;
+
+    margin: 0 !important;
+
+    padding: 0 !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+
+    justify-content: center !important;
+
+    gap: 0 !important;
+}
+
+
+/* Sembunyikan dua column kosong kiri/kanan. */
+
+[data-testid="stBottomBlockContainer"]:has(.st-key-yuki_thinking_input)
+.st-key-yuki_thinking_input
+[data-testid="stHorizontalBlock"]
+> [data-testid="stColumn"] {
+
+    display: none !important;
+}
+
+
+/* Hanya column tengah yang ditampilkan. */
+
+[data-testid="stBottomBlockContainer"]:has(.st-key-yuki_thinking_input)
+.st-key-yuki_thinking_input
+[data-testid="stHorizontalBlock"]
+> [data-testid="stColumn"]:has(.st-key-yuki_stop_dok) {
+
+    display: flex !important;
+
+    flex: 0 0 auto !important;
+
+    width: auto !important;
+
+    min-width: 0 !important;
+
+    padding: 0 !important;
+
+    margin: 0 !important;
+
+    align-items: center !important;
+
+    justify-content: center !important;
+}
+
+
+/* ================================================================
+   TOMBOL
+   ================================================================ */
+
+[data-testid="stBottomBlockContainer"]:has(.st-key-yuki_thinking_input)
+.st-key-yuki_stop_dok button {
+
+    min-height: 30px !important;
+
+    height: 30px !important;
+
+    width: auto !important;
+
+    min-width: 126px !important;
+
+    padding:
+        0.05rem
+        0.95rem !important;
+
+    margin: 0 !important;
+
+    border-radius: 999px !important;
+
+    display: inline-flex !important;
+
+    align-items: center !important;
+
+    justify-content: center !important;
+}
 /* ================================================================
    TOMBOL KIRIM
    ================================================================ */
