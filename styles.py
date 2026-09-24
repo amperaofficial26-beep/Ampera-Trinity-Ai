@@ -4646,7 +4646,7 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
 
 /* Panel kanan: mentok ke atas, sedikit lebih sempit. */
 .stApp:has(.tr-chat-layout) .st-key-chat_right_rail {
-    top: var(--dash-top) !important;
+    top: 68px !important;
     right: var(--dash-gap) !important;
     bottom: var(--dash-bottom) !important;
 
