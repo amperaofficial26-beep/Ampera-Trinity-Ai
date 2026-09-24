@@ -848,8 +848,10 @@ def page_multi_agent() -> None:
     # Ini mencegah Markdown menganggap tag <p> sebagai blok kode.
     hero = (
         '<div class="agent-hero">'
-        '<div class="agent-hero-icon">✦</div>'
-        '<div>'
+        '<div class="agent-hero-icon">'
+        '<span class="material-symbols-rounded">hub</span>'
+        '</div>'
+        '<div class="agent-hero-content">'
         '<h1>Multi Trinity Agent</h1>'
         '<p>'
         'Seluruh model Trinity menganalisis, mengkritik, '
