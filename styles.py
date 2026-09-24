@@ -7925,6 +7925,86 @@ div.stDownloadButton > button,
 .stApp:has(.tr-chat-layout) {
     overflow-x: hidden !important;
 }
+/* =========================================================
+   MULTI AI — LAYOUT UTAMA TANPA PANEL KANAN
+   ========================================================= */
+
+.stApp:has(.tr-multi-ai-layout) {
+    overflow-x: hidden !important;
+}
+
+/* Area utama Multi AI */
+.stApp:has(.tr-multi-ai-layout)
+[data-testid="stMainBlockContainer"] {
+    width: 100% !important;
+    max-width: none !important;
+
+    padding-top: 92px !important;
+    padding-left: calc(210px + 18px) !important;
+    padding-right: 36px !important;
+    padding-bottom: 9rem !important;
+}
+
+/* =========================================================
+   KONTEN MULTI AI
+   ========================================================= */
+
+.stApp:has(.tr-multi-ai-layout)
+[data-testid="stMainBlockContainer"]
+> [data-testid="stVerticalBlock"] {
+    width: min(
+        760px,
+        calc(100vw - 264px)
+    ) !important;
+
+    max-width: min(
+        760px,
+        calc(100vw - 264px)
+    ) !important;
+
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+/* =========================================================
+   TOPBAR
+   ========================================================= */
+
+.stApp:has(.tr-multi-ai-layout)
+.st-key-chat_topbar {
+    position: fixed !important;
+
+    top: 12px !important;
+    left: calc(210px + 18px) !important;
+    right: 36px !important;
+
+    width: auto !important;
+    max-width: none !important;
+    min-width: 0 !important;
+
+    margin: 0 !important;
+    transform: none !important;
+
+    z-index: 1000 !important;
+}
+
+/* =========================================================
+   PANEL KANAN — MATIKAN DI MULTI AI
+   ========================================================= */
+
+.stApp:has(.tr-multi-ai-layout)
+.st-key-chat_right_rail {
+    display: none !important;
+}
+
+/* =========================================================
+   HORIZONTAL OVERFLOW
+   ========================================================= */
+
+.stApp:has(.tr-multi-ai-layout)
+[data-testid="stHorizontalBlock"] {
+    overflow-x: hidden !important;
+}
 </style>
 """,
         unsafe_allow_html=True,
