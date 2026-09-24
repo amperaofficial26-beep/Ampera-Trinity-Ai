@@ -8550,164 +8550,136 @@ div.stDownloadButton > button,
     transform: none !important;
 }
 /* ============================================================
-   TRINITY AI — SETTINGS PAGE
-   MAIN APP COLOR THEME
+   TRINITY AI — SETTINGS
+   MENGIKUTI PALET UTAMA APP
    ============================================================ */
 
-.stApp {
-    background:
-        radial-gradient(
-            circle at 15% 10%,
-            rgba(255, 255, 255, 0.55),
-            transparent 32%
-        ),
-        radial-gradient(
-            circle at 85% 85%,
-            rgba(210, 195, 175, 0.20),
-            transparent 30%
-        ),
-        linear-gradient(
-            135deg,
-            #f4efe7 0%,
-            #eee8df 48%,
-            #e8e1d7 100%
-        ) !important;
+/* Latar Settings = SAMA dengan halaman utama */
+.stApp:has(.settings-floating-nav),
+.stApp:has([class*="st-key-settings_float_"]) {
+    background: #E8DCC8 !important;
+}
+
+
+/* Area utama tetap transparan agar warna utama terlihat */
+.stApp:has([class*="st-key-settings_float_"])
+[data-testid="stAppViewContainer"] {
+    background: transparent !important;
+}
+
+.stApp:has([class*="st-key-settings_float_"])
+[data-testid="stMain"] {
+    background: transparent !important;
 }
 
 
 /* ============================================================
-   HEADER
+   HEADER SETTINGS
    ============================================================ */
 
 .stApp .page-head {
-    background:
-        rgba(255, 255, 255, 0.48) !important;
+    background: #F2E8D6 !important;
 
-    border: 1px solid rgba(120, 105, 85, 0.12) !important;
+    border: 1px solid #DBCEB9 !important;
 
     box-shadow:
-        0 10px 30px rgba(70, 55, 40, 0.07),
-        inset 0 1px 0 rgba(255, 255, 255, 0.75) !important;
-
-    backdrop-filter: blur(18px) !important;
+        0 8px 24px rgba(48, 40, 58, 0.055),
+        inset 0 1px 0 rgba(255,255,255,0.65) !important;
 }
 
 .stApp .page-title {
-    color: #403b35 !important;
+    color: #2C1F33 !important;
 }
 
 .stApp .page-sub {
-    color: rgba(70, 63, 55, 0.58) !important;
+    color: #6B6172 !important;
 }
 
 
 /* ============================================================
-   SETTINGS CONTENT
+   TEXT SETTINGS
    ============================================================ */
-
-.stApp .settings-card,
-.stApp [class*="settings-card"] {
-
-    background:
-        rgba(255, 255, 255, 0.58) !important;
-
-    border:
-        1px solid rgba(120, 105, 85, 0.12) !important;
-
-    border-radius: 18px !important;
-
-    box-shadow:
-        0 10px 28px rgba(70, 55, 40, 0.07),
-        inset 0 1px 0 rgba(255,255,255,0.75) !important;
-
-    backdrop-filter: blur(16px) !important;
-}
-
-
-/* ============================================================
-   FLOATING SETTINGS ICON
-   ============================================================ */
-
-.stApp [class*="st-key-settings_float_"] button {
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(255,255,255,0.92),
-            rgba(235,229,220,0.92)
-        ) !important;
-
-    color: #625b52 !important;
-
-    border:
-        1px solid rgba(120,105,85,0.16) !important;
-
-    box-shadow:
-        0 7px 20px rgba(70,55,40,0.10),
-        inset 0 1px 0 rgba(255,255,255,0.85) !important;
-}
-
-
-/* Icon */
-
-.stApp [class*="st-key-settings_float_"] button span {
-    color: #625b52 !important;
-}
-
-
-/* Hover */
-
-.stApp [class*="st-key-settings_float_"] button:hover {
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(255,255,255,1),
-            rgba(242,237,230,1)
-        ) !important;
-
-    border-color:
-        rgba(159,126,72,0.30) !important;
-
-    box-shadow:
-        0 9px 25px rgba(70,55,40,0.14),
-        0 0 14px rgba(159,126,72,0.08) !important;
-}
-
-
-/* ============================================================
-   TEXT
-   ============================================================ */
-
-.stApp p,
-.stApp label,
-.stApp .stMarkdown {
-    color: #514b43;
-}
 
 .stApp h1,
 .stApp h2,
 .stApp h3,
 .stApp h4 {
-    color: #403b35 !important;
+    color: #2C1F33 !important;
+}
+
+.stApp:has([class*="st-key-settings_float_"])
+p,
+.stApp:has([class*="st-key-settings_float_"])
+label {
+    color: #6B6172;
 }
 
 
 /* ============================================================
-   INPUT
+   INPUT / SELECT
    ============================================================ */
 
-.stApp input,
-.stApp textarea,
-.stApp [data-baseweb="select"] > div {
+.stApp:has([class*="st-key-settings_float_"])
+input,
+.stApp:has([class*="st-key-settings_float_"])
+textarea,
+.stApp:has([class*="st-key-settings_float_"])
+[data-baseweb="select"] > div {
 
-    background:
-        rgba(255,255,255,0.55) !important;
+    background: #F2E8D6 !important;
 
-    color: #403b35 !important;
+    color: #2C1F33 !important;
 
-    border-color:
-        rgba(120,105,85,0.14) !important;
+    border-color: #DBCEB9 !important;
+}
+
+
+/* ============================================================
+   FLOATING ICON
+   ============================================================ */
+
+.stApp [class*="st-key-settings_float_"] button {
+
+    background: #F2E8D6 !important;
+
+    color: #2C1F33 !important;
+
+    border:
+        1px solid #DBCEB9 !important;
+
+    box-shadow:
+        0 6px 18px rgba(48, 40, 58, 0.09),
+        inset 0 1px 0 rgba(255,255,255,0.65) !important;
+}
+
+
+/* Icon Material */
+
+.stApp [class*="st-key-settings_float_"]
+button span {
+    color: #4A3559 !important;
+}
+
+
+/* Hover */
+
+.stApp [class*="st-key-settings_float_"]
+button:hover {
+
+    background: #EDE2D1 !important;
+
+    border-color: #CDBFA8 !important;
+
+    box-shadow:
+        0 8px 22px rgba(48, 40, 58, 0.13) !important;
+}
+
+
+/* Klik */
+
+.stApp [class*="st-key-settings_float_"]
+button:active {
+    transform: scale(0.93) !important;
 }
 
 
@@ -8715,9 +8687,9 @@ div.stDownloadButton > button,
    DIVIDER
    ============================================================ */
 
-.stApp hr {
-    border-color:
-        rgba(120,105,85,0.10) !important;
+.stApp:has([class*="st-key-settings_float_"])
+hr {
+    border-color: #DBCEB9 !important;
 }
 /* ============================================================
    SETTINGS — FLOATING ICON NAVIGATION
