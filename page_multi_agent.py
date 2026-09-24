@@ -860,12 +860,6 @@ def page_multi_agent() -> None:
         '</div>'
         '</div>'
     )
-
-    st.markdown(
-        hero,
-        unsafe_allow_html=True,
-    )
-
     if not thread:
         st.markdown(hero, unsafe_allow_html=True,)
         
