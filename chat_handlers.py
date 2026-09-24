@@ -707,7 +707,7 @@ def chat_input_atau_hentikan(placeholder: str, **kwargs):
     
         _render_input_particle_morph("return")
 
-return st.chat_input(placeholder, **kwargs)
+    return st.chat_input(placeholder, **kwargs)
 
 
 def handle_chat_request(answer_slot, request_text: str = "") -> None:
