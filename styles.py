@@ -3927,15 +3927,144 @@ button[class*="st-key-pel_pro"]::after {
 
 .st-key-chat_right_rail div.stButton > button {
     width: 100% !important;
+
     justify-content: flex-start !important;
+
     text-align: left !important;
+
     white-space: normal !important;
-    border-radius: calc(var(--tr-radius, 12px) + 4px) !important;
-    border: 1px solid color-mix(in srgb, var(--tr-border, #DBCEB9) 78%, transparent) !important;
-    background: color-mix(in srgb, var(--tr-bg, #E8DCC8) 22%, var(--tr-surface, #F2E8D6) 78%) !important;
-    color: var(--tr-text, #2C1F33) !important;
-    box-shadow: none !important;
-    transition: transform .18s ease, border-color .18s ease, background .18s ease !important;
+
+    border-radius:
+        calc(var(--tr-radius, 12px) + 4px)
+        !important;
+
+    border:
+        1px solid
+        rgba(78, 69, 83, 0.12)
+        !important;
+
+    color:
+        var(--tr-text, #2C1F33)
+        !important;
+
+    box-shadow:
+        0 2px 8px rgba(44, 31, 51, 0.035)
+        !important;
+
+    transition:
+        transform .18s ease,
+        border-color .18s ease,
+        background .18s ease,
+        box-shadow .18s ease
+        !important;
+}
+
+
+/* =========================================================
+   CHAT AI
+   ========================================================= */
+
+.st-key-rail_quick_chat div.stButton > button {
+    background:
+        #E8DDF0
+        !important;
+
+    border-color:
+        #D6C8E0
+        !important;
+}
+
+
+/* =========================================================
+   MULTI AI
+   ========================================================= */
+
+.st-key-rail_quick_multi div.stButton > button {
+    background:
+        #DDE8F1
+        !important;
+
+    border-color:
+        #C8D8E4
+        !important;
+}
+
+
+/* =========================================================
+   GENERATE GAMBAR
+   ========================================================= */
+
+.st-key-rail_quick_image div.stButton > button {
+    background:
+        #F0E1D5
+        !important;
+
+    border-color:
+        #E2CDBD
+        !important;
+}
+
+
+/* =========================================================
+   UPLOAD FILE
+   ========================================================= */
+
+.st-key-rail_quick_upload div.stButton > button {
+    background:
+        #E0EBDD
+        !important;
+
+    border-color:
+        #CDDCC8
+        !important;
+}
+
+
+/* =========================================================
+   HOVER — masing-masing mempertahankan warnanya
+   ========================================================= */
+
+.st-key-rail_quick_chat div.stButton > button:hover {
+    background:
+        #DED0E9
+        !important;
+
+    border-color:
+        #C4B0D2
+        !important;
+}
+
+
+.st-key-rail_quick_multi div.stButton > button:hover {
+    background:
+        #CFDDEA
+        !important;
+
+    border-color:
+        #B6CBDC
+        !important;
+}
+
+
+.st-key-rail_quick_image div.stButton > button:hover {
+    background:
+        #E7D2C2
+        !important;
+
+    border-color:
+        #D3B7A3
+        !important;
+}
+
+
+.st-key-rail_quick_upload div.stButton > button:hover {
+    background:
+        #D1E0CC
+        !important;
+
+    border-color:
+        #B9CEB2
+        !important;
 }
 
 .st-key-chat_right_rail div.stButton > button:hover {
