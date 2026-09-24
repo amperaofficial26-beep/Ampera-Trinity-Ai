@@ -2273,12 +2273,31 @@ def main() -> None:
 
     # Animasi ala iOS untuk perpindahan halaman.
 
-    # Animasi ala iOS untuk perpindahan halaman. Kelasnya HANYA dipasang
-    # saat halaman benar-benar berganti — kalau dipasang terus-menerus,
-    # animasinya akan terputar ulang setiap kali kirim chat atau klik
-    # tombol apa pun (mengganggu).
-    if st.session_state.get("_last_page") != page:
+    # ================================================================
+    # ANIMASI PERPINDAHAN HALAMAN
+    # ================================================================
+    #
+    # JANGAN jalankan animasi pada first load.
+    # First load harus langsung stabil supaya topbar, panel kanan,
+    # sidebar, dan elemen position:fixed tidak terpengaruh transform
+    # dari animasi halaman.
+    #
+    # Animasi hanya dijalankan kalau user BENAR-BENAR berpindah
+    # dari satu halaman ke halaman lain.
+    
+    _last_page = st.session_state.get("_last_page")
+    
+    if _last_page is None:
+    
+        # First load:
+        # simpan halaman sekarang, TANPA animasi.
         st.session_state["_last_page"] = page
+    
+    elif _last_page != page:
+    
+        # Benar-benar pindah halaman.
+        st.session_state["_last_page"] = page
+    
         inject_page_anim()
     if page == "artefak":
         page_artefak()
