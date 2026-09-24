@@ -20,12 +20,12 @@ WIB = ZoneInfo("Asia/Jakarta")
 # ============================================================
 
 # JUDUL + DESKRIPSI
-MULTI_HERO_X = -80
+MULTI_HERO_X = -100
 MULTI_HERO_Y = 0
 
 # AREA CHAT + BACKGROUND
 MULTI_CHAT_WIDTH = 760
-MULTI_CHAT_X = 0
+MULTI_CHAT_X = -100
 MULTI_CHAT_Y = 0
 
 # KOLOM INPUT
