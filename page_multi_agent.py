@@ -867,15 +867,8 @@ def page_multi_agent() -> None:
     )
 
     if not thread:
-        st.markdown(
-            '<div class="agent-pro-note">'
-            '✦ Khusus Trinity Pro · Model yang tersedia '
-            'bekerja sebagai satu panel; model yang gagal '
-            'tidak menghentikan proses.'
-            '</div>',
-            unsafe_allow_html=True,
-        )
-
+        st.markdown(hero, unsafe_allow_html=True,)
+        
     with st.container(key="multi_chat_area"):
         for message in thread:
             render_message(message)
