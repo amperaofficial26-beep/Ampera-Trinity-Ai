@@ -133,7 +133,8 @@ def inject_page_anim() -> None:
         "}"
         "</style>",
         unsafe_allow_html=True,
-    )def inject_page_anim() -> None:
+    )
+def inject_page_anim() -> None:
     """Animasi perpindahan halaman tanpa mengubah containing block layout.
 
     Jangan menganimasikan transform pada stMainBlockContainer karena di
@@ -159,7 +160,8 @@ def inject_page_anim() -> None:
         "}"
         "</style>",
         unsafe_allow_html=True,
-    )def inject_page_anim() -> None:
+    )
+def inject_page_anim() -> None:
     """Animasi perpindahan halaman tanpa mengubah containing block layout.
 
     Jangan menganimasikan transform pada stMainBlockContainer karena di
@@ -185,7 +187,8 @@ def inject_page_anim() -> None:
         "}"
         "</style>",
         unsafe_allow_html=True,
-    )def inject_page_anim() -> None:
+    )
+def inject_page_anim() -> None:
     """Animasi perpindahan halaman tanpa mengubah containing block layout.
 
     Jangan menganimasikan transform pada stMainBlockContainer karena di
@@ -211,7 +214,8 @@ def inject_page_anim() -> None:
         "}"
         "</style>",
         unsafe_allow_html=True,
-    )def inject_page_anim() -> None:
+    )
+def inject_page_anim() -> None:
     """Animasi perpindahan halaman tanpa mengubah containing block layout.
 
     Jangan menganimasikan transform pada stMainBlockContainer karena di
@@ -237,7 +241,8 @@ def inject_page_anim() -> None:
         "}"
         "</style>",
         unsafe_allow_html=True,
-    )def inject_page_anim() -> None:
+    )
+def inject_page_anim() -> None:
     """Animasi perpindahan halaman tanpa mengubah containing block layout.
 
     Jangan menganimasikan transform pada stMainBlockContainer karena di
@@ -263,7 +268,8 @@ def inject_page_anim() -> None:
         "}"
         "</style>",
         unsafe_allow_html=True,
-    )def inject_page_anim() -> None:
+    )
+def inject_page_anim() -> None:
     """Animasi perpindahan halaman tanpa mengubah containing block layout.
 
     Jangan menganimasikan transform pada stMainBlockContainer karena di
@@ -289,7 +295,8 @@ def inject_page_anim() -> None:
         "}"
         "</style>",
         unsafe_allow_html=True,
-    )def inject_page_anim() -> None:
+    )
+def inject_page_anim() -> None:
     """Animasi perpindahan halaman tanpa mengubah containing block layout.
 
     Jangan menganimasikan transform pada stMainBlockContainer karena di
