@@ -4819,7 +4819,7 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
     transform:
         translate(
             var(--chat-shift, 0px),
-            calc(-1 * var(--chat-lift, -145px))
+            calc(-1 * var(--chat-lift, -100px))
         ) !important;
 }
 
