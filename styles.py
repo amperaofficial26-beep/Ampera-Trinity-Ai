@@ -951,7 +951,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
        UKURAN TEKS
        ========================================================= */
 
-    font-size: 15px !important;
+    font-size: 12px !important;
     font-weight: 500 !important;
 
     line-height: 1.35 !important;
@@ -967,10 +967,10 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
        atas/bawah  -> padding-top
        
        Contoh:
-       padding-left: 12px  = makin ke kanan
+       padding-left: 10px  = makin ke kanan
        padding-left: 4px   = makin ke kiri
 
-       padding-top: 9px    = makin ke bawah
+       padding-top: 13px    = makin ke bawah
        padding-top: 5px    = makin ke atas
        ========================================================= */
 
@@ -1028,7 +1028,7 @@ section[data-testid="stSidebar"] .element-container { margin: 0 !important; }
 [data-testid="stChatInput"]
 textarea::placeholder {
 
-    font-size: 12px !important;
+    font-size: 14px !important;
 
     font-weight: 500 !important;
 
