@@ -5547,6 +5547,10 @@ button.st-key-yuki_stop_dok {
  * Jadi ukuran normal input sama sekali tidak berubah.
  */
 
+/* =========================================================
+   RETURN — INPUT DISIMPAN SAMPAI MORPH SELESAI
+   ========================================================= */
+
 [data-testid="stBottomBlockContainer"]:has(.yuki-input-morph--return)
 [data-testid="stChatInput"] {
     opacity: 0 !important;
@@ -5562,6 +5566,240 @@ button.st-key-yuki_stop_dok {
         both !important;
 }
 
+
+/* =========================================================
+   RETURN — KONTROL INPUT JANGAN MUNCUL DULU
+   ========================================================= */
+
+[data-testid="stBottomBlockContainer"]:has(.yuki-input-morph--return)
+.st-key-chat_controls {
+    animation:
+        yuki-controls-fade-in
+        5000ms
+        linear
+        both !important;
+}
+
+
+/* =========================================================
+   RETURN — TOMBOL VISUAL
+   ========================================================= */
+
+.st-key-yuki_return_visual_stop {
+    position: relative !important;
+
+    z-index: 1000000 !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+
+    justify-content: center !important;
+
+    animation:
+        yuki-return-stop-visual
+        5000ms
+        linear
+        both !important;
+}
+
+
+/* Tombolnya sendiri mengikuti bentuk tombol Hentikan asli. */
+
+.st-key-yuki_return_visual_stop button {
+    font-size: 13px !important;
+
+    min-height: 30px !important;
+
+    height: 30px !important;
+
+    padding:
+        0.05rem
+        0.95rem !important;
+
+    border-radius: 999px !important;
+
+    gap: 6px !important;
+}
+
+
+/* =========================================================
+   BACKGROUND KARTU INPUT SAAT RETURN
+   ========================================================= */
+
+[data-testid="stBottomBlockContainer"]:has(.yuki-input-morph--return) {
+    background: transparent !important;
+
+    border-color: transparent !important;
+
+    box-shadow: none !important;
+}
+
+
+/*
+   Buat kembali permukaan kartu hanya di ujung
+   animasi, setelah particle selesai.
+ */
+
+[data-testid="stBottomBlockContainer"]:has(.yuki-input-morph--return)::before {
+    content: "";
+
+    position: absolute !important;
+
+    inset: 0 !important;
+
+    border-radius: 22px !important;
+
+    pointer-events: none !important;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(248, 239, 222, 0.98),
+            rgba(239, 225, 202, 0.98)
+        ) !important;
+
+    border:
+        1px solid
+        rgba(159, 126, 72, 0.38) !important;
+
+    box-shadow:
+        0 8px 24px rgba(65, 46, 27, 0.12),
+        inset 0 1px 0
+        rgba(255, 255, 255, 0.78) !important;
+
+    z-index: 0 !important;
+
+    animation:
+        yuki-return-card
+        5000ms
+        linear
+        both !important;
+}
+
+
+/* Semua isi aktual berada di atas background. */
+
+[data-testid="stBottomBlockContainer"]:has(.yuki-input-morph--return)
+> * {
+    position: relative;
+
+    z-index: 2;
+}
+
+
+/* =========================================================
+   KEYFRAMES
+   ========================================================= */
+
+@keyframes yuki-return-stop-visual {
+
+    0% {
+        opacity: 1;
+
+        filter: blur(0);
+    }
+
+    55% {
+        opacity: 1;
+
+        filter: blur(0);
+    }
+
+    60% {
+        opacity: 1;
+
+        filter: blur(0);
+    }
+
+    72% {
+        opacity: 0.25;
+
+        filter: blur(2px);
+    }
+
+    80% {
+        opacity: 0;
+
+        filter: blur(5px);
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+
+@keyframes yuki-input-fade-in {
+
+    0% {
+        opacity: 0;
+    }
+
+    60% {
+        opacity: 0;
+    }
+
+    88% {
+        opacity: 0;
+    }
+
+    92% {
+        opacity: 0.42;
+    }
+
+    96% {
+        opacity: 0.82;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+
+@keyframes yuki-controls-fade-in {
+
+    0% {
+        opacity: 0;
+    }
+
+    88% {
+        opacity: 0;
+    }
+
+    94% {
+        opacity: 0.4;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+
+@keyframes yuki-return-card {
+
+    0% {
+        opacity: 0;
+    }
+
+    82% {
+        opacity: 0;
+    }
+
+    92% {
+        opacity: 0.35;
+    }
+
+    96% {
+        opacity: 0.75;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
 
 /*
  * Input fade-in hanya setelah partikel
