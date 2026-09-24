@@ -7885,6 +7885,60 @@ div.stDownloadButton > button,
        ------------------------------------------------ */
     --chat-width: 46rem;
 }
+
+/* ====================================================================
+   🛡️ FIX: LINDUNGI POSITION:FIXED DARI CONTAINING BLOCK ANIMASI
+   --------------------------------------------------------------------
+   MASALAH:
+   Setiap kali pengguna kembali dari halaman lain (Pengaturan, Artefak,
+   Kursus, dll), topbar dan panel kanan jadi tergeser 2x lipat dan
+   kolomnya menyempit ("Trin…", "Roo…", "Sap utra 26", "K…").
+
+   PENYEBAB:
+   inject_page_anim() menempelkan `animation` / `transform` ke
+   [data-testid="stAppViewContainer"] atau stMainBlockContainer. Elemen
+   apa pun dengan transform / filter / backdrop-filter / opacity<1 /
+   will-change otomatis menjadi CONTAINING BLOCK untuk semua
+   `position: fixed` di dalamnya. Akibatnya:
+       left: var(--dash-center-left)   /* 228px */
+   yang tadinya dihitung dari VIEWPORT, sekarang dihitung dari ancestor
+   yang sudah tergeser 228px → total 456px dari viewport.
+   Chrome bahkan menahan "layer promotion" setelah animasi selesai,
+   sehingga pergeseran terlihat PERMANEN, bukan cuma 0,4 detik.
+
+   SOLUSI:
+   Matikan semua properti pemicu containing block hanya pada ancestor
+   yang membungkus topbar / right rail di halaman chat. Halaman lain
+   (non-chat) tidak terpengaruh dan tetap mendapat animasi.
+==================================================================== */
+
+/* Bersihkan pemicu containing block dari seluruh ancestor rantai fixed */
+.stApp:has(.tr-chat-layout) [data-testid="stAppViewContainer"],
+.stApp:has(.tr-chat-layout) [data-testid="stMain"],
+.stApp:has(.tr-chat-layout) [data-testid="stMainBlockContainer"],
+.stApp:has(.tr-chat-layout) section.main,
+.stApp:has(.st-key-chat_topbar) [data-testid="stAppViewContainer"],
+.stApp:has(.st-key-chat_topbar) [data-testid="stMain"],
+.stApp:has(.st-key-chat_topbar) [data-testid="stMainBlockContainer"],
+.stApp:has(.st-key-chat_right_rail) [data-testid="stAppViewContainer"],
+.stApp:has(.st-key-chat_right_rail) [data-testid="stMain"],
+.stApp:has(.st-key-chat_right_rail) [data-testid="stMainBlockContainer"] {
+    animation: none !important;
+    transform: none !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    perspective: none !important;
+    will-change: auto !important;
+}
+
+/* Elemen fixed kita sendiri: pastikan tidak mewarisi transform apa pun */
+.stApp:has(.tr-chat-layout) .st-key-chat_topbar,
+.stApp:has(.tr-chat-layout) .st-key-chat_right_rail {
+    transform: none !important;
+    filter: none !important;
+    will-change: auto !important;
+}
 </style>
 """,
         unsafe_allow_html=True,
