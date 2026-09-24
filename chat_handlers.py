@@ -699,33 +699,33 @@ def chat_input_atau_hentikan(placeholder: str, **kwargs):
     # chat masuk kembali dengan arah animasi kebalikan: partikel menyatu
     # dari posisi tombol Hentikan menjadi kartu input utuh.
     _yuki_returning = st.session_state.pop(
-            "_yuki_morph_return",
-            False,
+        "_yuki_morph_return",
+        False,
+    )
+    
+    if _yuki_returning:
+        st.markdown(
+            '<div class="yuki-input-morph yuki-input-morph--return" '
+            'aria-hidden="true"></div>' +
+            _STOP_BTN_CSS,
+            unsafe_allow_html=True,
         )
-        
-        if _yuki_returning:
-            st.markdown(
-                '<div class="yuki-input-morph yuki-input-morph--return" '
-                'aria-hidden="true"></div>' +
-                _STOP_BTN_CSS,
-                unsafe_allow_html=True,
+    
+        _render_input_particle_morph("return")
+    
+        # Tombol visual sementara.
+        # Selama 3 detik pertama tetap terlihat,
+        # lalu menghilang ketika particle morph dimulai.
+        _kiri, _tombol, _kanan = st.columns([1, 0.8, 1])
+    
+        with _tombol:
+            st.button(
+                ":material/stop_circle:  Hentikan",
+                key="yuki_return_visual_stop",
+                disabled=True,
             )
-        
-            _render_input_particle_morph("return")
-        
-            # Tombol visual sementara.
-            # Selama 3 detik pertama tetap terlihat,
-            # lalu menghilang ketika particle morph dimulai.
-            _kiri, _tombol, _kanan = st.columns([1, 0.8, 1])
-        
-            with _tombol:
-                st.button(
-                    ":material/stop_circle:  Hentikan",
-                    key="yuki_return_visual_stop",
-                    disabled=True,
-                )
-        
-        return st.chat_input(placeholder, **kwargs)
+    
+    return st.chat_input(placeholder, **kwargs)
 
 
 def handle_chat_request(answer_slot, request_text: str = "") -> None:
