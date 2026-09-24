@@ -671,6 +671,9 @@ def chat_input_atau_hentikan(placeholder: str, **kwargs):
             'aria-hidden="true"></div>' + _STOP_BTN_CSS,
             unsafe_allow_html=True,
         )
+        
+        _render_input_particle_morph("stop")
+        
         _kiri, _tombol, _kanan = st.columns([1, 0.8, 1])
         with _tombol:
             if st.button(":material/stop_circle:  Hentikan",
@@ -701,7 +704,10 @@ def chat_input_atau_hentikan(placeholder: str, **kwargs):
             'aria-hidden="true"></div>',
             unsafe_allow_html=True,
         )
-    return st.chat_input(placeholder, **kwargs)
+    
+        _render_input_particle_morph("return")
+
+return st.chat_input(placeholder, **kwargs)
 
 
 def handle_chat_request(answer_slot, request_text: str = "") -> None:
@@ -1051,6 +1057,311 @@ def _dialog_premium() -> None:
     with c_kanan:
         if st.button("Nanti saja", use_container_width=True):
             st.rerun()
+
+def _render_input_particle_morph(direction: str) -> None:
+    """Canvas transparan yang memecah/menyusun siluet kolom chat.
+
+    Berbeda dari efek titik CSS, partikel di sini benar-benar ditempatkan
+    mengikuti bentuk kartu, garis tepi, placeholder, dan ikon input. Pada
+    arah ``stop`` bentuk itu runtuh ke tengah; pada arah ``return`` geraknya
+    dibalik untuk menyusun kembali kolom chat.
+    """
+    reverse = "true" if direction == "return" else "false"
+
+    html_fx = f"""
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+
+<style>
+* {{
+    box-sizing: border-box;
+}}
+
+html,
+body {{
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: transparent;
+}}
+
+canvas {{
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}}
+</style>
+</head>
+
+<body>
+<canvas id="morph"></canvas>
+
+<script>
+(() => {{
+    const canvas = document.getElementById("morph");
+    const ctx = canvas.getContext("2d");
+    const reverse = {reverse};
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    let W = innerWidth;
+    let H = innerHeight;
+
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+
+    ctx.scale(dpr, dpr);
+
+    // Geometri mengikuti kartu input pada bottom dock.
+    const margin = Math.max(
+        18,
+        Math.min(50, W * .045)
+    );
+
+    const card = {{
+        x: margin,
+        y: H - 154,
+        w: W - margin * 2,
+        h: 104,
+        r: 30
+    }};
+
+    const cx = W / 2;
+    const cy = card.y + card.h / 2;
+
+    const dots = [];
+
+    const add = (x, y, color, size = 2) => dots.push({{
+        sx: reverse
+            ? cx + (Math.random() - .5) * 20
+            : x,
+
+        sy: reverse
+            ? cy + (Math.random() - .5) * 12
+            : y,
+
+        ex: reverse
+            ? x
+            : cx + (Math.random() - .5) * 18,
+
+        ey: reverse
+            ? y
+            : cy + (Math.random() - .5) * 10,
+
+        color,
+        size,
+        spin: (Math.random() - .5) * 16
+    }});
+
+    // Partikel garis rounded rectangle.
+    const step = 7;
+    const edge = "#9b8d86";
+    const fill = "#efe4d0";
+
+    for (
+        let x = card.x + card.r;
+        x <= card.x + card.w - card.r;
+        x += step
+    ) {{
+        add(x, card.y, edge, 2.2);
+        add(x, card.y + card.h, edge, 2.2);
+    }}
+
+    for (
+        let y = card.y + card.r;
+        y <= card.y + card.h - card.r;
+        y += step
+    ) {{
+        add(card.x, y, edge, 2.2);
+        add(card.x + card.w, y, edge, 2.2);
+    }}
+
+    for (
+        let a = Math.PI;
+        a < Math.PI * 1.5;
+        a += .10
+    ) {{
+        add(
+            card.x + card.r + Math.cos(a) * card.r,
+            card.y + card.r + Math.sin(a) * card.r,
+            edge,
+            2.2
+        );
+    }}
+
+    for (
+        let a = Math.PI * 1.5;
+        a < Math.PI * 2;
+        a += .10
+    ) {{
+        add(
+            card.x + card.w - card.r + Math.cos(a) * card.r,
+            card.y + card.r + Math.sin(a) * card.r,
+            edge,
+            2.2
+        );
+    }}
+
+    for (
+        let a = 0;
+        a < Math.PI * .5;
+        a += .10
+    ) {{
+        add(
+            card.x + card.w - card.r + Math.cos(a) * card.r,
+            card.y + card.h - card.r + Math.sin(a) * card.r,
+            edge,
+            2.2
+        );
+    }}
+
+    for (
+        let a = Math.PI * .5;
+        a < Math.PI;
+        a += .10
+    ) {{
+        add(
+            card.x + card.r + Math.cos(a) * card.r,
+            card.y + card.h - card.r + Math.sin(a) * card.r,
+            edge,
+            2.2
+        );
+    }}
+
+    // Partikel permukaan kartu.
+    for (
+        let y = card.y + 12;
+        y < card.y + card.h - 10;
+        y += 10
+    ) {{
+        for (
+            let x = card.x + 18;
+            x < card.x + card.w - 18;
+            x += 12
+        ) {{
+            if (Math.random() < .32) {{
+                add(x, y, fill, 1.7);
+            }}
+        }}
+    }}
+
+    // Partikel placeholder.
+    for (
+        let x = card.x + 72;
+        x < Math.min(
+            card.x + 390,
+            card.x + card.w - 230
+        );
+        x += 6
+    ) {{
+        for (
+            let y = cy - 7;
+            y <= cy + 7;
+            y += 7
+        ) {{
+            if (Math.random() < .72) {{
+                add(x, y, "#756a70", 1.8);
+            }}
+        }}
+    }}
+
+    // Partikel posisi ikon.
+    [
+        card.x + 38,
+        card.x + card.w - 190,
+        card.x + card.w - 118,
+        card.x + card.w - 48
+    ].forEach(px => {{
+        for (
+            let a = 0;
+            a < Math.PI * 2;
+            a += .24
+        ) {{
+            add(
+                px + Math.cos(a) * 20,
+                cy + Math.sin(a) * 20,
+                "#756a70",
+                2
+            );
+        }}
+    }});
+
+    const start = performance.now();
+    const duration = 920;
+
+    const ease = t => (
+        t < .5
+            ? 4 * t * t * t
+            : 1 - Math.pow(-2 * t + 2, 3) / 2
+    );
+
+    function frame(now) {{
+        const raw = Math.min(
+            1,
+            (now - start) / duration
+        );
+
+        const t = ease(raw);
+
+        ctx.clearRect(0, 0, W, H);
+
+        for (const p of dots) {{
+            const x =
+                p.sx +
+                (p.ex - p.sx) * t +
+                Math.sin(t * Math.PI) * p.spin;
+
+            const y =
+                p.sy +
+                (p.ey - p.sy) * t +
+                Math.sin(t * Math.PI) *
+                (Math.random() - .5) * 12;
+
+            ctx.globalAlpha =
+                Math.sin(
+                    Math.PI *
+                    Math.min(1, raw * 1.08)
+                ) * .92;
+
+            ctx.fillStyle = p.color;
+            ctx.beginPath();
+
+            ctx.arc(
+                x,
+                y,
+                p.size * (1 - .38 * t),
+                0,
+                Math.PI * 2
+            );
+
+            ctx.fill();
+        }}
+
+        if (raw < 1) {{
+            requestAnimationFrame(frame);
+        }} else {{
+            ctx.clearRect(0, 0, W, H);
+        }}
+    }}
+
+    requestAnimationFrame(frame);
+}})();
+</script>
+</body>
+</html>
+"""
+
+    with st.container(key="yuki_morph_fx"):
+        components.html(
+            html_fx,
+            height=900,
+            scrolling=False,
+        )
 
 
 def render_input_controls(page_key: str = "chat", show_mode: bool = True) -> None:
