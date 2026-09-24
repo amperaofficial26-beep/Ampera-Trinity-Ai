@@ -6206,7 +6206,7 @@ section[data-testid="stSidebar"]
 div.stButton {
 
     margin:
-        2px 0
+        1px 0
         !important;
 }
 
@@ -6216,11 +6216,11 @@ section[data-testid="stSidebar"]
 div.stButton > button {
 
     min-height:
-        40px
+        36px
         !important;
 
     padding:
-        8px 11px
+        6px 11px
         !important;
 
     border:
