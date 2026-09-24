@@ -8821,6 +8821,20 @@ hr {
 button {
     border-color: #E4D7C4 !important;
 }
+/* ============================================================
+   PENGATURAN — ZONA KONTEN TENGAH
+   ============================================================ */
+
+.stApp:has([class*="st-key-settings_float_"])
+[data-testid="stMainBlockContainer"] {
+    background: rgba(255, 249, 240, 0.72) !important;
+    border: 1px solid rgba(228, 215, 196, 0.75) !important;
+    border-radius: 24px !important;
+    box-shadow:
+        0 10px 30px rgba(60, 45, 35, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.65) !important;
+    padding: 28px 32px !important;
+}
 </style>
 """,
         unsafe_allow_html=True,
