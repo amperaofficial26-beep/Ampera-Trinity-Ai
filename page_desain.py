@@ -51,33 +51,97 @@ def page_desain() -> None:
     )
 
     thread = mode_thread("desain")
+    st.markdown('<div class="design-page-shell"></div>', unsafe_allow_html=True)
 
     st.markdown(
-        '<div class="page-head"><div class="page-head-icon">' + mi("palette")
-        + '</div><div><h2 class="page-title">AI Desain</h2>'
-        '<p class="page-sub">Art director pribadimu: palet warna, tipografi, '
-        'kritik tampilan, sampai moodboard.</p></div></div>',
+        f'''
+        <div class="design-topbar">
+          <div class="design-heading">
+            <div class="design-heading-icon">{mi(":material/palette:")}</div>
+            <div>
+              <h1>AI Desain</h1>
+              <p>Art director pribadimu: palet warna, tipografi, kritik tampilan,
+              sampai moodboard.</p>
+            </div>
+          </div>
+        </div>
+        ''',
         unsafe_allow_html=True,
     )
 
     # ---- Mulai cepat: hanya tampil saat percakapan masih kosong ----
     if not thread:
-        st.markdown('<div class="sec-label">Mulai cepat</div>',
-                    unsafe_allow_html=True)
+        card_meta = {
+            "Buat palet warna": (
+                ":material/palette:",
+                "Dapatkan palet warna yang cocok untuk desain kamu.",
+                "palette",
+            ),
+            "Saran pasangan font": (
+                "Aa",
+                "Temukan kombinasi font yang harmonis dan profesional.",
+                "font",
+            ),
+            "Kritik desain saya": (
+                ":material/chat_bubble_outline:",
+                "Dapatkan masukan objektif untuk meningkatkan desainmu.",
+                "critique",
+            ),
+            "Buat moodboard": (
+                ":material/image:",
+                "Kumpulkan inspirasi visual untuk proyek desainmu.",
+                "moodboard",
+            ),
+        }
+
+        st.markdown(
+            '<div class="design-section-title">'
+            f'<span class="design-section-icon">{mi(":material/bolt:")}</span>'
+            '<span>Mulai cepat</span><i></i></div>',
+            unsafe_allow_html=True,
+        )
         with st.container(key="desain_quick"):
             for i in range(0, len(TOMBOL_CEPAT), 2):
                 pasangan = TOMBOL_CEPAT[i:i + 2]
-                cols = st.columns(len(pasangan))
+                cols = st.columns(len(pasangan), gap="medium")
                 for j, (label, prompt) in enumerate(pasangan):
                     with cols[j]:
-                        st.button(label, key=f"desain_q_{i + j}",
-                                  use_container_width=True,
-                                  on_click=_kirim, args=(prompt,))
+                        icon, desc, visual = card_meta[label]
+                        with st.container(key=f"desain_quick_card_{i + j}"):
+                            st.markdown(
+                                f'''
+                                <div class="design-quick-visual design-visual-{visual}">
+                                  <div class="design-quick-icon">{mi(icon) if icon.startswith(":") else icon}</div>
+                                  <div class="design-quick-art"></div>
+                                </div>
+                                ''',
+                                unsafe_allow_html=True,
+                            )
+                            st.button(
+                                f"**{label}**  \n:gray[{desc}]  \n→",
+                                key=f"desain_q_{i + j}",
+                                use_container_width=True,
+                                on_click=_kirim,
+                                args=(prompt,),
+                            )
 
         st.markdown(
-            '<div class="empty-card">Ceritakan apa yang sedang kamu rancang, '
-            "atau unggah tangkapan layar desainmu lewat tombol + di bawah. "
-            "Yuki akan menilainya seperti art director sungguhan.</div>",
+            f'''
+            <div class="design-prompt-card">
+              <div class="design-prompt-art" aria-hidden="true">
+                <div class="design-prompt-paper">Aa<div></div><span></span></div>
+                <div class="design-prompt-swatch swatch-a"></div>
+                <div class="design-prompt-swatch swatch-b"></div>
+                <div class="design-prompt-swatch swatch-c"></div>
+                <div class="design-prompt-spark">{mi(":material/auto_awesome:")}</div>
+              </div>
+              <div class="design-prompt-copy">
+                <h2>{mi(":material/auto_awesome:")} Apa yang ingin kamu desain?</h2>
+                <p>Ceritakan kebutuhan desainmu, misalnya: buatkan palet warna untuk aplikasi,
+                beri kritik pada desain yang ada, atau upload gambar untuk dianalisis.</p>
+              </div>
+            </div>
+            ''',
             unsafe_allow_html=True,
         )
 
@@ -88,7 +152,7 @@ def page_desain() -> None:
         st.rerun()
     fragmen_jawaban_yuki()
     render_loader_yuki()
-    
+
     # ruang kosong supaya isi terakhir tidak tertutup kotak input
     st.markdown('<div class="dock-spacer"></div>', unsafe_allow_html=True)
 
