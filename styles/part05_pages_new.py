@@ -853,6 +853,20 @@ div.stButton > button p strong { color: #2C1F33; }
     display: none !important;
 }
 
+/* Naikkan dok input khusus workspace Artefak. Nilai negatif masih
+   mempertahankan jarak dari bawah, tetapi lebih tinggi daripada posisi
+   bawaan halaman artefak lama. */
+.stApp:has(.artifact-workspace-shell) {
+    --chat-lift: 90px !important;
+    --chat-shift: 0px !important;
+}
+
+.stApp:has(.artifact-workspace-shell)
+[data-testid="stBottomBlockContainer"] {
+    margin-bottom: var(--chat-lift) !important;
+    transform: translateX(var(--chat-shift)) !important;
+}
+
 .stApp:has(.artifact-workspace-shell)
 [data-testid="stHorizontalBlock"] {
     align-items: center !important;
