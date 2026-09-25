@@ -34,12 +34,15 @@ TOMBOL_CEPAT = [
     ("Rencana belajar",
      "Buatkan rencana belajar Python selama 7 hari untuk pemula, "
      "1-2 jam sehari. Masukkan ke daftar tugasku."),
-    ("Rapikan minggu ini",
-     "Bantu aku menyusun prioritas minggu ini. Tanyakan dulu apa saja "
-     "yang harus kukerjakan."),
-    ("Pecah tugas besar",
-     "Aku punya satu tugas besar yang bikin menunda terus. Bantu pecah "
-     "jadi langkah kecil yang jelas selesainya."),
+    ("Rapat / meeting",
+     "Buatkan checklist persiapan rapat yang rapi, termasuk agenda, "
+     "peserta, materi, dan tindak lanjut."),
+    ("Tugas harian",
+     "Bantu aku menyusun daftar tugas harian berdasarkan prioritas dan "
+     "waktu yang tersedia hari ini."),
+    ("Rencana mingguan",
+     "Buatkan rencana mingguan yang realistis untuk mengatur pekerjaan, "
+     "istirahat, dan target utama selama 7 hari."),
 ]
 
 KELOMPOK = [
@@ -102,15 +105,41 @@ def _kirim(teks: str) -> None:
     st.session_state["pending_prompt_mode"] = teks
 
 
+def _kirim_form() -> None:
+    judul = (st.session_state.get("jd_new_title") or "").strip()
+    kapan = (st.session_state.get("jd_new_when") or "").strip()
+    waktu = (st.session_state.get("jd_new_time") or "").strip()
+    catatan = (st.session_state.get("jd_new_note") or "").strip()
+    gaya = st.session_state.get("jd_schedule_style") or "Otomatis"
+    detail = " ".join(x for x in (judul, kapan, waktu, catatan) if x)
+    if not detail:
+        detail = "kebutuhan jadwal saya"
+    st.session_state["pending_prompt_mode"] = (
+        f"Buatkan jadwal dengan gaya {gaya} berdasarkan kebutuhan berikut: {detail}. "
+        "Susun langkah yang realistis dan masukkan tugas penting ke daftar tugasku."
+    )
+
+
 def _tambah_manual() -> None:
     judul = (st.session_state.get("jd_new_title") or "").strip()
     if not judul:
         return
-    add_task(judul,
-             st.session_state.get("jd_new_when") or "",
-             st.session_state.get("jd_new_prio") or "sedang")
+    kapan = " ".join(
+        x for x in (
+            st.session_state.get("jd_new_when") or "",
+            st.session_state.get("jd_new_time") or "",
+        ) if x
+    )
+    add_task(
+        judul,
+        kapan,
+        st.session_state.get("jd_new_prio") or "sedang",
+        st.session_state.get("jd_new_note") or "",
+    )
     st.session_state["jd_new_title"] = ""
     st.session_state["jd_new_when"] = ""
+    st.session_state["jd_new_time"] = ""
+    st.session_state["jd_new_note"] = ""
 
 
 def _render_ringkasan(daftar: list[dict]) -> None:
@@ -207,30 +236,164 @@ def page_jadwal() -> None:
     )
 
     thread = mode_thread("jadwal")
+    punya_data = bool(tasks()) or bool(thread)
+    st.markdown('<div class="scheduler-page-shell"></div>', unsafe_allow_html=True)
 
     st.markdown(
-        '<div class="page-head"><div class="page-head-icon">'
-        + mi("calendar_month")
-        + '</div><div><h2 class="page-title">AI Penjadwal</h2>'
-        '<p class="page-sub">Pecah tujuan besar jadi langkah kecil, lalu '
-        'susun jadi jadwal yang masuk akal.</p></div></div>',
+        f'''
+        <div class="scheduler-topbar">
+          <div class="scheduler-heading">
+            <div class="scheduler-heading-icon">{mi(":material/calendar_month:")}</div>
+            <div>
+              <h1>AI Penjadwal</h1>
+              <p>Atur jadwal, rencana, dan tugas harian dengan bantuan AI.</p>
+            </div>
+          </div>
+          <div class="scheduler-brand">
+            <span>{mi(":material/auto_awesome:")} Trinity AI</span>
+            <i></i>
+            <small>Lebih cerdas, lebih produktif.</small>
+          </div>
+        </div>
+        ''',
         unsafe_allow_html=True,
     )
 
-    _render_panel_tugas()
+    if not punya_data:
+        st.markdown(
+            f'''
+            <section class="scheduler-hero">
+              <div class="scheduler-hero-copy">
+                <div class="scheduler-hero-icon">{mi(":material/auto_awesome:")}</div>
+                <div>
+                  <h2>Jadwalkan dengan lebih mudah</h2>
+                  <p>Tulis kebutuhan kamu, dan AI akan membantu membuat jadwal yang rapi,
+                  teratur, dan sesuai dengan prioritasmu.</p>
+                </div>
+              </div>
+              <div class="scheduler-hero-art" aria-hidden="true">
+                <div class="scheduler-calendar">
+                  <b></b><b></b><b></b><b></b><b></b><b></b>
+                  <span></span><span></span><span></span>
+                </div>
+                <div class="scheduler-clock">{mi(":material/schedule:")}</div>
+                <div class="scheduler-check">{mi(":material/check:")}</div>
+              </div>
+            </section>
+            ''',
+            unsafe_allow_html=True,
+        )
 
-    st.markdown('<div class="sec-divider"></div>', unsafe_allow_html=True)
+        with st.container(key="jadwal_builder"):
+            st.markdown(
+                f'''
+                <div class="scheduler-builder-heading">
+                  <div class="scheduler-builder-icon">{mi(":material/calendar_month:")}</div>
+                  <div>
+                    <h2>Buat Jadwal Baru</h2>
+                    <p>Ceritakan kebutuhan jadwalmu, dan AI akan membuatnya untukmu.</p>
+                  </div>
+                </div>
+                ''',
+                unsafe_allow_html=True,
+            )
 
-    if not thread:
-        st.markdown('<div class="sec-label">Mulai cepat</div>',
-                    unsafe_allow_html=True)
+            c1, c2, c3 = st.columns([1.7, 0.9, 0.9], gap="medium")
+            with c1:
+                st.text_input(
+                    "Judul / Kegiatan",
+                    key="jd_new_title",
+                    placeholder="Contoh: Rencana belajar, meeting, atau kegiatan harian...",
+                )
+            with c2:
+                st.text_input(
+                    "Tanggal",
+                    key="jd_new_when",
+                    placeholder="Pilih tanggal",
+                )
+            with c3:
+                st.selectbox(
+                    "Prioritas",
+                    ["tinggi", "sedang", "rendah"],
+                    index=1,
+                    key="jd_new_prio",
+                )
+
+            c4, c5 = st.columns([0.9, 1.7], gap="medium")
+            with c4:
+                st.text_input(
+                    "Waktu",
+                    key="jd_new_time",
+                    placeholder="Pilih waktu (opsional)",
+                )
+            with c5:
+                st.text_area(
+                    "Deskripsi / Catatan (opsional)",
+                    key="jd_new_note",
+                    placeholder="Tambahkan detail, tujuan, atau catatan penting lainnya...",
+                    height=88,
+                )
+
+            st.markdown('<div class="scheduler-style-label">Pilih gaya penjadwalan</div>',
+                        unsafe_allow_html=True)
+            style_col, action_col = st.columns([2.3, 0.7], gap="medium")
+            with style_col:
+                st.radio(
+                    "Gaya penjadwalan",
+                    ["Otomatis", "Terstruktur", "Fleksibel"],
+                    index=0,
+                    key="jd_schedule_style",
+                    horizontal=True,
+                    label_visibility="collapsed",
+                )
+            with action_col:
+                st.button(
+                    ":material/auto_awesome:  Buat Jadwal  →",
+                    key="jd_make_schedule",
+                    type="primary",
+                    use_container_width=True,
+                    on_click=_kirim_form,
+                )
+
+        st.markdown(
+            '<div class="scheduler-quick-label">'
+            f'{mi(":material/bolt:")} <span>Aksi cepat</span></div>',
+            unsafe_allow_html=True,
+        )
         with st.container(key="jadwal_quick"):
-            cols = st.columns(len(TOMBOL_CEPAT))
+            cols = st.columns(4, gap="medium")
+            quick_visuals = ["study", "meeting", "daily", "weekly"]
+            quick_icons = [
+                ":material/calendar_month:",
+                ":material/business_center:",
+                ":material/task_alt:",
+                ":material/star:",
+            ]
+            quick_desc = [
+                "Buat jadwal belajar yang efektif",
+                "Atur jadwal meeting dengan mudah",
+                "Kelola tugas dan to-do list",
+                "Buat rencana untuk 7 hari ke depan",
+            ]
             for i, (label, prompt) in enumerate(TOMBOL_CEPAT):
                 with cols[i]:
-                    st.button(label, key=f"jadwal_q_{i}", use_container_width=True,
-                              on_click=_kirim, args=(prompt,))
+                    with st.container(key=f"jadwal_quick_card_{i}"):
+                        st.markdown(
+                            f'<div class="scheduler-quick-visual scheduler-visual-{quick_visuals[i]}">'
+                            f'<div class="scheduler-quick-icon">{mi(quick_icons[i])}</div>'
+                            '<div class="scheduler-quick-art"></div></div>',
+                            unsafe_allow_html=True,
+                        )
+                        st.button(
+                            f"**{label}**  \n:gray[{quick_desc[i]}]  \n→",
+                            key=f"jadwal_q_{i}",
+                            use_container_width=True,
+                            on_click=_kirim,
+                            args=(prompt,),
+                        )
     else:
+        _render_panel_tugas()
+        st.markdown('<div class="sec-divider"></div>', unsafe_allow_html=True)
         st.markdown('<div class="sec-label">Obrolan</div>',
                     unsafe_allow_html=True)
 
