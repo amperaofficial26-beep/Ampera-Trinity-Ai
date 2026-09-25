@@ -336,7 +336,7 @@ div.stButton > button p strong { color: #2C1F33; }
    ARTEFAK — LANDING PAGE BERBASIS KARTU
    ============================================================ */
 .stApp:has(.artifact-page-shell) {
-    background: #FBF7EF !important;
+    background: #FFF5EA !important;
 }
 
 .stApp:has(.artifact-page-shell)
@@ -823,7 +823,7 @@ div.stButton > button p strong { color: #2C1F33; }
    ARTEFAK — WORKSPACE / CHAT HASIL KARTU
    ============================================================ */
 .stApp:has(.artifact-workspace-shell) {
-    background: #F3E8D7 !important;
+    background: #FFF5EA !important;
 }
 
 .stApp:has(.artifact-workspace-shell)
@@ -1080,7 +1080,7 @@ div.stButton > button p strong { color: #2C1F33; }
    AI DESAIN — LANDING PAGE
    ============================================================ */
 .stApp:has(.design-page-shell) {
-    background: #FBF9F3 !important;
+    background: #FFF5EA !important;
 }
 .stApp:has(.design-page-shell)
 [data-testid="stMain"],
