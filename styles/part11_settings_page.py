@@ -249,7 +249,7 @@ button {
 /* Zona utama dipisahkan dari latar: 50px dari sisi konten,
    20px dari atas, dan 32px ruang aman di bagian bawah. */
 .stApp:has(.set-section)
-[data-testid="stMainBlockContainer"] {
+[data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] {
     width: calc(100% - 100px) !important;
     max-width: none !important;
     margin: 20px 50px 32px !important;
@@ -261,8 +261,17 @@ button {
     box-shadow:
         0 18px 42px rgba(60, 45, 35, 0.12),
         inset 0 1px 0 rgba(255, 255, 255, 0.85) !important;
-    min-height: calc(100vh - -300px) !important;
+    height: max-content !important;
+    min-height: calc(100vh - 52px) !important;
     overflow: visible !important;
+}
+
+.stApp:has(.settings-card)
+[data-testid="stMain"],
+.stApp:has(.settings-card)
+[data-testid="stAppViewContainer"] {
+    height: auto !important;
+    min-height: 100vh !important;
 }
 
 .stApp:has(.set-section)
