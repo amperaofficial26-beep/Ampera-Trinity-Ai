@@ -263,7 +263,7 @@ button {
 
 /* Zona utama dipisahkan dari latar: 50px dari sisi konten,
    20px dari atas, dan 32px ruang aman di bagian bawah. */
-.stApp:has(.set-section)
+.stApp:has(.settings-card)
 [data-testid="stMainBlockContainer"] {
     width: calc(100% - 100px) !important;
     max-width: none !important;
@@ -280,35 +280,123 @@ button {
     overflow: visible !important;
 }
 
-.stApp:has(.set-section)
+.stApp:has(.settings-card)
 [data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] {
     width: 100% !important;
     max-width: none !important;
     min-width: 0 !important;
 }
 
+/* Kartu tengah untuk setiap kelompok Pengaturan. */
+.stApp:has(.settings-card)
+[class*="st-key-settings_card_"] {
+    background: rgba(255, 255, 255, 0.58) !important;
+    border: 1px solid #E2D8C9 !important;
+    border-radius: 16px !important;
+    box-sizing: border-box !important;
+    margin: 0 0 16px !important;
+    padding: 18px 18px 20px !important;
+    box-shadow: 0 4px 14px rgba(60, 45, 35, 0.045) !important;
+}
+
+.stApp:has(.settings-card)
+[class*="st-key-settings_card_"] > [data-testid="stVerticalBlock"] {
+    gap: 0.65rem !important;
+    min-width: 0 !important;
+}
+
+.stApp:has(.settings-card)
+[class*="st-key-settings_card_"] [data-testid="stHorizontalBlock"] {
+    column-gap: 18px !important;
+    row-gap: 14px !important;
+}
+
+.settings-card-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0 0 16px;
+    min-width: 0;
+}
+
+.settings-card-icon {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: #F0ECF5;
+    border: 1px solid #E3DCEA;
+    color: #4A3559;
+}
+
+.settings-card-icon .mi {
+    font-size: 21px;
+    vertical-align: middle;
+}
+
+.settings-card-copy {
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.settings-card-title {
+    color: #2C1F33;
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 1.08rem;
+    font-weight: 650;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+}
+
+.settings-card-subtitle {
+    color: #6B6172;
+    font-size: 0.82rem;
+    line-height: 1.35;
+    margin-top: 3px;
+    overflow-wrap: anywhere;
+}
+
 /* Header tidak lagi memotong subtitle ketika ukuran layar menyempit. */
-.stApp:has(.set-section) .page-head {
+.stApp:has(.settings-card) .page-head {
     width: 100% !important;
     min-width: 0 !important;
     box-sizing: border-box !important;
-    padding: 22px 26px !important;
-    margin: 0 0 26px !important;
+    padding: 4px 0 24px !important;
+    margin: 0 0 2px !important;
     align-items: flex-start !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
 }
 
-.stApp:has(.set-section) .page-head > div:last-child {
+.stApp:has(.settings-card) .page-head-icon {
+    background: #F0ECF5 !important;
+    border-color: #E3DCEA !important;
+    color: #263A70 !important;
+}
+
+
+.stApp:has(.settings-card) .page-head > div:last-child {
     min-width: 0 !important;
     flex: 1 1 auto !important;
 }
 
-.stApp:has(.set-section) .page-title {
+.stApp:has(.settings-card) .page-title {
+    font-family: 'Inter', 'Segoe UI', sans-serif !important;
     font-size: clamp(1.65rem, 3vw, 2.15rem) !important;
+    font-weight: 700 !important;
+    color: #182653 !important;
     line-height: 1.12 !important;
     margin: 0 0 7px !important;
 }
 
-.stApp:has(.set-section) .page-sub {
+.stApp:has(.settings-card) .page-sub {
+    color: #7180A3 !important;
+}
+
+.stApp:has(.settings-card) .page-sub {
     max-width: 100% !important;
     white-space: normal !important;
     overflow-wrap: anywhere !important;
@@ -316,27 +404,27 @@ button {
 }
 
 /* Semua pasangan kolom memakai jarak dan garis awal yang sama. */
-.stApp:has(.set-section)
+.stApp:has(.settings-card)
 [data-testid="stHorizontalBlock"] {
     align-items: flex-start !important;
     column-gap: 24px !important;
     row-gap: 18px !important;
 }
 
-.stApp:has(.set-section)
+.stApp:has(.settings-card)
 [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {
     min-width: 0 !important;
 }
 
 /* Jarak teks label ke widget dibuat konsisten di semua tab. */
-.stApp:has(.set-section)
+.stApp:has(.settings-card)
 [data-testid="stWidgetLabel"] {
     margin-bottom: 6px !important;
 }
 
-.stApp:has(.set-section)
+.stApp:has(.settings-card)
 [data-testid="stWidgetLabel"] p,
-.stApp:has(.set-section) label p {
+.stApp:has(.settings-card) label p {
     margin: 0 !important;
     color: #4B3D55 !important;
     font-size: 0.94rem !important;
@@ -346,7 +434,7 @@ button {
 }
 
 /* Kolom pilihan dan input mempunyai tinggi, radius, dan padding yang seragam. */
-.stApp:has(.set-section)
+.stApp:has(.settings-card)
 [data-baseweb="select"] > div {
     min-height: 44px !important;
     border-radius: 12px !important;
@@ -354,11 +442,11 @@ button {
     box-sizing: border-box !important;
 }
 
-.stApp:has(.set-section)
+.stApp:has(.settings-card)
 [data-testid="stTextInput"] input,
-.stApp:has(.set-section)
+.stApp:has(.settings-card)
 [data-testid="stTextArea"] textarea,
-.stApp:has(.set-section)
+.stApp:has(.settings-card)
 [data-testid="stNumberInput"] input {
     min-height: 44px !important;
     border-radius: 12px !important;
@@ -366,35 +454,35 @@ button {
     box-sizing: border-box !important;
 }
 
-.stApp:has(.set-section)
+.stApp:has(.settings-card)
 [data-testid="stTextArea"] textarea {
     line-height: 1.45 !important;
 }
 
-.stApp:has(.set-section)
+.stApp:has(.settings-card)
 [data-testid="stCheckbox"],
-.stApp:has(.set-section)
+.stApp:has(.settings-card)
 [data-testid="stRadio"],
-.stApp:has(.set-section)
+.stApp:has(.settings-card)
 [data-testid="stToggle"] {
     margin: 6px 0 !important;
 }
 
 /* Judul subbagian dibuat sebagai ritme visual yang sama di semua tab. */
-.stApp:has(.set-section) .set-section {
+.stApp:has(.settings-card) .set-section {
     margin: 28px 0 12px !important;
     line-height: 1.25 !important;
 }
 
-.stApp:has(.set-section)
+.stApp:has(.settings-card)
 [data-testid="stMainBlockContainer"] .set-section:first-child {
     margin-top: 0 !important;
 }
 
 /* Tombol aksi memiliki ukuran dan teks yang seragam, termasuk tombol panjang. */
-.stApp:has(.set-section)
+.stApp:has(.settings-card)
 [data-testid="stMainBlockContainer"] div.stButton > button,
-.stApp:has(.set-section)
+.stApp:has(.settings-card)
 [data-testid="stMainBlockContainer"] div.stDownloadButton > button {
     min-height: 42px !important;
     height: auto !important;
@@ -405,9 +493,9 @@ button {
     overflow-wrap: anywhere !important;
 }
 
-.stApp:has(.set-section)
+.stApp:has(.settings-card)
 [data-testid="stMainBlockContainer"] div.stButton > button p,
-.stApp:has(.set-section)
+.stApp:has(.settings-card)
 [data-testid="stMainBlockContainer"] div.stDownloadButton > button p {
     margin: 0 !important;
     line-height: 1.3 !important;
@@ -416,7 +504,7 @@ button {
 }
 
 /* Jangan biarkan tombol navigasi ikon ikut menjadi tombol tinggi. */
-.stApp:has(.set-section)
+.stApp:has(.settings-card)
 [class*="st-key-settings_float_"] button {
     width: 36px !important;
     height: 36px !important;
@@ -483,7 +571,7 @@ div[role="dialog"] div.stButton > button p {
 }
 
 @media (max-width: 760px) {
-    .stApp:has(.set-section)
+    .stApp:has(.settings-card)
     [data-testid="stMainBlockContainer"] {
         width: calc(100% - 16px) !important;
         margin: 12px 8px 24px !important;
@@ -492,17 +580,17 @@ div[role="dialog"] div.stButton > button p {
         min-height: calc(100vh - 36px) !important;
     }
 
-    .stApp:has(.set-section) .page-head {
+    .stApp:has(.settings-card) .page-head {
         padding: 18px !important;
         margin-bottom: 20px !important;
     }
 
-    .stApp:has(.set-section)
+    .stApp:has(.settings-card)
     [data-testid="stHorizontalBlock"] {
         flex-wrap: wrap !important;
     }
 
-    .stApp:has(.set-section)
+    .stApp:has(.settings-card)
     [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {
         flex: 1 1 100% !important;
         width: 100% !important;
