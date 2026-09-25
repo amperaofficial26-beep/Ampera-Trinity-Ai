@@ -729,26 +729,41 @@ def start_artifact_thread(key: str) -> None:
     go("artefak")
 
 
-def _artifact_grid(prefix: str) -> None:
-    cats = ARTIFACT_CATEGORIES
+def _artifact_visual_html(cat: dict) -> str:
+    """Visual dekoratif ringan untuk kartu Artefak tanpa aset gambar baru."""
+    key = cat["key"]
+    icon = mi(cat["icon"])
+    return (
+        f'<div class="artifact-card-visual artifact-visual-{key}">'
+        f'<div class="artifact-visual-glow"></div>'
+        f'<div class="artifact-visual-icon">{icon}</div>'
+        '<div class="artifact-visual-sheet">'
+        '<span></span><span></span><span></span>'
+        '</div>'
+        f'<div class="artifact-visual-badge">{icon}</div>'
+        '</div>'
+    )
 
-    for i in range(0, len(cats), 3):
-        cols = st.columns(3)
 
-        for j, cat in enumerate(cats[i:i + 3]):
+def _artifact_grid(prefix: str, categories: list[dict] | None = None) -> None:
+    cats = categories if categories is not None else ARTIFACT_CATEGORIES
+    for i in range(0, len(cats), 4):
+        cols = st.columns(4, gap="medium")
+        for j, cat in enumerate(cats[i:i + 4]):
             with cols[j]:
-                label = (
-                    f"{cat['icon']}  \n"
-                    f"**{cat['title']}**  \n"
-                    f":gray[{cat['desc']}]"
-                )
-
-                if st.button(
-                    label,
-                    key=f"{prefix}_{cat['key']}",
-                    use_container_width=True,
-                ):
-                    start_artifact_thread(cat["key"])
+                with st.container(key=f"artifact_card_{cat['key']}"):
+                    st.markdown(_artifact_visual_html(cat), unsafe_allow_html=True)
+                    label = (
+                        f"**{cat['title']}**  \n"
+                        f":gray[{cat['desc']}]  \n"
+                        "→"
+                    )
+                    if st.button(
+                        label,
+                        key=f"{prefix}_{cat['key']}",
+                        use_container_width=True,
+                    ):
+                        start_artifact_thread(cat["key"])
 
 
 def _artifact_workspace(aid: int) -> None:
