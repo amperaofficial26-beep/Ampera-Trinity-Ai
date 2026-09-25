@@ -281,16 +281,6 @@ button {
     overflow: visible !important;
 }
 
-/* Laat de instellingen-zone meegroeien met alle inhoud, ook wanneer
-   Streamlit de hoofdcontainer op viewporthoogte houdt. */
-.stApp:has(.settings-card)
-[data-testid="stMain"],
-.stApp:has(.settings-card)
-[data-testid="stAppViewContainer"] {
-    height: auto !important;
-    min-height: 100vh !important;
-}
-
 .stApp:has(.settings-card)
 [data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] {
     width: 100% !important;
