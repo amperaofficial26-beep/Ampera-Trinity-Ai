@@ -266,6 +266,23 @@ button {
     overflow: visible !important;
 }
 
+/* Streamlit memakai AppViewContainer sebagai viewport utama. Jadikan
+   elemen ini scroll container agar seluruh kartu di bawah tetap dapat
+   dicapai tanpa mengunci tinggi zona konten. */
+.stApp:has(.settings-card)
+[data-testid="stAppViewContainer"] {
+    height: 100vh !important;
+    max-height: 100vh !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+}
+
+.stApp:has(.settings-card)
+[data-testid="stMain"] {
+    min-height: max-content !important;
+    overflow: visible !important;
+}
+
 .stApp:has(.settings-card)
 [data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] {
     width: 100% !important;
