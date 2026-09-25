@@ -393,6 +393,7 @@ button {
     background: #F0ECF5 !important;
     border-color: #E3DCEA !important;
     color: #263A70 !important;
+    transform: translateY(16px) !important;
 }
 
 
