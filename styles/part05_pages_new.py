@@ -1107,53 +1107,53 @@ div.stButton > button p strong { color: #2C1F33; }
 .design-topbar {
     display: flex;
     align-items: center;
-    min-height: 112px;
-    padding-bottom: 28px;
+    min-height: 82px;
+    padding-bottom: 18px;
     border-bottom: 1px solid #E6DED2;
 }
 .design-heading {
     display: flex;
     align-items: center;
-    gap: 28px;
+    gap: 18px;
 }
 .design-heading-icon {
     display: grid;
     place-items: center;
-    width: 80px;
-    height: 80px;
-    flex: 0 0 80px;
+    width: 58px;
+    height: 58px;
+    flex: 0 0 58px;
     border: 1px solid #E1D8E8;
-    border-radius: 17px;
+    border-radius: 15px;
     background: linear-gradient(145deg, #F5EEF8, #EDE6F3);
     color: #4D3A69;
-    box-shadow: 0 8px 20px rgba(83, 64, 112, 0.08);
+    box-shadow: 0 6px 16px rgba(83, 64, 112, 0.08);
 }
-.design-heading-icon .mi { font-size: 38px; }
+.design-heading-icon .mi { font-size: 29px; }
 .design-heading h1 {
     margin: 0;
     color: #302243;
     font-family: 'Inter', 'Segoe UI', sans-serif;
-    font-size: clamp(2rem, 4vw, 3rem);
+    font-size: clamp(1.65rem, 3vw, 2.2rem);
     line-height: 1.05;
-    letter-spacing: -0.055em;
+    letter-spacing: -0.045em;
 }
 .design-heading p {
-    max-width: 670px;
-    margin: 9px 0 0;
+    max-width: 590px;
+    margin: 6px 0 0;
     color: #7A7080;
-    font-size: 1.02rem;
-    line-height: 1.45;
+    font-size: 0.86rem;
+    line-height: 1.4;
 }
 
 .design-section-title {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin: 28px 0 16px;
+    gap: 8px;
+    margin: 20px 0 11px;
     color: #594B62;
-    font-size: 0.84rem;
+    font-size: 0.74rem;
     font-weight: 700;
-    letter-spacing: 0.11em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
 }
 .design-section-title i {
@@ -1171,21 +1171,21 @@ div.stButton > button p strong { color: #2C1F33; }
 .stApp:has(.design-page-shell)
 [class*="st-key-desain_quick_card_"] {
     min-width: 0 !important;
-    min-height: 140px !important;
+    min-height: 108px !important;
     overflow: hidden !important;
     border: 1px solid #E6DDD2 !important;
-    border-radius: 15px !important;
+    border-radius: 13px !important;
     background: rgba(255, 253, 249, 0.68) !important;
-    box-shadow: 0 7px 18px rgba(88, 67, 47, 0.045) !important;
+    box-shadow: 0 5px 14px rgba(88, 67, 47, 0.04) !important;
 }
 .stApp:has(.design-page-shell)
 [class*="st-key-desain_quick_card_"] > [data-testid="stVerticalBlock"] {
     gap: 0 !important;
-    min-height: 140px !important;
+    min-height: 108px !important;
 }
 .design-quick-visual {
     position: relative;
-    height: 108px;
+    height: 78px;
     overflow: hidden;
     background: linear-gradient(135deg, #FBF5ED, #F4EAF0);
 }
@@ -1202,26 +1202,26 @@ div.stButton > button p strong { color: #2C1F33; }
 }
 .design-quick-icon {
     position: absolute;
-    left: 22px;
-    top: 25px;
+    left: 17px;
+    top: 16px;
     z-index: 2;
     display: grid;
     place-items: center;
-    width: 53px;
-    height: 53px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
     color: #4E3B6C;
     background: #F0E8F4;
-    font-size: 1.6rem;
+    font-size: 1.25rem;
     font-weight: 500;
 }
-.design-quick-icon .mi { font-size: 27px; }
+.design-quick-icon .mi { font-size: 21px; }
 .design-quick-art {
     position: absolute;
-    right: 52px;
-    top: 28px;
-    width: 96px;
-    height: 62px;
+    right: 38px;
+    top: 18px;
+    width: 76px;
+    height: 48px;
     border: 1px solid rgba(221, 212, 230, .9);
     border-radius: 12px;
     background: rgba(255,255,255,.68);
@@ -1304,17 +1304,17 @@ div.stButton > button p strong { color: #2C1F33; }
 
 .stApp:has(.design-page-shell)
 [class*="st-key-desain_quick_card_"] [class*="st-key-desain_q_"] {
-    min-height: 98px !important;
-    padding: 0 20px !important;
+    min-height: 70px !important;
+    padding: 0 16px !important;
 }
 .stApp:has(.design-page-shell)
 [class*="st-key-desain_quick_card_"] [class*="st-key-desain_q_"] button {
     width: 100% !important;
-    min-height: 98px !important;
+    min-height: 70px !important;
     height: auto !important;
     aspect-ratio: auto !important;
     margin: 0 !important;
-    padding: 14px 0 18px !important;
+    padding: 9px 0 12px !important;
     border: none !important;
     border-radius: 0 !important;
     background: transparent !important;
@@ -1337,16 +1337,16 @@ div.stButton > button p strong { color: #2C1F33; }
 .stApp:has(.design-page-shell)
 [class*="st-key-desain_quick_card_"] [class*="st-key-desain_q_"] button p strong {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
     color: #332543 !important;
-    font-size: 0.96rem !important;
+    font-size: 0.88rem !important;
 }
 .stApp:has(.design-page-shell)
 [class*="st-key-desain_quick_card_"] [class*="st-key-desain_q_"] button .stMarkdownColoredText {
     display: block;
-    max-width: 285px;
+    max-width: 250px;
     color: #837887 !important;
-    font-size: 0.8rem !important;
+    font-size: 0.7rem !important;
 }
 .stApp:has(.design-page-shell)
 [class*="st-key-desain_quick_card_"] [class*="st-key-desain_q_"] button p:last-child {
