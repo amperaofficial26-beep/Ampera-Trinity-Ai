@@ -652,18 +652,41 @@ def start_artifact_thread(key: str) -> None:
     go("artefak")
 
 
-def _artifact_grid(prefix: str) -> None:
-    cats = ARTIFACT_CATEGORIES
-    for i in range(0, len(cats), 3):
-        cols = st.columns(3)
-        for j, cat in enumerate(cats[i:i + 3]):
+def _artifact_visual_html(cat: dict) -> str:
+    """Visual dekoratif ringan untuk kartu Artefak tanpa aset gambar baru."""
+    key = cat["key"]
+    icon = mi(cat["icon"])
+    return (
+        f'<div class="artifact-card-visual artifact-visual-{key}">'
+        f'<div class="artifact-visual-glow"></div>'
+        f'<div class="artifact-visual-icon">{icon}</div>'
+        '<div class="artifact-visual-sheet">'
+        '<span></span><span></span><span></span>'
+        '</div>'
+        f'<div class="artifact-visual-badge">{icon}</div>'
+        '</div>'
+    )
+
+
+def _artifact_grid(prefix: str, categories: list[dict] | None = None) -> None:
+    cats = categories if categories is not None else ARTIFACT_CATEGORIES
+    for i in range(0, len(cats), 4):
+        cols = st.columns(4, gap="medium")
+        for j, cat in enumerate(cats[i:i + 4]):
             with cols[j]:
-                label = (f"{cat['icon']}  \n"
-                         f"**{cat['title']}**  \n"
-                         f":gray[{cat['desc']}]")
-                if st.button(label, key=f"{prefix}_{cat['key']}",
-                             use_container_width=True):
-                    start_artifact_thread(cat["key"])
+                with st.container(key=f"artifact_card_{cat['key']}"):
+                    st.markdown(_artifact_visual_html(cat), unsafe_allow_html=True)
+                    label = (
+                        f"**{cat['title']}**  \n"
+                        f":gray[{cat['desc']}]  \n"
+                        "→"
+                    )
+                    if st.button(
+                        label,
+                        key=f"{prefix}_{cat['key']}",
+                        use_container_width=True,
+                    ):
+                        start_artifact_thread(cat["key"])
 
 
 
@@ -729,31 +752,107 @@ def page_artefak() -> None:
         return
 
     artifacts = st.session_state.get("artifacts", [])
+    st.markdown('<div class="artifact-page-shell"></div>', unsafe_allow_html=True)
+
     st.markdown(
-        '<div class="page-head"><div class="page-head-icon">'
-        f'{mi(":material/data_object:")}</div>'
-        '<div><h2 class="page-title">Artefak</h2>'
-        "<p class=\"page-sub\">Pilih salah satu kotak di bawah. Yuki langsung "
-        "menjawab di halaman ini — bukan di chat utama.</p></div></div>",
+        f'''
+        <div class="artifact-topbar">
+          <div class="artifact-heading">
+            <div class="artifact-heading-icon">{mi(":material/auto_awesome:")}</div>
+            <div>
+              <h1>Artefak</h1>
+              <p>Buat berbagai file kreatif dengan mudah dan cepat.</p>
+            </div>
+          </div>
+          <div class="artifact-brand">
+            <span>{mi(":material/auto_awesome:")} Trinity AI</span>
+            <i></i>
+            <small>Lebih cerdas, lebih produktif.</small>
+          </div>
+        </div>
+        ''',
         unsafe_allow_html=True,
     )
 
-    if not artifacts:
+    st.markdown(
+        f'''
+        <section class="artifact-hero">
+          <div class="artifact-hero-copy">
+            <div class="artifact-welcome">{mi(":material/auto_awesome:")} Selamat datang di Artefak</div>
+            <h2>Ubah ide jadi karya nyata</h2>
+            <p>Pilih salah satu jenis artefak di bawah ini. Kami siap membantu
+            Anda membuat berbagai kebutuhan kreatif dengan cepat, praktis,
+            dan hasil yang berkualitas.</p>
+          </div>
+          <div class="artifact-hero-art" aria-hidden="true">
+            <div class="artifact-orbit artifact-orbit-a"></div>
+            <div class="artifact-orbit artifact-orbit-b"></div>
+            <div class="artifact-hero-window">
+              <div class="artifact-window-bar"><b></b><b></b><b></b></div>
+              <div class="artifact-window-line wide"></div>
+              <div class="artifact-window-line"></div>
+              <div class="artifact-window-line short"></div>
+              <div class="artifact-window-spark">{mi(":material/auto_awesome:")}</div>
+            </div>
+            <div class="artifact-float artifact-float-image">{mi(":material/image:")}</div>
+            <div class="artifact-float artifact-float-code">{mi(":material/code:")}</div>
+            <div class="artifact-float artifact-float-type">T</div>
+            <div class="artifact-float artifact-float-play">{mi(":material/play_arrow:")}</div>
+          </div>
+        </section>
+        ''',
+        unsafe_allow_html=True,
+    )
+
+    title_col, search_col = st.columns([2.15, 1], gap="large")
+    with title_col:
         st.markdown(
-            '<div class="empty-card">Belum ada artefak. Kode panjang dari '
-            "jawaban Yuki otomatis tersimpan dan muncul di bagian bawah "
-            "halaman ini.</div>",
+            f'''
+            <div class="artifact-category-heading">
+              <div class="artifact-category-icon">{mi(":material/widgets:")}</div>
+              <div>
+                <h2>Pilih Kategori Artefak</h2>
+                <p>Jelajahi berbagai jenis artefak yang tersedia dan temukan yang sesuai dengan kebutuhan Anda.</p>
+              </div>
+            </div>
+            ''',
+            unsafe_allow_html=True,
+        )
+    with search_col:
+        with st.container(key="artifact_search_box"):
+            query = st.text_input(
+                "Cari artefak",
+                key="artifact_search",
+                placeholder="Cari artefak...",
+                label_visibility="collapsed",
+            )
+
+    query = (query or "").strip().casefold()
+    categories = [
+        cat for cat in ARTIFACT_CATEGORIES
+        if not query
+        or query in cat["title"].casefold()
+        or query in cat["desc"].casefold()
+    ]
+
+    if categories:
+        _artifact_grid("cat", categories)
+    else:
+        st.markdown(
+            '<div class="artifact-no-results">Tidak ada kategori yang cocok dengan pencarianmu.</div>',
             unsafe_allow_html=True,
         )
 
-    _artifact_grid("cat")
-
     if artifacts:
-        st.markdown('<div class="sb-group" style="margin-top:14px;">Artefak tersimpan</div>',
-                    unsafe_allow_html=True)
+        st.markdown(
+            '<div class="artifact-saved-heading">Artefak tersimpan</div>',
+            unsafe_allow_html=True,
+        )
         for art in artifacts[:20]:
             with st.container(key=f"art_saved_{art['id']}"):
-                with st.expander(f":material/extension:  {art['title']}  ·  {art.get('time', '')}"):
+                with st.expander(
+                    f":material/extension:  {art['title']}  ·  {art.get('time', '')}"
+                ):
                     st.code(art["content"], language=art.get("lang") or None)
 
     _page_footer()
