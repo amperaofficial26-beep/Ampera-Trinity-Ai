@@ -974,12 +974,13 @@ def _settings_card(
     """Kartu visual seragam untuk setiap kelompok Pengaturan."""
     with st.container(key=f"settings_card_{key}"):
         st.markdown(
+            f'<div class="settings-card">'
             f'<div class="settings-card-head">'
             f'<div class="settings-card-icon">{mi(icon)}</div>'
             f'<div class="settings-card-copy">'
             f'<div class="settings-card-title">{html.escape(title)}</div>'
             f'<div class="settings-card-subtitle">{html.escape(subtitle)}</div>'
-            "</div></div>",
+            "</div></div></div>",
             unsafe_allow_html=True,
         )
         yield
