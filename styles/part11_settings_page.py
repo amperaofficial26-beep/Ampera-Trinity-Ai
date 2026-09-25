@@ -267,11 +267,10 @@ button {
 }
 
 .stApp:has(.settings-card)
-[data-testid="stMain"],
-.stApp:has(.settings-card)
-[data-testid="stAppViewContainer"] {
-    height: auto !important;
-    min-height: 100vh !important;
+[data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
 }
 
 .stApp:has(.set-section)
