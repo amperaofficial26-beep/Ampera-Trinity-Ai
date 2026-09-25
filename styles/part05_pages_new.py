@@ -819,6 +819,227 @@ div.stButton > button p strong { color: #2C1F33; }
     font-weight: 650;
 }
 
+/* ============================================================
+   ARTEFAK — WORKSPACE / CHAT HASIL KARTU
+   ============================================================ */
+.stApp:has(.artifact-workspace-shell) {
+    background: #F3E8D7 !important;
+}
+
+.stApp:has(.artifact-workspace-shell)
+[data-testid="stMain"],
+.stApp:has(.artifact-workspace-shell)
+[data-testid="stAppViewContainer"] {
+    background: transparent !important;
+}
+
+.stApp:has(.artifact-workspace-shell)
+[data-testid="stMainBlockContainer"] {
+    width: min(100% - 136px, 980px) !important;
+    max-width: none !important;
+    margin: 0 auto !important;
+    padding: 28px 0 150px !important;
+    box-sizing: border-box !important;
+}
+
+.stApp:has(.artifact-workspace-shell)
+[data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] {
+    width: 100% !important;
+    max-width: none !important;
+    gap: 0 !important;
+}
+
+.artifact-workspace-shell {
+    display: none !important;
+}
+
+.stApp:has(.artifact-workspace-shell)
+[data-testid="stHorizontalBlock"] {
+    align-items: center !important;
+    column-gap: 18px !important;
+}
+
+.stApp:has(.artifact-workspace-shell)
+[class*="st-key-artifact_workspace_back"] {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+}
+.stApp:has(.artifact-workspace-shell)
+[class*="st-key-artifact_workspace_back"] button {
+    width: 42px !important;
+    min-width: 42px !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    padding: 0 !important;
+    border: 1px solid #D9C9B5 !important;
+    border-radius: 13px !important;
+    background: #E7D8C3 !important;
+    color: #4A3559 !important;
+    box-shadow: 0 5px 14px rgba(86, 64, 42, 0.08) !important;
+}
+.stApp:has(.artifact-workspace-shell)
+[class*="st-key-artifact_workspace_back"] button:hover {
+    background: #DCCAB1 !important;
+    transform: translateY(-1px) !important;
+}
+
+.artifact-workspace-heading {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+}
+.artifact-workspace-icon,
+.artifact-workspace-banner-icon {
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    color: #4A3559;
+    background: #F0ECF5;
+    border: 1px solid #DFD4E8;
+}
+.artifact-workspace-icon .mi { font-size: 26px; }
+.artifact-workspace-heading h1 {
+    margin: 0;
+    color: #302244;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    font-size: clamp(1.55rem, 3vw, 2.1rem);
+    line-height: 1.1;
+    letter-spacing: -0.04em;
+    overflow-wrap: anywhere;
+}
+.artifact-workspace-heading p {
+    margin: 6px 0 0;
+    color: #766A7B;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+.artifact-workspace-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 9px 12px;
+    border: 1px solid #DCCEBE;
+    border-radius: 999px;
+    background: rgba(255, 251, 244, 0.68);
+    color: #5C765D;
+    font-size: 0.78rem;
+    white-space: nowrap;
+}
+.artifact-workspace-status .mi { font-size: 16px; }
+
+.artifact-workspace-banner {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 28px 0 26px;
+    padding: 18px 22px;
+    border: 1px solid #E1D4C3;
+    border-radius: 17px;
+    background: rgba(255, 250, 241, 0.62);
+    box-shadow: 0 9px 22px rgba(89, 65, 43, 0.045);
+}
+.artifact-workspace-banner-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 13px;
+}
+.artifact-workspace-banner-icon .mi { font-size: 22px; }
+.artifact-workspace-banner strong {
+    display: block;
+    margin-bottom: 4px;
+    color: #3B2B4A;
+    font-size: 0.96rem;
+}
+.artifact-workspace-banner p {
+    margin: 0;
+    color: #786D7D;
+    font-size: 0.84rem;
+    line-height: 1.5;
+}
+
+/* Pesan pengguna menjadi kartu brief yang lebih lapang. */
+.stApp:has(.artifact-workspace-shell) .bubble-row {
+    width: 100% !important;
+    margin: 14px 0 22px !important;
+}
+.stApp:has(.artifact-workspace-shell) .bubble-row.user {
+    justify-content: flex-end !important;
+}
+.stApp:has(.artifact-workspace-shell) .bubble-row.user .bubble-wrap {
+    width: min(82%, 780px) !important;
+    max-width: 780px !important;
+}
+.stApp:has(.artifact-workspace-shell) .bubble.user {
+    max-width: none !important;
+    padding: 20px 24px !important;
+    border: 1px solid #D7C5AD !important;
+    border-radius: 18px !important;
+    background: #E6D7C1 !important;
+    color: #3A2B48 !important;
+    font-size: 1.02rem !important;
+    line-height: 1.75 !important;
+    box-shadow: 0 7px 18px rgba(89, 65, 43, 0.06) !important;
+}
+
+/* Jawaban Yuki tampil di permukaan putih terpisah, bukan menempel di latar. */
+.stApp:has(.artifact-workspace-shell) .bubble-row.ai {
+    margin: 18px 0 28px !important;
+}
+.stApp:has(.artifact-workspace-shell) .bubble-row.ai .bubble-wrap {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+.stApp:has(.artifact-workspace-shell) .bubble.ai {
+    padding: 22px 24px !important;
+    border: 1px solid #E5DCD0 !important;
+    border-radius: 18px !important;
+    background: rgba(255, 253, 249, 0.72) !important;
+    color: #3B2D4A !important;
+    box-shadow: 0 7px 20px rgba(89, 65, 43, 0.045) !important;
+}
+
+/* Loader / status generasi tetap memiliki ruang dan gaya workspace. */
+.stApp:has(.artifact-workspace-shell)
+[data-testid="stStatusWidget"],
+.stApp:has(.artifact-workspace-shell)
+[class*="st-key-loader"],
+.stApp:has(.artifact-workspace-shell)
+[class*="st-key-loading"] {
+    color: #756A7A !important;
+}
+.stApp:has(.artifact-workspace-shell) .msg-action-time {
+    color: #8E8290 !important;
+}
+
+@media (max-width: 900px) {
+    .stApp:has(.artifact-workspace-shell)
+    [data-testid="stMainBlockContainer"] {
+        width: calc(100% - 32px) !important;
+        padding-top: 22px !important;
+    }
+    .artifact-workspace-status { display: none; }
+    .artifact-workspace-heading h1 { font-size: 1.45rem; }
+    .stApp:has(.artifact-workspace-shell) .bubble-row.user .bubble-wrap {
+        width: 100% !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .artifact-workspace-banner { align-items: flex-start; padding: 16px; }
+    .artifact-workspace-banner p { font-size: 0.8rem; }
+    .stApp:has(.artifact-workspace-shell) .bubble.user,
+    .stApp:has(.artifact-workspace-shell) .bubble.ai {
+        padding: 17px !important;
+        font-size: 0.94rem !important;
+    }
+}
+
 @media (max-width: 900px) {
     .stApp:has(.artifact-page-shell)
     [data-testid="stMainBlockContainer"] {
