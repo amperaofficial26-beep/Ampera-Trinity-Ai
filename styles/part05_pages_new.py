@@ -1490,4 +1490,421 @@ div.stButton > button p strong { color: #2C1F33; }
     .design-prompt-paper { left: 34%; top: 22px; }
     .design-prompt-copy { padding: 22px; }
 }
+
+/* ============================================================
+   AI PENJADWAL — LANDING PAGE
+   ============================================================ */
+.stApp:has(.scheduler-page-shell) {
+    background: #F5EBDD !important;
+}
+.stApp:has(.scheduler-page-shell)
+[data-testid="stMain"],
+.stApp:has(.scheduler-page-shell)
+[data-testid="stAppViewContainer"] {
+    background: transparent !important;
+}
+.stApp:has(.scheduler-page-shell)
+[data-testid="stMainBlockContainer"] {
+    width: calc(100% - 164px) !important;
+    max-width: none !important;
+    margin: 0 auto !important;
+    padding: 30px 0 150px !important;
+    box-sizing: border-box !important;
+}
+.stApp:has(.scheduler-page-shell)
+[data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] {
+    width: 100% !important;
+    max-width: none !important;
+    gap: 0 !important;
+}
+.scheduler-page-shell { display: none !important; }
+
+.scheduler-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 82px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid #E2D8CC;
+}
+.scheduler-heading {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+.scheduler-heading-icon {
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    flex: 0 0 64px;
+    border: 1px solid #E0D6E7;
+    border-radius: 16px;
+    background: #F4EDF7;
+    color: #4D3A69;
+    box-shadow: 0 7px 18px rgba(83, 64, 112, 0.07);
+}
+.scheduler-heading-icon .mi { font-size: 32px; }
+.scheduler-heading h1 {
+    margin: 0;
+    color: #302243;
+    font-size: clamp(1.9rem, 3.4vw, 2.6rem);
+    line-height: 1.05;
+    letter-spacing: -0.05em;
+}
+.scheduler-heading p {
+    margin: 7px 0 0;
+    color: #7A7080;
+    font-size: 0.9rem;
+}
+.scheduler-brand {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    color: #8A7F8A;
+    font-size: 0.78rem;
+}
+.scheduler-brand > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border: 1px solid #E5DCD2;
+    border-radius: 999px;
+    background: rgba(255, 253, 248, .62);
+    color: #5A4C66;
+    font-weight: 650;
+}
+.scheduler-brand > span .mi { font-size: 15px; }
+.scheduler-brand i { width: 1px; height: 18px; background: #DED4C9; }
+
+.scheduler-hero {
+    position: relative;
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    margin: 26px 0 22px;
+    padding: 24px 36px;
+    border: 1px solid #E6DCD1;
+    border-radius: 17px;
+    background:
+        radial-gradient(circle at 82% 52%, rgba(255,255,255,.92), transparent 30%),
+        linear-gradient(110deg, #F8F1E9, #F9F3EF 62%, #F2EAF3);
+    box-shadow: 0 9px 22px rgba(88, 67, 47, .04);
+}
+.scheduler-hero-copy {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    max-width: 610px;
+}
+.scheduler-hero-icon {
+    display: grid;
+    place-items: center;
+    width: 50px;
+    height: 50px;
+    flex: 0 0 50px;
+    border-radius: 50%;
+    color: #4D3A69;
+    background: #F1E8F4;
+}
+.scheduler-hero-icon .mi { font-size: 25px; }
+.scheduler-hero h2 {
+    margin: 0 0 7px;
+    color: #35264A;
+    font-size: 1.18rem;
+}
+.scheduler-hero p {
+    max-width: 560px;
+    margin: 0;
+    color: #7B7080;
+    font-size: .82rem;
+    line-height: 1.55;
+}
+.scheduler-hero-art {
+    position: absolute;
+    inset: 0 4% 0 62%;
+}
+.scheduler-calendar {
+    position: absolute;
+    right: 16%;
+    top: 24px;
+    display: grid;
+    grid-template-columns: repeat(3, 19px);
+    gap: 7px;
+    width: 118px;
+    height: 90px;
+    padding: 29px 12px 10px;
+    border-radius: 12px;
+    background: linear-gradient(145deg, #8B72C7, #614596);
+    box-shadow: 8px 13px 20px rgba(79, 57, 126, .20);
+    transform: rotate(4deg);
+}
+.scheduler-calendar::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; top: 18px;
+    height: 1px;
+    background: rgba(255,255,255,.48);
+}
+.scheduler-calendar::after {
+    content: "";
+    position: absolute;
+    left: 17px; right: 17px; top: -9px;
+    height: 16px;
+    border-top: 5px solid #EDE5F4;
+    border-radius: 50%;
+}
+.scheduler-calendar b {
+    width: 18px; height: 14px;
+    border-radius: 4px;
+    background: rgba(255,255,255,.66);
+}
+.scheduler-calendar span { display: none; }
+.scheduler-clock {
+    position: absolute;
+    right: 8%;
+    bottom: 22px;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    color: #5B467A;
+    background: #F7F1F8;
+    border: 5px solid #E3D5E8;
+    box-shadow: 0 7px 14px rgba(84, 61, 118, .14);
+}
+.scheduler-clock .mi { font-size: 24px; }
+.scheduler-check {
+    position: absolute;
+    right: 0;
+    top: 66px;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    color: #FFF;
+    background: #9B83CE;
+}
+.scheduler-check .mi { font-size: 19px; }
+
+.stApp:has(.scheduler-page-shell)
+[class*="st-key-jadwal_builder"] {
+    margin: 0 !important;
+    padding: 24px 30px 22px !important;
+    border: 1px solid #E5DCD1 !important;
+    border-radius: 17px !important;
+    background: rgba(255, 253, 249, .68) !important;
+    box-shadow: 0 8px 20px rgba(88, 67, 47, .04) !important;
+}
+.stApp:has(.scheduler-page-shell)
+[class*="st-key-jadwal_builder"] > [data-testid="stVerticalBlock"] {
+    gap: 0.45rem !important;
+}
+.scheduler-builder-heading {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 13px;
+}
+.scheduler-builder-icon {
+    display: grid;
+    place-items: center;
+    width: 37px;
+    height: 37px;
+    border-radius: 11px;
+    color: #4D3A69;
+    background: #F0E9F4;
+}
+.scheduler-builder-icon .mi { font-size: 21px; }
+.scheduler-builder-heading h2 {
+    margin: 0 0 3px;
+    color: #35264A;
+    font-size: 1.03rem;
+}
+.scheduler-builder-heading p {
+    margin: 0;
+    color: #837887;
+    font-size: .75rem;
+}
+.stApp:has(.scheduler-page-shell)
+[class*="st-key-jadwal_builder"] [data-testid="stWidgetLabel"] p {
+    color: #4E415B !important;
+    font-size: .76rem !important;
+}
+.stApp:has(.scheduler-page-shell)
+[class*="st-key-jadwal_builder"] input,
+.stApp:has(.scheduler-page-shell)
+[class*="st-key-jadwal_builder"] textarea,
+.stApp:has(.scheduler-page-shell)
+[class*="st-key-jadwal_builder"] [data-baseweb="select"] > div {
+    min-height: 39px !important;
+    border: 1px solid #E2D8D0 !important;
+    border-radius: 10px !important;
+    background: rgba(255,255,255,.56) !important;
+    color: #3B2D4A !important;
+}
+.stApp:has(.scheduler-page-shell)
+[class*="st-key-jadwal_builder"] input,
+.stApp:has(.scheduler-page-shell)
+[class*="st-key-jadwal_builder"] textarea {
+    padding: 8px 11px !important;
+}
+.stApp:has(.scheduler-page-shell)
+[class*="st-key-jadwal_builder"] textarea { min-height: 76px !important; }
+.scheduler-style-label {
+    margin: 13px 0 4px;
+    color: #4E415B;
+    font-size: .76rem;
+    font-weight: 600;
+}
+.stApp:has(.scheduler-page-shell)
+[class*="st-key-jadwal_builder"] [data-testid="stRadio"] {
+    margin: 0 !important;
+    padding: 8px 10px !important;
+    border: 1px solid #E5DCD2 !important;
+    border-radius: 10px !important;
+    background: rgba(255,255,255,.38) !important;
+}
+.stApp:has(.scheduler-page-shell)
+[class*="st-key-jadwal_builder"] [data-testid="stRadio"] label p {
+    color: #62546C !important;
+    font-size: .76rem !important;
+}
+.stApp:has(.scheduler-page-shell)
+[class*="st-key-jadwal_builder"] [class*="st-key-jd_make_schedule"] button {
+    min-height: 42px !important;
+    border-radius: 10px !important;
+    background: #4C3567 !important;
+    color: #FFF !important;
+    border-color: #4C3567 !important;
+    font-size: .8rem !important;
+}
+.scheduler-quick-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 25px 0 10px;
+    color: #665A6E;
+    font-size: .76rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+.scheduler-quick-label .mi { color: #4D3A69; font-size: 19px; }
+.stApp:has(.scheduler-page-shell)
+[class*="st-key-jadwal_quick_card_"] {
+    min-height: 96px !important;
+    overflow: hidden !important;
+    border: 1px solid #E5DCD2 !important;
+    border-radius: 13px !important;
+    background: rgba(255,253,249,.68) !important;
+    box-shadow: 0 5px 14px rgba(88,67,47,.035) !important;
+}
+.stApp:has(.scheduler-page-shell)
+[class*="st-key-jadwal_quick_card_"] > [data-testid="stVerticalBlock"] {
+    gap: 0 !important;
+    min-height: 96px !important;
+}
+.scheduler-quick-visual {
+    position: relative;
+    height: 52px;
+    overflow: hidden;
+    background: #F2ECF6;
+}
+.scheduler-quick-icon {
+    position: absolute;
+    left: 14px;
+    top: 10px;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    color: #4D3A69;
+    background: #EEE5F3;
+}
+.scheduler-quick-icon .mi { font-size: 18px; }
+.scheduler-quick-art {
+    position: absolute;
+    right: 20px;
+    top: 17px;
+    width: 54px;
+    height: 22px;
+    border: 1px solid #D9C9E4;
+    border-radius: 6px;
+    background: rgba(255,255,255,.65);
+    transform: rotate(-4deg);
+}
+.scheduler-visual-meeting { background: #F1F4F8; }
+.scheduler-visual-daily { background: #F2F7F1; }
+.scheduler-visual-weekly { background: #F7F1E7; }
+.scheduler-visual-meeting .scheduler-quick-icon { background: #E6EDF5; }
+.scheduler-visual-daily .scheduler-quick-icon { background: #E2F0E5; }
+.scheduler-visual-weekly .scheduler-quick-icon { background: #F3E8D4; }
+.stApp:has(.scheduler-page-shell)
+[class*="st-key-jadwal_quick_card_"] [class*="st-key-jadwal_q_"] button {
+    width: 100% !important;
+    min-height: 58px !important;
+    padding: 7px 14px 10px !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    text-align: left !important;
+}
+.stApp:has(.scheduler-page-shell)
+[class*="st-key-jadwal_quick_card_"] [class*="st-key-jadwal_q_"] button p {
+    margin: 0 !important;
+    text-align: left !important;
+    line-height: 1.25 !important;
+}
+.stApp:has(.scheduler-page-shell)
+[class*="st-key-jadwal_quick_card_"] [class*="st-key-jadwal_q_"] button p strong {
+    display: block;
+    margin-bottom: 3px;
+    color: #35264A !important;
+    font-size: .78rem !important;
+}
+.stApp:has(.scheduler-page-shell)
+[class*="st-key-jadwal_quick_card_"] [class*="st-key-jadwal_q_"] button .stMarkdownColoredText {
+    color: #837887 !important;
+    font-size: .67rem !important;
+}
+.stApp:has(.scheduler-page-shell)
+[data-testid="stBottomBlockContainer"] {
+    --chat-lift: 32px !important;
+    margin-bottom: var(--chat-lift) !important;
+    max-width: min(52rem, calc(100vw - 250px)) !important;
+}
+.stApp:has(.scheduler-page-shell) .dock-spacer { height: 70px !important; }
+
+@media (max-width: 900px) {
+    .stApp:has(.scheduler-page-shell)
+    [data-testid="stMainBlockContainer"] {
+        width: calc(100% - 32px) !important;
+        padding-top: 22px !important;
+    }
+    .scheduler-brand { display: none; }
+    .scheduler-heading { gap: 14px; }
+    .scheduler-heading-icon { width: 52px; height: 52px; flex-basis: 52px; }
+    .scheduler-hero { padding: 20px; }
+    .scheduler-hero-art { opacity: .23; left: 45%; }
+    .scheduler-builder { padding: 18px !important; }
+}
+
+@media (max-width: 640px) {
+    .scheduler-heading h1 { font-size: 1.75rem; }
+    .scheduler-heading p { font-size: .78rem; }
+    .scheduler-hero-copy { gap: 12px; }
+    .scheduler-hero-icon { width: 39px; height: 39px; flex-basis: 39px; }
+    .scheduler-hero h2 { font-size: 1rem; }
+    .scheduler-hero p { font-size: .74rem; }
+}
 """
