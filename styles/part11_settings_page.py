@@ -10,7 +10,7 @@ CSS = r"""
    MENGIKUTI PALET UTAMA APP
    ============================================================ */
 
-.stApp:has([class*="st-key-settings_float_"])
+.stApp:has(.set-section)
 [data-testid="stMain"] {
     background: transparent !important;
 }
@@ -19,13 +19,13 @@ CSS = r"""
    PENGATURAN — BACKGROUND
    ============================================================ */
 
-.stApp:has([class*="st-key-settings_float_"]) {
+.stApp:has(.set-section) {
     background: #F3E8D7 !important;
 }
 
-.stApp:has([class*="st-key-settings_float_"])
+.stApp:has(.set-section)
 [data-testid="stAppViewContainer"],
-.stApp:has([class*="st-key-settings_float_"])
+.stApp:has(.set-section)
 [data-testid="stMain"] {
     background: transparent !important;
 }
@@ -63,9 +63,9 @@ CSS = r"""
     color: #2C1F33 !important;
 }
 
-.stApp:has([class*="st-key-settings_float_"])
+.stApp:has(.set-section)
 p,
-.stApp:has([class*="st-key-settings_float_"])
+.stApp:has(.set-section)
 label {
     color: #6B6172;
 }
@@ -73,7 +73,7 @@ label {
    DIVIDER
    ============================================================ */
 
-.stApp:has([class*="st-key-settings_float_"])
+.stApp:has(.set-section)
 hr {
     border-color: #DBCEB9 !important;
 }
@@ -192,15 +192,15 @@ hr {
    ============================================================ */
 
 /* Input teks */
-.stApp:has([class*="st-key-settings_float_"]) input,
-.stApp:has([class*="st-key-settings_float_"]) textarea {
+.stApp:has(.set-section) input,
+.stApp:has(.set-section) textarea {
     background: #FFF9F0 !important;
     color: #2C1F33 !important;
     border-color: #E4D7C4 !important;
 }
 
 /* Selectbox / dropdown */
-.stApp:has([class*="st-key-settings_float_"])
+.stApp:has(.set-section)
 [data-baseweb="select"] > div {
     background: #FFF9F0 !important;
     color: #2C1F33 !important;
@@ -208,19 +208,19 @@ hr {
 }
 
 /* Kolom angka / number input */
-.stApp:has([class*="st-key-settings_float_"])
+.stApp:has(.set-section)
 [data-testid="stNumberInput"] input {
     background: #FFF9F0 !important;
 }
 
 /* Slider */
-.stApp:has([class*="st-key-settings_float_"])
+.stApp:has(.set-section)
 [data-testid="stSlider"] {
     background: transparent !important;
 }
 
 /* Checkbox */
-.stApp:has([class*="st-key-settings_float_"])
+.stApp:has(.set-section)
 [data-testid="stCheckbox"] {
     background: #FFF9F0 !important;
     border: 1px solid #E4D7C4 !important;
@@ -229,7 +229,7 @@ hr {
 }
 
 /* Radio / pilihan */
-.stApp:has([class*="st-key-settings_float_"])
+.stApp:has(.set-section)
 [data-testid="stRadio"] {
     background: #FFF9F0 !important;
     border: 1px solid #E4D7C4 !important;
@@ -238,7 +238,7 @@ hr {
 }
 
 /* Tombol pilihan / action */
-.stApp:has([class*="st-key-settings_float_"])
+.stApp:has(.set-section)
 button {
     border-color: #E4D7C4 !important;
 }
@@ -246,17 +246,26 @@ button {
    PENGATURAN — RAPAT, SEIMBANG, DAN RESPONSIF
    ============================================================ */
 
-/* Lebar utama dibuat stabil supaya semua tab memakai garis tepi yang sama. */
+/* Zona utama dipisahkan dari latar: 50px dari sisi konten,
+   20px dari atas, dan 32px ruang aman di bagian bawah. */
 .stApp:has(.set-section)
 [data-testid="stMainBlockContainer"] {
-    width: min(1180px, calc(100vw - 32px)) !important;
-    max-width: 1180px !important;
-    margin: 0 auto !important;
+    width: calc(100% - 100px) !important;
+    max-width: none !important;
+    margin: 20px 50px 32px !important;
     padding: 32px 40px 84px !important;
     box-sizing: border-box !important;
+    background: #FFF9F0 !important;
+    border: 1px solid #D8C7AF !important;
+    border-radius: 24px !important;
+    box-shadow:
+        0 18px 42px rgba(60, 45, 35, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.85) !important;
+    min-height: calc(100vh - 52px) !important;
+    overflow: visible !important;
 }
 
-.stApp:has([class*="st-key-settings_float_"])
+.stApp:has(.set-section)
 [data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] {
     width: 100% !important;
     max-width: none !important;
@@ -264,7 +273,7 @@ button {
 }
 
 /* Header tidak lagi memotong subtitle ketika ukuran layar menyempit. */
-.stApp:has([class*="st-key-settings_float_"]) .page-head {
+.stApp:has(.set-section) .page-head {
     width: 100% !important;
     min-width: 0 !important;
     box-sizing: border-box !important;
@@ -273,18 +282,18 @@ button {
     align-items: flex-start !important;
 }
 
-.stApp:has([class*="st-key-settings_float_"]) .page-head > div:last-child {
+.stApp:has(.set-section) .page-head > div:last-child {
     min-width: 0 !important;
     flex: 1 1 auto !important;
 }
 
-.stApp:has([class*="st-key-settings_float_"]) .page-title {
+.stApp:has(.set-section) .page-title {
     font-size: clamp(1.65rem, 3vw, 2.15rem) !important;
     line-height: 1.12 !important;
     margin: 0 0 7px !important;
 }
 
-.stApp:has([class*="st-key-settings_float_"]) .page-sub {
+.stApp:has(.set-section) .page-sub {
     max-width: 100% !important;
     white-space: normal !important;
     overflow-wrap: anywhere !important;
@@ -292,27 +301,27 @@ button {
 }
 
 /* Semua pasangan kolom memakai jarak dan garis awal yang sama. */
-.stApp:has([class*="st-key-settings_float_"])
+.stApp:has(.set-section)
 [data-testid="stHorizontalBlock"] {
     align-items: flex-start !important;
     column-gap: 24px !important;
     row-gap: 18px !important;
 }
 
-.stApp:has([class*="st-key-settings_float_"])
+.stApp:has(.set-section)
 [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {
     min-width: 0 !important;
 }
 
 /* Jarak teks label ke widget dibuat konsisten di semua tab. */
-.stApp:has([class*="st-key-settings_float_"])
+.stApp:has(.set-section)
 [data-testid="stWidgetLabel"] {
     margin-bottom: 6px !important;
 }
 
-.stApp:has([class*="st-key-settings_float_"])
+.stApp:has(.set-section)
 [data-testid="stWidgetLabel"] p,
-.stApp:has([class*="st-key-settings_float_"]) label p {
+.stApp:has(.set-section) label p {
     margin: 0 !important;
     color: #4B3D55 !important;
     font-size: 0.94rem !important;
@@ -322,7 +331,7 @@ button {
 }
 
 /* Kolom pilihan dan input mempunyai tinggi, radius, dan padding yang seragam. */
-.stApp:has([class*="st-key-settings_float_"])
+.stApp:has(.set-section)
 [data-baseweb="select"] > div {
     min-height: 44px !important;
     border-radius: 12px !important;
@@ -330,11 +339,11 @@ button {
     box-sizing: border-box !important;
 }
 
-.stApp:has([class*="st-key-settings_float_"])
+.stApp:has(.set-section)
 [data-testid="stTextInput"] input,
-.stApp:has([class*="st-key-settings_float_"])
+.stApp:has(.set-section)
 [data-testid="stTextArea"] textarea,
-.stApp:has([class*="st-key-settings_float_"])
+.stApp:has(.set-section)
 [data-testid="stNumberInput"] input {
     min-height: 44px !important;
     border-radius: 12px !important;
@@ -342,35 +351,35 @@ button {
     box-sizing: border-box !important;
 }
 
-.stApp:has([class*="st-key-settings_float_"])
+.stApp:has(.set-section)
 [data-testid="stTextArea"] textarea {
     line-height: 1.45 !important;
 }
 
-.stApp:has([class*="st-key-settings_float_"])
+.stApp:has(.set-section)
 [data-testid="stCheckbox"],
-.stApp:has([class*="st-key-settings_float_"])
+.stApp:has(.set-section)
 [data-testid="stRadio"],
-.stApp:has([class*="st-key-settings_float_"])
+.stApp:has(.set-section)
 [data-testid="stToggle"] {
     margin: 6px 0 !important;
 }
 
 /* Judul subbagian dibuat sebagai ritme visual yang sama di semua tab. */
-.stApp:has([class*="st-key-settings_float_"]) .set-section {
+.stApp:has(.set-section) .set-section {
     margin: 28px 0 12px !important;
     line-height: 1.25 !important;
 }
 
-.stApp:has([class*="st-key-settings_float_"])
+.stApp:has(.set-section)
 [data-testid="stMainBlockContainer"] .set-section:first-child {
     margin-top: 0 !important;
 }
 
 /* Tombol aksi memiliki ukuran dan teks yang seragam, termasuk tombol panjang. */
-.stApp:has([class*="st-key-settings_float_"])
+.stApp:has(.set-section)
 [data-testid="stMainBlockContainer"] div.stButton > button,
-.stApp:has([class*="st-key-settings_float_"])
+.stApp:has(.set-section)
 [data-testid="stMainBlockContainer"] div.stDownloadButton > button {
     min-height: 42px !important;
     height: auto !important;
@@ -381,9 +390,9 @@ button {
     overflow-wrap: anywhere !important;
 }
 
-.stApp:has([class*="st-key-settings_float_"])
+.stApp:has(.set-section)
 [data-testid="stMainBlockContainer"] div.stButton > button p,
-.stApp:has([class*="st-key-settings_float_"])
+.stApp:has(.set-section)
 [data-testid="stMainBlockContainer"] div.stDownloadButton > button p {
     margin: 0 !important;
     line-height: 1.3 !important;
@@ -392,7 +401,7 @@ button {
 }
 
 /* Jangan biarkan tombol navigasi ikon ikut menjadi tombol tinggi. */
-.stApp:has([class*="st-key-settings_float_"])
+.stApp:has(.set-section)
 [class*="st-key-settings_float_"] button {
     width: 36px !important;
     height: 36px !important;
@@ -459,24 +468,24 @@ div[role="dialog"] div.stButton > button p {
 }
 
 @media (max-width: 760px) {
-    .stApp:has([class*="st-key-settings_float_"])
+    .stApp:has(.set-section)
     [data-testid="stMainBlockContainer"] {
         width: calc(100vw - 16px) !important;
         padding: 22px 18px 76px !important;
         border-radius: 18px !important;
     }
 
-    .stApp:has([class*="st-key-settings_float_"]) .page-head {
+    .stApp:has(.set-section) .page-head {
         padding: 18px !important;
         margin-bottom: 20px !important;
     }
 
-    .stApp:has([class*="st-key-settings_float_"])
+    .stApp:has(.set-section)
     [data-testid="stHorizontalBlock"] {
         flex-wrap: wrap !important;
     }
 
-    .stApp:has([class*="st-key-settings_float_"])
+    .stApp:has(.set-section)
     [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {
         flex: 1 1 100% !important;
         width: 100% !important;
