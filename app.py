@@ -698,12 +698,51 @@ def _artifact_workspace(aid: int) -> None:
             meta = m.get("meta") or ""
             break
 
+    safe_meta = html.escape(meta or "Artefak")
+    st.markdown('<div class="artifact-workspace-shell"></div>', unsafe_allow_html=True)
+
+    back_col, heading_col, status_col = st.columns([0.22, 2.55, 0.75], gap="medium")
+    with back_col:
+        if st.button(
+            ":material/arrow_back:",
+            key="artifact_workspace_back",
+            help="Kembali ke semua artefak",
+        ):
+            st.session_state.artifact_active_id = None
+            go("artefak")
+            st.rerun()
+    with heading_col:
+        st.markdown(
+            f'''
+            <div class="artifact-workspace-heading">
+              <div class="artifact-workspace-icon">{mi(":material/auto_awesome:")}</div>
+              <div>
+                <h1>{safe_meta}</h1>
+                <p>Ruang kerja Artefak · Yuki membantu menyusun hasilnya.</p>
+              </div>
+            </div>
+            ''',
+            unsafe_allow_html=True,
+        )
+    with status_col:
+        st.markdown(
+            '<div class="artifact-workspace-status">'
+            f'{mi(":material/check_circle:")} Artefak aktif'
+            '</div>',
+            unsafe_allow_html=True,
+        )
+
     st.markdown(
-        f'<div class="page-head"><div class="page-head-icon">'
-        f'{mi(":material/data_object:")}</div>'
-        f'<div><h2 class="page-title">{html.escape(meta or "Artefak")}</h2>'
-        '<p class="page-sub">Yuki mengerjakan artefak ini di halaman ini — '
-        "chat utamamu tetap bersih.</p></div></div>",
+        f'''
+        <div class="artifact-workspace-banner">
+          <div class="artifact-workspace-banner-icon">{mi(":material/auto_awesome:")}</div>
+          <div>
+            <strong>Mulai kerjakan {safe_meta}</strong>
+            <p>Jelaskan kebutuhanmu di bawah. Yuki akan membantu membuat hasil
+            yang rapi, siap digunakan, dan tetap berada di ruang kerja ini.</p>
+          </div>
+        </div>
+        ''',
         unsafe_allow_html=True,
     )
 
