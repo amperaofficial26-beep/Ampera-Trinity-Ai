@@ -491,4 +491,75 @@ div[role="dialog"] div.stButton > button p {
         width: 100% !important;
     }
 }
+.stApp:has(.settings-card)
+[data-testid="stMainBlockContainer"] {
+    width: calc(100% - 100px) !important;
+    max-width: none !important;
+    margin: 20px 50px 32px !important;
+    padding: 32px 40px 84px !important;
+    box-sizing: border-box !important;
+    background: #FFF9F0 !important;
+    border: 1px solid #D8C7AF !important;
+    border-radius: 24px !important;
+    box-shadow:
+        0 18px 42px rgba(60, 45, 35, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.85) !important;
+    min-height: calc(100vh - 52px) !important;
+}
+
+.stApp:has(.settings-card)
+[class*="st-key-settings_card_"] {
+    background: rgba(255, 255, 255, 0.58) !important;
+    border: 1px solid #E2D8C9 !important;
+    border-radius: 16px !important;
+    margin: 0 0 16px !important;
+    padding: 18px 18px 20px !important;
+    box-shadow: 0 4px 14px rgba(60, 45, 35, 0.045) !important;
+}
+
+.settings-card-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0 0 16px;
+}
+
+.settings-card-icon {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: #F0ECF5;
+    border: 1px solid #E3DCEA;
+    color: #4A3559;
+}
+
+.settings-card-icon .mi {
+    font-size: 21px;
+}
+
+.settings-card-title {
+    color: #2C1F33;
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 1.08rem;
+    font-weight: 650;
+    line-height: 1.2;
+}
+
+.settings-card-subtitle {
+    color: #6B6172;
+    font-size: 0.82rem;
+    line-height: 1.35;
+    margin-top: 3px;
+}
+
+.stApp:has(.settings-card) .page-head {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 4px 0 24px !important;
+    margin: 0 0 2px !important;
+}
 """
