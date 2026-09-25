@@ -857,7 +857,7 @@ div.stButton > button p strong { color: #2C1F33; }
    mempertahankan jarak dari bawah, tetapi lebih tinggi daripada posisi
    bawaan halaman artefak lama. */
 .stApp:has(.artifact-workspace-shell) {
-    --chat-lift: 90px !important;
+    --chat-lift: 50px !important;
     --chat-shift: 0px !important;
 }
 
