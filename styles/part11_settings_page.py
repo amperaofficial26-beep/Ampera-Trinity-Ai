@@ -276,8 +276,19 @@ button {
     box-shadow:
         0 18px 42px rgba(60, 45, 35, 0.12),
         inset 0 1px 0 rgba(255, 255, 255, 0.85) !important;
+    height: max-content !important;
     min-height: calc(100vh - 52px) !important;
     overflow: visible !important;
+}
+
+/* Laat de instellingen-zone meegroeien met alle inhoud, ook wanneer
+   Streamlit de hoofdcontainer op viewporthoogte houdt. */
+.stApp:has(.settings-card)
+[data-testid="stMain"],
+.stApp:has(.settings-card)
+[data-testid="stAppViewContainer"] {
+    height: auto !important;
+    min-height: 100vh !important;
 }
 
 .stApp:has(.settings-card)
