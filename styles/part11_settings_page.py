@@ -247,7 +247,7 @@ button {
    ============================================================ */
 
 /* Lebar utama dibuat stabil supaya semua tab memakai garis tepi yang sama. */
-.stApp:has([class*="st-key-settings_float_"])
+.stApp:has(.set-section)
 [data-testid="stMainBlockContainer"] {
     width: min(1180px, calc(100vw - 32px)) !important;
     max-width: 1180px !important;
