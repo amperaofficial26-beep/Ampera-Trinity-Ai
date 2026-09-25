@@ -261,7 +261,7 @@ button {
     box-shadow:
         0 18px 42px rgba(60, 45, 35, 0.12),
         inset 0 1px 0 rgba(255, 255, 255, 0.85) !important;
-    min-height: calc(100vh - 52px) !important;
+    min-height: calc(100vh - 20px) !important;
     overflow: visible !important;
 }
 
