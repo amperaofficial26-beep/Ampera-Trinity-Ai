@@ -261,14 +261,23 @@ button {
    PENGATURAN — RAPAT, SEIMBANG, DAN RESPONSIF
    ============================================================ */
 
-/* Lebar utama dibuat stabil supaya semua tab memakai garis tepi yang sama. */
+/* Zona utama dipisahkan dari latar: 50px dari sisi konten,
+   20px dari atas, dan 32px ruang aman di bagian bawah. */
 .stApp:has(.set-section)
 [data-testid="stMainBlockContainer"] {
-    width: min(1180px, calc(100vw - 32px)) !important;
-    max-width: 1180px !important;
-    margin: 0 auto !important;
+    width: calc(100% - 100px) !important;
+    max-width: none !important;
+    margin: 20px 50px 32px !important;
     padding: 32px 40px 84px !important;
     box-sizing: border-box !important;
+    background: #FFF9F0 !important;
+    border: 1px solid #D8C7AF !important;
+    border-radius: 24px !important;
+    box-shadow:
+        0 18px 42px rgba(60, 45, 35, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.85) !important;
+    min-height: calc(100vh - 52px) !important;
+    overflow: visible !important;
 }
 
 .stApp:has(.set-section)
@@ -476,9 +485,11 @@ div[role="dialog"] div.stButton > button p {
 @media (max-width: 760px) {
     .stApp:has(.set-section)
     [data-testid="stMainBlockContainer"] {
-        width: calc(100vw - 16px) !important;
+        width: calc(100% - 16px) !important;
+        margin: 12px 8px 24px !important;
         padding: 22px 18px 76px !important;
         border-radius: 18px !important;
+        min-height: calc(100vh - 36px) !important;
     }
 
     .stApp:has(.set-section) .page-head {
