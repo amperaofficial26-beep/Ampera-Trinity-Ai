@@ -775,22 +775,5 @@ CSS = r"""
     line-height: 1.45 !important;
 }
 
-/* Posisi dikontrol dari page_multi_agent.py. */
-.stApp:has(.tr-multi-ai-layout) .multi-landing-hero {
-    position: relative !important;
-    left: var(--multi-header-x, 0px) !important;
-    top: var(--multi-header-y, 0px) !important;
-}
-.stApp:has(.tr-multi-ai-layout) .multi-feature-grid {
-    position: relative !important;
-    left: var(--multi-cards-x, 0px) !important;
-    top: var(--multi-cards-y, 0px) !important;
-    width: min(var(--multi-cards-width, 1040px), calc(100vw - 48px)) !important;
-}
-.stApp:has(.tr-multi-ai-layout)
-[data-testid="stBottomBlockContainer"] {
-    position: relative !important;
-    left: var(--multi-chat-x, 0px) !important;
-    top: var(--multi-chat-y, 0px) !important;
-}
+/* Posisi landing dikontrol langsung dari page_multi_agent.py. */
 """

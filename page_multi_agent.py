@@ -822,16 +822,18 @@ def page_multi_agent() -> None:
     st.markdown(
         f"""
         <style>
-        .stApp:has(.tr-multi-ai-layout) {{
-            --multi-header-x: {MULTI_HEADER_X}px;
-            --multi-header-y: {MULTI_HEADER_Y}px;
-            --multi-cards-x: {MULTI_CARDS_X}px;
-            --multi-cards-y: {MULTI_CARDS_Y}px;
-            --multi-chat-x: {MULTI_CHAT_X}px;
-            --multi-chat-y: {MULTI_CHAT_Y}px;
-            --multi-cards-width: {MULTI_CARDS_WIDTH}px;
-            --multi-chat-width: {MULTI_CHAT_WIDTH}px;
-            --multi-input-width: {MULTI_INPUT_WIDTH}px;
+        /* Posisi header dan kartu diterapkan langsung pada markup HTML di bawah. */
+        .stApp:has(.tr-multi-ai-layout) .multi-feature-grid {{
+            width: min({MULTI_CARDS_WIDTH}px, calc(100vw - 48px)) !important;
+        }}
+        .stApp:has(.tr-multi-ai-layout)
+        [data-testid="stBottomBlockContainer"]:has(.st-key-multi_position_input) {{
+            width: min({MULTI_CHAT_WIDTH}px, calc(100vw - 48px)) !important;
+            max-width: min({MULTI_CHAT_WIDTH}px, calc(100vw - 48px)) !important;
+            transform: translate(
+                {MULTI_CHAT_X}px,
+                {MULTI_CHAT_Y}px
+            ) !important;
         }}
         </style>
         """,
@@ -842,13 +844,13 @@ def page_multi_agent() -> None:
     # Ini mencegah Markdown menganggap tag <p> sebagai blok kode.
     logo = f"data:image/png;base64,{LOGO_B64}"
     hero = (
-        '<div class="multi-landing-hero">'
+        f'<div class="multi-landing-hero" style="position:relative;left:{MULTI_HEADER_X}px;top:{MULTI_HEADER_Y}px;">'
         f'<div class="multi-landing-logo"><img src="{logo}" alt="Trinity"></div>'
         '<h1>Multi Trinity Agent</h1>'
         '<p>Seluruh model Trinity menganalisis, mengkritik, dan menyatukan<br>'
         'jawaban profesional dalam satu ruang kolaborasi.</p>'
         '</div>'
-        '<div class="multi-feature-grid">'
+        f'<div class="multi-feature-grid" style="position:relative;left:{MULTI_CARDS_X}px;top:{MULTI_CARDS_Y}px;width:min({MULTI_CARDS_WIDTH}px,calc(100vw - 48px)) !important;">'
         '<div class="multi-feature-card">'
         '<span class="material-symbols-rounded">psychology</span>'
         '<strong>Analisis Mendalam</strong>'
@@ -879,7 +881,8 @@ def page_multi_agent() -> None:
             render_message(message)
 
     prompt = st.chat_input(
-        "Tanyakan sesuatu kepada Multi Trinity Agent…"
+        "Tanyakan sesuatu kepada Multi Trinity Agent…",
+        key="multi_position_input",
     )
 
     if prompt and prompt.strip():
