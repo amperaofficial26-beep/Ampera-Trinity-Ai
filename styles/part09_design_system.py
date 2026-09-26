@@ -2210,18 +2210,18 @@ section[data-testid="stSidebar"] .sb-account {
     .stApp:has(.tr-chat-layout)
 section[data-testid="stSidebar"] .sb-brand,
 section[data-testid="stSidebar"] .sb-brand {
-        min-height: 124px !important;
+        min-height: 92px !important;
         box-sizing: border-box !important;
     }
     .stApp:has(.tr-chat-layout)
     section[data-testid="stSidebar"] .sb-brand-logo,
     section[data-testid="stSidebar"] .sb-brand-logo {
-        width: 90px !important;
-        height: 90px !important;
-        min-width: 90px !important;
-        padding-right: 10px !important;
+        width: 58px !important;
+        height: 58px !important;
+        min-width: 58px !important;
+        padding-right: 6px !important;
         box-sizing: border-box !important;
-        flex: 0 0 90px !important;
+        flex: 0 0 58px !important;
     }
     .stApp:has(.tr-chat-layout)
     section[data-testid="stSidebar"] .sb-brand-logo .logo-sidebar,
@@ -2229,8 +2229,8 @@ section[data-testid="stSidebar"] .sb-brand {
     .stApp:has(.tr-chat-layout)
     section[data-testid="stSidebar"] .sb-brand-logo .logo-sidebar img,
     section[data-testid="stSidebar"] .sb-brand-logo .logo-sidebar img {
-        width: 82px !important;
-        height: 82px !important;
+        width: 50px !important;
+        height: 50px !important;
         max-width: none !important;
     }
 }
