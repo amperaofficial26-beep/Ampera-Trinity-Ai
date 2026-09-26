@@ -2207,17 +2207,27 @@ section[data-testid="stSidebar"] .sb-account {
    membesarkan slotnya. Ukuran span dan img dipaksa bersama-sama karena
    logo_img_html() membawa inline width/height. */
 @media (min-width: 821px) {
-    section[data-testid="stSidebar"] .sb-brand {
+    .stApp:has(.tr-chat-layout)
+section[data-testid="stSidebar"] .sb-brand,
+section[data-testid="stSidebar"] .sb-brand {
         min-height: 124px !important;
+        box-sizing: border-box !important;
     }
+    .stApp:has(.tr-chat-layout)
+    section[data-testid="stSidebar"] .sb-brand-logo,
     section[data-testid="stSidebar"] .sb-brand-logo {
         width: 90px !important;
         height: 90px !important;
         min-width: 90px !important;
         padding-right: 10px !important;
         box-sizing: border-box !important;
+        flex: 0 0 90px !important;
     }
+    .stApp:has(.tr-chat-layout)
     section[data-testid="stSidebar"] .sb-brand-logo .logo-sidebar,
+    section[data-testid="stSidebar"] .sb-brand-logo .logo-sidebar,
+    .stApp:has(.tr-chat-layout)
+    section[data-testid="stSidebar"] .sb-brand-logo .logo-sidebar img,
     section[data-testid="stSidebar"] .sb-brand-logo .logo-sidebar img {
         width: 82px !important;
         height: 82px !important;
