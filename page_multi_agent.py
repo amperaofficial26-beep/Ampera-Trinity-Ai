@@ -822,6 +822,15 @@ def page_multi_agent() -> None:
     st.markdown(
         f"""
         <style>
+        /* Variabel diletakkan di root agar elemen fixed Streamlit ikut membacanya. */
+        :root {{
+            --multi-chat-width: {MULTI_CHAT_WIDTH}px;
+            --multi-chat-x: {MULTI_CHAT_X}px;
+            --multi-chat-y: {MULTI_CHAT_Y}px;
+            --multi-input-width: {MULTI_INPUT_WIDTH}px;
+            --multi-input-x: {MULTI_CHAT_X}px;
+            --multi-input-y: {MULTI_CHAT_Y}px;
+        }}
         /* Posisi header dan kartu diterapkan langsung pada markup HTML di bawah. */
         .stApp:has(.tr-multi-ai-layout) .multi-feature-grid {{
             width: min({MULTI_CARDS_WIDTH}px, calc(100vw - 48px)) !important;
@@ -837,7 +846,7 @@ def page_multi_agent() -> None:
                 {MULTI_CHAT_Y}px
             ) !important;
         }}
-        .stApp:has(.tr-multi-ai-layout)
+        /* stBottomBlockContainer berada di luar main block Streamlit. */
         [data-testid="stBottomBlockContainer"]:has(.st-key-multi_position_input) {{
             width: min({MULTI_CHAT_WIDTH}px, calc(100vw - 48px)) !important;
             max-width: min({MULTI_CHAT_WIDTH}px, calc(100vw - 48px)) !important;
@@ -846,7 +855,6 @@ def page_multi_agent() -> None:
                 {MULTI_CHAT_Y}px
             ) !important;
         }}
-        .stApp:has(.tr-multi-ai-layout)
         [data-testid="stBottomBlockContainer"]:has(.st-key-multi_position_input)
         [data-testid="stChatInput"] {{
             width: min({MULTI_INPUT_WIDTH}px, calc(100vw - 48px)) !important;
