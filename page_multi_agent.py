@@ -835,6 +835,12 @@ def page_multi_agent() -> None:
                 {MULTI_CHAT_Y}px
             ) !important;
         }}
+        .stApp:has(.tr-multi-ai-layout)
+        [data-testid="stBottomBlockContainer"]:has(.st-key-multi_position_input)
+        [data-testid="stChatInput"] {{
+            width: min({MULTI_INPUT_WIDTH}px, calc(100vw - 48px)) !important;
+            max-width: min({MULTI_INPUT_WIDTH}px, calc(100vw - 48px)) !important;
+        }}
         </style>
         """,
         unsafe_allow_html=True,
