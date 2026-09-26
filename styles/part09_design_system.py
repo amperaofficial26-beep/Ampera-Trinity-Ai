@@ -2234,4 +2234,83 @@ section[data-testid="stSidebar"] .sb-brand {
         max-width: none !important;
     }
 }
+
+/* ================================================================
+   SIDEBAR PARITY — SEMUA HALAMAN
+   Override global ini sengaja berada di bagian paling akhir agar sidebar
+   halaman non-chat memakai geometri yang sama dengan room chat utama.
+================================================================ */
+section[data-testid="stSidebar"] [data-testid="stSidebarCollapseButton"],
+section[data-testid="stSidebar"] [data-testid="stSidebarCollapsedControl"],
+[data-testid="stSidebarCollapsedControl"],
+[data-testid="collapsedControl"],
+[data-testid="stExpandSidebarButton"],
+button[kind="headerNoPadding"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+section[data-testid="stSidebar"] [data-testid="stSidebarHeader"] {
+    height: 0 !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+}
+
+@media (min-width: 821px) {
+    section[data-testid="stSidebar"] .sb-brand {
+        min-height: 92px !important;
+        box-sizing: border-box !important;
+    }
+    section[data-testid="stSidebar"] .sb-brand-logo {
+        width: 58px !important;
+        height: 58px !important;
+        min-width: 58px !important;
+        padding-right: 6px !important;
+        box-sizing: border-box !important;
+        flex: 0 0 58px !important;
+    }
+    section[data-testid="stSidebar"] .sb-brand-logo .logo-sidebar,
+    section[data-testid="stSidebar"] .sb-brand-logo .logo-sidebar img {
+        width: 50px !important;
+        height: 50px !important;
+        max-width: none !important;
+    }
+    section[data-testid="stSidebar"] {
+        width: 224px !important;
+        min-width: 224px !important;
+        max-width: 224px !important;
+        overflow: hidden !important;
+    }
+    section[data-testid="stSidebar"] > div,
+    section[data-testid="stSidebar"] [data-testid="stSidebarUserContent"],
+    section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
+        max-height: 100vh !important;
+        overflow-x: hidden !important;
+        overflow-y: hidden !important;
+    }
+    section[data-testid="stSidebar"] > div {
+        padding: 22px 14px 18px !important;
+    }
+    section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
+        gap: 0 !important;
+        row-gap: 0 !important;
+        column-gap: 0 !important;
+    }
+    section[data-testid="stSidebar"] .element-container,
+    section[data-testid="stSidebar"] div.stButton {
+        margin-top: 0 !important;
+        margin-bottom: 4px !important;
+    }
+    section[data-testid="stSidebar"] div.stButton > button {
+        min-height: 40px !important;
+        height: auto !important;
+        padding: 6px 16px !important;
+        border-radius: 999px !important;
+    }
+    section[data-testid="stSidebar"] div.stButton > button[kind="primary"] {
+        min-height: 40px !important;
+        padding: 6px 16px !important;
+    }
+}
 """
