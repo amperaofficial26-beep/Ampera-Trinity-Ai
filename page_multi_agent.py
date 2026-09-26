@@ -28,7 +28,7 @@ MULTI_CARDS_X = -132
 MULTI_CARDS_Y = 0
 
 # Kolom chat/input di bagian bawah.
-MULTI_CHAT_X = -20
+MULTI_CHAT_X = 20
 MULTI_CHAT_Y = 0
 
 # Ukuran kartu dan kolom chat.
