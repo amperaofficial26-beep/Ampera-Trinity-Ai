@@ -20,11 +20,11 @@ WIB = ZoneInfo("Asia/Jakarta")
 # ============================================================
 
 # Header: logo, judul, dan subtitle.
-MULTI_HEADER_X = -15
+MULTI_HEADER_X = -20
 MULTI_HEADER_Y = 0
 
 # Kartu fitur: empat kartu Analisis, Kritik, Sintesis, dan Hasil.
-MULTI_CARDS_X = -100
+MULTI_CARDS_X = -20
 MULTI_CARDS_Y = 0
 
 # Kolom chat/input di bagian bawah.
