@@ -72,6 +72,7 @@ _LOGO_SIZES = {
     "logo-foot":     "18px",   # logo di footer halaman
     "logo-inline":   "18px",   # default umum
     "logo-shimmer":  "25px",   # logo di indikator "berpikir"
+    "logo-sidebar":  "56px",   # logo besar di brand card sidebar
 }
 
 

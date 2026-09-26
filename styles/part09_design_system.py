@@ -1971,4 +1971,235 @@ div.stDownloadButton > button,
 .stApp:has(.tr-chat-layout) {
     overflow-x: hidden !important;
 }
+
+/* ================================================================
+   SIDEBAR — TRINITY WARM NAVIGATION
+================================================================ */
+@media (min-width: 821px) {
+    section[data-testid="stSidebar"] {
+        width: 258px !important;
+        min-width: 258px !important;
+        max-width: 258px !important;
+        background: #EFE2D0 !important;
+        border-right: 1px solid #D8C9B6 !important;
+        box-shadow: 5px 0 22px rgba(48, 40, 58, .035) !important;
+    }
+
+    .stApp:has(.tr-chat-layout) {
+        --tr-sidebar-width: 258px !important;
+        --dash-sidebar: 258px !important;
+    }
+
+    .stApp:has(.tr-chat-layout)
+    section[data-testid="stSidebar"] {
+        width: var(--dash-sidebar) !important;
+        min-width: var(--dash-sidebar) !important;
+        max-width: var(--dash-sidebar) !important;
+    }
+}
+
+section[data-testid="stSidebar"] > div {
+    padding: 22px 14px 18px !important;
+    background: #EFE2D0 !important;
+}
+section[data-testid="stSidebar"] > div:first-child {
+    padding-bottom: 84px !important;
+}
+section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
+    gap: 0 !important;
+}
+section[data-testid="stSidebar"] .element-container {
+    margin: 0 !important;
+}
+
+/* Brand card: kompas besar, garis pemisah, dan nama Trinity. */
+section[data-testid="stSidebar"] .sb-brand {
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+    width: auto !important;
+    min-height: 92px !important;
+    margin: 7px 8px 30px !important;
+    padding: 14px 18px !important;
+    border: 1px solid #E0D2C0 !important;
+    border-radius: 31px !important;
+    background: #F8F0E6 !important;
+    box-shadow: 0 10px 24px rgba(76, 58, 43, .055) !important;
+}
+section[data-testid="stSidebar"] .sb-brand-logo {
+    position: relative !important;
+    display: grid !important;
+    place-items: center !important;
+    width: 56px !important;
+    height: 56px !important;
+    min-width: 56px !important;
+    padding-right: 15px !important;
+    border-right: 1px solid #D8C9B6 !important;
+}
+section[data-testid="stSidebar"] .sb-brand-logo .logo-sidebar {
+    width: 56px !important;
+    height: 56px !important;
+}
+section[data-testid="stSidebar"] .sb-brand-title {
+    padding: 0 !important;
+    color: #2E2040 !important;
+    font-family: 'Source Serif 4', Georgia, serif !important;
+    font-size: 2rem !important;
+    font-weight: 600 !important;
+    letter-spacing: -.045em !important;
+    line-height: 1 !important;
+}
+
+/* Semua item navigasi memakai tinggi dan jarak konsisten. */
+section[data-testid="stSidebar"] div.stButton {
+    margin: 4px 0 !important;
+}
+section[data-testid="stSidebar"] div.stButton > button {
+    width: 100% !important;
+    min-height: 46px !important;
+    padding: 8px 16px !important;
+    border: 1px solid transparent !important;
+    border-radius: 999px !important;
+    background: transparent !important;
+    color: #3D2D4D !important;
+    box-shadow: none !important;
+    font-size: 1.02rem !important;
+    font-weight: 500 !important;
+    line-height: 1.2 !important;
+    transition: background .18s ease, color .18s ease, transform .18s ease !important;
+}
+section[data-testid="stSidebar"] div.stButton > button:hover {
+    background: #E5D8C6 !important;
+    color: #352346 !important;
+    transform: translateX(2px) !important;
+}
+section[data-testid="stSidebar"] div.stButton > button > div,
+section[data-testid="stSidebar"] div.stButton > button [data-testid="stMarkdownContainer"] {
+    width: 100% !important;
+    text-align: left !important;
+    justify-content: flex-start !important;
+}
+section[data-testid="stSidebar"] div.stButton > button p {
+    margin: 0 !important;
+    color: inherit !important;
+    font-size: 1.02rem !important;
+    font-weight: inherit !important;
+    line-height: 1.25 !important;
+    text-align: left !important;
+}
+section[data-testid="stSidebar"] div.stButton > button [data-testid="stIconMaterial"] {
+    width: 1.45rem !important;
+    height: 1.45rem !important;
+    flex: 0 0 1.45rem !important;
+    color: inherit !important;
+    font-size: 1.45rem !important;
+    line-height: 1 !important;
+}
+
+/* Item yang sedang aktif: pill ungu seperti referensi. */
+section[data-testid="stSidebar"] div.stButton > button[kind="primary"] {
+    min-height: 54px !important;
+    padding: 9px 17px !important;
+    background: #4B315D !important;
+    border-color: #4B315D !important;
+    color: #FFF9F1 !important;
+    box-shadow: 0 8px 18px rgba(75, 49, 93, .18) !important;
+}
+section[data-testid="stSidebar"] div.stButton > button[kind="primary"] p,
+section[data-testid="stSidebar"] div.stButton > button[kind="primary"] [data-testid="stIconMaterial"] {
+    color: #FFF9F1 !important;
+}
+section[data-testid="stSidebar"] div.stButton > button[kind="primary"]:hover {
+    background: #5B3D70 !important;
+    border-color: #5B3D70 !important;
+    transform: translateX(0) !important;
+}
+
+/* Room baru tampil sebagai menu ringan, bukan kartu penuh. */
+section[data-testid="stSidebar"] .st-key-sb_new {
+    margin-bottom: 6px !important;
+}
+section[data-testid="stSidebar"] .st-key-sb_new div.stButton > button {
+    color: #3D2D4D !important;
+    font-size: 1.04rem !important;
+    font-weight: 500 !important;
+}
+section[data-testid="stSidebar"] .st-key-sb_new div.stButton > button:hover {
+    background: #E5D8C6 !important;
+}
+
+/* Jarak antar grup utama dan kelompok Proyek. */
+section[data-testid="stSidebar"] .sb-divider {
+    height: 1px !important;
+    margin: 18px 18px !important;
+    background: #D8C9B6 !important;
+    opacity: .9 !important;
+}
+section[data-testid="stSidebar"] .st-key-sb_menu_proyek,
+section[data-testid="stSidebar"] .st-key-sb_menu_artefak,
+section[data-testid="stSidebar"] .st-key-sb_menu_sesuaikan,
+section[data-testid="stSidebar"] .st-key-sb_menu_desain,
+section[data-testid="stSidebar"] .st-key-sb_menu_jadwal {
+    margin: 2px 0 !important;
+}
+section[data-testid="stSidebar"] .st-key-sb_menu_jadwal div.stButton > button p {
+    max-width: 126px !important;
+}
+
+/* Akun tetap berada di bawah, dengan warna yang menyatu dengan sidebar. */
+section[data-testid="stSidebar"] .sb-account {
+    width: 258px !important;
+    max-width: 258px !important;
+    padding: 12px 18px !important;
+    border-top: 1px solid #D8C9B6 !important;
+    background: #EFE2D0 !important;
+}
+
+@media (max-width: 820px) {
+    section[data-testid="stSidebar"] > div {
+        padding: 14px 7px 12px !important;
+    }
+    section[data-testid="stSidebar"] .sb-brand {
+        min-height: 58px !important;
+        margin: 4px 2px 16px !important;
+        padding: 8px !important;
+        border-radius: 19px !important;
+        justify-content: center !important;
+    }
+    section[data-testid="stSidebar"] .sb-brand-logo {
+        width: 42px !important;
+        height: 42px !important;
+        min-width: 42px !important;
+        padding-right: 0 !important;
+        border-right: none !important;
+    }
+    section[data-testid="stSidebar"] .sb-brand-logo .logo-sidebar {
+        width: 42px !important;
+        height: 42px !important;
+    }
+    section[data-testid="stSidebar"] .sb-brand-title,
+    section[data-testid="stSidebar"] div.stButton > button p {
+        display: none !important;
+    }
+    section[data-testid="stSidebar"] div.stButton > button {
+        justify-content: center !important;
+        padding: 8px !important;
+    }
+    section[data-testid="stSidebar"] div.stButton > button > div,
+    section[data-testid="stSidebar"] div.stButton > button [data-testid="stMarkdownContainer"] {
+        justify-content: center !important;
+        width: auto !important;
+    }
+    section[data-testid="stSidebar"] div.stButton > button [data-testid="stIconMaterial"] {
+        margin: 0 !important;
+    }
+    section[data-testid="stSidebar"] .sb-divider {
+        margin: 12px 5px !important;
+    }
+    section[data-testid="stSidebar"] .sb-account {
+        width: 76px !important;
+        max-width: 76px !important;
+        padding: 10px 7px !important;
+    }
+}
 """
