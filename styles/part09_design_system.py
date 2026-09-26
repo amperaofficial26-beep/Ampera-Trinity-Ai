@@ -2236,9 +2236,8 @@ section[data-testid="stSidebar"] .sb-brand {
 }
 
 /* ================================================================
-   SIDEBAR PARITY — SEMUA HALAMAN
-   Override global ini sengaja berada di bagian paling akhir agar sidebar
-   halaman non-chat memakai geometri yang sama dengan room chat utama.
+   SIDEBAR — CANONICAL LAYOUT FOR EVERY PAGE
+   Satu geometri yang sama dengan sidebar room chat utama.
 ================================================================ */
 section[data-testid="stSidebar"] [data-testid="stSidebarCollapseButton"],
 section[data-testid="stSidebar"] [data-testid="stSidebarCollapsedControl"],
@@ -2258,24 +2257,6 @@ section[data-testid="stSidebar"] [data-testid="stSidebarHeader"] {
 }
 
 @media (min-width: 821px) {
-    section[data-testid="stSidebar"] .sb-brand {
-        min-height: 92px !important;
-        box-sizing: border-box !important;
-    }
-    section[data-testid="stSidebar"] .sb-brand-logo {
-        width: 58px !important;
-        height: 58px !important;
-        min-width: 58px !important;
-        padding-right: 6px !important;
-        box-sizing: border-box !important;
-        flex: 0 0 58px !important;
-    }
-    section[data-testid="stSidebar"] .sb-brand-logo .logo-sidebar,
-    section[data-testid="stSidebar"] .sb-brand-logo .logo-sidebar img {
-        width: 50px !important;
-        height: 50px !important;
-        max-width: none !important;
-    }
     section[data-testid="stSidebar"] {
         width: 224px !important;
         min-width: 224px !important;
@@ -2299,114 +2280,37 @@ section[data-testid="stSidebar"] [data-testid="stSidebarHeader"] {
     }
     section[data-testid="stSidebar"] .element-container,
     section[data-testid="stSidebar"] div.stButton {
-        margin-top: 0 !important;
-        margin-bottom: 4px !important;
-    }
-    section[data-testid="stSidebar"] div.stButton > button {
-        min-height: 40px !important;
-        height: auto !important;
-        padding: 6px 16px !important;
-        border-radius: 999px !important;
-    }
-    section[data-testid="stSidebar"] div.stButton > button[kind="primary"] {
-        min-height: 40px !important;
-        padding: 6px 16px !important;
-    }
-}
-
-/* Room chat utama mempertahankan spacing sidebar compact yang lama. */
-@media (min-width: 821px) {
-    .stApp:has(.tr-chat-layout)
-    section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
-        gap: 0 !important;
-        row-gap: 0 !important;
-        column-gap: 0 !important;
-    }
-    .stApp:has(.tr-chat-layout)
-    section[data-testid="stSidebar"] .element-container,
-    .stApp:has(.tr-chat-layout)
-    section[data-testid="stSidebar"] div.stButton {
         margin-top: 1px !important;
         margin-bottom: 1px !important;
     }
-    .stApp:has(.tr-chat-layout)
     section[data-testid="stSidebar"] div.stButton > button {
         min-height: 12px !important;
         height: auto !important;
         padding: 2px 11px !important;
         border-radius: 12px !important;
     }
-    .stApp:has(.tr-chat-layout)
     section[data-testid="stSidebar"] div.stButton > button[kind="primary"] {
         min-height: 12px !important;
         padding: 2px 11px !important;
     }
-}
-
-/* Marker eksplisit dari sidebar.py untuk room chat utama. */
-@media (min-width: 821px) {
-    .stApp:has(.sidebar-room-shell)
-    section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
-        gap: 0 !important;
-        row-gap: 0 !important;
-        column-gap: 0 !important;
+    section[data-testid="stSidebar"] .sb-brand {
+        min-height: 92px !important;
+        box-sizing: border-box !important;
     }
-    .stApp:has(.sidebar-room-shell)
-    section[data-testid="stSidebar"] .element-container,
-    .stApp:has(.sidebar-room-shell)
-    section[data-testid="stSidebar"] div.stButton {
-        margin-top: 1px !important;
-        margin-bottom: 1px !important;
+    section[data-testid="stSidebar"] .sb-brand-logo {
+        width: 58px !important;
+        height: 58px !important;
+        min-width: 58px !important;
+        padding-right: 6px !important;
+        box-sizing: border-box !important;
+        flex: 0 0 58px !important;
     }
-    .stApp:has(.sidebar-room-shell)
-    section[data-testid="stSidebar"] div.stButton > button {
-        min-height: 12px !important;
-        height: auto !important;
-        padding: 2px 11px !important;
-        border-radius: 12px !important;
+    section[data-testid="stSidebar"] .sb-brand-logo .logo-sidebar,
+    section[data-testid="stSidebar"] .sb-brand-logo .logo-sidebar img {
+        width: 50px !important;
+        height: 50px !important;
+        max-width: none !important;
     }
-    .stApp:has(.sidebar-room-shell)
-    section[data-testid="stSidebar"] div.stButton > button[kind="primary"] {
-        min-height: 12px !important;
-        padding: 2px 11px !important;
-    }
-}
-
-/* Sidebar non-main memakai jarak yang sama rapatnya dengan room chat. */
-@media (min-width: 821px) {
-    .stApp:has(.sidebar-page-shell)
-    section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
-        gap: 0 !important;
-        row-gap: 0 !important;
-        column-gap: 0 !important;
-    }
-    .stApp:has(.sidebar-page-shell)
-    section[data-testid="stSidebar"] .element-container,
-    .stApp:has(.sidebar-page-shell)
-    section[data-testid="stSidebar"] div.stButton {
-        margin-top: 1px !important;
-        margin-bottom: 1px !important;
-    }
-    .stApp:has(.sidebar-page-shell)
-    section[data-testid="stSidebar"] div.stButton > button {
-        min-height: 12px !important;
-        height: auto !important;
-        padding: 2px 11px !important;
-        border-radius: 12px !important;
-    }
-    .stApp:has(.sidebar-page-shell)
-    section[data-testid="stSidebar"] div.stButton > button[kind="primary"] {
-        min-height: 12px !important;
-        padding: 2px 11px !important;
-    }
-    .stApp:has(.sidebar-page-shell)
-    section[data-testid="stSidebar"] .st-key-sb_menu_settings button p {
-        white-space: nowrap !important;
-    }
-}
-
-/* Brand tetap utuh di sidebar 224px. */
-@media (min-width: 821px) {
     section[data-testid="stSidebar"] .sb-brand-title {
         font-size: 1.75rem !important;
     }
