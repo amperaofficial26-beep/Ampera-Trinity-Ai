@@ -214,16 +214,6 @@ show_sesuaikan_dialog = _register_dialog("Sesuaikan", _sesuaikan_dialog_body)
 
 def render_sidebar() -> None:
     with st.sidebar:
-        sidebar_scope = (
-            "sidebar-room-shell"
-            if st.session_state.get("page", "chat") == "chat"
-            else "sidebar-page-shell"
-        )
-        st.markdown(
-            f'<div class="{sidebar_scope}"></div>',
-            unsafe_allow_html=True,
-        )
-
         # Brand serif ala "Claude"
         st.markdown(
             f'<div class="sb-brand">'
