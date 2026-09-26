@@ -775,25 +775,22 @@ CSS = r"""
     line-height: 1.45 !important;
 }
 
-/* Seluruh landing Multi Trinity digeser bersama agar tidak terlalu ke kanan. */
-.stApp:has(.tr-multi-ai-layout) {
-    --multi-landing-shift: -120px;
+/* Posisi dikontrol dari page_multi_agent.py. */
+.stApp:has(.tr-multi-ai-layout) .multi-landing-hero {
+    position: relative !important;
+    left: var(--multi-header-x, 0px) !important;
+    top: var(--multi-header-y, 0px) !important;
 }
-.stApp:has(.tr-multi-ai-layout) .multi-landing-hero,
-.stApp:has(.tr-multi-ai-layout) .multi-feature-grid,
+.stApp:has(.tr-multi-ai-layout) .multi-feature-grid {
+    position: relative !important;
+    left: var(--multi-cards-x, 0px) !important;
+    top: var(--multi-cards-y, 0px) !important;
+    width: min(var(--multi-cards-width, 1040px), calc(100vw - 48px)) !important;
+}
 .stApp:has(.tr-multi-ai-layout)
 [data-testid="stBottomBlockContainer"] {
     position: relative !important;
-    left: var(--multi-landing-shift) !important;
-}
-@media (max-width: 900px) {
-    .stApp:has(.tr-multi-ai-layout) {
-        --multi-landing-shift: -32px;
-    }
-}
-@media (max-width: 520px) {
-    .stApp:has(.tr-multi-ai-layout) {
-        --multi-landing-shift: 0px;
-    }
+    left: var(--multi-chat-x, 0px) !important;
+    top: var(--multi-chat-y, 0px) !important;
 }
 """

@@ -16,30 +16,25 @@ from ui_helpers import _page_footer, render_message
 WIB = ZoneInfo("Asia/Jakarta")
 
 # ============================================================
-# PENGATURAN POSISI MULTI AI
+# PENGATURAN POSISI MULTI AI — UBAH ANGKA DI BLOK INI SAJA
 # ============================================================
 
-# ------------------------------------------------------------
-# JUDUL + DESKRIPSI
-# ------------------------------------------------------------
-MULTI_HERO_X = -210
-MULTI_HERO_Y = -30
+# Header: logo, judul, dan subtitle.
+MULTI_HEADER_X = -120
+MULTI_HEADER_Y = 0
 
-# ------------------------------------------------------------
-# CHAT SURFACE
-# Background + seluruh pesan bergerak sebagai SATU LAYER
-# ------------------------------------------------------------
-MULTI_CHAT_WIDTH = 750
-MULTI_CHAT_X = 80
+# Kartu fitur: empat kartu Analisis, Kritik, Sintesis, dan Hasil.
+MULTI_CARDS_X = -120
+MULTI_CARDS_Y = 0
+
+# Kolom chat/input di bagian bawah.
+MULTI_CHAT_X = 40
 MULTI_CHAT_Y = 0
 
-# ------------------------------------------------------------
-# CHAT INPUT
-# Hanya kolom mengetik yang bergerak
-# ------------------------------------------------------------
+# Ukuran kartu dan kolom chat.
+MULTI_CARDS_WIDTH = 1040
+MULTI_CHAT_WIDTH = 760
 MULTI_INPUT_WIDTH = 760
-MULTI_INPUT_X = 40
-MULTI_INPUT_Y = 0
 # ============================================================
 
 _AGENT_CSS = """
@@ -828,16 +823,15 @@ def page_multi_agent() -> None:
         f"""
         <style>
         .stApp:has(.tr-multi-ai-layout) {{
-            --multi-hero-x: {MULTI_HERO_X}px;
-            --multi-hero-y: {MULTI_HERO_Y}px;
-    
-            --multi-chat-width: {MULTI_CHAT_WIDTH}px;
+            --multi-header-x: {MULTI_HEADER_X}px;
+            --multi-header-y: {MULTI_HEADER_Y}px;
+            --multi-cards-x: {MULTI_CARDS_X}px;
+            --multi-cards-y: {MULTI_CARDS_Y}px;
             --multi-chat-x: {MULTI_CHAT_X}px;
             --multi-chat-y: {MULTI_CHAT_Y}px;
-    
+            --multi-cards-width: {MULTI_CARDS_WIDTH}px;
+            --multi-chat-width: {MULTI_CHAT_WIDTH}px;
             --multi-input-width: {MULTI_INPUT_WIDTH}px;
-            --multi-input-x: {MULTI_INPUT_X}px;
-            --multi-input-y: {MULTI_INPUT_Y}px;
         }}
         </style>
         """,
@@ -848,13 +842,13 @@ def page_multi_agent() -> None:
     # Ini mencegah Markdown menganggap tag <p> sebagai blok kode.
     logo = f"data:image/png;base64,{LOGO_B64}"
     hero = (
-        '<div class="multi-landing-hero" style="position:relative;left:-120px;">'
+        '<div class="multi-landing-hero">'
         f'<div class="multi-landing-logo"><img src="{logo}" alt="Trinity"></div>'
         '<h1>Multi Trinity Agent</h1>'
         '<p>Seluruh model Trinity menganalisis, mengkritik, dan menyatukan<br>'
         'jawaban profesional dalam satu ruang kolaborasi.</p>'
         '</div>'
-        '<div class="multi-feature-grid" style="position:relative;left:-120px;">'
+        '<div class="multi-feature-grid">'
         '<div class="multi-feature-card">'
         '<span class="material-symbols-rounded">psychology</span>'
         '<strong>Analisis Mendalam</strong>'
