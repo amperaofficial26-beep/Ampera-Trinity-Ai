@@ -629,4 +629,125 @@ CSS = r"""
 
     transform: none !important;
 }
+
+/* ============================================================
+   MULTI TRINITY AGENT — LANDING PAGE
+   ============================================================ */
+.stApp:has(.tr-multi-ai-layout)
+[data-testid="stMainBlockContainer"] {
+    width: 100% !important;
+    max-width: none !important;
+    padding: 18px 24px 126px !important;
+    box-sizing: border-box !important;
+}
+.stApp:has(.tr-multi-ai-layout)
+[data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    gap: 0 !important;
+}
+.stApp:has(.tr-multi-ai-layout) .multi-landing-hero {
+    width: min(820px, calc(100vw - 48px)) !important;
+    margin: 0 auto 18px !important;
+    text-align: center !important;
+}
+.stApp:has(.tr-multi-ai-layout) .multi-landing-logo {
+    width: 92px !important;
+    height: 92px !important;
+    margin: 0 auto 6px !important;
+    display: grid !important;
+    place-items: center !important;
+}
+.stApp:has(.tr-multi-ai-layout) .multi-landing-logo img {
+    display: block !important;
+    width: 92px !important;
+    height: 92px !important;
+    object-fit: contain !important;
+    filter: drop-shadow(0 5px 9px rgba(73, 49, 92, .16)) !important;
+}
+.stApp:has(.tr-multi-ai-layout) .multi-landing-hero h1 {
+    margin: 0 !important;
+    color: #30213F !important;
+    font-family: "Space Grotesk", sans-serif !important;
+    font-size: clamp(1.75rem, 3vw, 2.35rem) !important;
+    font-weight: 700 !important;
+    letter-spacing: -.045em !important;
+    line-height: 1.12 !important;
+}
+.stApp:has(.tr-multi-ai-layout) .multi-landing-hero p {
+    margin: 8px auto 0 !important;
+    color: #786D7D !important;
+    font-family: "Space Grotesk", sans-serif !important;
+    font-size: .82rem !important;
+    line-height: 1.55 !important;
+}
+.stApp:has(.tr-multi-ai-layout) .multi-feature-grid {
+    width: min(820px, calc(100vw - 48px)) !important;
+    margin: 0 auto 40px !important;
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+}
+.stApp:has(.tr-multi-ai-layout) .multi-feature-card {
+    min-height: 82px !important;
+    padding: 11px 12px 10px !important;
+    border: 1px solid #E2D6C8 !important;
+    border-radius: 9px !important;
+    background: rgba(255, 253, 248, .64) !important;
+    box-shadow: 0 7px 15px rgba(78, 58, 40, .045) !important;
+    text-align: left !important;
+}
+.stApp:has(.tr-multi-ai-layout) .multi-feature-card > span {
+    display: block !important;
+    margin-bottom: 5px !important;
+    color: #51406A !important;
+    font-size: 18px !important;
+}
+.stApp:has(.tr-multi-ai-layout) .multi-feature-card strong {
+    display: block !important;
+    color: #3B2D4A !important;
+    font-size: .63rem !important;
+    line-height: 1.2 !important;
+}
+.stApp:has(.tr-multi-ai-layout) .multi-feature-card small {
+    display: block !important;
+    margin-top: 4px !important;
+    color: #817686 !important;
+    font-size: .54rem !important;
+    line-height: 1.35 !important;
+}
+.stApp:has(.tr-multi-ai-layout)
+[data-testid="stBottomBlockContainer"] {
+    width: min(760px, calc(100vw - 48px)) !important;
+    max-width: min(760px, calc(100vw - 48px)) !important;
+    margin: 0 auto !important;
+    transform: none !important;
+}
+.stApp:has(.tr-multi-ai-layout)
+[data-testid="stBottomBlockContainer"] [data-testid="stChatInput"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    transform: none !important;
+}
+@media (max-width: 760px) {
+    .stApp:has(.tr-multi-ai-layout) .multi-feature-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+@media (max-width: 520px) {
+    .stApp:has(.tr-multi-ai-layout) [data-testid="stMainBlockContainer"] {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+    }
+    .stApp:has(.tr-multi-ai-layout) .multi-landing-hero,
+    .stApp:has(.tr-multi-ai-layout) .multi-feature-grid {
+        width: 100% !important;
+    }
+    .stApp:has(.tr-multi-ai-layout) .multi-landing-logo,
+    .stApp:has(.tr-multi-ai-layout) .multi-landing-logo img {
+        width: 72px !important;
+        height: 72px !important;
+    }
+}
 """
