@@ -29,7 +29,7 @@ MULTI_CARDS_Y = 0
 
 # Kolom chat/input di bagian bawah.
 MULTI_CHAT_X = 10
-MULTI_CHAT_Y = -5
+MULTI_CHAT_Y = 5
 
 # Ukuran kartu dan kolom chat.
 MULTI_CARDS_WIDTH = 1040
@@ -854,6 +854,8 @@ def page_multi_agent() -> None:
         }}
         /* stBottomBlockContainer berada di luar main block Streamlit. */
         [data-testid="stBottomBlockContainer"]:has(.st-key-multi_position_input) {{
+            position: relative !important;
+            top: {MULTI_CHAT_Y}px !important;
             width: min({MULTI_CHAT_WIDTH}px, calc(100vw - 48px)) !important;
             max-width: min({MULTI_CHAT_WIDTH}px, calc(100vw - 48px)) !important;
         }}
