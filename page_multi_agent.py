@@ -854,6 +854,8 @@ def page_multi_agent() -> None:
         }}
         /* stBottomBlockContainer berada di luar main block Streamlit. */
         [data-testid="stBottomBlockContainer"]:has(.st-key-multi_position_input) {{
+            position: relative !important;
+            top: {MULTI_CHAT_Y}px !important;
             width: min({MULTI_CHAT_WIDTH}px, calc(100vw - 48px)) !important;
             max-width: min({MULTI_CHAT_WIDTH}px, calc(100vw - 48px)) !important;
         }}
