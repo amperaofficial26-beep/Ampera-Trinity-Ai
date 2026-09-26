@@ -2316,79 +2316,66 @@ section[data-testid="stSidebar"] [data-testid="stSidebarHeader"] {
     }
 }
 
-/* Non-main pages keep only one route back to the main room. */
-@media (min-width: 821px) {
-    .stApp:has(.minimal-sidebar-shell)
-    section[data-testid="stSidebar"] {
-        width: 224px !important;
-        min-width: 224px !important;
-        max-width: 224px !important;
-        overflow: hidden !important;
-    }
-    .stApp:has(.minimal-sidebar-shell)
-    section[data-testid="stSidebar"] > div {
-        padding: 22px 14px 18px !important;
-    }
-    .stApp:has(.minimal-sidebar-shell)
-    section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
-        gap: 0 !important;
-    }
-    .stApp:has(.minimal-sidebar-shell)
-    section[data-testid="stSidebar"] .st-key-sidebar_back_chat {
-        margin: 12px 0 0 !important;
-    }
-    .stApp:has(.minimal-sidebar-shell)
-    section[data-testid="stSidebar"] .st-key-sidebar_back_chat button {
-        min-height: 40px !important;
-        padding: 6px 11px !important;
-        border-radius: 12px !important;
-        background: #4B315D !important;
-        border-color: #4B315D !important;
-        color: #FFF9F1 !important;
-        box-shadow: 0 5px 14px rgba(75, 49, 93, .16) !important;
-    }
-    .stApp:has(.minimal-sidebar-shell)
-    section[data-testid="stSidebar"] .st-key-sidebar_back_chat button p,
-    .stApp:has(.minimal-sidebar-shell)
-    section[data-testid="stSidebar"] .st-key-sidebar_back_chat button [data-testid="stIconMaterial"] {
-        color: #FFF9F1 !important;
-    }
-}
-
-/* Corak dekoratif untuk sidebar minimal di halaman non-main. */
-.stApp:has(.minimal-sidebar-shell) .minimal-sidebar-shell {
+/* Non-main pages hide the sidebar and keep only a fixed back control. */
+.stApp:has(.secondary-page-shell)
+section[data-testid="stSidebar"],
+.stApp:has(.secondary-page-shell)
+[data-testid="stSidebarCollapsedControl"],
+.stApp:has(.secondary-page-shell)
+[data-testid="collapsedControl"],
+.stApp:has(.secondary-page-shell)
+[data-testid="stExpandSidebarButton"] {
     display: none !important;
-}
-.stApp:has(.minimal-sidebar-shell) .minimal-sidebar-art {
-    position: relative !important;
-    left: auto !important;
-    bottom: auto !important;
-    display: block !important;
-    width: calc(100% + 28px) !important;
-    height: calc(100vh - 120px) !important;
-    min-height: 460px !important;
-    margin: 20px 0 0 -14px !important;
-    z-index: 0 !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    min-width: 0 !important;
+    max-width: 0 !important;
     pointer-events: none !important;
-    overflow: hidden !important;
 }
-.stApp:has(.minimal-sidebar-shell) .minimal-sidebar-art svg {
-    display: block !important;
-    width: 100% !important;
-    height: 100% !important;
+.stApp:has(.secondary-page-shell)
+section[data-testid="stMainBlockContainer"] {
+    width: calc(100% - 48px) !important;
+    max-width: none !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
 }
-.stApp:has(.minimal-sidebar-shell)
-section[data-testid="stSidebar"] .st-key-sidebar_back_chat {
-    position: relative !important;
-    z-index: 3 !important;
+.stApp:has(.secondary-page-shell)
+[class*="st-key-secondary_back_chat"] {
+    position: fixed !important;
+    top: 18px !important;
+    right: 24px !important;
+    z-index: 999999 !important;
+    width: auto !important;
+    margin: 0 !important;
+}
+.stApp:has(.secondary-page-shell)
+[class*="st-key-secondary_back_chat"] button {
+    min-height: 40px !important;
+    padding: 7px 14px !important;
+    border: 1px solid #4B315D !important;
+    border-radius: 12px !important;
+    background: #4B315D !important;
+    color: #FFF9F1 !important;
+    box-shadow: 0 6px 16px rgba(75, 49, 93, .18) !important;
+}
+.stApp:has(.secondary-page-shell)
+[class*="st-key-secondary_back_chat"] button p,
+.stApp:has(.secondary-page-shell)
+[class*="st-key-secondary_back_chat"] button [data-testid="stIconMaterial"] {
+    color: #FFF9F1 !important;
+    white-space: nowrap !important;
 }
 
 @media (max-width: 820px) {
-    .stApp:has(.minimal-sidebar-shell) .minimal-sidebar-art {
-        width: calc(100% + 14px) !important;
-        height: 320px !important;
-        min-height: 320px !important;
-        margin-left: -7px !important;
+    .stApp:has(.secondary-page-shell)
+    [class*="st-key-secondary_back_chat"] {
+        top: 12px !important;
+        right: 12px !important;
+    }
+    .stApp:has(.secondary-page-shell)
+    [class*="st-key-secondary_back_chat"] button {
+        min-height: 36px !important;
+        padding: 5px 10px !important;
     }
 }
 """
