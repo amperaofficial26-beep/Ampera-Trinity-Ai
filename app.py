@@ -2236,9 +2236,8 @@ def main() -> None:
       
     # Launcher "Analisis berlapis" dihapus; navigasi Multi AI tetap tersedia
     # melalui sidebar dan halaman Multi AI.
-    render_sidebar()
-
     page = st.session_state.get("page", "chat")
+    render_sidebar(page)
 
     # Panel File hanya tampil di halaman yang mendukung fitur file.
     if page in ("chat", "desain", "jadwal", "multi_agent"):
