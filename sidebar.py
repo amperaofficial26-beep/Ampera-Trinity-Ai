@@ -212,8 +212,8 @@ show_proyek_dialog = _register_dialog("Proyek", _proyek_dialog_body)
 show_artefak_dialog = _register_dialog("Artefak", _artefak_dialog_body)
 show_sesuaikan_dialog = _register_dialog("Sesuaikan", _sesuaikan_dialog_body)
 
-def render_sidebar() -> None:
-    page = st.session_state.get("page", "chat")
+def render_sidebar(page: str | None = None) -> None:
+    page = page if page is not None else st.session_state.get("page", "chat")
     if page != "chat":
         with st.sidebar:
             st.markdown(
