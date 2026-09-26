@@ -1977,17 +1977,17 @@ div.stDownloadButton > button,
 ================================================================ */
 @media (min-width: 821px) {
     section[data-testid="stSidebar"] {
-        width: 258px !important;
-        min-width: 258px !important;
-        max-width: 258px !important;
+        width: 224px !important;
+        min-width: 224px !important;
+        max-width: 224px !important;
         background: #EFE2D0 !important;
         border-right: 1px solid #D8C9B6 !important;
         box-shadow: 5px 0 22px rgba(48, 40, 58, .035) !important;
     }
 
     .stApp:has(.tr-chat-layout) {
-        --tr-sidebar-width: 258px !important;
-        --dash-sidebar: 258px !important;
+        --tr-sidebar-width: 224px !important;
+        --dash-sidebar: 224px !important;
     }
 
     .stApp:has(.tr-chat-layout)
@@ -2016,11 +2016,11 @@ section[data-testid="stSidebar"] .element-container {
 section[data-testid="stSidebar"] .sb-brand {
     display: flex !important;
     align-items: center !important;
-    gap: 16px !important;
+    gap: 8px !important;
     width: auto !important;
-    min-height: 92px !important;
-    margin: 7px 8px 30px !important;
-    padding: 14px 18px !important;
+    min-height: 104px !important;
+    margin: 7px 0 30px !important;
+    padding: 10px !important;
     border: 1px solid #E0D2C0 !important;
     border-radius: 31px !important;
     background: #F8F0E6 !important;
@@ -2030,15 +2030,15 @@ section[data-testid="stSidebar"] .sb-brand-logo {
     position: relative !important;
     display: grid !important;
     place-items: center !important;
-    width: 56px !important;
-    height: 56px !important;
-    min-width: 56px !important;
-    padding-right: 15px !important;
+    width: 70px !important;
+    height: 70px !important;
+    min-width: 70px !important;
+    padding-right: 12px !important;
     border-right: 1px solid #D8C9B6 !important;
 }
 section[data-testid="stSidebar"] .sb-brand-logo .logo-sidebar {
-    width: 56px !important;
-    height: 56px !important;
+    width: 70px !important;
+    height: 70px !important;
 }
 section[data-testid="stSidebar"] .sb-brand-title {
     padding: 0 !important;
@@ -2148,8 +2148,8 @@ section[data-testid="stSidebar"] .st-key-sb_menu_jadwal div.stButton > button p 
 
 /* Akun tetap berada di bawah, dengan warna yang menyatu dengan sidebar. */
 section[data-testid="stSidebar"] .sb-account {
-    width: 258px !important;
-    max-width: 258px !important;
+    width: 224px !important;
+    max-width: 224px !important;
     padding: 12px 18px !important;
     border-top: 1px solid #D8C9B6 !important;
     background: #EFE2D0 !important;
