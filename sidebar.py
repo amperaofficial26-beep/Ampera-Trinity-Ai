@@ -296,10 +296,11 @@ def render_sidebar(page: str | None = None) -> None:
             if st.button(
                 ":material/image: &nbsp;Generate Gambar",
                 use_container_width=True,
-                type="primary" if page == "chat" and in_image_mode else "secondary",
+                type="primary" if page == "image" else "secondary",
             ):
-                st.session_state.image_mode = True
-                go("chat")
+                # Halaman khusus AI Image (page_image.py): text-to-image
+                # ala Canva dengan chip gaya & format di kotak prompt.
+                go("image")
         
         with st.container(key="sb_menu_history"):
             if st.button(":material/history: &nbsp;Riwayat Chat", use_container_width=True):

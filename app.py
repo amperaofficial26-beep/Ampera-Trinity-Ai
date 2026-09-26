@@ -11,6 +11,8 @@ dan CSS di styles.py.
 
 HALAMAN (routing internal lewat st.session_state.page):
   - chat        → halaman utama (default)
+  - image       → AI Image: text-to-image ala Canva (chip gaya & format,
+                  hasil muncul sebagai balasan di thread halaman itu)
   - artefak     → kotak kategori ala Claude, Yuki menjawab di halaman itu
   - pengaturan  → 8 tab: Umum · Akun · Privasi · Penagihan · Kemampuan ·
                   Memori · Refleksi · Waktu dan fokus
@@ -71,6 +73,7 @@ from panel_file import render_file_dock          # ← BARIS BARU
 from page_desain import page_desain
 from page_jadwal import page_jadwal
 from page_multi_agent import page_multi_agent
+from page_image import page_image
 from styles import inject_css
 from riwayat import dialog_bersihkan, tampilkan_toast_tertunda
 from tampilan import (
@@ -356,8 +359,7 @@ def _render_chat_right_rail() -> None:
                     key="rail_btn_image",
                     use_container_width=True,
                 ):
-                    st.session_state.image_mode = True
-                    go("chat")
+                    go("image")
 
         with q2:
             with st.container(key="rail_quick_multi"):
@@ -2293,6 +2295,8 @@ def main() -> None:
         page_jadwal()
     elif page == "multi_agent":
         page_multi_agent()
+    elif page == "image":
+        page_image()
     else:
         render_chat_page()
 

@@ -10,6 +10,7 @@ Dibuat oleh **Ampera Official — Palembang, Indonesia**. Punya produk lain juga
 
 - 💬 **Multi AI** — 14 tingkat model (Trinity Seed sampai Trinity Sovereign) dari berbagai provider, dengan fallback otomatis
 - 🖼️ **Analisis & generate gambar** — model bervision + image engine
+- ✨ **AI Image** — halaman text-to-image ala Canva: pilih gaya (Realistis, Anime, Cat Air, …) & format (1:1 sampai 9:16), tulis prompt, hasilnya muncul sebagai balasan yang bisa diunduh
 - 🗂️ **Artefak** — jawaban dengan kategori ala Claude
 - 🎓 **Trinity Kursus** — Yuki jadi mentor di thread khusus
 - 🌐 **14 bahasa** — antarmuka + bahasa jawaban bisa diganti
@@ -54,6 +55,7 @@ GROQ_API_KEY = "gsk_..."
 | File | Fungsi |
 |---|---|
 | `app.py` | File utama: routing & navigasi antar halaman |
+| `page_image.py` | Halaman AI Image: text-to-image ala Canva (chip gaya & format, hasil sebagai balasan) |
 | `config.py` | Konstanta & katalog (model, bahasa, artefak, kursus, identitas & harga Ampera) |
 | `state.py` | Manajemen state sesi |
 | `chat_handlers.py` | Handler kirim pesan & render input chat |

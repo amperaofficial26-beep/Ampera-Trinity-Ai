@@ -394,6 +394,7 @@ def detect_loading_mode(
     if (
         image_mode
         or page == "desain"
+        or page == "image"
     ):
         return "design"
 

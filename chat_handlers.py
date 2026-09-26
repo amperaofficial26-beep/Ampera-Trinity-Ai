@@ -113,7 +113,11 @@ def maybe_run_yuki(answer_slot) -> bool:
         if job.get("auto"):
             st.toast("Beralih ke mode gambar otomatis.",
                      icon=":material/auto_awesome:")
-        handle_image_request(job.get("text") or "")
+        handle_image_request(
+            job.get("text") or "",
+            gaya=job.get("image_style"),
+            rasio=job.get("image_ratio"),
+        )
     else:
         handle_chat_request(answer_slot, request_text=job.get("text") or "")
     return True
@@ -181,7 +185,54 @@ def rapihkan_teks_chat(teks: str) -> str:
     return teks.strip()
     
 
-def handle_image_request(prompt: str) -> None:
+def _potong_rasio_gambar(data: bytes, rasio: str | None) -> bytes:
+    """Potong gambar FLUX (persegi) ke rasio pilihan User (center-crop).
+
+    FLUX.1-schnell di Cloudflare hanya menghasilkan gambar 1:1, jadi rasio
+    lain (4:5, 9:16, 16:9, 4:3) diterapkan setelah gambar jadi: tepi kiri-
+    kanan / atas-bawah dipotong simetris dari tengah. Gagal memotong →
+    gambar asli dikembalikan apa adanya (jangan sampai hasil hilang hanya
+    karena pemotongan error).
+    """
+    if not rasio or rasio == "1:1" or not data:
+        return data
+    try:
+        from config import IMAGE_RATIOS
+
+        info = next((r for r in IMAGE_RATIOS if r["key"] == rasio), None)
+        if not info:
+            return data
+        im = Image.open(io.BytesIO(data))
+        w, h = im.size
+        target = info["w"] / info["h"]
+        if w / h > target:          # terlalu lebar → potong kiri-kanan
+            nw = int(round(h * target))
+            x0 = (w - nw) // 2
+            im = im.crop((x0, 0, x0 + nw, h))
+        elif w / h < target:        # terlalu tinggi → potong atas-bawah
+            nh = int(round(w / target))
+            y0 = (h - nh) // 2
+            im = im.crop((0, y0, w, y0 + nh))
+        else:
+            return data             # sudah pas, tidak perlu dipotong
+        buf = io.BytesIO()
+        im.save(buf, format="PNG")
+        return buf.getvalue()
+    except Exception:
+        return data
+
+
+def handle_image_request(prompt: str, gaya: str | None = None,
+                         rasio: str | None = None) -> None:
+    """Buat gambar dari prompt di halaman AI Image.
+
+    `gaya`  : key di config.IMAGE_STYLES — suffix gaya ditambahkan ke
+              prompt sebelum dikirim ke FLUX (efek nyata pada hasil).
+    `rasio` : key di config.IMAGE_RATIOS — gambar persegi dipotong ke
+              rasio pilihan setelah jadi.
+    """
+    from config import IMAGE_STYLES
+
     thread = active_thread()
     if not IMAGE_READY:
         thread.append({
@@ -190,6 +241,16 @@ def handle_image_request(prompt: str) -> None:
             "time": now_wib(),
         })
         return
+
+    # Susun prompt final: teks User + kata kunci gaya pilihan.
+    prompt_final = (prompt or "").strip()
+    if gaya:
+        suffix = next(
+            (g.get("suffix", "") for g in IMAGE_STYLES if g.get("key") == gaya),
+            "",
+        )
+        if suffix:
+            prompt_final = f"{prompt_final}. {suffix}"
 
     progress_slot = st.empty()
     result: dict = {"data": None, "error": None, "catatan": ""}
@@ -200,7 +261,7 @@ def handle_image_request(prompt: str) -> None:
             # ditolak Cloudflare (HTTP 400). Ringkas/potong dulu di sini
             # supaya animasi loading tetap tampil selama proses berjalan.
             from engines.image_engine import ringkas_prompt_panjang
-            prompt_siap, catatan = ringkas_prompt_panjang(prompt)
+            prompt_siap, catatan = ringkas_prompt_panjang(prompt_final)
             result["catatan"] = catatan
             result["data"] = generate_image(prompt_siap)
         except Exception as exc:
@@ -248,10 +309,13 @@ def handle_image_request(prompt: str) -> None:
         time.sleep(IMAGE_DONE_SECONDS)
         progress_slot.empty()
         st.session_state.pop("_last_image_error", None)
+        data_akhir = _potong_rasio_gambar(result["data"], rasio)
         thread.append({
             "id": next_msg_id(), "role": "assistant", "type": "image",
-            "image_bytes": result["data"], "prompt": prompt,
+            "image_bytes": data_akhir, "prompt": prompt,
             "catatan_prompt": result.get("catatan") or None,
+            "gaya": gaya if gaya and gaya != "otomatis" else None,
+            "rasio": rasio if rasio and rasio != "1:1" else None,
             "time": now_wib(),
         })
         return
@@ -1293,7 +1357,15 @@ def process_user_input(user_input, answer_slot, is_fresh: bool = False) -> bool:
     # ROUTER NIAT (niat.py): kalau User tidak menyalakan mode gambar
     # sendiri, Yuki menebak dari kalimatnya. Saklar manual tetap menang —
     # User yang sengaja menyalakan mode gambar tidak akan dibantah.
-    mode_manual = bool(st.session_state.image_mode and not images)
+    #
+    # Halaman "AI Image" (page_image.py) murni text-to-image: semua kiriman
+    # teks di halaman itu PASTI jadi gambar, tanpa lewat tebakan niat.
+    halaman_gambar = (
+        str(st.session_state.get("page") or "chat") == "image"
+        and bool(text)
+        and not images
+    )
+    mode_manual = bool(st.session_state.image_mode and not images) or halaman_gambar
     if mode_manual:
         buat_gambar = True
     else:
@@ -1331,5 +1403,8 @@ def process_user_input(user_input, answer_slot, is_fresh: bool = False) -> bool:
         "text": text,
         "auto": buat_gambar and not mode_manual,
         "loader_mode": loader_mode,
+        # Pilihan gaya & rasio dari halaman AI Image (page_image.py).
+        "image_style": st.session_state.get("aiimg_gaya") if halaman_gambar else None,
+        "image_ratio": st.session_state.get("aiimg_rasio") if halaman_gambar else None,
     }
     return True

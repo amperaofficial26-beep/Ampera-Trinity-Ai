@@ -99,7 +99,7 @@ def clear_done_tasks() -> None:
 def active_thread() -> list[dict]:
     """Riwayat pesan milik halaman yang sedang dibuka."""
     page = st.session_state.get("page", "chat")
-    if page in ("desain", "jadwal"):
+    if page in ("desain", "jadwal", "image"):
         return mode_thread(page)
     if page == "artefak":
         aid = st.session_state.get("artifact_active_id")

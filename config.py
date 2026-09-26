@@ -374,6 +374,56 @@ CF_API_BASE = "https://api.cloudflare.com/client/v4/accounts"
 CF_IMAGE_MODEL = "@cf/black-forest-labs/flux-1-schnell"
 CF_DEFAULT_STEPS = 4
 
+# ----------------------------------------------------------------------------
+# KATALOG HALAMAN "AI IMAGE" (page_image.py)
+#
+# IMAGE_STYLES : pilihan gaya di baris kontrol halaman AI Image. "suffix"
+#                ditambahkan ke prompt User sebelum dikirim ke FLUX, jadi
+#                tiap pilihan punya efek NYATA pada hasil gambar.
+#                Baris pertama ("otomatis") tidak menambahkan apa pun.
+# IMAGE_RATIOS : pilihan format/rasio. FLUX selalu menghasilkan gambar
+#                persegi (1024x1024); rasio selain 1:1 diterapkan dengan
+#                memotong tepi (center-crop) pakai Pillow setelah gambar
+#                jadi — berguna untuk format IG story, post, dll.
+# ----------------------------------------------------------------------------
+IMAGE_STYLES = [
+    {"key": "otomatis",   "label": "Otomatis",  "icon": ":material/auto_awesome:", "suffix": ""},
+    {"key": "realistis",  "label": "Realistis", "icon": ":material/photo_camera:",
+     "suffix": "ultra realistic photograph, natural lighting, sharp focus, "
+               "fine detail, 50mm lens"},
+    {"key": "anime",      "label": "Anime",     "icon": ":material/animation:",
+     "suffix": "anime style illustration, vibrant colors, clean line art, "
+               "cel shading"},
+    {"key": "ilustrasi",  "label": "Ilustrasi", "icon": ":material/brush:",
+     "suffix": "flat vector illustration, bold shapes, playful color "
+               "palette, clean composition"},
+    {"key": "catair",     "label": "Cat Air",   "icon": ":material/format_paint:",
+     "suffix": "watercolor painting, soft color washes, visible paper "
+               "texture, delicate brush strokes"},
+    {"key": "digital",    "label": "Digital",   "icon": ":material/palette:",
+     "suffix": "digital art, concept art, dramatic lighting, rich colors, "
+               "highly detailed"},
+    {"key": "3d",         "label": "3D",        "icon": ":material/view_in_ar:",
+     "suffix": "cute stylized 3D render, soft studio lighting, smooth "
+               "materials, subtle depth of field"},
+    {"key": "sinematik",  "label": "Sinematik", "icon": ":material/movie:",
+     "suffix": "cinematic shot, film grain, anamorphic lens flare, dramatic "
+               "color grading, movie still"},
+]
+
+IMAGE_RATIOS = [
+    {"key": "1:1",   "label": "1:1",  "icon": ":material/crop_square:",
+     "hint": "Kotak",  "w": 1,  "h": 1},
+    {"key": "4:5",   "label": "4:5",  "icon": ":material/crop_portrait:",
+     "hint": "Post IG", "w": 4,  "h": 5},
+    {"key": "9:16",  "label": "9:16", "icon": ":material/smartphone:",
+     "hint": "Story",  "w": 9,  "h": 16},
+    {"key": "16:9",  "label": "16:9", "icon": ":material/monitor:",
+     "hint": "Sinema", "w": 16, "h": 9},
+    {"key": "4:3",   "label": "4:3",  "icon": ":material/filter_frames:",
+     "hint": "Klasik", "w": 4,  "h": 3},
+]
+
 # ============================================================================
 # SUARA & GAMBAR MASUK
 # ============================================================================

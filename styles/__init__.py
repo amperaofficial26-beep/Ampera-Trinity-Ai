@@ -22,6 +22,7 @@ from .part08_controls_icons import CSS as _P08
 from .part09_design_system import CSS as _P09
 from .part10_multiai_layout import CSS as _P10
 from .part11_settings_page import CSS as _P11
+from .part12_ai_image import CSS as _P12
 
 # Setiap modul part*.py menulis kontennya sebagai CSS = r"""\n...\n"""
 # sehingga selalu ada tepat satu newline pembungkus di awal & akhir yang
@@ -31,7 +32,7 @@ _ALL_CSS = "\n".join(
     part[1:-1]
     for part in (
         _P01, _P02, _P03, _P04, _P05,
-        _P06, _P07, _P08, _P09, _P10, _P11,
+        _P06, _P07, _P08, _P09, _P10, _P11, _P12,
     )
 )
 
