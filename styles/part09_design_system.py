@@ -2202,4 +2202,26 @@ section[data-testid="stSidebar"] .sb-account {
         padding: 10px 7px !important;
     }
 }
+
+/* Override desktop: logo sidebar harus memenuhi brand card, bukan hanya
+   membesarkan slotnya. Ukuran span dan img dipaksa bersama-sama karena
+   logo_img_html() membawa inline width/height. */
+@media (min-width: 821px) {
+    section[data-testid="stSidebar"] .sb-brand {
+        min-height: 124px !important;
+    }
+    section[data-testid="stSidebar"] .sb-brand-logo {
+        width: 90px !important;
+        height: 90px !important;
+        min-width: 90px !important;
+        padding-right: 10px !important;
+        box-sizing: border-box !important;
+    }
+    section[data-testid="stSidebar"] .sb-brand-logo .logo-sidebar,
+    section[data-testid="stSidebar"] .sb-brand-logo .logo-sidebar img {
+        width: 82px !important;
+        height: 82px !important;
+        max-width: none !important;
+    }
+}
 """
