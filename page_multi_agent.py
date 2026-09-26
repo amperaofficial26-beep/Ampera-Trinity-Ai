@@ -28,7 +28,7 @@ MULTI_CARDS_X = -132
 MULTI_CARDS_Y = 0
 
 # Kolom chat/input di bagian bawah.
-MULTI_CHAT_X = 20
+MULTI_CHAT_X = 40
 MULTI_CHAT_Y = 0
 
 # Ukuran kartu dan kolom chat.
@@ -830,6 +830,12 @@ def page_multi_agent() -> None:
             --multi-input-width: {MULTI_INPUT_WIDTH}px;
             --multi-input-x: {MULTI_CHAT_X}px;
             --multi-input-y: {MULTI_CHAT_Y}px;
+            --chat-shift: {MULTI_CHAT_X}px !important;
+            --chat-width: {MULTI_CHAT_WIDTH}px !important;
+        }}
+        .stApp:has(.tr-multi-ai-layout) {{
+            --chat-shift: {MULTI_CHAT_X}px !important;
+            --chat-width: {MULTI_CHAT_WIDTH}px !important;
         }}
         /* Posisi header dan kartu diterapkan langsung pada markup HTML di bawah. */
         .stApp:has(.tr-multi-ai-layout) .multi-feature-grid {{
@@ -850,10 +856,6 @@ def page_multi_agent() -> None:
         [data-testid="stBottomBlockContainer"]:has(.st-key-multi_position_input) {{
             width: min({MULTI_CHAT_WIDTH}px, calc(100vw - 48px)) !important;
             max-width: min({MULTI_CHAT_WIDTH}px, calc(100vw - 48px)) !important;
-            transform: translate(
-                {MULTI_CHAT_X}px,
-                {MULTI_CHAT_Y}px
-            ) !important;
         }}
         [data-testid="stBottomBlockContainer"]:has(.st-key-multi_position_input)
         [data-testid="stChatInput"] {{
