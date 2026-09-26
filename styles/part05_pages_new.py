@@ -1907,4 +1907,121 @@ div.stButton > button p strong { color: #2C1F33; }
     .scheduler-hero h2 { font-size: 1rem; }
     .scheduler-hero p { font-size: .74rem; }
 }
+
+/* Form tugas manual pada AI Penjadwal */
+.stApp:has(.scheduler-page-shell)
+[data-testid="stExpander"] {
+    overflow: hidden !important;
+    margin: 22px 0 10px !important;
+    border: 1px solid #DED3C5 !important;
+    border-radius: 16px !important;
+    background: rgba(255, 253, 248, .72) !important;
+    box-shadow: 0 8px 20px rgba(78, 58, 40, .045) !important;
+}
+.stApp:has(.scheduler-page-shell)
+[data-testid="stExpander"] details > summary {
+    min-height: 54px !important;
+    padding: 0 20px !important;
+    border-bottom: 1px solid transparent !important;
+    background: linear-gradient(90deg, rgba(247, 240, 230, .95), rgba(255, 253, 248, .64)) !important;
+    color: #3E2E4D !important;
+    transition: background .16s ease, border-color .16s ease !important;
+}
+.stApp:has(.scheduler-page-shell)
+[data-testid="stExpander"] details[open] > summary {
+    border-bottom-color: #E5DCD1 !important;
+    background: #F7F0E6 !important;
+}
+.stApp:has(.scheduler-page-shell)
+[data-testid="stExpander"] details > summary:hover {
+    background: #F4ECE1 !important;
+}
+.stApp:has(.scheduler-page-shell)
+[data-testid="stExpander"] details > summary p {
+    margin: 0 !important;
+    color: #443251 !important;
+    font-size: .93rem !important;
+    font-weight: 600 !important;
+    letter-spacing: -.01em !important;
+}
+.stApp:has(.scheduler-page-shell)
+[data-testid="stExpander"] details > summary svg {
+    color: #665375 !important;
+}
+.stApp:has(.scheduler-page-shell)
+[data-testid="stExpanderDetails"] {
+    padding: 20px 24px 22px !important;
+    background: rgba(255, 253, 248, .52) !important;
+}
+.stApp:has(.scheduler-page-shell)
+[data-testid="stExpanderDetails"] > [data-testid="stVerticalBlock"] {
+    gap: .55rem !important;
+}
+.stApp:has(.scheduler-page-shell)
+[data-testid="stExpanderDetails"] [data-testid="stWidgetLabel"] p {
+    margin-bottom: 4px !important;
+    color: #554360 !important;
+    font-size: .74rem !important;
+    font-weight: 650 !important;
+}
+.stApp:has(.scheduler-page-shell)
+[data-testid="stExpanderDetails"] input,
+.stApp:has(.scheduler-page-shell)
+[data-testid="stExpanderDetails"] [data-baseweb="select"] > div {
+    min-height: 40px !important;
+    border: 1px solid #E1D6C8 !important;
+    border-radius: 11px !important;
+    background: #FFFDF9 !important;
+    color: #3E2E4D !important;
+    box-shadow: none !important;
+}
+.stApp:has(.scheduler-page-shell)
+[data-testid="stExpanderDetails"] input {
+    padding: 8px 12px !important;
+}
+.stApp:has(.scheduler-page-shell)
+[data-testid="stExpanderDetails"] input:focus {
+    border-color: #8E72A4 !important;
+    box-shadow: 0 0 0 3px rgba(142, 114, 164, .12) !important;
+}
+.stApp:has(.scheduler-page-shell)
+[data-testid="stExpanderDetails"] [data-testid="stHorizontalBlock"] {
+    gap: 14px !important;
+}
+.stApp:has(.scheduler-page-shell)
+[data-testid="stExpanderDetails"] [class*="st-key-jd_add"] {
+    display: flex !important;
+    justify-content: flex-end !important;
+    margin-top: 4px !important;
+}
+.stApp:has(.scheduler-page-shell)
+[data-testid="stExpanderDetails"] [class*="st-key-jd_add"] button {
+    width: min(100%, 184px) !important;
+    min-height: 40px !important;
+    margin-left: auto !important;
+    border: 1px solid #4C3567 !important;
+    border-radius: 10px !important;
+    background: #4C3567 !important;
+    color: #FFF !important;
+    font-size: .8rem !important;
+    font-weight: 650 !important;
+    box-shadow: 0 5px 12px rgba(76, 53, 103, .12) !important;
+}
+.stApp:has(.scheduler-page-shell)
+[data-testid="stExpanderDetails"] [class*="st-key-jd_add"] button:hover {
+    background: #5A4176 !important;
+    border-color: #5A4176 !important;
+    transform: translateY(-1px) !important;
+}
+
+@media (max-width: 640px) {
+    .stApp:has(.scheduler-page-shell)
+    [data-testid="stExpanderDetails"] {
+        padding: 17px 15px 19px !important;
+    }
+    .stApp:has(.scheduler-page-shell)
+    [data-testid="stExpanderDetails"] [class*="st-key-jd_add"] button {
+        width: 100% !important;
+    }
+}
 """
