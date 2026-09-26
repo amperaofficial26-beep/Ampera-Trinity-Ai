@@ -769,9 +769,31 @@ CSS = r"""
 .stApp:has(.tr-multi-ai-layout) .multi-feature-card strong {
     font-size: .76rem !important;
 }
-.stApp:has(.tr-multi-ai-layout) .multi-feature-card small {
+    .stApp:has(.tr-multi-ai-layout) .multi-feature-card small {
     margin-top: 6px !important;
     font-size: .62rem !important;
     line-height: 1.45 !important;
+}
+
+/* Seluruh landing Multi Trinity digeser bersama agar tidak terlalu ke kanan. */
+.stApp:has(.tr-multi-ai-layout) {
+    --multi-landing-shift: -120px;
+}
+.stApp:has(.tr-multi-ai-layout) .multi-landing-hero,
+.stApp:has(.tr-multi-ai-layout) .multi-feature-grid,
+.stApp:has(.tr-multi-ai-layout)
+[data-testid="stBottomBlockContainer"] {
+    position: relative !important;
+    left: var(--multi-landing-shift) !important;
+}
+@media (max-width: 900px) {
+    .stApp:has(.tr-multi-ai-layout) {
+        --multi-landing-shift: -32px;
+    }
+}
+@media (max-width: 520px) {
+    .stApp:has(.tr-multi-ai-layout) {
+        --multi-landing-shift: 0px;
+    }
 }
 """
