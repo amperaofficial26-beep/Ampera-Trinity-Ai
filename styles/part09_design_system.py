@@ -2354,4 +2354,41 @@ section[data-testid="stSidebar"] [data-testid="stSidebarHeader"] {
         color: #FFF9F1 !important;
     }
 }
+
+/* Corak dekoratif untuk sidebar minimal di halaman non-main. */
+.stApp:has(.minimal-sidebar-shell) .minimal-sidebar-shell {
+    display: none !important;
+}
+.stApp:has(.minimal-sidebar-shell) .minimal-sidebar-art {
+    position: relative !important;
+    left: auto !important;
+    bottom: auto !important;
+    display: block !important;
+    width: calc(100% + 28px) !important;
+    height: calc(100vh - 120px) !important;
+    min-height: 460px !important;
+    margin: 20px 0 0 -14px !important;
+    z-index: 0 !important;
+    pointer-events: none !important;
+    overflow: hidden !important;
+}
+.stApp:has(.minimal-sidebar-shell) .minimal-sidebar-art svg {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+.stApp:has(.minimal-sidebar-shell)
+section[data-testid="stSidebar"] .st-key-sidebar_back_chat {
+    position: relative !important;
+    z-index: 3 !important;
+}
+
+@media (max-width: 820px) {
+    .stApp:has(.minimal-sidebar-shell) .minimal-sidebar-art {
+        width: calc(100% + 14px) !important;
+        height: 320px !important;
+        min-height: 320px !important;
+        margin-left: -7px !important;
+    }
+}
 """
