@@ -750,4 +750,28 @@ CSS = r"""
         height: 72px !important;
     }
 }
+
+/* Kartu fitur diperbesar agar menjadi fokus landing page. */
+.stApp:has(.tr-multi-ai-layout) .multi-feature-grid {
+    width: min(1040px, calc(100vw - 48px)) !important;
+    gap: 16px !important;
+    margin-bottom: 48px !important;
+}
+.stApp:has(.tr-multi-ai-layout) .multi-feature-card {
+    min-height: 132px !important;
+    padding: 16px 17px 14px !important;
+    border-radius: 11px !important;
+}
+.stApp:has(.tr-multi-ai-layout) .multi-feature-card > span {
+    margin-bottom: 8px !important;
+    font-size: 22px !important;
+}
+.stApp:has(.tr-multi-ai-layout) .multi-feature-card strong {
+    font-size: .76rem !important;
+}
+.stApp:has(.tr-multi-ai-layout) .multi-feature-card small {
+    margin-top: 6px !important;
+    font-size: .62rem !important;
+    line-height: 1.45 !important;
+}
 """
