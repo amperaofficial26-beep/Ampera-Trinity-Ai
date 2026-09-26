@@ -2342,4 +2342,33 @@ section[data-testid="stSidebar"] [data-testid="stSidebarHeader"] {
         padding: 2px 11px !important;
     }
 }
+
+/* Marker eksplisit dari sidebar.py untuk room chat utama. */
+@media (min-width: 821px) {
+    .stApp:has(.sidebar-room-shell)
+    section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
+        gap: 0 !important;
+        row-gap: 0 !important;
+        column-gap: 0 !important;
+    }
+    .stApp:has(.sidebar-room-shell)
+    section[data-testid="stSidebar"] .element-container,
+    .stApp:has(.sidebar-room-shell)
+    section[data-testid="stSidebar"] div.stButton {
+        margin-top: 1px !important;
+        margin-bottom: 1px !important;
+    }
+    .stApp:has(.sidebar-room-shell)
+    section[data-testid="stSidebar"] div.stButton > button {
+        min-height: 12px !important;
+        height: auto !important;
+        padding: 2px 11px !important;
+        border-radius: 12px !important;
+    }
+    .stApp:has(.sidebar-room-shell)
+    section[data-testid="stSidebar"] div.stButton > button[kind="primary"] {
+        min-height: 12px !important;
+        padding: 2px 11px !important;
+    }
+}
 """
