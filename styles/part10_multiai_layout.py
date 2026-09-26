@@ -769,9 +769,11 @@ CSS = r"""
 .stApp:has(.tr-multi-ai-layout) .multi-feature-card strong {
     font-size: .76rem !important;
 }
-.stApp:has(.tr-multi-ai-layout) .multi-feature-card small {
+    .stApp:has(.tr-multi-ai-layout) .multi-feature-card small {
     margin-top: 6px !important;
     font-size: .62rem !important;
     line-height: 1.45 !important;
 }
+
+/* Posisi landing dikontrol langsung dari page_multi_agent.py. */
 """
