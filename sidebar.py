@@ -217,7 +217,17 @@ def render_sidebar(page: str | None = None) -> None:
     if page != "chat":
         with st.sidebar:
             st.markdown(
-                '<div class="minimal-sidebar-shell"></div>'
+                '<div class="minimal-sidebar-shell"></div>',
+                unsafe_allow_html=True,
+            )
+            st.button(
+                ":material/arrow_back:  Kembali ke Chat",
+                key="sidebar_back_chat",
+                use_container_width=True,
+                on_click=go_cb,
+                args=("chat",),
+            )
+            st.markdown(
                 '<div class="minimal-sidebar-art" aria-hidden="true">'
                 '<svg viewBox="0 0 224 360" preserveAspectRatio="none" '
                 'xmlns="http://www.w3.org/2000/svg">'
@@ -245,13 +255,6 @@ def render_sidebar(page: str | None = None) -> None:
                 'menjadi nyata.</text>'
                 '</svg></div>',
                 unsafe_allow_html=True,
-            )
-            st.button(
-                ":material/arrow_back:  Kembali ke Chat",
-                key="sidebar_back_chat",
-                use_container_width=True,
-                on_click=go_cb,
-                args=("chat",),
             )
         return
 

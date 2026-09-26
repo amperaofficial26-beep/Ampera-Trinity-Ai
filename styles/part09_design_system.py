@@ -2360,11 +2360,14 @@ section[data-testid="stSidebar"] [data-testid="stSidebarHeader"] {
     display: none !important;
 }
 .stApp:has(.minimal-sidebar-shell) .minimal-sidebar-art {
-    position: fixed !important;
-    left: 0 !important;
-    bottom: 0 !important;
-    width: 224px !important;
-    height: 360px !important;
+    position: relative !important;
+    left: auto !important;
+    bottom: auto !important;
+    display: block !important;
+    width: calc(100% + 28px) !important;
+    height: calc(100vh - 120px) !important;
+    min-height: 460px !important;
+    margin: 20px 0 0 -14px !important;
     z-index: 0 !important;
     pointer-events: none !important;
     overflow: hidden !important;
@@ -2382,8 +2385,10 @@ section[data-testid="stSidebar"] .st-key-sidebar_back_chat {
 
 @media (max-width: 820px) {
     .stApp:has(.minimal-sidebar-shell) .minimal-sidebar-art {
-        width: 100vw !important;
-        height: 300px !important;
+        width: calc(100% + 14px) !important;
+        height: 320px !important;
+        min-height: 320px !important;
+        margin-left: -7px !important;
     }
 }
 """
