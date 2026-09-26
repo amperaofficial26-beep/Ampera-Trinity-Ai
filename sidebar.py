@@ -213,6 +213,22 @@ show_artefak_dialog = _register_dialog("Artefak", _artefak_dialog_body)
 show_sesuaikan_dialog = _register_dialog("Sesuaikan", _sesuaikan_dialog_body)
 
 def render_sidebar() -> None:
+    page = st.session_state.get("page", "chat")
+    if page != "chat":
+        with st.sidebar:
+            st.markdown(
+                '<div class="minimal-sidebar-shell"></div>',
+                unsafe_allow_html=True,
+            )
+            st.button(
+                ":material/arrow_back:  Kembali ke Chat",
+                key="sidebar_back_chat",
+                use_container_width=True,
+                on_click=go_cb,
+                args=("chat",),
+            )
+        return
+
     with st.sidebar:
         # Brand serif ala "Claude"
         st.markdown(

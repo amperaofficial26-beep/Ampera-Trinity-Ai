@@ -2315,4 +2315,43 @@ section[data-testid="stSidebar"] [data-testid="stSidebarHeader"] {
         font-size: 1.75rem !important;
     }
 }
+
+/* Non-main pages keep only one route back to the main room. */
+@media (min-width: 821px) {
+    .stApp:has(.minimal-sidebar-shell)
+    section[data-testid="stSidebar"] {
+        width: 224px !important;
+        min-width: 224px !important;
+        max-width: 224px !important;
+        overflow: hidden !important;
+    }
+    .stApp:has(.minimal-sidebar-shell)
+    section[data-testid="stSidebar"] > div {
+        padding: 22px 14px 18px !important;
+    }
+    .stApp:has(.minimal-sidebar-shell)
+    section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
+        gap: 0 !important;
+    }
+    .stApp:has(.minimal-sidebar-shell)
+    section[data-testid="stSidebar"] .st-key-sidebar_back_chat {
+        margin: 12px 0 0 !important;
+    }
+    .stApp:has(.minimal-sidebar-shell)
+    section[data-testid="stSidebar"] .st-key-sidebar_back_chat button {
+        min-height: 40px !important;
+        padding: 6px 11px !important;
+        border-radius: 12px !important;
+        background: #4B315D !important;
+        border-color: #4B315D !important;
+        color: #FFF9F1 !important;
+        box-shadow: 0 5px 14px rgba(75, 49, 93, .16) !important;
+    }
+    .stApp:has(.minimal-sidebar-shell)
+    section[data-testid="stSidebar"] .st-key-sidebar_back_chat button p,
+    .stApp:has(.minimal-sidebar-shell)
+    section[data-testid="stSidebar"] .st-key-sidebar_back_chat button [data-testid="stIconMaterial"] {
+        color: #FFF9F1 !important;
+    }
+}
 """
