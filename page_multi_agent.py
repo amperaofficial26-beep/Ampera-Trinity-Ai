@@ -848,13 +848,13 @@ def page_multi_agent() -> None:
     # Ini mencegah Markdown menganggap tag <p> sebagai blok kode.
     logo = f"data:image/png;base64,{LOGO_B64}"
     hero = (
-        '<div class="multi-landing-hero">'
+        '<div class="multi-landing-hero" style="position:relative;left:-120px;">'
         f'<div class="multi-landing-logo"><img src="{logo}" alt="Trinity"></div>'
         '<h1>Multi Trinity Agent</h1>'
         '<p>Seluruh model Trinity menganalisis, mengkritik, dan menyatukan<br>'
         'jawaban profesional dalam satu ruang kolaborasi.</p>'
         '</div>'
-        '<div class="multi-feature-grid">'
+        '<div class="multi-feature-grid" style="position:relative;left:-120px;">'
         '<div class="multi-feature-card">'
         '<span class="material-symbols-rounded">psychology</span>'
         '<strong>Analisis Mendalam</strong>'
