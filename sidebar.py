@@ -215,41 +215,14 @@ show_sesuaikan_dialog = _register_dialog("Sesuaikan", _sesuaikan_dialog_body)
 def render_sidebar(page: str | None = None) -> None:
     page = page if page is not None else st.session_state.get("page", "chat")
     if page != "chat":
-        with st.sidebar:
-            st.markdown(
-                '<div class="minimal-sidebar-shell"></div>'
-                '<div class="minimal-sidebar-art" aria-hidden="true">'
-                '<svg viewBox="0 0 224 360" preserveAspectRatio="none" '
-                'xmlns="http://www.w3.org/2000/svg">'
-                '<path fill="#4B315D" d="M0 132 C28 164 55 170 83 194 '
-                'C111 218 125 253 224 270 L224 360 L0 360 Z"/>'
-                '<path fill="none" stroke="#D8C9B6" stroke-width="2" '
-                'opacity=".72" d="M-20 152 C40 195 89 179 130 246 '
-                'C154 284 183 296 249 310"/>'
-                '<path fill="none" stroke="#8A6A89" stroke-width="1" '
-                'opacity=".55" d="M-18 167 C41 209 91 194 135 260 '
-                'C157 292 188 310 244 324"/>'
-                '<g fill="#E9DCCB" opacity=".96">'
-                '<path d="M34 280 l3 9 9 3-9 3-3 9-3-9-9-3 9-3z"/>'
-                '<circle cx="58" cy="300" r="2"/>'
-                '<circle cx="48" cy="291" r="1.5"/>'
-                '</g>'
-                '<text x="28" y="238" fill="#F6EDE1" opacity=".82" '
-                'font-family="Inter, sans-serif" font-size="7">'
-                'Bersama Trinity,</text>'
-                '<text x="28" y="249" fill="#F6EDE1" opacity=".82" '
-                'font-family="Inter, sans-serif" font-size="7">'
-                'wujudkan ide</text>'
-                '<text x="28" y="260" fill="#F6EDE1" opacity=".82" '
-                'font-family="Inter, sans-serif" font-size="7">'
-                'menjadi nyata.</text>'
-                '</svg></div>',
-                unsafe_allow_html=True,
-            )
+        st.markdown(
+            '<div class="secondary-page-shell"></div>',
+            unsafe_allow_html=True,
+        )
+        with st.container(key="secondary_back_chat"):
             st.button(
                 ":material/arrow_back:  Kembali ke Chat",
-                key="sidebar_back_chat",
-                use_container_width=True,
+                key="secondary_back_chat_button",
                 on_click=go_cb,
                 args=("chat",),
             )
