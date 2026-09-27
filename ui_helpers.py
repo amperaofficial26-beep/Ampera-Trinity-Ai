@@ -912,10 +912,28 @@ def render_message(msg: dict) -> None:
             with st.container(
                 key=f"simulator_{simulator_id}"
             ):
+                # Shell visual membuat setiap simulator terasa seperti produk
+                # mini yang berdiri sendiri, bukan iframe polos di dalam chat.
+                st.markdown(
+                    '<div class="sim-card-head">'
+                    '<div class="sim-card-mark"><span>✦</span></div>'
+                    '<div><div class="sim-card-kicker">SIMULASI INTERAKTIF</div>'
+                    '<div class="sim-card-subtitle">Ubah parameter dan lihat hasilnya secara langsung</div></div>'
+                    '<div class="sim-card-live"><i></i> LIVE</div>'
+                    '</div>',
+                    unsafe_allow_html=True,
+                )
                 components.html(
                     html_document,
                     height=520,
                     scrolling=True,
+                )
+                st.markdown(
+                    '<div class="sim-card-foot">'
+                    '<span>Eksperimen dengan kontrol di atas</span>'
+                    '<span class="sim-card-tip">↗ Responsif · Tanpa data dikirim</span>'
+                    '</div>',
+                    unsafe_allow_html=True,
                 )
 
                 st.download_button(
