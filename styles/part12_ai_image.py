@@ -328,6 +328,106 @@ CSS = r"""
     width: auto !important;
     min-width: 0 !important;
 }
+/* ----------------------------------------------------------------
+   Versi baru: chip memakai st.pills (widget bawaan Streamlit).
+   Wadahnya dibuat MENDATAR: label "GAYA" di kiri, deretan pil di kanan.
+   Kalau kelas st-key-* tidak tersedia (Streamlit lama), aturan ini
+   diabaikan dan label cuma pindah ke atas pil — tetap rapi.
+   ---------------------------------------------------------------- */
+.st-key-aiimg_chips_gaya,
+.st-key-aiimg_chips_rasio {
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    gap: 8px !important;
+    width: 100%;
+}
+.st-key-aiimg_chips_gaya > [data-testid="stElementContainer"],
+.st-key-aiimg_chips_rasio > [data-testid="stElementContainer"] {
+    width: auto !important;
+    flex: 0 0 auto !important;
+    min-width: 0 !important;
+}
+/* blok pil boleh melebar & melipat ke baris berikutnya bila sempit */
+.st-key-aiimg_chips_gaya > [data-testid="stElementContainer"]:has(.stButtonGroup),
+.st-key-aiimg_chips_rasio > [data-testid="stElementContainer"]:has(.stButtonGroup) {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+}
+.st-key-aiimg_chips_gaya .stButtonGroup [role="group"],
+.st-key-aiimg_chips_rasio .stButtonGroup [role="group"],
+.st-key-aiimg_chips_gaya .stButtonGroup > div,
+.st-key-aiimg_chips_rasio .stButtonGroup > div {
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+}
+
+/* Pil: keadaan biasa (beige) — dua penulisan agar cocok di versi
+   Streamlit lama (stBaseButton-pills) maupun baru (data-variant). */
+[data-testid="stBottom"] button[data-variant="pills"],
+[data-testid="stBottomBlockContainer"] button[data-variant="pills"],
+[data-testid="stBottom"] [data-testid="stBaseButton-pills"],
+[data-testid="stBottomBlockContainer"] [data-testid="stBaseButton-pills"] {
+    background: #F8F1E4 !important;
+    border: 1px solid #E2D6C2 !important;
+    border-radius: 999px !important;
+    color: #5C5266 !important;
+    font-size: 0.78rem !important;
+    font-weight: 600 !important;
+    padding: 0.2rem 0.7rem !important;
+    min-height: 31px !important;
+    box-shadow: none !important;
+    white-space: nowrap !important;
+    transition: border-color 0.15s ease, background 0.15s ease,
+                color 0.15s ease !important;
+}
+[data-testid="stBottom"] button[data-variant="pills"]:hover,
+[data-testid="stBottomBlockContainer"] button[data-variant="pills"]:hover,
+[data-testid="stBottom"] [data-testid="stBaseButton-pills"]:hover,
+[data-testid="stBottomBlockContainer"] [data-testid="stBaseButton-pills"]:hover {
+    border-color: #B39EC6 !important;
+    background: #FBF6EC !important;
+    color: #4A3559 !important;
+}
+/* Pil terpilih: ungu Trinity */
+[data-testid="stBottom"] button[data-variant="pills"][data-selected],
+[data-testid="stBottomBlockContainer"] button[data-variant="pills"][data-selected],
+[data-testid="stBottom"] button[data-variant="pills"][aria-selected="true"],
+[data-testid="stBottomBlockContainer"] button[data-variant="pills"][aria-selected="true"],
+[data-testid="stBottom"] [data-testid="stBaseButton-pillsActive"],
+[data-testid="stBottomBlockContainer"] [data-testid="stBaseButton-pillsActive"] {
+    background: linear-gradient(135deg, #7C5C99, #4D3A69) !important;
+    border: 1px solid transparent !important;
+    border-radius: 999px !important;
+    color: #FFF6E9 !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 12px rgba(77, 58, 105, 0.32) !important;
+}
+[data-testid="stBottom"] button[data-variant="pills"][data-selected] *,
+[data-testid="stBottomBlockContainer"] button[data-variant="pills"][data-selected] *,
+[data-testid="stBottom"] [data-testid="stBaseButton-pillsActive"] *,
+[data-testid="stBottomBlockContainer"] [data-testid="stBaseButton-pillsActive"] * {
+    color: #FFF6E9 !important;
+}
+/* ikon material di dalam pil ikut mengecil */
+[data-testid="stBottom"] button[data-variant="pills"] [data-testid="stIconMaterial"],
+[data-testid="stBottomBlockContainer"] button[data-variant="pills"] [data-testid="stIconMaterial"] {
+    font-size: 15px !important;
+    width: 15px !important;
+    height: 15px !important;
+}
+
+/* Rapatkan jarak antar baris kontrol di kotak bawah */
+.st-key-aiimg_controls {
+    gap: 6px !important;
+    padding-top: 2px;
+}
+.st-key-aiimg_chips_gaya .aiimg-chip-label,
+.st-key-aiimg_chips_rasio .aiimg-chip-label,
+.st-key-aiimg_chips_rasio .aiimg-rasio-hint {
+    padding: 0 2px !important;
+}
+
 /* Label "Gaya" / "Format" di depan chip */
 .aiimg-chip-label {
     display: flex;
