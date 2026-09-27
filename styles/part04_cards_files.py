@@ -894,4 +894,39 @@ p.trinity-foot.in-chat,
 .stApp .rc-card .rc-link-src {
     background: transparent !important;
 }
+
+/* ====================================================================
+   POSISI KARTU YUKI (mendatar)
+   --------------------------------------------------------------------
+   Kartu sempat terdorong ke kanan karena lebarnya lebih kecil daripada
+   kolom percakapan, lalu sisa ruangnya jatuh di sebelah kiri. Di sini
+   kartu dipaksa menempel KIRI (sejajar tulisan "Yuki"), dan geserannya
+   bisa diatur lewat satu angka.
+
+   >>> ATUR DI SINI <<<
+   --rc-card-geser : 0px  = rata kiri (sejajar teks jawaban)
+                     40px = sedikit menjorok ke kanan
+                     auto = kembali ke tengah kolom
+   --rc-card-lebar : lebar maksimum kartu
+==================================================================== */
+:root {
+    --rc-card-geser: 0px;
+    --rc-card-lebar: 640px;
+}
+.stApp .rc-card,
+.stApp [class*="st-key-qr_card_"],
+.stApp [class*="st-key-rc_nav_"],
+.stApp [class*="st-key-rc_map_"],
+.stApp [class*="st-key-rc_itin_"] {
+    max-width: min(var(--rc-card-lebar), 100%) !important;
+    margin-left: var(--rc-card-geser) !important;
+    margin-right: auto !important;
+    align-self: flex-start !important;   /* kalau induknya wadah flex */
+}
+/* Wadah markdown tempat kartu ditanam juga dibuat rata kiri. */
+.stApp [data-testid="stMarkdownContainer"]:has(> .rc-card) {
+    display: block !important;
+    width: 100% !important;
+    text-align: left !important;
+}
 """
