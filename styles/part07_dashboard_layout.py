@@ -600,7 +600,7 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
     /* ===== ANGKA PATOKAN UTAMA ===== */
     --dash-sidebar: 210px;       /* lebar sidebar kiri */
     --dash-rail: 250px;          /* lebar panel kanan */
-    --dash-gap: 18px;            /* jarak sidebar/topbar/panel */
+    --dash-gap: 20px;            /* jarak sidebar/topbar/panel */
     --dash-top: 10px;            /* jarak atas topbar & panel kanan */
     --dash-bottom: 16px;         /* jarak bawah panel kanan */
 
