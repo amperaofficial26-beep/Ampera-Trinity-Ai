@@ -1123,7 +1123,7 @@ span[role="img"],
        yang dipakai supaya topbar tidak menempel ke sidebar. */
     left:
         calc(var(--dash-center-left)
-             + var(--topbar-jarak-sidebar, 22px)) !important;
+             + var(--topbar-jarak-sidebar, 20px)) !important;
 
     right:
         calc(var(--dash-center-right)
