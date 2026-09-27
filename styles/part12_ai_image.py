@@ -335,7 +335,11 @@ CSS = r"""
     left: auto !important;
     width: var(--aiimg-panel-w) !important;
     max-width: var(--aiimg-panel-w) !important;
-    bottom: var(--aiimg-panel-bottom) !important;
+    bottom: auto !important;
+    /* tinggi dihitung eksplisit (bukan mengandalkan top+bottom) supaya
+       panelnya PASTI memanjang di semua browser */
+    height: calc(100vh - var(--aiimg-panel-top)
+                 - var(--aiimg-panel-bottom)) !important;
     min-height: 340px !important;
     max-height: none !important;
     overflow-y: auto !important;
@@ -574,6 +578,7 @@ CSS = r"""
         max-width: none !important;
         max-height: none !important;
         min-height: 0 !important;
+        height: auto !important;
         bottom: auto !important;
         margin: 0 0 16px !important;
         overflow: visible !important;
