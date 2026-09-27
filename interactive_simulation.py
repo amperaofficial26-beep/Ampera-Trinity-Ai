@@ -120,6 +120,18 @@ INTERAKSI:
 - Berikan label yang jelas pada setiap kontrol.
 - Berikan nilai awal yang masuk akal.
 
+DESAIN KHUSUS SESUAI JENIS SIMULASI:
+- Setiap simulasi wajib punya desain visual yang unik dan kontekstual, bukan template polos yang sama.
+- Jangan tampilkan kontrol browser default sebagai tampilan utama. Style semua input range, tombol, panel, label, dan output dengan CSS.
+- Buat satu kartu/aplikasi mini dengan header, judul, deskripsi singkat, area visual utama, panel kontrol, dan output nilai yang jelas.
+- Gunakan font system modern, warna aksen, gradient, border, shadow, radius, spacing, dan micro-animation yang konsisten.
+- Pengubahan warna: gunakan tema color studio yang cerah, swatch besar, preview warna, kode HEX/RGB yang menonjol, slider berwarna, dan tombol reset bergaya.
+- Gaya gravitasi/fisika: gunakan tema ruang angkasa gelap dengan bintang/nebula, planet atau objek bergerak, jejak gerak, grid/canvas, serta indikator kecepatan dan gravitasi.
+- Simulasi grafik/data: gunakan tema dashboard analitik dengan panel metrik, grid halus, grafik yang dominan, dan warna status yang informatif.
+- Simulasi alam/ekosistem: gunakan palet hijau-biru, ilustrasi atau bentuk organik, dan animasi yang terasa hidup.
+- Pilih tema yang paling sesuai untuk topik lain; desain harus terasa sengaja dibuat untuk topik tersebut.
+- Pastikan kontras teks mudah dibaca, layout tidak terpotong, dan tetap nyaman di layar HP.
+
 FORMAT WAJIB:
 Buat kode seringkas mungkin: maksimal 180 baris, tanpa komentar panjang, tanpa
 penjelasan langkah kerja, dan tanpa kode yang tidak dipakai. Setelah satu
