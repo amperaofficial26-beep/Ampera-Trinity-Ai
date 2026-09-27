@@ -322,10 +322,10 @@ CSS = r"""
    ================================================================ */
 :root {
     --aiimg-panel-w: 268px;
-    --aiimg-panel-top: 76px;
+    --aiimg-panel-top: 30px;
     /* jarak dasar panel dari bawah layar — disamakan dengan tinggi
        angkat kotak input supaya kaki panel & kotak input sejajar */
-    --aiimg-panel-bottom: 30px;
+    --aiimg-panel-bottom: 70px;
 }
 
 .stApp:has(.aiimg-page-shell) .st-key-aiimg_panel {
@@ -339,7 +339,7 @@ CSS = r"""
     /* Ditulis SATU BARIS & pakai angka mentah (bukan var) supaya tidak ada
        satu pun browser/parser yang membuangnya — panel wajib memanjang. */
     height: auto !important;
-    min-height: calc(100vh - 106px) !important;
+    min-height: calc(100vh - 100px) !important;
     max-height: none !important;
     overflow-y: auto !important;
     padding: 15px 16px 14px !important;
