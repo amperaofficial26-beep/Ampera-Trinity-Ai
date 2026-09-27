@@ -883,4 +883,55 @@ body .stApp:has(.tr-multi-ai-layout) .yuki-answer-body {
     max-height: none !important;
     overflow: visible !important;
 }
+
+/* ====================================================================
+   MULTI AI — HALAMAN HARUS BISA DIGULIR SAMPAI HABIS
+   --------------------------------------------------------------------
+   Gejala: jawaban berhenti di tengah, seolah halaman "mentok".
+   Tiga sebab yang ditutup di sini:
+
+   1. Simulator interaktif dirender sebagai <iframe> setinggi 520px dengan
+      scroll sendiri. Saat kursor berada di atasnya, roda mouse menggulir
+      ISI IFRAME, bukan halaman — jadi terasa seperti tertahan. Tingginya
+      dibatasi dan diberi tepi supaya jelas batasnya.
+   2. Kartu input bawah melayang di atas isi; ruang bawah ditambah agar
+      pesan terakhir tidak tertutup.
+   3. Pastikan tidak ada pembatas tinggi/overflow pada wadah utama.
+
+   >>> ATUR DI SINI <<<
+   --multi-sim-tinggi : tinggi maksimum kartu simulasi
+   --multi-ruang-bawah: ruang kosong di bawah pesan terakhir
+==================================================================== */
+body .stApp:has(.tr-multi-ai-layout) {
+    --multi-sim-tinggi: 360px;
+    --multi-ruang-bawah: 240px;
+}
+
+body .stApp:has(.tr-multi-ai-layout) [data-testid="stMain"],
+body .stApp:has(.tr-multi-ai-layout) [data-testid="stAppViewContainer"] {
+    max-height: none !important;
+    overflow-y: auto !important;
+}
+
+body .stApp:has(.tr-multi-ai-layout)
+[data-testid="stMainBlockContainer"] {
+    padding-bottom: var(--multi-ruang-bawah) !important;
+    overflow: visible !important;
+}
+
+/* Kartu simulasi interaktif: lebih pendek & tidak "menelan" guliran. */
+body .stApp:has(.tr-multi-ai-layout) [class*="st-key-simulator_"] iframe,
+body .stApp:has(.tr-multi-ai-layout) iframe[title="st.iframe"],
+body .stApp:has(.tr-multi-ai-layout) [data-testid="stIFrame"] {
+    height: var(--multi-sim-tinggi) !important;
+    max-height: var(--multi-sim-tinggi) !important;
+    width: 100% !important;
+    border: 1px solid var(--tr-border, #DBCEB9) !important;
+    border-radius: 14px !important;
+    background: #FFFFFF !important;
+}
+body .stApp:has(.tr-multi-ai-layout) [class*="st-key-simulator_"] {
+    margin: 8px 0 18px !important;
+    overflow: visible !important;
+}
 """
