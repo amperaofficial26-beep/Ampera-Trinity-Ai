@@ -1022,7 +1022,7 @@ span[role="img"],
 
     top: 12px !important;
 
-    left: calc(var(--dash-center-left) + 50px) !important;
+    left: var(--dash-center-left) !important;
 
     right: var(--dash-center-right) !important;
 
