@@ -930,21 +930,48 @@ p.trinity-foot.in-chat,
     text-align: left !important;
 }
 
-/* Halaman Multi AI memakai kolom sempit sendiri — geseran kartu
-   dinetralkan di sana supaya isi jawaban tidak keluar/terpotong. */
+/* ====================================================================
+   HALAMAN MULTI AI — ISI PESAN DIKUNCI DI DALAM KARTU
+   --------------------------------------------------------------------
+   Kolom Multi AI punya kartu sendiri (.st-key-multi_chat_area, 760px)
+   yang digeser lewat transform. Segala geseran/pergeseran lain (margin
+   negatif kartu Yuki, transform, position absolute) dinetralkan di sini
+   supaya teks jawaban tidak keluar dari kartu lalu terpotong.
+==================================================================== */
 .stApp:has(.tr-multi-ai-layout) .rc-card,
 .stApp:has(.tr-multi-ai-layout) [class*="st-key-qr_card_"],
 .stApp:has(.tr-multi-ai-layout) [class*="st-key-rc_nav_"],
 .stApp:has(.tr-multi-ai-layout) [class*="st-key-rc_map_"],
 .stApp:has(.tr-multi-ai-layout) [class*="st-key-rc_itin_"] {
     margin-left: 0 !important;
+    margin-right: auto !important;
 }
-/* Isi pesan tidak boleh melewati batas kolom percakapan. */
+
+.stApp:has(.tr-multi-ai-layout) .st-key-multi_chat_area
+[data-testid="stVerticalBlock"],
+.stApp:has(.tr-multi-ai-layout) .st-key-multi_chat_area
+[data-testid="stElementContainer"],
+.stApp:has(.tr-multi-ai-layout) .st-key-multi_chat_area
+[data-testid="stMarkdownContainer"],
 .stApp:has(.tr-multi-ai-layout) .bubble-row,
-.stApp:has(.tr-multi-ai-layout) .bubble-wrap,
-.stApp:has(.tr-multi-ai-layout) .bubble {
+.stApp:has(.tr-multi-ai-layout) .bubble-wrap {
+    position: static !important;
+    left: auto !important;
+    right: auto !important;
     margin-left: 0 !important;
+    margin-right: 0 !important;
+    transform: none !important;
+    width: 100% !important;
     max-width: 100% !important;
     min-width: 0 !important;
+    box-sizing: border-box !important;
 }
+.stApp:has(.tr-multi-ai-layout) .bubble {
+    max-width: 100% !important;
+    min-width: 0 !important;
+    margin-left: 0 !important;
+    overflow-wrap: anywhere !important;
+}
+.stApp:has(.tr-multi-ai-layout) .bubble-row.ai   { justify-content: flex-start !important; }
+.stApp:has(.tr-multi-ai-layout) .bubble-row.user { justify-content: flex-end !important; }
 """
