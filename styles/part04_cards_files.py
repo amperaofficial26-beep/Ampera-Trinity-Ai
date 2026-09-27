@@ -910,7 +910,7 @@ p.trinity-foot.in-chat,
    --rc-card-lebar : lebar maksimum kartu
 ==================================================================== */
 :root {
-    --rc-card-geser: 0px;
+    --rc-card-geser: -150px;
     --rc-card-lebar: 640px;
 }
 .stApp .rc-card,
