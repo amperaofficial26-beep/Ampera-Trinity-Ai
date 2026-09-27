@@ -322,7 +322,7 @@ CSS = r"""
    ================================================================ */
 :root {
     --aiimg-panel-w: 268px;
-    --aiimg-panel-top: 76px;
+    --aiimg-panel-top: 30px;
     /* jarak dasar panel dari bawah layar — disamakan dengan tinggi
        angkat kotak input supaya kaki panel & kotak input sejajar */
     --aiimg-panel-bottom: 30px;
