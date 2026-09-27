@@ -1117,7 +1117,7 @@ span[role="img"],
 .st-key-chat_topbar {
 
     left:
-        var(--dash-center-left) !important;
+        calc(var(--dash-center-left) + 24) !important;
 
     right:
         var(--dash-center-right) !important;
