@@ -698,6 +698,16 @@ _AGENT_CSS = """
     ) !important;
 }
 
+</style>
+"""
+
+
+def _now() -> str:
+    return datetime.now(WIB).strftime("%H:%M")
+
+
+_TC_LOADER_CSS = """
+<style>
 /* ================================================================
    TRINITY CORE LOADER (versi kecil, TANPA kotak)
    ----------------------------------------------------------------
@@ -879,10 +889,6 @@ _AGENT_CSS = """
 """
 
 
-def _now() -> str:
-    return datetime.now(WIB).strftime("%H:%M")
-
-
 def _assembly_html() -> str:
     """Loader kecil Multi Trinity Agent: inti berputar + nama model berjalan.
 
@@ -909,17 +915,26 @@ def _assembly_html() -> str:
     nama_html = "".join(f"<b>{n}</b>" for n in nama_model)
     status_html = "".join(f"<i>{t}</i>" for t in status)
 
+    # Atribut fill/stroke ditulis langsung di SVG (bukan hanya lewat CSS)
+    # supaya kalau gaya gagal dimuat, bentuknya tetap cincin — bukan
+    # lingkaran hitam penuh selebar layar.
     svg = (
-        '<svg viewBox="0 0 180 180" aria-hidden="true">'
-        '<path class="tc-ring tc-a" d="M90 20 A70 70 0 0 1 151.6 55'
+        '<svg viewBox="0 0 180 180" width="54" height="54" '
+        'fill="none" aria-hidden="true">'
+        '<path class="tc-ring tc-a" fill="none" stroke="#4A3559" '
+        'stroke-width="7" stroke-linecap="round" d="M90 20 A70 70 0 0 1 151.6 55'
         ' A70 70 0 0 1 151.6 125 A70 70 0 0 1 90 160"/>'
-        '<path class="tc-ring tc-b" d="M90 32 A58 58 0 0 0 39 61'
+        '<path class="tc-ring tc-b" fill="none" stroke="#E8B04B" '
+        'stroke-width="6" stroke-linecap="round" d="M90 32 A58 58 0 0 0 39 61'
         ' A58 58 0 0 0 39 119 A58 58 0 0 0 90 148"/>'
-        '<path class="tc-ring tc-c" d="M28 90 A62 62 0 1 1 152 90"/>'
+        '<path class="tc-ring tc-c" fill="none" stroke="#8C74A8" '
+        'stroke-width="4.5" stroke-dasharray="14 22" '
+        'd="M28 90 A62 62 0 1 1 152 90"/>'
         '</svg>'
     )
 
     return (
+        _TC_LOADER_CSS +
         '<div class="tc-load" role="status" aria-label="Sedang memproses">'
         f'<div class="tc-core">{svg}<span class="tc-nuc"></span></div>'
         '<div class="tc-copy">'
