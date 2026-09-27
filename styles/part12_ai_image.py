@@ -323,6 +323,9 @@ CSS = r"""
 :root {
     --aiimg-panel-w: 268px;
     --aiimg-panel-top: 92px;
+    /* jarak dasar panel dari bawah layar — disamakan dengan tinggi
+       angkat kotak input supaya kaki panel & kotak input sejajar */
+    --aiimg-panel-bottom: 96px;
 }
 
 .stApp:has(.aiimg-page-shell) .st-key-aiimg_panel {
@@ -332,7 +335,9 @@ CSS = r"""
     left: auto !important;
     width: var(--aiimg-panel-w) !important;
     max-width: var(--aiimg-panel-w) !important;
-    max-height: calc(100vh - var(--aiimg-panel-top) - 120px) !important;
+    bottom: var(--aiimg-panel-bottom) !important;
+    min-height: 340px !important;
+    max-height: none !important;
     overflow-y: auto !important;
     padding: 15px 16px 14px !important;
     border: 1px solid #E6DAC6 !important;
@@ -371,7 +376,7 @@ CSS = r"""
     display: flex;
     align-items: flex-start;
     gap: 7px;
-    margin-top: 10px;
+    margin-top: auto;
     padding-top: 10px;
     border-top: 1px dashed #E3D6C2;
     color: #9B8FA6;
@@ -469,15 +474,28 @@ CSS = r"""
    ================================================================ */
 /* --aiimg-chat-lift : tinggi angkat kolom input dari dasar layar.
    Perbesar angkanya kalau mau kolom chat lebih naik lagi. */
+/* Kotaknya diberi KOTAK YANG SAMA dengan kolom isi halaman (kartu contoh
+   & percakapan), lalu kartu input di dalamnya dipusatkan — jadi titik
+   tengahnya persis segaris dengan kartu di atasnya, bukan tengah layar. */
 .stApp:has(.aiimg-page-shell)
 [data-testid="stBottomBlockContainer"] {
     --aiimg-chat-lift: 72px;
     margin-bottom: var(--aiimg-chat-lift) !important;
-    max-width: min(46rem,
-        calc(100vw - 220px - var(--aiimg-panel-w) - 90px)) !important;
+    width: calc(100% - 220px - var(--aiimg-panel-w)) !important;
+    max-width: none !important;
+    margin-left: auto !important;
+    margin-right: calc(var(--aiimg-panel-w) + 30px) !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    align-items: center !important;
+    transform: none !important;
+}
+.stApp:has(.aiimg-page-shell)
+[data-testid="stBottomBlockContainer"] > * {
+    width: 100% !important;
+    max-width: 46rem !important;
     margin-left: auto !important;
     margin-right: auto !important;
-    transform: none !important;
 }
 .stApp:has(.aiimg-page-shell) .dock-spacer { height: 104px !important; }
 
@@ -555,6 +573,8 @@ CSS = r"""
         width: 100% !important;
         max-width: none !important;
         max-height: none !important;
+        min-height: 0 !important;
+        bottom: auto !important;
         margin: 0 0 16px !important;
         overflow: visible !important;
     }
@@ -566,6 +586,7 @@ CSS = r"""
     }
     .stApp:has(.aiimg-page-shell)
     [data-testid="stBottomBlockContainer"] {
+        width: 100% !important;
         max-width: 46rem !important;
         margin-left: auto !important;
         margin-right: auto !important;
