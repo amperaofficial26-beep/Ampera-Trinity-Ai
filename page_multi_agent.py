@@ -697,6 +697,184 @@ _AGENT_CSS = """
       var(--multi-chat-y)
     ) !important;
 }
+
+/* ================================================================
+   TRINITY CORE LOADER (versi kecil, TANPA kotak)
+   ----------------------------------------------------------------
+   Pengganti kartu "Trinity AI Assembly" yang besar. Bentuknya cuma
+   satu baris: inti berputar + nama model berganti + garis sapuan.
+   Tidak ada border/latar/bayangan, jadi menyatu dengan percakapan.
+   Semua warna memakai var(--tr-*) supaya ikut tema aplikasi.
+
+   >>> ATUR DI SINI <<<
+   --tc-size  : diameter inti
+   --tc-emas  : warna aksen kedua (emas Trinity)
+================================================================ */
+.tc-load {
+  --tc-size: 54px;
+  --tc-emas: #E8B04B;
+
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin: 10px 0 18px;
+  padding: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+}
+
+.tc-core {
+  position: relative;
+  flex: 0 0 var(--tc-size);
+  width: var(--tc-size);
+  height: var(--tc-size);
+  animation: tcGlow 2s ease-in-out infinite;
+}
+.tc-core svg { width: 100%; height: 100%; overflow: visible; display: block; }
+
+.tc-ring { fill: none; stroke-linecap: round; transform-origin: 90px 90px; }
+.tc-a {
+  stroke: var(--tr-accent, #4A3559);
+  stroke-width: 7;
+  opacity: .95;
+  animation: tcSpin 5.5s linear infinite;
+}
+.tc-b {
+  stroke: var(--tc-emas);
+  stroke-width: 6;
+  opacity: .85;
+  animation: tcSpin 4s linear infinite reverse;
+}
+.tc-c {
+  stroke: color-mix(in srgb, var(--tr-accent, #4A3559) 60%, #FFFFFF);
+  stroke-width: 4.5;
+  opacity: .6;
+  stroke-dasharray: 14 22;
+  animation: tcSpinR 7s linear infinite;
+}
+@keyframes tcSpin  { to { transform: rotate(360deg); } }
+@keyframes tcSpinR { to { transform: rotate(-360deg); } }
+
+.tc-nuc {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 11px; height: 11px;
+  margin: -5.5px 0 0 -5.5px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%,
+      #FFF6E9, var(--tc-emas) 48%, var(--tr-accent, #4A3559) 100%);
+  box-shadow: 0 0 9px 2px color-mix(in srgb, var(--tc-emas) 55%, transparent);
+  animation: tcBreathe 2.2s ease-in-out infinite;
+}
+@keyframes tcBreathe {
+  0%, 100% { transform: scale(0.9); }
+  50%      { transform: scale(1.25); }
+}
+@keyframes tcGlow {
+  0%, 100% { filter: drop-shadow(0 0 6px color-mix(in srgb,
+              var(--tr-accent, #4A3559) 30%, transparent)); }
+  50%      { filter: drop-shadow(0 0 13px color-mix(in srgb,
+              var(--tr-accent, #4A3559) 55%, transparent)); }
+}
+
+/* ---- sisi teks ---- */
+.tc-copy { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+
+.tc-tag {
+  font-size: 8.5px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--tr-text2, #9C8C7C);
+  line-height: 1;
+}
+.tc-tag em {
+  font-style: normal;
+  font-weight: 700;
+  color: var(--tr-accent, #4A3559);
+}
+
+/* Nama model berganti tiap 2 detik (ticker, bukan JS). */
+.tc-name-win { height: 17px; overflow: hidden; }
+.tc-name-list {
+  display: block;
+  animation: tcRoll 28s steps(14, end) infinite;
+}
+.tc-name-list b {
+  display: block;
+  height: 17px;
+  line-height: 17px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .8px;
+  color: var(--tr-text, #2C1F33);
+  white-space: nowrap;
+  animation: tcFlick 2s ease-out infinite;
+}
+@keyframes tcRoll { to { transform: translateY(-238px); } }
+@keyframes tcFlick {
+  0%   { opacity: .25; filter: blur(1.4px); letter-spacing: 2.4px; }
+  18%  { opacity: 1;   filter: blur(0);     letter-spacing: .8px; }
+  100% { opacity: 1;   filter: blur(0);     letter-spacing: .8px; }
+}
+
+.tc-bar {
+  position: relative;
+  width: 168px;
+  max-width: 100%;
+  height: 2px;
+  border-radius: 2px;
+  overflow: hidden;
+  background: linear-gradient(90deg, transparent,
+      color-mix(in srgb, var(--tr-accent, #4A3559) 18%, transparent) 15%,
+      color-mix(in srgb, var(--tr-accent, #4A3559) 18%, transparent) 85%,
+      transparent);
+}
+.tc-bar::after {
+  content: "";
+  position: absolute;
+  top: 0; left: -40%;
+  width: 40%; height: 100%;
+  background: linear-gradient(90deg, transparent, var(--tc-emas), transparent);
+  animation: tcSweep 1.6s ease-in-out infinite;
+}
+@keyframes tcSweep { 0% { left: -40%; } 100% { left: 100%; } }
+
+.tc-status {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 8.5px;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: var(--tr-text2, #9C8C7C);
+}
+.tc-led {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--tc-emas);
+  box-shadow: 0 0 5px 1.5px color-mix(in srgb, var(--tc-emas) 60%, transparent);
+  animation: tcLed 1s ease-in-out infinite;
+}
+@keyframes tcLed { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
+
+.tc-status-win { height: 11px; overflow: hidden; }
+.tc-status-list {
+  display: block;
+  animation: tcRollS 12s steps(6, end) infinite;
+}
+.tc-status-list i {
+  display: block;
+  height: 11px;
+  line-height: 11px;
+  font-style: normal;
+  white-space: nowrap;
+}
+@keyframes tcRollS { to { transform: translateY(-66px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .tc-load *, .tc-load *::after { animation-duration: 6s !important; }
+}
 </style>
 """
 
@@ -706,81 +884,52 @@ def _now() -> str:
 
 
 def _assembly_html() -> str:
-    """Loader 14 model: thinking, done, lalu menyatu ke Trinity Core."""
+    """Loader kecil Multi Trinity Agent: inti berputar + nama model berjalan.
+
+    Versi ini sengaja TANPA kotak/kartu (tidak ada border, latar, atau
+    bayangan) supaya menyatu dengan percakapan, dan seluruh warnanya
+    mengikuti tema aktif lewat var(--tr-*). Semua gerakan murni CSS —
+    tidak ada JavaScript — jadi aman dirender lewat st.markdown.
+    """
     nama_model = [
-        "GPT-OSS 20B",
-        "Compound Mini",
-        "Qwen 3.8",
-        "Plugsky Micro",
-        "Plugsky Lite",
-        "Aion RP",
-        "Aion 2.0",
-        "Aion 3 Mini",
-        "Aion 3.0",
-        "GPT-OSS 120B",
-        "Compound",
-        "DeepSeek V4",
-        "Trinity Infinity",
-        "GPT-5 Mini",
+        "GPT-OSS 20B", "Compound Mini", "Qwen 3.8", "Plugsky Micro",
+        "Plugsky Lite", "Aion RP", "Aion 2.0", "Aion 3 Mini",
+        "Aion 3.0", "GPT-OSS 120B", "Compound", "DeepSeek V4",
+        "Trinity Infinity", "GPT-5 Mini",
+    ]
+    status = [
+        "Mengumpulkan 14 model",
+        "Memuat bobot neural",
+        "Menyelaraskan jawaban",
+        "Mengkalibrasi core",
+        "Menghubungkan node",
+        "Menyatukan hasil panel",
     ]
 
-    logo = (
-        f"data:image/png;base64,{LOGO_B64}"
+    nama_html = "".join(f"<b>{n}</b>" for n in nama_model)
+    status_html = "".join(f"<i>{t}</i>" for t in status)
+
+    svg = (
+        '<svg viewBox="0 0 180 180" aria-hidden="true">'
+        '<path class="tc-ring tc-a" d="M90 20 A70 70 0 0 1 151.6 55'
+        ' A70 70 0 0 1 151.6 125 A70 70 0 0 1 90 160"/>'
+        '<path class="tc-ring tc-b" d="M90 32 A58 58 0 0 0 39 61'
+        ' A58 58 0 0 0 39 119 A58 58 0 0 0 90 148"/>'
+        '<path class="tc-ring tc-c" d="M28 90 A62 62 0 1 1 152 90"/>'
+        '</svg>'
     )
 
-    kartu = []
-
-    for index, nama in enumerate(nama_model):
-        kartu.append(
-            f'<div class="assembly-model" '
-            f'style="--i:{index}">'
-
-            f'<strong>'
-            f'{index + 1:02d} · {nama}'
-            f'</strong>'
-
-            '<div class="assembly-state">'
-
-            '<span class="assembly-thinking">'
-            'Thinking'
-
-            '<span class="assembly-dots">'
-            '<i></i>'
-            '<i></i>'
-            '<i></i>'
-            '</span>'
-
-            '</span>'
-
-            '<span class="assembly-done">'
-            '✓ Done'
-            '</span>'
-
-            '</div>'
-            '</div>'
-        )
-
     return (
-        '<div class="trinity-assembly">'
-    
-        '<div class="assembly-core">'
-    
-        f'<img src="{logo}" alt="Trinity">'
-        '<b>TRINITY</b>'
-        '<small>CORE</small>'
-    
+        '<div class="tc-load" role="status" aria-label="Sedang memproses">'
+        f'<div class="tc-core">{svg}<span class="tc-nuc"></span></div>'
+        '<div class="tc-copy">'
+        '<div class="tc-tag">Ampera <em>Trinity</em> Engine</div>'
+        f'<div class="tc-name-win"><div class="tc-name-list">{nama_html}</div></div>'
+        '<div class="tc-bar"></div>'
+        '<div class="tc-status"><span class="tc-led"></span>'
+        f'<span class="tc-status-win"><span class="tc-status-list">{status_html}</span></span>'
         '</div>'
-    
-        + "".join(kartu)
-    
-        + '<div class="assembly-wait">'
-        'Menyatukan jawaban panel…'
         '</div>'
-    
-        + '<div class="assembly-count">'
-        '14 AI · 30 DETIK'
-        '</div>'
-    
         '</div>'
     )
 
