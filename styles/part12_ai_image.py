@@ -310,64 +310,87 @@ CSS = r"""
 .aiimg-tips-icon .mi { font-size: 17px; }
 
 /* ================================================================
-   BARIS KONTROL DI KOTAK BAWAH — chip gaya & format
+   PANEL KANAN — pengaturan gaya & format
+   ----------------------------------------------------------------
+   Chip GAYA & FORMAT dulu menempel di kotak input bawah sehingga
+   doknya tinggi dan gampang menumpuk. Sekarang keduanya tinggal di
+   kartu melayang di sisi kanan layar (st.container(key="aiimg_panel")),
+   dan kotak input ikut terangkat.
+
+   --aiimg-panel-w   : lebar kartu panel
+   --aiimg-panel-top : jarak kartu dari sisi atas layar
    ================================================================ */
-/* Baris chip: satu lajur mendatar, bisa digeser kalau sempit. */
-.st-key-aiimg_chips_gaya [data-testid="stHorizontalBlock"],
-.st-key-aiimg_chips_rasio [data-testid="stHorizontalBlock"] {
-    flex-wrap: nowrap !important;
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
-    margin: 0 -2px;
-    padding: 1px 2px 3px;
+:root {
+    --aiimg-panel-w: 268px;
+    --aiimg-panel-top: 92px;
+}
+
+.stApp:has(.aiimg-page-shell) .st-key-aiimg_panel {
+    position: fixed !important;
+    top: var(--aiimg-panel-top) !important;
+    right: 22px !important;
+    left: auto !important;
+    width: var(--aiimg-panel-w) !important;
+    max-width: var(--aiimg-panel-w) !important;
+    max-height: calc(100vh - var(--aiimg-panel-top) - 120px) !important;
+    overflow-y: auto !important;
+    padding: 15px 16px 14px !important;
+    border: 1px solid #E6DAC6 !important;
+    border-radius: 18px !important;
+    background: linear-gradient(180deg, #FFFDF8 0%, #FBF3E6 100%) !important;
+    box-shadow: 0 18px 42px rgba(76, 58, 105, 0.13) !important;
+    gap: 7px !important;
+    z-index: 40 !important;
     scrollbar-width: thin;
 }
-.st-key-aiimg_chips_gaya [data-testid="stColumn"],
-.st-key-aiimg_chips_rasio [data-testid="stColumn"] {
-    flex: 0 0 auto !important;
-    width: auto !important;
-    min-width: 0 !important;
+/* Judul kartu panel */
+.aiimg-panel-head {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin: 0 0 4px;
+    color: #4D3A69;
+    font-size: 0.88rem;
+    font-weight: 800;
+    letter-spacing: 0.01em;
 }
-/* ----------------------------------------------------------------
-   Versi baru: chip memakai st.pills (widget bawaan Streamlit).
-   Wadahnya dibuat MENDATAR: label "GAYA" di kiri, deretan pil di kanan.
-   Kalau kelas st-key-* tidak tersedia (Streamlit lama), aturan ini
-   diabaikan dan label cuma pindah ke atas pil — tetap rapi.
-   ---------------------------------------------------------------- */
-.st-key-aiimg_chips_gaya,
-.st-key-aiimg_chips_rasio {
-    flex-direction: row !important;
-    flex-wrap: nowrap !important;
-    align-items: center !important;
-    gap: 8px !important;
-    width: 100%;
+.aiimg-panel-head-icon {
+    display: grid;
+    place-items: center;
+    flex: 0 0 28px;
+    width: 28px;
+    height: 28px;
+    border-radius: 9px;
+    background: linear-gradient(145deg, #F5EEF8, #EDE6F3);
+    border: 1px solid #E1D8E8;
+    color: #4D3A69;
 }
-.st-key-aiimg_chips_gaya > [data-testid="stElementContainer"],
-.st-key-aiimg_chips_rasio > [data-testid="stElementContainer"] {
-    width: auto !important;
-    flex: 0 0 auto !important;
-    min-width: 0 !important;
+.aiimg-panel-head-icon .mi { font-size: 16px; }
+/* Keterangan format terpilih di dasar panel */
+.aiimg-panel-hint {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed #E3D6C2;
+    color: #9B8FA6;
+    font-size: 0.72rem;
+    line-height: 1.45;
 }
-/* blok pil boleh melebar & melipat ke baris berikutnya bila sempit */
-.st-key-aiimg_chips_gaya > [data-testid="stElementContainer"]:has(.stButtonGroup),
-.st-key-aiimg_chips_rasio > [data-testid="stElementContainer"]:has(.stButtonGroup) {
-    flex: 1 1 auto !important;
-    min-width: 0 !important;
-}
-.st-key-aiimg_chips_gaya .stButtonGroup [role="group"],
-.st-key-aiimg_chips_rasio .stButtonGroup [role="group"],
-.st-key-aiimg_chips_gaya .stButtonGroup > div,
-.st-key-aiimg_chips_rasio .stButtonGroup > div {
+.aiimg-panel-hint .mi { font-size: 14px; color: #B39EC6; }
+
+/* Pil di dalam panel boleh melipat ke baris berikutnya */
+.stApp:has(.aiimg-page-shell) .stButtonGroup [role="group"],
+.stApp:has(.aiimg-page-shell) .stButtonGroup > div {
     flex-wrap: wrap !important;
     gap: 6px !important;
 }
 
 /* Pil: keadaan biasa (beige) — dua penulisan agar cocok di versi
    Streamlit lama (stBaseButton-pills) maupun baru (data-variant). */
-[data-testid="stBottom"] button[data-variant="pills"],
-[data-testid="stBottomBlockContainer"] button[data-variant="pills"],
-[data-testid="stBottom"] [data-testid="stBaseButton-pills"],
-[data-testid="stBottomBlockContainer"] [data-testid="stBaseButton-pills"] {
+.stApp:has(.aiimg-page-shell) button[data-variant="pills"],
+.stApp:has(.aiimg-page-shell) [data-testid="stBaseButton-pills"] {
     background: #F8F1E4 !important;
     border: 1px solid #E2D6C2 !important;
     border-radius: 999px !important;
@@ -381,21 +404,16 @@ CSS = r"""
     transition: border-color 0.15s ease, background 0.15s ease,
                 color 0.15s ease !important;
 }
-[data-testid="stBottom"] button[data-variant="pills"]:hover,
-[data-testid="stBottomBlockContainer"] button[data-variant="pills"]:hover,
-[data-testid="stBottom"] [data-testid="stBaseButton-pills"]:hover,
-[data-testid="stBottomBlockContainer"] [data-testid="stBaseButton-pills"]:hover {
+.stApp:has(.aiimg-page-shell) button[data-variant="pills"]:hover,
+.stApp:has(.aiimg-page-shell) [data-testid="stBaseButton-pills"]:hover {
     border-color: #B39EC6 !important;
     background: #FBF6EC !important;
     color: #4A3559 !important;
 }
 /* Pil terpilih: ungu Trinity */
-[data-testid="stBottom"] button[data-variant="pills"][data-selected],
-[data-testid="stBottomBlockContainer"] button[data-variant="pills"][data-selected],
-[data-testid="stBottom"] button[data-variant="pills"][aria-selected="true"],
-[data-testid="stBottomBlockContainer"] button[data-variant="pills"][aria-selected="true"],
-[data-testid="stBottom"] [data-testid="stBaseButton-pillsActive"],
-[data-testid="stBottomBlockContainer"] [data-testid="stBaseButton-pillsActive"] {
+.stApp:has(.aiimg-page-shell) button[data-variant="pills"][data-selected],
+.stApp:has(.aiimg-page-shell) button[data-variant="pills"][aria-selected="true"],
+.stApp:has(.aiimg-page-shell) [data-testid="stBaseButton-pillsActive"] {
     background: linear-gradient(135deg, #7C5C99, #4D3A69) !important;
     border: 1px solid transparent !important;
     border-radius: 999px !important;
@@ -403,37 +421,72 @@ CSS = r"""
     font-weight: 700 !important;
     box-shadow: 0 4px 12px rgba(77, 58, 105, 0.32) !important;
 }
-[data-testid="stBottom"] button[data-variant="pills"][data-selected] *,
-[data-testid="stBottomBlockContainer"] button[data-variant="pills"][data-selected] *,
-[data-testid="stBottom"] [data-testid="stBaseButton-pillsActive"] *,
-[data-testid="stBottomBlockContainer"] [data-testid="stBaseButton-pillsActive"] * {
+.stApp:has(.aiimg-page-shell) button[data-variant="pills"][data-selected] *,
+.stApp:has(.aiimg-page-shell) button[data-variant="pills"][aria-selected="true"] *,
+.stApp:has(.aiimg-page-shell) [data-testid="stBaseButton-pillsActive"] * {
     color: #FFF6E9 !important;
 }
 /* ikon material di dalam pil ikut mengecil */
-[data-testid="stBottom"] button[data-variant="pills"] [data-testid="stIconMaterial"],
-[data-testid="stBottomBlockContainer"] button[data-variant="pills"] [data-testid="stIconMaterial"] {
+.stApp:has(.aiimg-page-shell) button[data-variant="pills"]
+[data-testid="stIconMaterial"],
+.stApp:has(.aiimg-page-shell) [data-testid="stBaseButton-pills"]
+[data-testid="stIconMaterial"] {
     font-size: 15px !important;
     width: 15px !important;
     height: 15px !important;
 }
 
-/* Rapatkan jarak antar baris kontrol di kotak bawah */
-.st-key-aiimg_controls {
-    gap: 6px !important;
-    padding-top: 2px;
+/* Tombol cadangan (Streamlit lama, tanpa st.pills) di dalam panel */
+.st-key-aiimg_panel [class*="st-key-aiimg_gaya_"]:not([class*="st-key-aiimg_gaya_on"]) button,
+.st-key-aiimg_panel [class*="st-key-aiimg_rasio_"]:not([class*="st-key-aiimg_rasio_on"]) button {
+    background: #F8F1E4 !important;
+    border: 1px solid #E2D6C2 !important;
+    border-radius: 999px !important;
+    color: #5C5266 !important;
+    font-size: 0.78rem !important;
+    min-height: 31px !important;
 }
-.st-key-aiimg_chips_gaya .aiimg-chip-label,
-.st-key-aiimg_chips_rasio .aiimg-chip-label,
-.st-key-aiimg_chips_rasio .aiimg-rasio-hint {
-    padding: 0 2px !important;
+.st-key-aiimg_panel [class*="st-key-aiimg_gaya_on"] button,
+.st-key-aiimg_panel [class*="st-key-aiimg_rasio_on"] button {
+    background: linear-gradient(135deg, #7C5C99, #4D3A69) !important;
+    border: 1px solid transparent !important;
+    border-radius: 999px !important;
+    color: #FFF6E9 !important;
+    min-height: 31px !important;
 }
 
-/* Label "Gaya" / "Format" di depan chip */
+/* Isi halaman diberi ruang supaya tidak tertimpa panel kanan */
+.stApp:has(.aiimg-page-shell)
+[data-testid="stMainBlockContainer"] {
+    width: calc(100% - 220px - var(--aiimg-panel-w)) !important;
+    margin-left: auto !important;
+    margin-right: calc(var(--aiimg-panel-w) + 30px) !important;
+    padding-bottom: 120px !important;
+}
+
+/* ================================================================
+   KOLOM CHAT INPUT — dinaikkan (chip sudah tidak menempel lagi)
+   ================================================================ */
+/* --aiimg-chat-lift : tinggi angkat kolom input dari dasar layar.
+   Perbesar angkanya kalau mau kolom chat lebih naik lagi. */
+.stApp:has(.aiimg-page-shell)
+[data-testid="stBottomBlockContainer"] {
+    --aiimg-chat-lift: 72px;
+    margin-bottom: var(--aiimg-chat-lift) !important;
+    max-width: min(46rem,
+        calc(100vw - 220px - var(--aiimg-panel-w) - 90px)) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    transform: none !important;
+}
+.stApp:has(.aiimg-page-shell) .dock-spacer { height: 104px !important; }
+
+/* Label "Gaya" / "Format" di atas deretan pil */
 .aiimg-chip-label {
     display: flex;
     align-items: center;
     gap: 5px;
-    padding: 7px 6px 0 2px;
+    padding: 4px 2px 1px;
     color: #8E8398;
     font-size: 0.68rem;
     font-weight: 700;
@@ -442,6 +495,7 @@ CSS = r"""
     white-space: nowrap;
 }
 .aiimg-chip-label .mi { font-size: 14px; color: #7C5C99; }
+.aiimg-chip-label-2 { margin-top: 10px; }
 
 /* Chip dasar (tidak aktif) */
 [class*="st-key-aiimg_gaya_"]:not([class*="st-key-aiimg_gaya_on"]) button,
@@ -493,6 +547,30 @@ CSS = r"""
 /* ================================================================
    RESPONSIF — layar sempit
    ================================================================ */
+/* Layar tidak cukup lebar untuk panel melayang: panel turun jadi kartu
+   biasa di atas percakapan, isi halaman & kotak input kembali penuh. */
+@media (max-width: 1200px) {
+    .stApp:has(.aiimg-page-shell) .st-key-aiimg_panel {
+        position: static !important;
+        width: 100% !important;
+        max-width: none !important;
+        max-height: none !important;
+        margin: 0 0 16px !important;
+        overflow: visible !important;
+    }
+    .stApp:has(.aiimg-page-shell)
+    [data-testid="stMainBlockContainer"] {
+        width: calc(100% - 64px) !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+    .stApp:has(.aiimg-page-shell)
+    [data-testid="stBottomBlockContainer"] {
+        max-width: 46rem !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+}
 @media (max-width: 860px) {
     .aiimg-hero { padding: 34px 18px 28px; }
     .aiimg-hero .frame-a,
