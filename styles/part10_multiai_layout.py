@@ -903,7 +903,7 @@ body .stApp:has(.tr-multi-ai-layout) .yuki-answer-body {
    --multi-ruang-bawah: ruang kosong di bawah pesan terakhir
 ==================================================================== */
 body .stApp:has(.tr-multi-ai-layout) {
-    --multi-sim-tinggi: 360px;
+    --multi-sim-tinggi: 620px;
     --multi-ruang-bawah: 240px;
 }
 
