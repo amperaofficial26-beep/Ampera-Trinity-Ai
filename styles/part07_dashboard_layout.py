@@ -869,7 +869,7 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
     --dash-center-right: calc(var(--dash-rail) + var(--dash-gap) + var(--dash-gap));
     --dash-center-width: calc(100vw - var(--dash-center-left) - var(--dash-center-right));
     --dash-center-left: calc(var(--dash-sidebar) + var(--dash-gap) + -30px);
-    --dash-content-width: min(690px, var(--dash-center-width));
+    --dash-content-width: min(710px, var(--dash-center-width));
     --chat-width: min(42rem, var(--dash-center-width));
     --chat-shift: calc((var(--dash-center-left) - var(--dash-center-right)) / 2);
 }
