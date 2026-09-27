@@ -335,12 +335,11 @@ CSS = r"""
     left: auto !important;
     width: var(--aiimg-panel-w) !important;
     max-width: var(--aiimg-panel-w) !important;
-    bottom: auto !important;
-    /* tinggi dihitung eksplisit (bukan mengandalkan top+bottom) supaya
-       panelnya PASTI memanjang di semua browser */
-    height: calc(100vh - var(--aiimg-panel-top)
-                 - var(--aiimg-panel-bottom)) !important;
-    min-height: 420px !important;
+    bottom: var(--aiimg-panel-bottom) !important;
+    /* Ditulis SATU BARIS & pakai angka mentah (bukan var) supaya tidak ada
+       satu pun browser/parser yang membuangnya — panel wajib memanjang. */
+    height: auto !important;
+    min-height: calc(100vh - 106px) !important;
     max-height: none !important;
     overflow-y: auto !important;
     padding: 15px 16px 14px !important;
