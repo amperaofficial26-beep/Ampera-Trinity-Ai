@@ -1127,7 +1127,7 @@ span[role="img"],
 
     right:
         calc(var(--dash-center-right)
-             + var(--topbar-jarak-panel, 0px)) !important;
+             + var(--topbar-jarak-panel, 10px)) !important;
 }
 
 
