@@ -854,7 +854,7 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
 ==================================================================== */
 .stApp:has(.tr-chat-layout) {
     --dash-sidebar: 250px;
-    --dash-rail: 280px;
+    --dash-rail: 250px;
     --dash-gap: 18px;
     --dash-top: 12px;
     --dash-bottom: 16px;
