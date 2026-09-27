@@ -74,6 +74,37 @@ def _pilih_rasio(key: str) -> None:
     st.session_state["aiimg_rasio"] = key
 
 
+# --- sinkronisasi nilai widget st.pills -> state yang dipakai engine ------
+def _sync_gaya() -> None:
+    nilai = st.session_state.get("aiimg_gaya_pills")
+    if not nilai:                       # pil diklik ulang (batal pilih)
+        nilai = GAYA_AKTIF_DEFAULT
+        st.session_state["aiimg_gaya_pills"] = nilai
+    st.session_state["aiimg_gaya"] = nilai
+
+
+def _sync_rasio() -> None:
+    nilai = st.session_state.get("aiimg_rasio_pills")
+    if not nilai:
+        nilai = RASIO_AKTIF_DEFAULT
+        st.session_state["aiimg_rasio_pills"] = nilai
+    st.session_state["aiimg_rasio"] = nilai
+
+
+def _label_gaya(key: str) -> str:
+    for s in IMAGE_STYLES:
+        if s["key"] == key:
+            return f"{s['icon']} {s['label']}"
+    return key
+
+
+def _label_rasio(key: str) -> str:
+    for r in IMAGE_RATIOS:
+        if r["key"] == key:
+            return f"{r['icon']} {r['label']}"
+    return key
+
+
 # ----------------------------------------------------------------------------
 # Kartu contoh prompt (hero) — hanya tampil saat percakapan masih kosong.
 # ----------------------------------------------------------------------------
@@ -150,6 +181,68 @@ def _hero_dan_contoh() -> None:
 # membedakan (lihat styles/part12_ai_image.py).
 # ----------------------------------------------------------------------------
 def _baris_kontrol() -> None:
+    """Chip GAYA + FORMAT.
+
+    Dipakai st.pills (widget bawaan Streamlit >= 1.40): satu baris pil
+    mendatar yang MELIPAT rapi kalau sempit. Cara lama (st.columns + tombol)
+    gampang "jebol" — begitu lebar kotak bawah menyempit, Streamlit menumpuk
+    tiap kolom jadi satu tombol selebar layar (persis keluhan tampilan
+    memanjang ke bawah). st.pills tidak punya masalah itu.
+
+    Kalau versi Streamlit terlalu tua (tanpa st.pills), otomatis jatuh ke
+    cara lama lewat _baris_kontrol_kolom().
+    """
+    if not hasattr(st, "pills"):
+        _baris_kontrol_kolom()
+        return
+
+    gaya_aktif = st.session_state.get("aiimg_gaya", GAYA_AKTIF_DEFAULT)
+    rasio_aktif = st.session_state.get("aiimg_rasio", RASIO_AKTIF_DEFAULT)
+
+    with st.container(key="aiimg_chips_gaya"):
+        st.markdown(
+            f'<div class="aiimg-chip-label">{mi(":material/palette:")}'
+            f' Gaya</div>',
+            unsafe_allow_html=True,
+        )
+        st.pills(
+            "Gaya",
+            options=[s["key"] for s in IMAGE_STYLES],
+            format_func=_label_gaya,
+            default=gaya_aktif,
+            key="aiimg_gaya_pills",
+            on_change=_sync_gaya,
+            label_visibility="collapsed",
+        )
+
+    with st.container(key="aiimg_chips_rasio"):
+        st.markdown(
+            f'<div class="aiimg-chip-label">{mi(":material/aspect_ratio:")}'
+            f' Format</div>',
+            unsafe_allow_html=True,
+        )
+        st.pills(
+            "Format",
+            options=[r["key"] for r in IMAGE_RATIOS],
+            format_func=_label_rasio,
+            default=rasio_aktif,
+            key="aiimg_rasio_pills",
+            on_change=_sync_rasio,
+            label_visibility="collapsed",
+        )
+        hint = next(
+            (r["hint"] for r in IMAGE_RATIOS if r["key"] == rasio_aktif), ""
+        )
+        st.markdown(
+            f'<div class="aiimg-rasio-hint">{hint}'
+            f'{" &middot; dipotong otomatis" if rasio_aktif != "1:1" else ""}'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
+
+
+# Cadangan untuk Streamlit lama (< 1.40, belum ada st.pills).
+def _baris_kontrol_kolom() -> None:
     gaya_aktif = st.session_state.get("aiimg_gaya", GAYA_AKTIF_DEFAULT)
     rasio_aktif = st.session_state.get("aiimg_rasio", RASIO_AKTIF_DEFAULT)
 
