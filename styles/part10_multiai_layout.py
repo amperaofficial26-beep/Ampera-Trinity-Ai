@@ -810,4 +810,77 @@ body .stApp:has(.tr-multi-ai-layout) .bubble-row.user {
 body .stApp:has(.tr-multi-ai-layout) .bubble-row.ai {
     justify-content: flex-start !important;
 }
+
+/* ====================================================================
+   MULTI AI — JAWABAN TANPA LATAR (flat, seperti chat utama)
+   --------------------------------------------------------------------
+   Sebelumnya jawaban Yuki duduk di atas kartu .st-key-multi_chat_area
+   yang punya latar, garis tepi, bayangan, dan overflow:hidden — itu yang
+   membuat teks terlihat terpotong di bagian bawah.
+
+   Sekarang: gelembung AI dan kartunya dibuat transparan, dan kartunya
+   tidak lagi memotong isi.
+
+   >>> KALAU MAU KARTUNYA KEMBALI <<<
+   hapus blok ini, atau ganti nilai background/border di bawah.
+==================================================================== */
+body .stApp:has(.tr-multi-ai-layout) .bubble.ai {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 2px !important;
+}
+
+body .stApp:has(.tr-multi-ai-layout) .st-key-multi_chat_area {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+
+    /* jangan memotong jawaban yang panjang */
+    overflow: visible !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+}
+
+/* Gelembung pengguna tetap punya latar supaya mudah dibedakan. */
+body .stApp:has(.tr-multi-ai-layout) .bubble.user {
+    background: var(--tr-bubble, #E0D2BB) !important;
+    border-radius: 18px !important;
+    padding: 11px 16px !important;
+}
+
+/* ====================================================================
+   MULTI AI — TEKS JAWABAN SELALU TERLIHAT
+   --------------------------------------------------------------------
+   ui_helpers menandai jawaban terakhir dengan .yuki-fade-blur; tiap baris
+   lalu dianimasikan dari opacity:0 + blur dengan jeda 0,3 detik per baris
+   (animation-fill-mode: both). Pada jawaban panjang di Multi AI, baris
+   terakhir baru muncul setelah ~7 detik, dan kalau animasinya tidak
+   dijalankan ulang setelah rerun, teksnya tidak pernah terlihat.
+
+   Di halaman Multi AI animasi itu dimatikan: jawaban langsung tampil utuh.
+==================================================================== */
+body .stApp:has(.tr-multi-ai-layout) .yuki-fade-blur .yuki-reveal-line,
+body .stApp:has(.tr-multi-ai-layout) .yuki-reveal-line,
+body .stApp:has(.tr-multi-ai-layout) .bubble.ai,
+body .stApp:has(.tr-multi-ai-layout) .yuki-answer-body {
+    animation: none !important;
+    animation-delay: 0s !important;
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
+    visibility: visible !important;
+}
+
+body .stApp:has(.tr-multi-ai-layout) .bubble.ai,
+body .stApp:has(.tr-multi-ai-layout) .yuki-answer-body {
+    display: block !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+}
 """
