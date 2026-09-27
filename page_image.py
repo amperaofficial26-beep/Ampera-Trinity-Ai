@@ -176,127 +176,124 @@ def _hero_dan_contoh() -> None:
 
 
 # ----------------------------------------------------------------------------
-# Baris kontrol di kotak bawah: chip GAYA + chip RASIO.
-# Chip aktif diberi suffix "_on" pada key container-nya supaya CSS bisa
-# membedakan (lihat styles/part12_ai_image.py).
+# PANEL KANAN — pengaturan GAYA & FORMAT.
+#
+# Dulu kedua deret chip ini menempel di kotak input bawah; sekarang pindah
+# ke kartu melayang di sisi kanan layar (lihat .st-key-aiimg_panel di
+# styles/part12_ai_image.py) supaya kotak input bisa naik & lega.
+# Di layar sempit (<= 1200px) panelnya otomatis jadi kartu biasa di atas
+# percakapan — bukan melayang — jadi tidak pernah menutupi isi halaman.
 # ----------------------------------------------------------------------------
-def _baris_kontrol() -> None:
-    """Chip GAYA + FORMAT.
+def _pills(label: str, opsi: list, fmt, default, key: str, on_change) -> None:
+    """st.pills dengan wrap=True bila versi Streamlit mendukungnya."""
+    kw = dict(
+        options=opsi,
+        format_func=fmt,
+        default=default,
+        key=key,
+        on_change=on_change,
+        label_visibility="collapsed",
+    )
+    try:
+        st.pills(label, wrap=True, **kw)
+    except TypeError:                   # Streamlit lama: belum ada `wrap`
+        st.pills(label, **kw)
 
-    Dipakai st.pills (widget bawaan Streamlit >= 1.40): satu baris pil
-    mendatar yang MELIPAT rapi kalau sempit. Cara lama (st.columns + tombol)
-    gampang "jebol" — begitu lebar kotak bawah menyempit, Streamlit menumpuk
-    tiap kolom jadi satu tombol selebar layar (persis keluhan tampilan
-    memanjang ke bawah). st.pills tidak punya masalah itu.
 
-    Kalau versi Streamlit terlalu tua (tanpa st.pills), otomatis jatuh ke
-    cara lama lewat _baris_kontrol_kolom().
-    """
-    if not hasattr(st, "pills"):
-        _baris_kontrol_kolom()
-        return
-
+def _panel_kanan() -> None:
+    """Kartu pengaturan di sisi kanan: pilih gaya & format gambar."""
     gaya_aktif = st.session_state.get("aiimg_gaya", GAYA_AKTIF_DEFAULT)
     rasio_aktif = st.session_state.get("aiimg_rasio", RASIO_AKTIF_DEFAULT)
 
-    with st.container(key="aiimg_chips_gaya"):
+    with st.container(key="aiimg_panel"):
+        st.markdown(
+            f'<div class="aiimg-panel-head">'
+            f'<span class="aiimg-panel-head-icon">'
+            f'{mi(":material/tune:")}</span>'
+            f'<span>Pengaturan gambar</span></div>',
+            unsafe_allow_html=True,
+        )
+
+        # Streamlit terlalu tua (tanpa st.pills) → pakai tombol biasa.
+        if not hasattr(st, "pills"):
+            _panel_tombol(gaya_aktif, rasio_aktif)
+            return
+
         st.markdown(
             f'<div class="aiimg-chip-label">{mi(":material/palette:")}'
             f' Gaya</div>',
             unsafe_allow_html=True,
         )
-        st.pills(
+        _pills(
             "Gaya",
-            options=[s["key"] for s in IMAGE_STYLES],
-            format_func=_label_gaya,
-            default=gaya_aktif,
-            key="aiimg_gaya_pills",
-            on_change=_sync_gaya,
-            label_visibility="collapsed",
+            [s["key"] for s in IMAGE_STYLES],
+            _label_gaya,
+            gaya_aktif,
+            "aiimg_gaya_pills",
+            _sync_gaya,
         )
 
-    with st.container(key="aiimg_chips_rasio"):
         st.markdown(
-            f'<div class="aiimg-chip-label">{mi(":material/aspect_ratio:")}'
-            f' Format</div>',
+            f'<div class="aiimg-chip-label aiimg-chip-label-2">'
+            f'{mi(":material/aspect_ratio:")} Format</div>',
             unsafe_allow_html=True,
         )
-        st.pills(
+        _pills(
             "Format",
-            options=[r["key"] for r in IMAGE_RATIOS],
-            format_func=_label_rasio,
-            default=rasio_aktif,
-            key="aiimg_rasio_pills",
-            on_change=_sync_rasio,
-            label_visibility="collapsed",
+            [r["key"] for r in IMAGE_RATIOS],
+            _label_rasio,
+            rasio_aktif,
+            "aiimg_rasio_pills",
+            _sync_rasio,
         )
+
         hint = next(
             (r["hint"] for r in IMAGE_RATIOS if r["key"] == rasio_aktif), ""
         )
         st.markdown(
-            f'<div class="aiimg-rasio-hint">{hint}'
+            f'<div class="aiimg-panel-hint">{mi(":material/info:")}'
+            f'<span>{hint}'
             f'{" &middot; dipotong otomatis" if rasio_aktif != "1:1" else ""}'
-            f'</div>',
+            f'</span></div>',
             unsafe_allow_html=True,
         )
 
 
-# Cadangan untuk Streamlit lama (< 1.40, belum ada st.pills).
-def _baris_kontrol_kolom() -> None:
-    gaya_aktif = st.session_state.get("aiimg_gaya", GAYA_AKTIF_DEFAULT)
-    rasio_aktif = st.session_state.get("aiimg_rasio", RASIO_AKTIF_DEFAULT)
+def _panel_tombol(gaya_aktif: str, rasio_aktif: str) -> None:
+    """Isi panel versi cadangan (Streamlit < 1.40, belum ada st.pills)."""
+    st.markdown(
+        f'<div class="aiimg-chip-label">{mi(":material/palette:")} Gaya</div>',
+        unsafe_allow_html=True,
+    )
+    for s in IMAGE_STYLES:
+        aktif = s["key"] == gaya_aktif
+        with st.container(
+            key=("aiimg_gaya_on_" if aktif else "aiimg_gaya_") + s["key"]
+        ):
+            st.button(
+                f"{s['icon']} &nbsp;{s['label']}",
+                key=f"aiimg_gbtn_{s['key']}",
+                use_container_width=True,
+                on_click=_pilih_gaya,
+                args=(s["key"],),
+            )
 
-    with st.container(key="aiimg_chips_gaya"):
-        cols = st.columns([0.62] + [0.6] * len(IMAGE_STYLES), gap="small")
-        with cols[0]:
-            st.markdown(
-                f'<div class="aiimg-chip-label">{mi(":material/palette:")}'
-                f' Gaya</div>',
-                unsafe_allow_html=True,
-            )
-        for c, s in zip(cols[1:], IMAGE_STYLES):
-            aktif = s["key"] == gaya_aktif
-            with st.container(
-                key=("aiimg_gaya_on_" if aktif else "aiimg_gaya_") + s["key"]
-            ):
-                st.button(
-                    f"{s['icon']} &nbsp;{s['label']}",
-                    key=f"aiimg_gbtn_{s['key']}",
-                    use_container_width=True,
-                    on_click=_pilih_gaya,
-                    args=(s["key"],),
-                )
-
-    with st.container(key="aiimg_chips_rasio"):
-        cols = st.columns([0.62] + [0.55] * len(IMAGE_RATIOS) + [1.5],
-                          gap="small")
-        with cols[0]:
-            st.markdown(
-                f'<div class="aiimg-chip-label">{mi(":material/aspect_ratio:")}'
-                f' Format</div>',
-                unsafe_allow_html=True,
-            )
-        for c, r in zip(cols[1:-1], IMAGE_RATIOS):
-            aktif = r["key"] == rasio_aktif
-            with st.container(
-                key=("aiimg_rasio_on_" if aktif else "aiimg_rasio_") + r["key"]
-            ):
-                st.button(
-                    f"{r['icon']} &nbsp;{r['label']}",
-                    key=f"aiimg_rbtn_{r['key']}",
-                    use_container_width=True,
-                    on_click=_pilih_rasio,
-                    args=(r["key"],),
-                )
-        with cols[-1]:
-            hint = next(
-                (r["hint"] for r in IMAGE_RATIOS if r["key"] == rasio_aktif), ""
-            )
-            st.markdown(
-                f'<div class="aiimg-rasio-hint">{hint}'
-                f'{" &middot; dipotong otomatis" if rasio_aktif != "1:1" else ""}'
-                f'</div>',
-                unsafe_allow_html=True,
+    st.markdown(
+        f'<div class="aiimg-chip-label aiimg-chip-label-2">'
+        f'{mi(":material/aspect_ratio:")} Format</div>',
+        unsafe_allow_html=True,
+    )
+    for r in IMAGE_RATIOS:
+        aktif = r["key"] == rasio_aktif
+        with st.container(
+            key=("aiimg_rasio_on_" if aktif else "aiimg_rasio_") + r["key"]
+        ):
+            st.button(
+                f"{r['icon']} &nbsp;{r['label']}",
+                key=f"aiimg_rbtn_{r['key']}",
+                use_container_width=True,
+                on_click=_pilih_rasio,
+                args=(r["key"],),
             )
 
 
@@ -335,6 +332,9 @@ def page_image() -> None:
             unsafe_allow_html=True,
         )
 
+    # ---- Panel pengaturan (gaya & format) di sisi kanan layar ----
+    _panel_kanan()
+
     # ---- Hero + contoh: hanya saat percakapan masih kosong ----
     if not thread:
         _hero_dan_contoh()
@@ -356,11 +356,11 @@ def page_image() -> None:
 
     bottom_dock = getattr(st, "bottom", None) or st._bottom
     with bottom_dock:
+        # Kotak bawah kini HANYA berisi kolom input — chip gaya & format
+        # sudah pindah ke panel kanan, jadi kolom chat bisa naik dan lega.
         user_input = chat_input_atau_hentikan(
             "Deskripsikan gambar yang ingin dibuat…", **chat_kwargs
         )
-        with st.container(key="aiimg_controls"):
-            _baris_kontrol()
 
     antre = (st.session_state.pop("pending_prompt_mode", "") or "").strip()
 
