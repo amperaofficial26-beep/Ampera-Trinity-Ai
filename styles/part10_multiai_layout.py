@@ -934,4 +934,45 @@ body .stApp:has(.tr-multi-ai-layout) [class*="st-key-simulator_"] {
     margin: 8px 0 18px !important;
     overflow: visible !important;
 }
+
+/* ====================================================================
+   MULTI AI — KARTU CHAT BOLEH TUMBUH (perbaikan "mentok di chat ke-2/3")
+   --------------------------------------------------------------------
+   Penyebabnya:
+       .st-key-multi_chat_area          { flex: 0 0 760px; }
+       .st-key-multi_chat_area  ... vertical block { flex: 0 0 100%; }
+
+   Induk kedua elemen itu adalah flex CONTAINER BERARAH KOLOM, sehingga
+   flex-basis mengunci TINGGI (sumbu utama), bukan lebar. Akibatnya kartu
+   percakapan terpaku setinggi 760px, isi berikutnya terpotong, dan
+   halaman tidak bisa digulir lebih jauh.
+
+   Lebar tetap diatur lewat width/min-width/max-width yang sudah ada;
+   di sini flex-basis-nya dilepas supaya tingginya mengikuti isi.
+==================================================================== */
+body .stApp:has(.tr-multi-ai-layout) .st-key-multi_chat_area,
+body .stApp:has(.tr-multi-ai-layout) .st-key-multi_chat_area
+[data-testid="stVerticalBlock"],
+body .stApp:has(.tr-multi-ai-layout) .st-key-multi_chat_area
+[data-testid="stElementContainer"] {
+    flex: 0 0 auto !important;
+    flex-basis: auto !important;
+    flex-grow: 0 !important;
+    flex-shrink: 0 !important;
+
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    overflow: visible !important;
+}
+
+/* Wadah pembungkus dari Streamlit juga tidak boleh membatasi tinggi. */
+body .stApp:has(.tr-multi-ai-layout) [data-testid="stLayoutWrapper"],
+body .stApp:has(.tr-multi-ai-layout)
+[data-testid="stVerticalBlockBorderWrapper"] {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+}
 """
