@@ -982,7 +982,7 @@ def _capability_state(setting_key: str) -> str:
     if not s.get(setting_key, True):
         return "nonaktif"
     if setting_key == "cap_image":
-        return "aktif" if IMAGE_READY else "butuh Cloudflare"
+        return "aktif" if IMAGE_READY else "butuh provider gambar"
     if setting_key in ("cap_voice", "cap_vision"):
         return "aktif" if CHAT_READY else "butuh GROQ_API_KEY"
     return "aktif"
@@ -1826,8 +1826,11 @@ HELP_FAQ = [
      "cek status \"Chat AI (Yuki)\" di Pengaturan → Kemampuan — bila tertulis "
      "\"butuh GROQ_API_KEY\", kredensial belum diisi pemilik aplikasi."),
     ("Kenapa generate gambar gagal?",
-     "Generate gambar butuh CF_ACCOUNT_ID dan CF_API_TOKEN (Cloudflare). "
-     "Statusnya terlihat di Pengaturan → Kemampuan."),
+     "Generate gambar butuh minimal satu provider aktif: Cloudflare "
+     "(CF_ACCOUNT_ID + CF_API_TOKEN), Leonardo (LEONARDO_API_KEY), Ideogram "
+     "(IDEOGRAM_API_KEY), Google ImageFX (IMAGEFX_AUTH_TOKEN), atau Microsoft "
+     "Designer (BING_COOKIE_U). Provider dipilih di panel kanan halaman AI "
+     "Image; statusnya terlihat di Pengaturan → Kemampuan."),
     ("Apakah percakapanku tersimpan di server?",
      "Tidak. Riwayat hidup di sesi browser kamu dan hilang saat sesi "
      "berakhir, kecuali kamu mengunduhnya lewat \"Unduh Chat\"."),

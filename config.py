@@ -374,6 +374,23 @@ CF_API_BASE = "https://api.cloudflare.com/client/v4/accounts"
 CF_IMAGE_MODEL = "@cf/black-forest-labs/flux-1-schnell"
 CF_DEFAULT_STEPS = 4
 
+# ============================================================================
+# PROVIDER GAMBAR LAIN (Leonardo, Ideogram, Google ImageFX, MS Designer)
+# ----------------------------------------------------------------------------
+# Endpoint & model bawaan tiap provider. Semua kredensialnya dibaca di
+# bagian bawah file ini (_get_secret) dari Streamlit Secrets / env var.
+# ============================================================================
+LEONARDO_API_BASE = "https://cloud.leonardo.ai/api/rest/v1"
+LEONARDO_DEFAULT_MODEL = "7b592283-e8a7-4c5a-9ba6-d18c31f258b9"  # Lucid Origin
+
+IDEOGRAM_API_V3 = "https://api.ideogram.ai/v1/ideogram-v3/generate"
+IDEOGRAM_API_LEGACY = "https://api.ideogram.ai/generate"
+
+IMAGEFX_ENDPOINT = "https://aisandbox-pa.googleapis.com/v1:runImageFx"
+IMAGEFX_MODEL = "IMAGEN_3_5"
+
+DESIGNER_BASE = "https://www.bing.com"
+
 # ----------------------------------------------------------------------------
 # KATALOG HALAMAN "AI IMAGE" (page_image.py)
 #
@@ -640,4 +657,72 @@ TAVILY_API_KEY = _get_secret("TAVILY_API_KEY")
 FINAL_ROUTER_API_KEY = _get_secret("FINAL_ROUTER_API_KEY")
 FINAL_ROUTER_BASE_URL = "https://finalrouter.com/api/v1"
 CHAT_READY = bool(GROQ_API_KEY or PLUGSKY_API_KEY or AION_API_KEY or FINAL_ROUTER_API_KEY)
-IMAGE_READY = bool(CF_ACCOUNT_ID and CF_API_TOKEN)
+
+# ----------------------------------------------------------------------------
+# KREDENSIAL PROVIDER GAMBAR
+#   Leonardo & Ideogram : API key resmi.
+#   ImageFX & Designer  : token/cookie akun pribadi (jalur tidak resmi,
+#                         umurnya pendek — perlu diperbarui berkala).
+# ----------------------------------------------------------------------------
+LEONARDO_API_KEY = _get_secret("LEONARDO_API_KEY", "LEONARDO_KEY")
+LEONARDO_MODEL_ID = _get_secret("LEONARDO_MODEL_ID") or LEONARDO_DEFAULT_MODEL
+
+IDEOGRAM_API_KEY = _get_secret("IDEOGRAM_API_KEY", "IDEOGRAM_KEY")
+
+IMAGEFX_AUTH_TOKEN = _get_secret("IMAGEFX_AUTH_TOKEN", "IMAGEFX_TOKEN",
+                                 "GOOGLE_LABS_TOKEN")
+
+DESIGNER_COOKIE_U = _get_secret("BING_COOKIE_U", "DESIGNER_COOKIE_U",
+                                "BING_U")
+DESIGNER_COOKIE_SRCH = _get_secret("BING_COOKIE_SRCHHPGUSR",
+                                   "DESIGNER_COOKIE_SRCHHPGUSR")
+
+# ----------------------------------------------------------------------------
+# KATALOG PROVIDER GAMBAR (dipakai panel kanan page_image.py & engine)
+#   key    : dipakai engines/image_engine.py untuk memilih jalur
+#   kuota  : ringkasan jatah gratis harian (untuk ditampilkan ke User)
+#   butuh  : nama secret yang wajib diisi pemilik aplikasi
+#   resmi  : True = API resmi; False = jalur tidak resmi (token/cookie web)
+# ----------------------------------------------------------------------------
+IMAGE_PROVIDERS = [
+    {
+        "key": "cloudflare", "label": "FLUX", "icon": ":material/bolt:",
+        "nama": "Cloudflare FLUX.1 schnell",
+        "kuota": "Sesuai kuota Workers AI akun Cloudflare",
+        "butuh": ["CF_ACCOUNT_ID", "CF_API_TOKEN"], "resmi": True,
+        "ready": bool(CF_ACCOUNT_ID and CF_API_TOKEN),
+    },
+    {
+        "key": "leonardo", "label": "Leonardo", "icon": ":material/diamond:",
+        "nama": "Leonardo.ai",
+        "kuota": "150 Fast Token gratis/hari, reset tiap 24 jam",
+        "butuh": ["LEONARDO_API_KEY"], "resmi": True,
+        "ready": bool(LEONARDO_API_KEY),
+    },
+    {
+        "key": "ideogram", "label": "Ideogram", "icon": ":material/title:",
+        "nama": "Ideogram.ai",
+        "kuota": "10 slow credit/hari (±40 gambar lewat antrean standar)",
+        "butuh": ["IDEOGRAM_API_KEY"], "resmi": True,
+        "ready": bool(IDEOGRAM_API_KEY),
+    },
+    {
+        "key": "imagefx", "label": "ImageFX", "icon": ":material/blur_on:",
+        "nama": "Google ImageFX (Imagen)",
+        "kuota": "±40–80 gambar gratis/hari, terikat akun Google",
+        "butuh": ["IMAGEFX_AUTH_TOKEN"], "resmi": False,
+        "ready": bool(IMAGEFX_AUTH_TOKEN),
+    },
+    {
+        "key": "designer", "label": "Designer", "icon": ":material/brush:",
+        "nama": "Microsoft Designer (Bing Image Creator)",
+        "kuota": "15–30 Boost/hari; habis → lanjut antrean kecepatan normal",
+        "butuh": ["BING_COOKIE_U"], "resmi": False,
+        "ready": bool(DESIGNER_COOKIE_U),
+    },
+]
+
+IMAGE_PROVIDER_BY_KEY = {p["key"]: p for p in IMAGE_PROVIDERS}
+IMAGE_PROVIDERS_READY = [p["key"] for p in IMAGE_PROVIDERS if p["ready"]]
+IMAGE_PROVIDER_DEFAULT = (IMAGE_PROVIDERS_READY or ["cloudflare"])[0]
+IMAGE_READY = bool(IMAGE_PROVIDERS_READY)
