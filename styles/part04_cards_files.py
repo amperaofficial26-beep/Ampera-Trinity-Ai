@@ -859,4 +859,39 @@ p.trinity-foot.in-chat,
     }
     .rc-tr { grid-template-columns: 1fr !important; }
 }
+
+/* ====================================================================
+   WARNA LATAR KARTU YUKI
+   --------------------------------------------------------------------
+   Semua kartu yang ditampilkan Yuki (perbandingan, langkah, link, peta,
+   itinerary, terjemahan, palet, kartu pilihan) memakai satu warna latar
+   yang sama. Ganti nilainya di --rc-card-bg saja.
+
+   Selector sengaja diawali .stApp supaya bobotnya lebih tinggi daripada
+   aturan penyeragaman permukaan di tampilan.py (yang menimpa .rc-card
+   dengan var(--tr-surface)) — tanpa itu warna di bawah ini kalah.
+==================================================================== */
+:root {
+    --rc-card-bg: #F9F2DF;
+    --rc-card-border: #E9DCC2;
+}
+.stApp .rc-card,
+.stApp [class*="st-key-qr_card_"],
+.stApp [class*="st-key-rc_nav_"],
+.stApp [class*="st-key-rc_map_"],
+.stApp [class*="st-key-rc_itin_"] {
+    background: var(--rc-card-bg) !important;
+    background-color: var(--rc-card-bg) !important;
+    border-color: var(--rc-card-border) !important;
+}
+/* Bagian dalam kartu ikut transparan supaya warnanya seragam. */
+.stApp .rc-card .rc-cmp-row,
+.stApp .rc-card .rc-cmp-cell,
+.stApp .rc-card .rc-cmp-head,
+.stApp .rc-card .rc-tr-pane,
+.stApp .rc-card .rc-itin-row,
+.stApp .rc-card .rc-step-dots,
+.stApp .rc-card .rc-link-src {
+    background: transparent !important;
+}
 """
