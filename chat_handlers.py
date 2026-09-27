@@ -43,7 +43,7 @@ from loading_params import (
 )
 from model_dna import DNA_CSS, dna_header_html, active_node_css
 from cards import parse_cards
-from engines.image_engine import generate_image, generate_image_provider
+from engines.image_engine import generate_image
 from errors import public_error_chat, public_error_image
 from icons import ICON_MIC
 from state import active_thread, get_settings, next_msg_id
@@ -117,7 +117,6 @@ def maybe_run_yuki(answer_slot) -> bool:
             job.get("text") or "",
             gaya=job.get("image_style"),
             rasio=job.get("image_ratio"),
-            provider=job.get("image_provider"),
         )
     else:
         handle_chat_request(answer_slot, request_text=job.get("text") or "")
@@ -224,32 +223,24 @@ def _potong_rasio_gambar(data: bytes, rasio: str | None) -> bytes:
 
 
 def handle_image_request(prompt: str, gaya: str | None = None,
-                         rasio: str | None = None,
-                         provider: str | None = None) -> None:
+                         rasio: str | None = None) -> None:
     """Buat gambar dari prompt di halaman AI Image.
 
     `gaya`  : key di config.IMAGE_STYLES — suffix gaya ditambahkan ke
               prompt sebelum dikirim ke FLUX (efek nyata pada hasil).
-    `rasio` : key di config.IMAGE_RATIOS — provider yang mendukung rasio
-              native memakainya langsung; sisanya dipotong setelah jadi.
-    `provider` : key di config.IMAGE_PROVIDERS (cloudflare, leonardo,
-              ideogram, imagefx, designer).
+    `rasio` : key di config.IMAGE_RATIOS — gambar persegi dipotong ke
+              rasio pilihan setelah jadi.
     """
-    from config import IMAGE_PROVIDER_BY_KEY, IMAGE_PROVIDER_DEFAULT, IMAGE_STYLES
+    from config import IMAGE_STYLES
 
     thread = active_thread()
     if not IMAGE_READY:
         thread.append({
             "id": next_msg_id(), "role": "assistant", "type": "text",
-            "content": ("Belum ada provider gambar yang dikonfigurasi pemilik "
-                        "aplikasi (Cloudflare / Leonardo / Ideogram / ImageFX "
-                        "/ Designer)."),
+            "content": "Fitur gambar belum dikonfigurasi pemilik (CF_ACCOUNT_ID / CF_API_TOKEN).",
             "time": now_wib(),
         })
         return
-
-    provider = (provider or IMAGE_PROVIDER_DEFAULT or "cloudflare")
-    info_provider = IMAGE_PROVIDER_BY_KEY.get(provider) or {}
 
     # Susun prompt final: teks User + kata kunci gaya pilihan.
     prompt_final = (prompt or "").strip()
@@ -270,14 +261,9 @@ def handle_image_request(prompt: str, gaya: str | None = None,
             # ditolak Cloudflare (HTTP 400). Ringkas/potong dulu di sini
             # supaya animasi loading tetap tampil selama proses berjalan.
             from engines.image_engine import ringkas_prompt_panjang
-            if provider == "cloudflare":
-                prompt_siap, catatan = ringkas_prompt_panjang(prompt_final)
-                result["catatan"] = catatan
-            else:
-                prompt_siap = prompt_final
-            result["data"] = generate_image_provider(
-                prompt_siap, provider=provider, rasio=rasio,
-            )
+            prompt_siap, catatan = ringkas_prompt_panjang(prompt_final)
+            result["catatan"] = catatan
+            result["data"] = generate_image(prompt_siap)
         except Exception as exc:
             result["error"] = exc
 
@@ -330,7 +316,6 @@ def handle_image_request(prompt: str, gaya: str | None = None,
             "catatan_prompt": result.get("catatan") or None,
             "gaya": gaya if gaya and gaya != "otomatis" else None,
             "rasio": rasio if rasio and rasio != "1:1" else None,
-            "provider": info_provider.get("nama") or provider,
             "time": now_wib(),
         })
         return
@@ -1421,7 +1406,5 @@ def process_user_input(user_input, answer_slot, is_fresh: bool = False) -> bool:
         # Pilihan gaya & rasio dari halaman AI Image (page_image.py).
         "image_style": st.session_state.get("aiimg_gaya") if halaman_gambar else None,
         "image_ratio": st.session_state.get("aiimg_rasio") if halaman_gambar else None,
-        "image_provider": (st.session_state.get("aiimg_provider")
-                           if halaman_gambar else None),
     }
     return True

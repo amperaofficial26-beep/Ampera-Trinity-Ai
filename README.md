@@ -50,18 +50,6 @@ Aplikasi membaca kredensial dari **Streamlit Secrets** atau environment variable
 GROQ_API_KEY = "gsk_..."
 ```
 
-### Provider gambar (halaman AI Image)
-
-Cukup isi salah satu; provider dipilih User lewat panel kanan halaman AI Image.
-
-| Provider | Secret | Jatah gratis | Catatan |
-|---|---|---|---|
-| Cloudflare FLUX | `CF_ACCOUNT_ID`, `CF_API_TOKEN` | kuota Workers AI | API resmi |
-| Leonardo.ai | `LEONARDO_API_KEY` (opsional `LEONARDO_MODEL_ID`) | 150 Fast Token/hari, reset 24 jam | API resmi |
-| Ideogram.ai | `IDEOGRAM_API_KEY` | 10 slow credit/hari (±40 gambar) | API resmi |
-| Google ImageFX | `IMAGEFX_AUTH_TOKEN` | ±40–80 gambar/hari | Jalur tidak resmi: token dari labs.google/fx, umur ±1 jam |
-| Microsoft Designer | `BING_COOKIE_U` (opsional `BING_COOKIE_SRCHHPGUSR`) | 15–30 Boost/hari, habis → antrean normal | Jalur tidak resmi: cookie `_U` bing.com, ganti tiap 2–4 minggu |
-
 ## 📁 Struktur Proyek
 
 | File | Fungsi |

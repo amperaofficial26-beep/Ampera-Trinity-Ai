@@ -380,28 +380,6 @@ CSS = r"""
 }
 .aiimg-panel-hint .mi { font-size: 14px; color: #B39EC6; }
 
-/* Keterangan provider terpilih (nama layanan + jatah gratis harian) */
-.aiimg-provider-note {
-    margin: 2px 0 2px;
-    padding: 8px 10px;
-    border: 1px solid #EFE4D2;
-    border-radius: 11px;
-    background: rgba(255, 255, 255, 0.65);
-    color: #8B8095;
-    font-size: 0.71rem;
-    line-height: 1.45;
-}
-.aiimg-provider-note b { color: #4D3A69; }
-.aiimg-provider-note code {
-    padding: 1px 5px;
-    border-radius: 6px;
-    background: #F3EADB;
-    color: #7C5C99;
-    font-size: 0.68rem;
-}
-.aiimg-panel-warn { color: #A07E3C; }
-.aiimg-panel-warn .mi { font-size: 13px; color: #C89B3C; }
-
 /* Pil di dalam panel boleh melipat ke baris berikutnya */
 .stApp:has(.aiimg-page-shell) .stButtonGroup [role="group"],
 .stApp:has(.aiimg-page-shell) .stButtonGroup > div {

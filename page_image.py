@@ -20,8 +20,7 @@ from __future__ import annotations
 import streamlit as st
 
 from config import (
-    CHAT_INPUT_SUPPORTS_AUDIO, IMAGE_PROVIDER_BY_KEY, IMAGE_PROVIDER_DEFAULT,
-    IMAGE_PROVIDERS, IMAGE_READY, IMAGE_RATIOS, IMAGE_STYLES,
+    CHAT_INPUT_SUPPORTS_AUDIO, IMAGE_READY, IMAGE_RATIOS, IMAGE_STYLES,
 )
 from icons import mi
 from state import mode_thread
@@ -60,7 +59,6 @@ CONTOH_PROMPT = [
 
 GAYA_AKTIF_DEFAULT = "otomatis"
 RASIO_AKTIF_DEFAULT = "1:1"
-PROVIDER_AKTIF_DEFAULT = IMAGE_PROVIDER_DEFAULT
 
 
 def _kirim(teks: str) -> None:
@@ -91,20 +89,6 @@ def _sync_rasio() -> None:
         nilai = RASIO_AKTIF_DEFAULT
         st.session_state["aiimg_rasio_pills"] = nilai
     st.session_state["aiimg_rasio"] = nilai
-
-
-def _sync_provider() -> None:
-    nilai = st.session_state.get("aiimg_provider_pills")
-    if not nilai:
-        nilai = st.session_state.get("aiimg_provider") or PROVIDER_AKTIF_DEFAULT
-        st.session_state["aiimg_provider_pills"] = nilai
-    st.session_state["aiimg_provider"] = nilai
-
-
-def _label_provider(key: str) -> str:
-    p = IMAGE_PROVIDER_BY_KEY.get(key) or {}
-    kunci = "" if p.get("ready") else " :material/lock:"
-    return f"{p.get('icon', '')} {p.get('label', key)}{kunci}"
 
 
 def _label_gaya(key: str) -> str:
@@ -220,8 +204,6 @@ def _panel_kanan() -> None:
     """Kartu pengaturan di sisi kanan: pilih gaya & format gambar."""
     gaya_aktif = st.session_state.get("aiimg_gaya", GAYA_AKTIF_DEFAULT)
     rasio_aktif = st.session_state.get("aiimg_rasio", RASIO_AKTIF_DEFAULT)
-    provider_aktif = st.session_state.get("aiimg_provider",
-                                          PROVIDER_AKTIF_DEFAULT)
 
     with st.container(key="aiimg_panel"):
         st.markdown(
@@ -238,37 +220,8 @@ def _panel_kanan() -> None:
             return
 
         st.markdown(
-            f'<div class="aiimg-chip-label">{mi(":material/hub:")}'
-            f' Provider</div>',
-            unsafe_allow_html=True,
-        )
-        _pills(
-            "Provider",
-            [p["key"] for p in IMAGE_PROVIDERS],
-            _label_provider,
-            provider_aktif,
-            "aiimg_provider_pills",
-            _sync_provider,
-        )
-        info = IMAGE_PROVIDER_BY_KEY.get(provider_aktif) or {}
-        tanda = "" if info.get("resmi", True) else (
-            f'<br><span class="aiimg-panel-warn">{mi(":material/warning:")}'
-            ' jalur tidak resmi — token/cookie akun pribadi</span>'
-        )
-        if info.get("ready"):
-            isi = f'<b>{info.get("nama", "")}</b><br>{info.get("kuota", "")}{tanda}'
-        else:
-            isi = (f'<b>{info.get("nama", "")}</b> belum aktif — pemilik '
-                   f'aplikasi perlu mengisi '
-                   f'<code>{", ".join(info.get("butuh") or [])}</code>.')
-        st.markdown(
-            f'<div class="aiimg-provider-note">{isi}</div>',
-            unsafe_allow_html=True,
-        )
-
-        st.markdown(
-            f'<div class="aiimg-chip-label aiimg-chip-label-2">'
-            f'{mi(":material/palette:")} Gaya</div>',
+            f'<div class="aiimg-chip-label">{mi(":material/palette:")}'
+            f' Gaya</div>',
             unsafe_allow_html=True,
         )
         _pills(
@@ -373,10 +326,9 @@ def page_image() -> None:
     # Peringatan lembut bila engine gambar belum dikonfigurasi pemilik.
     if not IMAGE_READY:
         st.markdown(
-            '<div class="aiimg-warning">Belum ada provider gambar yang '
-            'dikonfigurasi pemilik aplikasi (Cloudflare, Leonardo, Ideogram, '
-            'ImageFX, atau Designer). Prompt tetap terkirim, tapi Yuki akan '
-            'menjelaskan lewat balasan.</div>',
+            '<div class="aiimg-warning">Engine gambar belum dikonfigurasi '
+            'pemilik aplikasi (CF_ACCOUNT_ID / CF_API_TOKEN). Prompt tetap '
+            'terkirim, tapi Yuki akan menjelaskan lewat balasan.</div>',
             unsafe_allow_html=True,
         )
 
