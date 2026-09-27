@@ -711,7 +711,7 @@ section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] [data-test
     min-width: 0 !important;
 
     margin: 0 !important;
-    padding: 5px 10px !important;
+    padding: 5px 7px !important;
     border-radius: calc(var(--tr-radius, 12px) + 8px) !important;
     z-index: 999990 !important;
 }
