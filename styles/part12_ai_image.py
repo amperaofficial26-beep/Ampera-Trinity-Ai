@@ -322,10 +322,10 @@ CSS = r"""
    ================================================================ */
 :root {
     --aiimg-panel-w: 268px;
-    --aiimg-panel-top: 92px;
+    --aiimg-panel-top: 76px;
     /* jarak dasar panel dari bawah layar — disamakan dengan tinggi
        angkat kotak input supaya kaki panel & kotak input sejajar */
-    --aiimg-panel-bottom: 96px;
+    --aiimg-panel-bottom: 30px;
 }
 
 .stApp:has(.aiimg-page-shell) .st-key-aiimg_panel {
@@ -340,7 +340,7 @@ CSS = r"""
        panelnya PASTI memanjang di semua browser */
     height: calc(100vh - var(--aiimg-panel-top)
                  - var(--aiimg-panel-bottom)) !important;
-    min-height: 340px !important;
+    min-height: 420px !important;
     max-height: none !important;
     overflow-y: auto !important;
     padding: 15px 16px 14px !important;
