@@ -1022,7 +1022,7 @@ span[role="img"],
 
     top: 12px !important;
 
-    left: var(--dash-center-left) !important;
+    left: calc(var(--dash-center-left) + 24px) !important;
 
     right: var(--dash-center-right) !important;
 
@@ -1117,7 +1117,7 @@ span[role="img"],
 .st-key-chat_topbar {
 
     left:
-        calc(var(--dash-center-left) + 20) !important;
+        var(--dash-center-left) !important;
 
     right:
         var(--dash-center-right) !important;
