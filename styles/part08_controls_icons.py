@@ -1116,11 +1116,18 @@ span[role="img"],
 .stApp:has(.tr-chat-layout)
 .st-key-chat_topbar {
 
+    /* >>> JARAK TOPBAR KE SIDEBAR <<<
+       --topbar-jarak-sidebar : tambahan jarak dari tepi sidebar (kiri).
+       --topbar-jarak-panel   : tambahan jarak dari panel kanan.
+       Sidebar di halaman chat memang dipatok terbuka, jadi jarak ini
+       yang dipakai supaya topbar tidak menempel ke sidebar. */
     left:
-        var(--dash-center-left) !important;
+        calc(var(--dash-center-left)
+             + var(--topbar-jarak-sidebar, 26px)) !important;
 
     right:
-        var(--dash-center-right) !important;
+        calc(var(--dash-center-right)
+             + var(--topbar-jarak-panel, 0px)) !important;
 }
 
 
