@@ -776,4 +776,38 @@ CSS = r"""
 }
 
 /* Posisi landing dikontrol langsung dari page_multi_agent.py. */
+
+/* ====================================================================
+   MULTI AI — BATALKAN GESERAN PERCAKAPAN MILIK CHAT UTAMA
+   --------------------------------------------------------------------
+   part09_design_system.py memberi:
+       .stApp:has(.tr-chat-layout) .bubble-row {
+           position: relative; left: var(--conversation-x); }
+   dengan --conversation-x: -190px (setelan halaman chat utama).
+
+   Halaman Multi AI memakai penanda "tr-chat-layout tr-multi-ai-layout",
+   jadi ikut tergeser -190px dan teksnya keluar dari kartu lalu terpotong.
+   Di sini geseran itu DIBATALKAN khusus Multi AI. Ditulis di part10
+   (dimuat setelah part09) dan diawali `body` agar bobotnya menang.
+==================================================================== */
+body .stApp:has(.tr-multi-ai-layout) .bubble-row,
+body .stApp:has(.tr-multi-ai-layout) .bubble-wrap,
+body .stApp:has(.tr-multi-ai-layout) [class*="st-key-msg_actions_"],
+body .stApp:has(.tr-multi-ai-layout) .trinity-greeting {
+    position: static !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    transform: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+body .stApp:has(.tr-multi-ai-layout) .bubble-row.user {
+    justify-content: flex-end !important;
+}
+body .stApp:has(.tr-multi-ai-layout) .bubble-row.ai {
+    justify-content: flex-start !important;
+}
 """
