@@ -929,4 +929,22 @@ p.trinity-foot.in-chat,
     width: 100% !important;
     text-align: left !important;
 }
+
+/* Halaman Multi AI memakai kolom sempit sendiri — geseran kartu
+   dinetralkan di sana supaya isi jawaban tidak keluar/terpotong. */
+.stApp:has(.tr-multi-ai-layout) .rc-card,
+.stApp:has(.tr-multi-ai-layout) [class*="st-key-qr_card_"],
+.stApp:has(.tr-multi-ai-layout) [class*="st-key-rc_nav_"],
+.stApp:has(.tr-multi-ai-layout) [class*="st-key-rc_map_"],
+.stApp:has(.tr-multi-ai-layout) [class*="st-key-rc_itin_"] {
+    margin-left: 0 !important;
+}
+/* Isi pesan tidak boleh melewati batas kolom percakapan. */
+.stApp:has(.tr-multi-ai-layout) .bubble-row,
+.stApp:has(.tr-multi-ai-layout) .bubble-wrap,
+.stApp:has(.tr-multi-ai-layout) .bubble {
+    margin-left: 0 !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+}
 """
