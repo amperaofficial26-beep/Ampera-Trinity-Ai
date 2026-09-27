@@ -253,7 +253,7 @@ CSS = r"""
        UKURAN TEKS
        ========================================================= */
 
-    font-size: 12px !important;
+    font-size: 15px !important;
     font-weight: 500 !important;
 
     line-height: 1.35 !important;
