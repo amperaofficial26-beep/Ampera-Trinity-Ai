@@ -781,4 +781,82 @@ p.trinity-foot.in-chat,
     height: 1.2em !important;
 }
 
+/* ====================================================================
+   RAPIKAN ISI PERCAKAPAN — kartu & teks tidak boleh keluar kolom
+   --------------------------------------------------------------------
+   Gejala sebelumnya: kartu perbandingan (dan tabel/kode panjang) lebih
+   lebar daripada kolom percakapan, sehingga seluruh halaman ikut bisa
+   digeser ke samping. Tiga penyebabnya ditutup sekaligus di sini:
+     1. kartu memakai lebar tetap 640px -> diganti min(640px, 100%)
+     2. kolom grid memakai 1fr (lantai min-content) -> minmax(0, 1fr)
+     3. teks/tabel/kode panjang tidak boleh dipatahkan -> dibolehkan
+==================================================================== */
+.rc-card {
+    width: 100% !important;
+    max-width: min(640px, 100%) !important;
+    box-sizing: border-box !important;
+}
+.rc-cmp-row {
+    grid-template-columns: repeat(var(--rc-cols, 2), minmax(0, 1fr)) !important;
+}
+.rc-cmp-head,
+.rc-cmp-cell,
+.rc-cmp-label,
+.rc-cmp-value,
+.rc-step-title,
+.rc-step-desc,
+.rc-link-title,
+.rc-link-desc,
+.rc-tr-text,
+.rc-itin-act,
+.rc-itin-note {
+    min-width: 0 !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+}
+
+/* Gelembung pesan & teks jawaban ikut dipatahkan, jangan melebar. */
+.bubble,
+.bubble-wrap {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow-wrap: anywhere !important;
+}
+.bubble p,
+.bubble li,
+.bubble h1, .bubble h2, .bubble h3, .bubble h4 {
+    overflow-wrap: anywhere !important;
+}
+
+/* Tabel & blok kode: digulung DI DALAM kartunya, bukan melebarkan halaman. */
+.bubble table,
+[data-testid="stMarkdownContainer"] table {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    border-collapse: collapse !important;
+}
+.bubble pre,
+[data-testid="stMarkdownContainer"] pre {
+    max-width: 100% !important;
+    overflow-x: auto !important;
+}
+
+/* Kolom percakapan tidak boleh ikut melar karena isi yang kelebaran. */
+[data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"],
+[data-testid="stMainBlockContainer"] [data-testid="stElementContainer"] {
+    min-width: 0 !important;
+}
+
+/* Kolom kartu perbandingan menumpuk lebih awal (kolom chat memang sempit,
+   bukan selebar layar) supaya tulisannya tidak berdesakan. */
+@media (max-width: 1100px) {
+    .rc-cmp-row { grid-template-columns: 1fr !important; }
+    .rc-cmp-row > *:not(:first-child) {
+        border-left: none !important;
+        border-top: 1px solid #F3ECE0 !important;
+    }
+    .rc-tr { grid-template-columns: 1fr !important; }
+}
 """
