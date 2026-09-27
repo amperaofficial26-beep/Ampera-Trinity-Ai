@@ -325,7 +325,7 @@ CSS = r"""
     --aiimg-panel-top: 30px;
     /* jarak dasar panel dari bawah layar — disamakan dengan tinggi
        angkat kotak input supaya kaki panel & kotak input sejajar */
-    --aiimg-panel-bottom: 30px;
+    --aiimg-panel-bottom: 50px;
 }
 
 .stApp:has(.aiimg-page-shell) .st-key-aiimg_panel {
