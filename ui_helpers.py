@@ -23,6 +23,19 @@ from logo import LOGO_B64
 from state import active_thread
 
 # ============================================================================
+# PENGATURAN KARTU SIMULASI INTERAKTIF  <<< UBAH DI SINI
+#   Berlaku untuk SEMUA mode chat AI (bukan hanya Multi Agent).
+#   SIM_GESER_X : geser kartu. Negatif = ke kiri, positif = ke kanan (px).
+#   SIM_GESER_Y : geser kartu atas/bawah (px).
+#   SIM_LEBAR   : lebar maksimal kartu simulator (px).
+#   SIM_TINGGI  : tinggi area simulator (px).
+# ============================================================================
+SIM_GESER_X = -100
+SIM_GESER_Y = 0
+SIM_LEBAR = 700
+SIM_TINGGI = 520
+
+# ============================================================================
 # THINKING INDICATOR ALA CLAUDE
 #   Bintang ✳ berdenyut + frasa dengan shimmer yang muncul perlahan
 #   dan berganti-ganti lambat (animasi murni CSS → tetap jalan
