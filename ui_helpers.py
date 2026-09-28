@@ -909,6 +909,18 @@ def render_message(msg: dict) -> None:
                 msg["interactive_html"]
             )
 
+            # Gaya posisi lokal ikut disisipkan di sini agar berlaku di semua
+            # mode chat, termasuk mode yang tidak memakai layout Multi AI.
+            st.markdown(
+                '<style>\n'
+                '@media (min-width:900px){'
+                '[class*="st-key-simulator_"]{'
+                'position:relative!important;left:-280px!important;'
+                'width:calc(100% + 280px)!important;max-width:none!important;'
+                'margin-left:0!important;}'
+                '}\n</style>',
+                unsafe_allow_html=True,
+            )
             with st.container(
                 key=f"simulator_{simulator_id}"
             ):
