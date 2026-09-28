@@ -118,11 +118,17 @@ SAPAAN = {
 
 
 def get_greeting() -> str:
-    """Sapaan halaman utama; acak per sesi, sesuai waktu, tidak monoton."""
-    if "sapaan" not in st.session_state:
-        h = datetime.now().hour
-        periode = ("pagi" if 4 <= h < 11 else "siang" if 11 <= h < 15
-                   else "sore" if 15 <= h < 19 else "malam")
+    """Sapaan halaman utama.
+
+    Jam diambil dari zona Asia/Jakarta (WIB), bukan jam server, supaya
+    sapaan tidak meleset (mis. "Selamat malam" padahal pukul 10:45 pagi).
+    Pilihan kalimat tetap acak, tetapi ikut berubah saat periode berganti.
+    """
+    h = datetime.now(_WIB).hour
+    periode = ("pagi" if 4 <= h < 11 else "siang" if 11 <= h < 15
+               else "sore" if 15 <= h < 19 else "malam")
+    if st.session_state.get("sapaan_periode") != periode:
+        st.session_state["sapaan_periode"] = periode
         st.session_state["sapaan"] = random.choice(SAPAAN[periode])
     return st.session_state["sapaan"]
 

@@ -13,8 +13,11 @@ import html
 import os
 import random
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 import streamlit as st
+
+_WIB = ZoneInfo("Asia/Jakarta")
 
 _LOGO_PATH = os.path.join(
     os.path.dirname(os.path.abspath(__file__)), "assets", "logo_thinking_small.png"
@@ -82,11 +85,12 @@ SAPAAN = {
 
 
 def get_greeting() -> str:
-    """Sapaan halaman utama; acak per sesi, sesuai waktu, tidak monoton."""
-    if "sapaan" not in st.session_state:
-        h = datetime.now().hour
-        periode = ("pagi" if 4 <= h < 11 else "siang" if 11 <= h < 15
-                   else "sore" if 15 <= h < 19 else "malam")
+    """Sapaan halaman utama, mengikuti jam WIB (Asia/Jakarta)."""
+    h = datetime.now(_WIB).hour
+    periode = ("pagi" if 4 <= h < 11 else "siang" if 11 <= h < 15
+               else "sore" if 15 <= h < 19 else "malam")
+    if st.session_state.get("sapaan_periode") != periode:
+        st.session_state["sapaan_periode"] = periode
         st.session_state["sapaan"] = random.choice(SAPAAN[periode])
     return st.session_state["sapaan"]
 
