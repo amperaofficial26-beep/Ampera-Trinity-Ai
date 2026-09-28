@@ -2016,13 +2016,13 @@ section[data-testid="stSidebar"] .element-container {
 section[data-testid="stSidebar"] .sb-brand {
     display: flex !important;
     align-items: center !important;
-    gap: 8px !important;
+    gap: 6px !important;
     width: auto !important;
-    min-height: 104px !important;
-    margin: 7px 0 30px !important;
-    padding: 10px !important;
+    min-height: 64px !important;
+    margin: 6px 0 16px !important;
+    padding: 7px 9px !important;
     border: 1px solid #E0D2C0 !important;
-    border-radius: 31px !important;
+    border-radius: 20px !important;
     background: #F8F0E6 !important;
     box-shadow: 0 10px 24px rgba(76, 58, 43, .055) !important;
 }
@@ -2030,23 +2030,23 @@ section[data-testid="stSidebar"] .sb-brand-logo {
     position: relative !important;
     display: grid !important;
     place-items: center !important;
-    width: 70px !important;
-    height: 70px !important;
-    min-width: 70px !important;
-    padding-right: 12px !important;
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    padding-right: 8px !important;
     border-right: 1px solid #D8C9B6 !important;
 }
 section[data-testid="stSidebar"] .sb-brand-logo .logo-sidebar {
-    width: 70px !important;
-    height: 70px !important;
+    width: 38px !important;
+    height: 38px !important;
 }
 section[data-testid="stSidebar"] .sb-brand-title {
     padding: 0 !important;
     color: #2E2040 !important;
     font-family: 'Source Serif 4', Georgia, serif !important;
-    font-size: 2rem !important;
+    font-size: 1.28rem !important;
     font-weight: 600 !important;
-    letter-spacing: -.045em !important;
+    letter-spacing: -.035em !important;
     line-height: 1 !important;
 }
 
@@ -2210,18 +2210,18 @@ section[data-testid="stSidebar"] .sb-account {
     .stApp:has(.tr-chat-layout)
 section[data-testid="stSidebar"] .sb-brand,
 section[data-testid="stSidebar"] .sb-brand {
-        min-height: 92px !important;
+        min-height: 64px !important;
         box-sizing: border-box !important;
     }
     .stApp:has(.tr-chat-layout)
     section[data-testid="stSidebar"] .sb-brand-logo,
     section[data-testid="stSidebar"] .sb-brand-logo {
-        width: 58px !important;
-        height: 58px !important;
-        min-width: 58px !important;
+        width: 42px !important;
+        height: 42px !important;
+        min-width: 42px !important;
         padding-right: 6px !important;
         box-sizing: border-box !important;
-        flex: 0 0 58px !important;
+        flex: 0 0 42px !important;
     }
     .stApp:has(.tr-chat-layout)
     section[data-testid="stSidebar"] .sb-brand-logo .logo-sidebar,
@@ -2229,8 +2229,8 @@ section[data-testid="stSidebar"] .sb-brand {
     .stApp:has(.tr-chat-layout)
     section[data-testid="stSidebar"] .sb-brand-logo .logo-sidebar img,
     section[data-testid="stSidebar"] .sb-brand-logo .logo-sidebar img {
-        width: 50px !important;
-        height: 50px !important;
+        width: 36px !important;
+        height: 36px !important;
         max-width: none !important;
     }
 }
