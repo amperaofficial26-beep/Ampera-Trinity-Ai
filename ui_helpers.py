@@ -23,6 +23,19 @@ from logo import LOGO_B64
 from state import active_thread
 
 # ============================================================================
+# PENGATURAN KARTU SIMULASI INTERAKTIF  <<< UBAH DI SINI
+#   Berlaku untuk SEMUA mode chat AI (bukan hanya Multi Agent).
+#   SIM_GESER_X : geser kartu. Negatif = ke kiri, positif = ke kanan (px).
+#   SIM_GESER_Y : geser kartu atas/bawah (px).
+#   SIM_LEBAR   : lebar maksimal kartu simulator (px).
+#   SIM_TINGGI  : tinggi area simulator (px).
+# ============================================================================
+SIM_GESER_X = 0
+SIM_GESER_Y = 0
+SIM_LEBAR = 700
+SIM_TINGGI = 520
+
+# ============================================================================
 # THINKING INDICATOR ALA CLAUDE
 #   Bintang ✳ berdenyut + frasa dengan shimmer yang muncul perlahan
 #   dan berganti-ganti lambat (animasi murni CSS → tetap jalan
@@ -915,11 +928,12 @@ def render_message(msg: dict) -> None:
                 '<style>\n'
                 '@media (min-width:900px){'
                 '[class*="st-key-simulator_"]{'
-                'position:relative!important;left:0!important;'
-                'width:100%!important;max-width:700px!important;'
+                'position:relative!important;'
+                f'left:{SIM_GESER_X}px!important;top:{SIM_GESER_Y}px!important;'
+                f'width:100%!important;max-width:{SIM_LEBAR}px!important;'
                 'margin-left:0!important;margin-right:auto!important;}'
                 '[class*="st-key-simulator_"] iframe{'
-                'width:100%!important;max-width:680px!important;'
+                f'width:100%!important;max-width:{SIM_LEBAR - 20}px!important;'
                 'margin-left:0!important;margin-right:auto!important;'
                 'display:block!important;}'
                 '[class*="st-key-simulator_"] [data-testid="stIFrame"],'
@@ -947,8 +961,8 @@ def render_message(msg: dict) -> None:
                 )
                 components.html(
                     html_document,
-                    height=520,
-                    width=680,
+                    height=SIM_TINGGI,
+                    width=SIM_LEBAR - 20,
                     scrolling=True,
                 )
                 st.markdown(
