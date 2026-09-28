@@ -178,8 +178,9 @@ def _render_chat_chrome(is_fresh: bool) -> None:
     )
 
     with st.container(key="chat_topbar"):
+        # Kolom "AI Assistant" dipendekkan agar tidak menelan ruang topbar.
         brand_col, status_col, user_col, out_col = st.columns(
-            [1.15, 2.85, 1.05, 0.82],
+            [1.15, 1.75, 1.25, 0.82],
             gap="small",
         )
 

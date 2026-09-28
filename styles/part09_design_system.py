@@ -2391,4 +2391,26 @@ section[data-testid="stSidebar"] .st-key-sidebar_back_chat {
         margin-left: -7px !important;
     }
 }
+
+/* Topbar: pil "AI Assistant" dibuat lebih pendek dan teksnya dipangkas. */
+.stApp:has(.tr-chat-layout) .tr-assistant-pill {
+    max-width: 330px !important;
+    width: 100% !important;
+    min-height: 40px !important;
+    padding: 4px 11px !important;
+}
+.stApp:has(.tr-chat-layout) .tr-assistant-pill .tr-pill-copy {
+    min-width: 0 !important;
+    overflow: hidden !important;
+}
+.stApp:has(.tr-chat-layout) .tr-assistant-pill .tr-pill-title,
+.stApp:has(.tr-chat-layout) .tr-assistant-pill .tr-pill-sub {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+.stApp:has(.tr-chat-layout) .tr-user-pill b,
+.stApp:has(.tr-chat-layout) .tr-user-pill small {
+    white-space: nowrap !important;
+}
 """
