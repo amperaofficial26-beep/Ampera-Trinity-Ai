@@ -35,15 +35,18 @@ def _files() -> list[dict]:
 # ============================================================================
 DOK_LEBAR_PX = 336            # lebar kartu daftar file
 DOK_MAKS_TINGGI = "85vh"      # tinggi maksimum sebelum daftar discroll
-WARNA_KARTU = "#2C1F33"       # latar kartu (ungu gelap)
-WARNA_TEKS = "#F6EEDF"        # teks utama (krem terang)
-WARNA_REDUP = "#B8A9C0"       # teks sekunder
-WARNA_AKSEN = "#E8B04B"       # emas: chip ekstensi & hover tombol
+# Palet premium krem, senada topbar & sidebar (bukan lagi ungu gelap).
+WARNA_KARTU = "#FBF5EC"       # latar kartu (krem terang)
+WARNA_TEKS = "#2C1F33"        # teks utama (ungu gelap)
+WARNA_REDUP = "#8A7F8A"       # teks sekunder
+WARNA_AKSEN = "#4A3559"       # ungu: chip ekstensi & aksi
+WARNA_GARIS = "#E4D6C3"       # garis tepi lembut
+WARNA_HOVER = "#F1E6D6"       # latar saat kursor di atas tombol
 MAKS_FILE_TAMPIL = 12         # dok itu kecil; sisanya cukup disebut jumlahnya
 
 TOMBOL_ATAS_PX = 15           # posisi ikon folder dari atas layar
 TOMBOL_KANAN_PX = 15         # posisi ikon folder dari kanan layar
-TEKS_GELEMBUNG = "File kamu ada di sini"
+# Gelembung "File kamu ada di sini" dihapus atas permintaan pengguna.
 
 
 # ============================================================================
@@ -77,10 +80,16 @@ def _css(terbuka: bool) -> str:
         "align-items:center!important;"
         f"background:{WARNA_KARTU}!important;"
         f"color:{WARNA_TEKS}!important;"
-        "border:1px solid rgba(255,255,255,.16)!important;"
-        "box-shadow:0 6px 18px rgba(44,31,51,.20)!important;}"
+        f"border:1px solid {WARNA_GARIS}!important;"
+        "font-weight:600!important;"
+        "box-shadow:0 8px 20px rgba(76,58,43,.10)!important;"
+        "transition:background .18s ease,border-color .18s ease,"
+        "transform .18s ease!important;}"
         "body [class*='st-key-fd_toggle'] button:hover{"
-        f"background:{WARNA_AKSEN}!important;color:{WARNA_KARTU}!important;}}"
+        f"background:{WARNA_HOVER}!important;color:{WARNA_TEKS}!important;"
+        f"border-color:{WARNA_AKSEN}!important;transform:translateY(-1px)!important;}}"
+        "body [class*='st-key-fd_toggle'] button [data-testid='stIconMaterial']{"
+        f"color:{WARNA_AKSEN}!important;}}"
 
         "body [class*='st-key-fd_toggle'] button > div{"
         "width:100%!important;"
@@ -119,7 +128,7 @@ def _css(terbuka: bool) -> str:
            
         "body [class*='st-key-fd_toggle'] button "
         "[data-testid='stMarkdownContainer'] strong{"
-        "animation:fd-text-glow 2.6s ease-in-out infinite!important;"
+        f"color:{WARNA_TEKS}!important;font-weight:700!important;"
         "}"
         
         "@keyframes fd-text-glow{"
@@ -138,24 +147,10 @@ def _css(terbuka: bool) -> str:
         ".fd-dot{"
         f"position:fixed;top:{TOMBOL_ATAS_PX - 6}px;"
         f"right:{TOMBOL_KANAN_PX - 4}px;z-index:999999;"
-        "min-width:20px;height:20px;padding:0 5px;border-radius:10px;"
-        "background:#D9534F;color:#FFF;font-size:11px;font-weight:700;"
+        "min-width:19px;height:19px;padding:0 5px;border-radius:10px;"
+        f"background:{WARNA_AKSEN};color:#FFF;font-size:11px;font-weight:700;"
         "display:flex;align-items:center;justify-content:center;"
         "box-shadow:0 2px 8px rgba(0,0,0,.25);pointer-events:none;}"
-        # ---- gelembung kecil di samping ikon ---------------------------
-        ".fd-bubble{"
-        f"position:fixed;top:{TOMBOL_ATAS_PX + 8}px;"
-        f"right:{TOMBOL_KANAN_PX + 56}px;z-index:999999;"
-        f"background:{WARNA_KARTU};color:{WARNA_TEKS};"
-        "font-size:12.5px;font-weight:600;padding:8px 13px;"
-        "border-radius:14px 14px 4px 14px;white-space:nowrap;"
-        "box-shadow:0 8px 22px rgba(44,31,51,.30);pointer-events:none;"
-        "animation:fd-float 2.2s ease-in-out infinite;}"
-        ".fd-bubble::after{content:'';position:absolute;right:-6px;top:50%;"
-        f"transform:translateY(-50%);border-left:7px solid {WARNA_KARTU};"
-        "border-top:6px solid transparent;border-bottom:6px solid transparent;}"
-        "@keyframes fd-float{0%,100%{transform:translateX(0)}"
-        "50%{transform:translateX(-5px)}}"
         # ---- kartu dok ------------------------------------------------
         "body .st-key-fd_panel{"
         f"position:fixed!important;"
@@ -167,9 +162,9 @@ def _css(terbuka: bool) -> str:
         f"max-height:{DOK_MAKS_TINGGI}!important;"
         "overflow-y:auto!important;"
         f"background:{WARNA_KARTU}!important;"
-        "border:1px solid rgba(255,255,255,.10)!important;"
+        f"border:1px solid {WARNA_GARIS}!important;"
         "border-radius:18px!important;padding:18px 16px 14px!important;"
-        "box-shadow:0 18px 48px rgba(20,12,26,.45)!important;"
+        "box-shadow:0 18px 40px rgba(76,58,43,.14)!important;"
         "z-index:999997!important;animation:fd-in .22s ease-out;}"
         "@keyframes fd-in{from{opacity:0;transform:translateY(-8px)}"
         "to{opacity:1;transform:translateY(0)}}"
@@ -180,7 +175,7 @@ def _css(terbuka: bool) -> str:
         "word-break:break-all;line-height:1.35;}"
         f".fd-meta{{color:{WARNA_REDUP};font-size:11.5px;margin-top:2px;}}"
         ".fd-ext{display:inline-block;vertical-align:2px;"
-        f"background:{WARNA_AKSEN};color:{WARNA_KARTU};font-size:10px;"
+        f"background:{WARNA_AKSEN};color:#FFFFFF;font-size:10px;"
         "font-weight:800;border-radius:6px;padding:1px 6px;margin-right:7px;}"
         f".fd-more{{color:{WARNA_REDUP};font-size:12px;text-align:center;"
         "margin:2px 0 4px;}"
@@ -188,24 +183,23 @@ def _css(terbuka: bool) -> str:
         "line-height:1.6;padding:14px 6px 10px;}"
         # ---- baris file -------------------------------------------------
         "body [class*='st-key-fd_row_']{"
-        "background:rgba(255,255,255,.055)!important;"
-        "border:1px solid rgba(255,255,255,.07)!important;"
+        "background:#FFFFFF!important;"
+        f"border:1px solid {WARNA_GARIS}!important;"
         "border-radius:12px!important;padding:10px!important;"
         "margin:0 0 8px!important;}"
         "body [class*='st-key-fd_row_'] button{"
         "height:34px!important;min-height:34px!important;width:100%!important;"
         "padding:0!important;border-radius:10px!important;"
-        f"background:rgba(255,255,255,.08)!important;color:{WARNA_TEKS}!important;"
-        "border:1px solid rgba(255,255,255,.14)!important;"
+        f"background:{WARNA_KARTU}!important;color:{WARNA_TEKS}!important;"
+        f"border:1px solid {WARNA_GARIS}!important;"
         "box-shadow:none!important;}"
         "body [class*='st-key-fd_row_'] button:hover{"
-        f"background:{WARNA_AKSEN}!important;color:{WARNA_KARTU}!important;"
+        f"background:{WARNA_AKSEN}!important;color:#FFFFFF!important;"
         f"border-color:{WARNA_AKSEN}!important;}}"
         # ---- ponsel -----------------------------------------------------
         "@media(max-width:850px){"
         "body .st-key-fd_panel{width:calc(100vw - 24px)!important;"
-        "right:12px!important;}"
-        ".fd-bubble{font-size:12px;}}"
+        "right:12px!important;}}"
         "</style>"
     )
 
@@ -259,8 +253,7 @@ def render_file_dock() -> None:
     # Gelembung + titik merah: hanya saat ada file BARU dan dok tertutup.
     if baru and not terbuka:
         st.markdown(
-            f'<div class="fd-dot">{baru}</div>'
-            f'<div class="fd-bubble">{html.escape(TEKS_GELEMBUNG)}</div>',
+            f'<div class="fd-dot">{baru}</div>',
             unsafe_allow_html=True,
         )
 
