@@ -916,8 +916,18 @@ def render_message(msg: dict) -> None:
                 '@media (min-width:900px){'
                 '[class*="st-key-simulator_"]{'
                 'position:relative!important;left:0!important;'
-                'width:100%!important;max-width:760px!important;'
+                'width:100%!important;max-width:700px!important;'
                 'margin-left:0!important;margin-right:auto!important;}'
+                '[class*="st-key-simulator_"] iframe{'
+                'width:100%!important;max-width:680px!important;'
+                'margin-left:0!important;margin-right:auto!important;'
+                'display:block!important;}'
+                '[class*="st-key-simulator_"] [data-testid="stIFrame"],'
+                '[class*="st-key-simulator_"] [data-testid="stElementContainer"],'
+                '[class*="st-key-simulator_"] [data-testid="stVerticalBlock"]{'
+                'width:100%!important;max-width:100%!important;'
+                'align-items:flex-start!important;'
+                'margin-left:0!important;margin-right:0!important;}'
                 '}\n</style>',
                 unsafe_allow_html=True,
             )
@@ -935,15 +945,12 @@ def render_message(msg: dict) -> None:
                     '</div>',
                     unsafe_allow_html=True,
                 )
-                # Batasi viewport iframe lewat kolom nyata Streamlit; CSS
-                # pada wrapper saja tidak cukup karena iframe mengikuti parent.
-                _sim_left, _sim_center, _sim_right = st.columns([1, 4, 1])
-                with _sim_center:
-                    components.html(
-                        html_document,
-                        height=620,
-                        scrolling=True,
-                    )
+                components.html(
+                    html_document,
+                    height=520,
+                    width=680,
+                    scrolling=True,
+                )
                 st.markdown(
                     '<div class="sim-card-foot">'
                     '<span>Eksperimen dengan kontrol di atas</span>'
