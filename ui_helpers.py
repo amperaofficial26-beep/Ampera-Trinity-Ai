@@ -924,26 +924,31 @@ def render_message(msg: dict) -> None:
 
             # Gaya posisi lokal ikut disisipkan di sini agar berlaku di semua
             # mode chat, termasuk mode yang tidak memakai layout Multi AI.
-            st.markdown(
-                '<style>\n'
-                '@media (min-width:900px){'
-                '[class*="st-key-simulator_"]{'
-                'position:relative!important;left:0!important;'
-                'width:100%!important;max-width:700px!important;'
-                'margin-left:0!important;margin-right:auto!important;}'
-                '[class*="st-key-simulator_"] iframe{'
-                'width:100%!important;max-width:680px!important;'
-                'margin-left:0!important;margin-right:auto!important;'
-                'display:block!important;}'
-                '[class*="st-key-simulator_"] [data-testid="stIFrame"],'
-                '[class*="st-key-simulator_"] [data-testid="stElementContainer"],'
-                '[class*="st-key-simulator_"] [data-testid="stVerticalBlock"]{'
-                'width:100%!important;max-width:100%!important;'
-                'align-items:flex-start!important;'
-                'margin-left:0!important;margin-right:0!important;}'
-                '}\n</style>',
-                unsafe_allow_html=True,
+            _sim_css = (
+                "<style>@media (min-width:900px){"
+                'body .stApp [class*="st-key-simulator_"]{'
+                "position:relative!important;"
+                "left:" + str(SIM_GESER_X) + "px!important;"
+                "top:" + str(SIM_GESER_Y) + "px!important;"
+                "width:100%!important;"
+                "max-width:" + str(SIM_LEBAR) + "px!important;"
+                "min-width:0!important;"
+                "margin-left:0!important;margin-right:auto!important;"
+                "transform:none!important;}"
+                'body .stApp [class*="st-key-simulator_"] iframe{'
+                "width:100%!important;"
+                "max-width:" + str(SIM_LEBAR - 20) + "px!important;"
+                "margin-left:0!important;margin-right:auto!important;"
+                "display:block!important;}"
+                'body .stApp [class*="st-key-simulator_"] [data-testid="stIFrame"],'
+                'body .stApp [class*="st-key-simulator_"] [data-testid="stElementContainer"],'
+                'body .stApp [class*="st-key-simulator_"] [data-testid="stVerticalBlock"]{'
+                "width:100%!important;max-width:100%!important;"
+                "align-items:flex-start!important;"
+                "margin-left:0!important;margin-right:0!important;}"
+                "}</style>"
             )
+            st.markdown(_sim_css, unsafe_allow_html=True)
             with st.container(
                 key=f"simulator_{simulator_id}"
             ):
@@ -960,8 +965,8 @@ def render_message(msg: dict) -> None:
                 )
                 components.html(
                     html_document,
-                    height=520,
-                    width=680,
+                    height=SIM_TINGGI,
+                    width=SIM_LEBAR - 20,
                     scrolling=True,
                 )
                 st.markdown(
