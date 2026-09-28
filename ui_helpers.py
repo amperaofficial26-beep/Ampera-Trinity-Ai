@@ -919,7 +919,15 @@ def render_message(msg: dict) -> None:
                 'width:100%!important;max-width:700px!important;'
                 'margin-left:0!important;margin-right:auto!important;}'
                 '[class*="st-key-simulator_"] iframe{'
-                'width:100%!important;max-width:680px!important;}'
+                'width:100%!important;max-width:680px!important;'
+                'margin-left:0!important;margin-right:auto!important;'
+                'display:block!important;}'
+                '[class*="st-key-simulator_"] [data-testid="stIFrame"],'
+                '[class*="st-key-simulator_"] [data-testid="stElementContainer"],'
+                '[class*="st-key-simulator_"] [data-testid="stVerticalBlock"]{'
+                'width:100%!important;max-width:100%!important;'
+                'align-items:flex-start!important;'
+                'margin-left:0!important;margin-right:0!important;}'
                 '}\n</style>',
                 unsafe_allow_html=True,
             )

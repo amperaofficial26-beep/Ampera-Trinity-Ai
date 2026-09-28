@@ -184,7 +184,7 @@ def extract_interactive_html(
     responsive_guard = """
 <style id="trinity-responsive-guard">
 html, body { width:100% !important; min-width:0 !important; max-width:100% !important; overflow-x:hidden !important; }
-body { box-sizing:border-box !important; margin-left:auto !important; margin-right:auto !important; }
+body { box-sizing:border-box !important; margin-left:0 !important; margin-right:0 !important; }
 body > * { max-width:100% !important; box-sizing:border-box !important; }
 </style>
 """
