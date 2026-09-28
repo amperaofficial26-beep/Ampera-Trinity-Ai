@@ -903,7 +903,7 @@ body .stApp:has(.tr-multi-ai-layout) .yuki-answer-body {
    --multi-ruang-bawah: ruang kosong di bawah pesan terakhir
 ==================================================================== */
 body .stApp:has(.tr-multi-ai-layout) {
-    --multi-sim-tinggi: 360px;
+    --multi-sim-tinggi: 620px;
     --multi-ruang-bawah: 240px;
 }
 
@@ -975,4 +975,18 @@ body .stApp:has(.tr-multi-ai-layout)
     max-height: none !important;
     overflow: visible !important;
 }
+
+/* Premium chrome untuk setiap kartu simulasi interaktif. */
+[class*="st-key-simulator_"] { max-width: 860px; margin: 16px 0 22px !important; padding: 0 10px 10px !important; border: 1px solid rgba(219,206,185,.9); border-radius: 22px; background: linear-gradient(145deg,#fffdf9,#f8f1e6); box-shadow: 0 14px 34px rgba(44,31,51,.10),0 2px 6px rgba(44,31,51,.05); overflow: hidden; }
+[class*="st-key-simulator_"]::before { content: ""; display:block; height:4px; margin:0 -10px; background:linear-gradient(90deg,#2c1f33,#b687b8 48%,#e3aa69); }
+.sim-card-head { display:flex; align-items:center; gap:11px; padding:15px 10px 12px; color:#2c1f33; }
+.sim-card-mark { display:grid; place-items:center; flex:0 0 35px; height:35px; border-radius:12px; color:#fff8ef; font-size:1.2rem; background:linear-gradient(135deg,#2c1f33,#65466d); box-shadow:0 5px 12px rgba(44,31,51,.2); }
+.sim-card-kicker { font-size:.69rem; font-weight:800; letter-spacing:.14em; }
+.sim-card-subtitle { margin-top:2px; color:#857887; font-size:.78rem; }
+.sim-card-live { margin-left:auto; padding:5px 9px; border:1px solid #d8c7b5; border-radius:999px; color:#78666f; font-size:.65rem; font-weight:800; letter-spacing:.08em; }
+.sim-card-live i { display:inline-block; width:6px; height:6px; margin-right:5px; border-radius:50%; background:#5aa982; box-shadow:0 0 0 3px #dcefe3; }
+[class*="st-key-simulator_"] iframe { display:block; border:1px solid #e5d8c8 !important; border-radius:15px !important; box-shadow:0 5px 16px rgba(44,31,51,.08); }
+.sim-card-foot { display:flex; justify-content:space-between; gap:12px; padding:10px 4px 0; color:#988b98; font-size:.72rem; }
+.sim-card-tip { color:#b09272; }
+@media (max-width:600px) { [class*="st-key-simulator_"] { padding:0 6px 8px !important; border-radius:17px; } .sim-card-head { padding:12px 6px 10px; } .sim-card-subtitle { font-size:.7rem; } .sim-card-foot { flex-direction:column; gap:3px; } }
 """
