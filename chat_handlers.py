@@ -92,6 +92,12 @@ _STOP_BTN_CSS = (
 # IMAGE_MAX_SECONDS : batas aman menunggu API sebelum dianggap timeout.
 # Siklus frasa desain tetap 15 detik di loading_params.py; angka ini hanya
 # mencegah kedipan jika API gambar menjawab sangat cepat.
+# ============================================================================
+# POSISI LOADER "YUKI SEDANG BERPIKIR"  <<< UBAH DI SINI
+#   Negatif = geser ke kiri, positif = ke kanan (px).
+# ============================================================================
+LOADER_GESER_X = 0
+
 IMAGE_MIN_SECONDS = float(THINKING_MIN_SECONDS)
 IMAGE_DONE_SECONDS = 0.7
 IMAGE_MAX_SECONDS = 200.0
@@ -279,15 +285,38 @@ def handle_image_request(prompt: str, gaya: str | None = None,
     # `special_loading_html()` berisi CSS + elemen bertumpuk. Renderer
     # Markdown dapat menutup tag <span> lebih awal dan menampilkan sisanya
     # sebagai teks kode; components.html merendernya sebagai dokumen HTML utuh.
-    with progress_slot:
-        components.html(
-            special_loading_html(
-                "design",
-                loading_subject(prompt),
-            ),
-            height=62,
-            scrolling=False,
+    with progress_slot.container():
+        # Dibungkus container berkunci agar posisi/ukurannya sama dengan
+        # loader teks, dan agar animasinya tidak hilang saat st.empty()
+        # dipakai ulang.
+        st.markdown(
+            "<style>"
+            'body .stApp [class*="st-key-img_loader_slot"],'
+            'body .stApp [class*="st-key-img_loader_slot"] '
+            '[data-testid="stElementContainer"],'
+            'body .stApp [class*="st-key-img_loader_slot"] '
+            '[data-testid="stIFrame"]{'
+            "width:100%!important;max-width:100%!important;"
+            "margin-left:0!important;margin-right:0!important;"
+            "align-items:flex-start!important;}"
+            'body .stApp [class*="st-key-img_loader_slot"] iframe{'
+            "position:relative!important;"
+            "left:" + str(LOADER_GESER_X) + "px!important;"
+            "width:100%!important;max-width:100%!important;"
+            "margin-left:0!important;margin-right:auto!important;"
+            "display:block!important;}"
+            "</style>",
+            unsafe_allow_html=True,
         )
+        with st.container(key="img_loader_slot"):
+            components.html(
+                special_loading_html(
+                    "design",
+                    loading_subject(prompt),
+                ),
+                height=74,
+                scrolling=False,
+            )
         if st.session_state.pop("_yuki_scroll_pending", False):
             _scroll_to_yuki_work_once()
 
@@ -665,13 +694,6 @@ def _scroll_to_yuki_work_once() -> None:
         scrolling=False,
     )
     
-
-# ============================================================================
-# POSISI LOADER "YUKI SEDANG BERPIKIR"  <<< UBAH DI SINI
-#   Negatif = geser ke kiri, positif = ke kanan (px).
-# ============================================================================
-LOADER_GESER_X = 0
-
 
 def render_loader_yuki() -> None:
     """Animasi "Yuki sedang berpikir" — dirender oleh SCRIPT UTAMA.
