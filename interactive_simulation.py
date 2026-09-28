@@ -120,8 +120,11 @@ INTERAKSI:
 - Berikan label yang jelas pada setiap kontrol.
 - Berikan nilai awal yang masuk akal.
 
-DESAIN KHUSUS SESUAI JENIS SIMULASI:
-- Setiap simulasi wajib punya desain visual yang unik dan kontekstual, bukan template polos yang sama.
+DESAIN VISUAL WAJIB — GAYA KARTU REFERENSI:
+- Semua simulator wajib tampil sebagai satu kartu aplikasi premium seperti desain referensi: latar belakang pastel lembut, kartu utama putih dengan sudut sangat membulat, bayangan halus, ruang kosong lega, dan komposisi rapi.
+- Gunakan hierarki yang jelas: header dengan ikon/emoji ilustratif, judul besar tebal, subtitle singkat, badge aksen di kanan, area visual utama yang dominan, panel kontrol berbentuk baris kartu, lalu footer informasi.
+- Gunakan gaya visual modern playful: palet pastel, aksen pink/ungu/biru/hijau sesuai konteks, gradient lembut, typography system modern, ikon sederhana, border tipis, dan micro-animation.
+- Setiap simulator wajib punya desain visual yang unik dan kontekstual, bukan template polos yang sama.
 - Jangan tampilkan kontrol browser default sebagai tampilan utama. Style semua input range, tombol, panel, label, dan output dengan CSS.
 - Buat satu kartu/aplikasi mini dengan header, judul, deskripsi singkat, area visual utama, panel kontrol, dan output nilai yang jelas.
 - Gunakan font system modern, warna aksen, gradient, border, shadow, radius, spacing, dan micro-animation yang konsisten.
@@ -175,6 +178,20 @@ def extract_interactive_html(
     html_doc = match.group(1).strip()
     html_doc = re.sub(r"^```(?:html)?\s*", "", html_doc, flags=re.I)
     html_doc = re.sub(r"\s*```$", "", html_doc).strip()
+
+    # Paksa dokumen simulator mengikuti viewport iframe. Ini mencegah layout
+    # buatan AI yang memakai lebar tetap terdorong ke kanan dan terpotong.
+    responsive_guard = """
+<style id="trinity-responsive-guard">
+html, body { width:100% !important; min-width:0 !important; max-width:100% !important; overflow-x:hidden !important; }
+body { box-sizing:border-box !important; margin-left:auto !important; margin-right:auto !important; }
+body > * { max-width:100% !important; box-sizing:border-box !important; }
+</style>
+"""
+    if "</head>" in html_doc.lower():
+        html_doc = re.sub(r"</head>", responsive_guard + "</head>", html_doc, count=1, flags=re.I)
+    else:
+        html_doc = responsive_guard + html_doc
 
     if complete_marker:
         clean = _BLOCK.sub("", source, count=1).strip()
