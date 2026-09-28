@@ -179,6 +179,20 @@ def extract_interactive_html(
     html_doc = re.sub(r"^```(?:html)?\s*", "", html_doc, flags=re.I)
     html_doc = re.sub(r"\s*```$", "", html_doc).strip()
 
+    # Paksa dokumen simulator mengikuti viewport iframe. Ini mencegah layout
+    # buatan AI yang memakai lebar tetap terdorong ke kanan dan terpotong.
+    responsive_guard = """
+<style id="trinity-responsive-guard">
+html, body { width:100% !important; min-width:0 !important; max-width:100% !important; overflow-x:hidden !important; }
+body { box-sizing:border-box !important; margin-left:auto !important; margin-right:auto !important; }
+body > * { max-width:100% !important; box-sizing:border-box !important; }
+</style>
+"""
+    if "</head>" in html_doc.lower():
+        html_doc = re.sub(r"</head>", responsive_guard + "</head>", html_doc, count=1, flags=re.I)
+    else:
+        html_doc = responsive_guard + html_doc
+
     if complete_marker:
         clean = _BLOCK.sub("", source, count=1).strip()
     elif raw_html:
