@@ -925,7 +925,7 @@ def render_message(msg: dict) -> None:
                 )
                 components.html(
                     html_document,
-                    height=520,
+                    height=620,
                     scrolling=True,
                 )
                 st.markdown(
