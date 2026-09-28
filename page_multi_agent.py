@@ -28,8 +28,7 @@ MULTI_CARDS_X = -132
 MULTI_CARDS_Y = 0
 
 # Kolom chat/input di bagian bawah.
-# Geser area chat ke kiri agar kartu simulator tidak masuk ke panel kanan.
-MULTI_CHAT_X = -90
+MULTI_CHAT_X = 10
 MULTI_CHAT_Y = -20
 
 # Ukuran kartu dan kolom chat.
