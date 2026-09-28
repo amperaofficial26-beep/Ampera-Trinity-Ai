@@ -996,7 +996,7 @@ body .stApp:has(.tr-multi-ai-layout)
     max-width: 100% !important;
     min-width: 0 !important;
     box-sizing: border-box !important;
-    margin-left: 50 !important;
+    margin-left: 200 !important;
     margin-right: 0 !important;
     transform: none !important;
 }
