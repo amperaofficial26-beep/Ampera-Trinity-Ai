@@ -670,7 +670,7 @@ def _scroll_to_yuki_work_once() -> None:
 # POSISI LOADER "YUKI SEDANG BERPIKIR"  <<< UBAH DI SINI
 #   Negatif = geser ke kiri, positif = ke kanan (px).
 # ============================================================================
-LOADER_GESER_X = -100
+LOADER_GESER_X = -160
 
 
 def render_loader_yuki() -> None:
