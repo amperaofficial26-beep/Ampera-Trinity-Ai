@@ -989,4 +989,20 @@ body .stApp:has(.tr-multi-ai-layout)
 .sim-card-foot { display:flex; justify-content:space-between; gap:12px; padding:10px 4px 0; color:#988b98; font-size:.72rem; }
 .sim-card-tip { color:#b09272; }
 @media (max-width:600px) { [class*="st-key-simulator_"] { padding:0 6px 8px !important; border-radius:17px; } .sim-card-head { padding:12px 6px 10px; } .sim-card-subtitle { font-size:.7rem; } .sim-card-foot { flex-direction:column; gap:3px; } }
+
+/* Simulator mengikuti lebar area chat, bukan lebar layar/sidebar. */
+.stApp:has(.tr-multi-ai-layout) [class*="st-key-simulator_"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    transform: none !important;
+}
+.stApp:has(.tr-multi-ai-layout) [class*="st-key-simulator_"] iframe {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
 """
