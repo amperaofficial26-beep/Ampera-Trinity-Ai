@@ -1529,4 +1529,23 @@ div.stDownloadButton > button:hover {
 }
 @keyframes caretBlink { 50% { opacity: 0; } }
 
+
+/* Loader "thinking": disejajarkan dengan teks jawaban Yuki (rata kiri). */
+[class*="st-key-yuki_loader_slot"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: block !important;
+    text-align: left !important;
+}
+[class*="st-key-yuki_loader_slot"] [data-testid="stElementContainer"],
+[class*="st-key-yuki_loader_slot"] [data-testid="stIFrame"],
+[class*="st-key-yuki_loader_slot"] iframe {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: auto !important;
+    display: block !important;
+}
 """

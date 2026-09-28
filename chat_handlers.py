@@ -705,11 +705,14 @@ def render_loader_yuki() -> None:
         "_yuki_loader_tampil"
     ] = True
 
-    components.html(
-        loader_html,
-        height=62 if loader_mode else 90,
-        scrolling=False,
-    )
+    # Loader dibungkus container berkunci supaya posisinya bisa disamakan
+    # dengan teks jawaban Yuki (rata kiri, bukan menjorok ke tengah).
+    with st.container(key="yuki_loader_slot"):
+        components.html(
+            loader_html,
+            height=62 if loader_mode else 90,
+            scrolling=False,
+        )
     # Hanya kiriman baru yang menggeser kamera. Rerun fragmen dan kemunculan
     # jawaban tidak mengulang scroll, sehingga pengguna bebas melihat ke atas.
     if st.session_state.pop("_yuki_scroll_pending", False):
