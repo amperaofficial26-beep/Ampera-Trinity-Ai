@@ -30,7 +30,7 @@ from state import active_thread
 #   SIM_LEBAR   : lebar maksimal kartu simulator (px).
 #   SIM_TINGGI  : tinggi area simulator (px).
 # ============================================================================
-SIM_GESER_X = -180
+SIM_GESER_X = -190
 SIM_GESER_Y = 0
 SIM_LEBAR = 700
 SIM_TINGGI = 520
