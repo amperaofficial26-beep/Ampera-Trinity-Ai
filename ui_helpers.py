@@ -915,9 +915,9 @@ def render_message(msg: dict) -> None:
                 '<style>\n'
                 '@media (min-width:900px){'
                 '[class*="st-key-simulator_"]{'
-                'position:relative!important;left:-280px!important;'
-                'width:calc(100% + 280px)!important;max-width:none!important;'
-                'margin-left:0!important;}'
+                'position:relative!important;left:0!important;'
+                'width:100%!important;max-width:760px!important;'
+                'margin-left:0!important;margin-right:auto!important;}'
                 '}\n</style>',
                 unsafe_allow_html=True,
             )
@@ -935,11 +935,15 @@ def render_message(msg: dict) -> None:
                     '</div>',
                     unsafe_allow_html=True,
                 )
-                components.html(
-                    html_document,
-                    height=620,
-                    scrolling=True,
-                )
+                # Batasi viewport iframe lewat kolom nyata Streamlit; CSS
+                # pada wrapper saja tidak cukup karena iframe mengikuti parent.
+                _sim_left, _sim_center, _sim_right = st.columns([1, 4, 1])
+                with _sim_center:
+                    components.html(
+                        html_document,
+                        height=620,
+                        scrolling=True,
+                    )
                 st.markdown(
                     '<div class="sim-card-foot">'
                     '<span>Eksperimen dengan kontrol di atas</span>'
