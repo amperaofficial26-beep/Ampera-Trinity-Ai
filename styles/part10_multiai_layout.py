@@ -997,7 +997,7 @@ body .stApp:has(.tr-multi-ai-layout)
     min-width: 0 !important;
     box-sizing: border-box !important;
     margin-left: 200 !important;
-    margin-right: 0 !important;
+    margin-right: 100 !important;
     transform: none !important;
 }
 .stApp:has(.tr-multi-ai-layout) [class*="st-key-simulator_"] iframe {
