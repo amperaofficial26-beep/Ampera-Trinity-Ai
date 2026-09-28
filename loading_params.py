@@ -128,8 +128,9 @@ _HTML = """<style>
   color: transparent;
   animation: glowSweep 2.4s linear infinite;
 }
+html, body { margin: 0 !important; padding: 0 !important; }
 </style>
-<div style="display:flex;align-items:center;justify-content:flex-start;padding:1.5rem 0;">
+<div style="display:flex;align-items:center;justify-content:flex-start;padding:1.1rem 0 0;margin:0;">
   <div style="display:flex;align-items:center;gap:10px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:13.5px;color:#6B6172;">
     <span class="param-logo">__LOGO__</span>
     <span id="pline" class="param-line">menyetel parameter…</span>
@@ -580,6 +581,7 @@ def special_loading_html(
     }}
 }}
 
+html,body {{ margin:0 !important; padding:0 !important; }}
 .special-loader {{
   display:flex; align-items:center; justify-content:flex-start;
   min-height:50px; padding:7px 0; color:#6B6172;
