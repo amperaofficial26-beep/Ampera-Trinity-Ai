@@ -53,17 +53,101 @@ def daftar_artefak() -> list[dict]:
     return st.session_state.artifacts
 
 
-def _tebak_nama(lang: str, kode: str, sebelum: str) -> str:
-    m = _NAMA_RE.search((sebelum or "").strip().splitlines()[-1]
-                        if (sebelum or "").strip() else "")
+_STOPWORD = {
+    "yang", "untuk", "dengan", "sebuah", "buatkan", "buat", "tolong",
+    "kode", "file", "sederhana", "berikut", "ini", "itu", "adalah",
+    "contoh", "dan", "atau", "saya", "kamu", "aku", "bisa", "coba",
+    "html", "css", "python", "javascript", "program", "script",
+}
+
+
+def _slug(teks: str, maks_kata: int = 3) -> str:
+    """Ubah kalimat jadi nama file yang enak dibaca: 'form-login'."""
+    kata = [
+        k for k in re.findall(r"[A-Za-z0-9]+", (teks or "").lower())
+        if len(k) > 2 and k not in _STOPWORD
+    ]
+    return "-".join(kata[:maks_kata])
+
+
+def _nama_dari_isi(lang: str, kode: str) -> str:
+    """Tebak nama dari isi kode: judul halaman, nama kelas, atau fungsi."""
+    m = re.search(r"<title[^>]*>(.*?)</title>", kode, re.I | re.S)
     if m:
-        return m.group(1)
+        return _slug(m.group(1))
+
+    m = re.search(r"<h1[^>]*>(.*?)</h1>", kode, re.I | re.S)
+    if m:
+        return _slug(re.sub(r"<[^>]+>", " ", m.group(1)))
+
+    m = re.search(r"^\s*(?:class|interface)\s+([A-Za-z_][\w]*)", kode, re.M)
+    if m:
+        return _slug(re.sub(r"(?<!^)(?=[A-Z])", "-", m.group(1)))
+
+    m = re.search(r"^\s*(?:def|function|func|fn)\s+([A-Za-z_][\w]*)", kode, re.M)
+    if m:
+        return _slug(m.group(1).replace("_", "-"))
+
+    m = re.search(r"^\s*\.([A-Za-z][\w-]+)\s*\{", kode, re.M)
+    if m:
+        return _slug(m.group(1))
+
+    return ""
+
+
+def _tebak_nama(lang: str, kode: str, sebelum: str) -> str:
+    """Nama file mengikuti konteks aslinya, bukan file_1/file_2 yang monoton.
+
+    Urutan penebakan:
+      1. Nama file yang memang disebut di teks sebelum blok kode.
+      2. Nama file pada komentar baris pertama kode.
+      3. Isi kode: <title>, <h1>, nama kelas/fungsi, atau selector CSS.
+      4. Kalimat terakhir sebelum blok kode (diringkas jadi slug).
+      5. Baru sebagai jalan terakhir: nama generik bernomor.
+    """
+    ext = _EKSTENSI.get((lang or "").lower(), "txt")
+    konteks = (sebelum or "").strip()
+
+    # 1. "simpan sebagai index.html" / "index.html:" di teks sebelumnya
+    if konteks:
+        baris_akhir = konteks.splitlines()[-1]
+        m = _NAMA_RE.search(baris_akhir)
+        if m:
+            return m.group(1)
+        kandidat = re.findall(r"[\w./-]+\.[A-Za-z0-9]{1,5}", konteks[-400:])
+        if kandidat:
+            return kandidat[-1]
+
+    # 2. komentar nama file di baris pertama kode
     baris1 = (kode.splitlines() or [""])[0].strip()
     m2 = re.search(r"([\w./-]+\.[A-Za-z0-9]{1,5})", baris1)
     if m2 and baris1.startswith(("#", "//", "/*", "<!--")):
         return m2.group(1)
-    ext = _EKSTENSI.get((lang or "").lower(), "txt")
+
+    # 3. nama dari isi kode
+    dasar = _nama_dari_isi(lang, kode)
+
+    # 4. kalimat terakhir sebelum blok kode
+    if not dasar and konteks:
+        teks_bersih = re.sub(r"[*_`#>]+", " ", konteks)
+        kalimat = [k for k in re.split(r"[.\n:!?]", teks_bersih) if k.strip()]
+        if kalimat:
+            dasar = _slug(kalimat[-1])
+
+    if dasar:
+        nama = f"{dasar}.{ext}"
+        # Hindari tabrakan nama dalam satu sesi: tambah -2, -3, dst.
+        terpakai = {str(a.get("title", "")).lower() for a in daftar_artefak()}
+        if nama.lower() in terpakai:
+            n = 2
+            while f"{dasar}-{n}.{ext}".lower() in terpakai:
+                n += 1
+            nama = f"{dasar}-{n}.{ext}"
+        return nama
+
+    # 5. jalan terakhir
     return f"file_{len(daftar_artefak()) + 1}.{ext}"
+
 
 def ambil_artefak(teks: str) -> tuple[str, list[int]]:
     """Potong blok kode dari jawaban Yuki -> simpan sebagai file, 
