@@ -920,20 +920,6 @@ body .stApp:has(.tr-multi-ai-layout)
 }
 
 /* Kartu simulasi interaktif: lebih pendek & tidak "menelan" guliran. */
-body .stApp:has(.tr-multi-ai-layout) [class*="st-key-simulator_"] iframe,
-body .stApp:has(.tr-multi-ai-layout) iframe[title="st.iframe"],
-body .stApp:has(.tr-multi-ai-layout) [data-testid="stIFrame"] {
-    height: var(--multi-sim-tinggi) !important;
-    max-height: var(--multi-sim-tinggi) !important;
-    width: 100% !important;
-    border: 1px solid var(--tr-border, #DBCEB9) !important;
-    border-radius: 14px !important;
-    background: #FFFFFF !important;
-}
-body .stApp:has(.tr-multi-ai-layout) [class*="st-key-simulator_"] {
-    margin: 8px 0 18px !important;
-    overflow: visible !important;
-}
 
 /* ====================================================================
    MULTI AI — KARTU CHAT BOLEH TUMBUH (perbaikan "mentok di chat ke-2/3")
@@ -977,7 +963,7 @@ body .stApp:has(.tr-multi-ai-layout)
 }
 
 /* Premium chrome untuk setiap kartu simulasi interaktif. */
-[class*="st-key-simulator_"] { max-width: 860px; margin: 16px 0 22px !important; padding: 0 10px 10px !important; border: 1px solid rgba(219,206,185,.9); border-radius: 22px; background: linear-gradient(145deg,#fffdf9,#f8f1e6); box-shadow: 0 14px 34px rgba(44,31,51,.10),0 2px 6px rgba(44,31,51,.05); overflow: hidden; align-self: flex-start !important; justify-self: start !important; }
+[class*="st-key-simulator_"] { margin: 16px 0 22px; padding: 0 10px 10px; border: 1px solid rgba(219,206,185,.9); border-radius: 22px; background: linear-gradient(145deg,#fffdf9,#f8f1e6); box-shadow: 0 14px 34px rgba(44,31,51,.10),0 2px 6px rgba(44,31,51,.05); overflow: hidden; }
 [class*="st-key-simulator_"]::before { content: ""; display:block; height:4px; margin:0 -10px; background:linear-gradient(90deg,#2c1f33,#b687b8 48%,#e3aa69); }
 .sim-card-head { display:flex; align-items:center; gap:11px; padding:15px 10px 12px; color:#2c1f33; }
 .sim-card-mark { display:grid; place-items:center; flex:0 0 35px; height:35px; border-radius:12px; color:#fff8ef; font-size:1.2rem; background:linear-gradient(135deg,#2c1f33,#65466d); box-shadow:0 5px 12px rgba(44,31,51,.2); }
@@ -990,24 +976,6 @@ body .stApp:has(.tr-multi-ai-layout)
 .sim-card-tip { color:#b09272; }
 @media (max-width:600px) { [class*="st-key-simulator_"] { padding:0 6px 8px !important; border-radius:17px; } .sim-card-head { padding:12px 6px 10px; } .sim-card-subtitle { font-size:.7rem; } .sim-card-foot { flex-direction:column; gap:3px; } }
 
-/* Simulator mengikuti lebar area chat, bukan lebar layar/sidebar. */
-.stApp:has(.tr-multi-ai-layout) [class*="st-key-simulator_"] {
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-    box-sizing: border-box !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    transform: none !important;
-}
-/* Kompensasi kolom tengah Streamlit: kartu kembali sejajar dengan bubble chat. */
-@media (min-width: 900px) {
-    [class*="st-key-simulator_"] {
-        margin-left: -280px !important;
-        width: calc(100% + 280px) !important;
-        max-width: none !important;
-    }
-}
 .stApp:has(.tr-multi-ai-layout) [class*="st-key-simulator_"] iframe {
     width: 100% !important;
     max-width: 100% !important;
