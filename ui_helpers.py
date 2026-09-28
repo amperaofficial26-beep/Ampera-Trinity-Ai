@@ -915,9 +915,9 @@ def render_message(msg: dict) -> None:
                 '<style>\n'
                 '@media (min-width:900px){'
                 '[class*="st-key-simulator_"]{'
-                'position:relative!important;left:-280px!important;'
-                'width:calc(100% + 280px)!important;max-width:none!important;'
-                'margin-left:0!important;}'
+                'position:relative!important;left:0!important;'
+                'width:100%!important;max-width:760px!important;'
+                'margin-left:0!important;margin-right:auto!important;}'
                 '}\n</style>',
                 unsafe_allow_html=True,
             )
