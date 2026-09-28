@@ -666,6 +666,13 @@ def _scroll_to_yuki_work_once() -> None:
     )
     
 
+# ============================================================================
+# POSISI LOADER "YUKI SEDANG BERPIKIR"  <<< UBAH DI SINI
+#   Negatif = geser ke kiri, positif = ke kanan (px).
+# ============================================================================
+LOADER_GESER_X = 0
+
+
 def render_loader_yuki() -> None:
     """Animasi "Yuki sedang berpikir" — dirender oleh SCRIPT UTAMA.
 
@@ -707,6 +714,24 @@ def render_loader_yuki() -> None:
 
     # Loader dibungkus container berkunci supaya posisinya bisa disamakan
     # dengan teks jawaban Yuki (rata kiri, bukan menjorok ke tengah).
+    st.markdown(
+        "<style>"
+        'body .stApp [class*="st-key-yuki_loader_slot"],'
+        'body .stApp [class*="st-key-yuki_loader_slot"] > div,'
+        'body .stApp [class*="st-key-yuki_loader_slot"] [data-testid="stElementContainer"],'
+        'body .stApp [class*="st-key-yuki_loader_slot"] [data-testid="stIFrame"]{'
+        "width:100%!important;max-width:100%!important;min-width:0!important;"
+        "margin-left:0!important;margin-right:0!important;"
+        "align-items:flex-start!important;text-align:left!important;}"
+        'body .stApp [class*="st-key-yuki_loader_slot"] iframe{'
+        "position:relative!important;"
+        "left:" + str(LOADER_GESER_X) + "px!important;"
+        "width:100%!important;max-width:100%!important;"
+        "margin-left:0!important;margin-right:auto!important;"
+        "display:block!important;}"
+        "</style>",
+        unsafe_allow_html=True,
+    )
     with st.container(key="yuki_loader_slot"):
         components.html(
             loader_html,
