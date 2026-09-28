@@ -36,6 +36,16 @@ SIM_LEBAR = 700
 SIM_TINGGI = 520
 
 # ============================================================================
+# PENGATURAN PREVIEW GAMBAR HASIL AI  <<< UBAH DI SINI
+#   IMG_LEBAR   : lebar maksimal preview gambar (px).
+#   IMG_GESER_X : geser preview. Negatif = ke kiri, positif = ke kanan (px).
+#   IMG_GESER_Y : geser preview atas/bawah (px).
+# ============================================================================
+IMG_LEBAR = 320
+IMG_GESER_X = 0
+IMG_GESER_Y = 0
+
+# ============================================================================
 # THINKING INDICATOR ALA CLAUDE
 #   Bintang ✳ berdenyut + frasa dengan shimmer yang muncul perlahan
 #   dan berganti-ganti lambat (animasi murni CSS → tetap jalan
@@ -848,7 +858,38 @@ def render_message(msg: dict) -> None:
         # kali halaman digambar ulang.
         thread = active_thread()
         baru = bool(thread) and thread[-1] is msg
-        wadah = st.container(key=f"img_pop_{mid}") if baru else st.container()
+        # Preview gambar dibungkus container berkunci supaya ukurannya kecil
+        # dan posisinya bisa digeser lewat IMG_LEBAR / IMG_GESER_X / IMG_GESER_Y.
+        st.markdown(
+            "<style>"
+            'body .stApp [class*="st-key-img_prev_"],'
+            'body .stApp [class*="st-key-img_pop_"]{'
+            "position:relative!important;"
+            "left:" + str(IMG_GESER_X) + "px!important;"
+            "top:" + str(IMG_GESER_Y) + "px!important;"
+            "width:100%!important;"
+            "max-width:" + str(IMG_LEBAR) + "px!important;"
+            "margin-left:0!important;margin-right:auto!important;}"
+            'body .stApp [class*="st-key-img_prev_"] img,'
+            'body .stApp [class*="st-key-img_pop_"] img{'
+            "width:100%!important;"
+            "max-width:" + str(IMG_LEBAR) + "px!important;"
+            "height:auto!important;border-radius:14px!important;"
+            "display:block!important;}"
+            'body .stApp [class*="st-key-img_prev_"] [data-testid="stImage"],'
+            'body .stApp [class*="st-key-img_prev_"] [data-testid="stImageContainer"],'
+            'body .stApp [class*="st-key-img_pop_"] [data-testid="stImage"],'
+            'body .stApp [class*="st-key-img_pop_"] [data-testid="stImageContainer"]{'
+            "width:100%!important;"
+            "max-width:" + str(IMG_LEBAR) + "px!important;}"
+            "</style>",
+            unsafe_allow_html=True,
+        )
+        # Gambar terbaru tetap memakai key img_pop_ agar animasi "tumbuh"
+        # di anim.py tidak hilang; keduanya diatur CSS yang sama.
+        wadah = st.container(
+            key=(f"img_pop_{mid}" if baru else f"img_prev_{mid}")
+        )
         with wadah:
             st.image(msg["image_bytes"], use_container_width=True)
             # Catatan kecil kalau prompt panjang tadi diringkas otomatis.
