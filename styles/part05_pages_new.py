@@ -2390,4 +2390,87 @@ body [class*="st-key-ap_support"] a {
     .ap-hero-art { display: none; }
     .ap-plat { min-height: 0; }
 }
+
+
+/* ================================================================
+   LEBAR & LATAR HALAMAN: BERLANGGANAN + DAPATKAN APLIKASI
+   Disamakan dengan halaman artefak/desain/jadwal.
+   ================================================================ */
+.stApp:has(.upgrade-page-shell),
+.stApp:has(.appdl-page-shell) {
+    background: #F5EBDD !important;
+}
+.stApp:has(.upgrade-page-shell) [data-testid="stMain"],
+.stApp:has(.upgrade-page-shell) [data-testid="stAppViewContainer"],
+.stApp:has(.appdl-page-shell) [data-testid="stMain"],
+.stApp:has(.appdl-page-shell) [data-testid="stAppViewContainer"] {
+    background: transparent !important;
+}
+body .stApp:has(.upgrade-page-shell) [data-testid="stMain"],
+body .stApp:has(.appdl-page-shell) [data-testid="stMain"],
+body .stApp:has(.upgrade-page-shell) [data-testid="stMain"] > div,
+body .stApp:has(.appdl-page-shell) [data-testid="stMain"] > div {
+    width: 100% !important;
+    max-width: none !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+body .stApp:has(.upgrade-page-shell) section[data-testid="stSidebar"],
+body .stApp:has(.appdl-page-shell) section[data-testid="stSidebar"] {
+    display: none !important;
+    width: 0 !important;
+}
+body .stApp:has(.upgrade-page-shell) [data-testid="stMainBlockContainer"],
+body .stApp:has(.appdl-page-shell) [data-testid="stMainBlockContainer"],
+body .stApp:has(.upgrade-page-shell) .stMainBlockContainer,
+body .stApp:has(.appdl-page-shell) .stMainBlockContainer {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 18px 16px 48px !important;
+    box-sizing: border-box !important;
+}
+
+/* Zona tengah: seluruh isi halaman dibungkus satu panel besar supaya
+   halaman terasa penuh, bukan kartu-kartu yang mengambang sendiri. */
+body .stApp:has(.upgrade-page-shell)
+[data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"],
+body .stApp:has(.appdl-page-shell)
+[data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] {
+    width: 100% !important;
+    max-width: none !important;
+    padding: 30px 34px 38px !important;
+    border: 1px solid #E8DCC9 !important;
+    border-radius: 28px !important;
+    background:
+        radial-gradient(90% 120% at 50% -10%, #FFFDF9 0%,
+                        rgba(255, 253, 249, 0) 58%),
+        linear-gradient(180deg, #FDF7EF 0%, #FBF3E8 100%) !important;
+    box-shadow: 0 22px 50px rgba(76, 58, 43, .10) !important;
+}
+.stApp:has(.upgrade-page-shell)
+[data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"],
+.stApp:has(.appdl-page-shell)
+[data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+}
+.upgrade-page-shell,
+.appdl-page-shell { display: none !important; }
+
+@media (max-width: 900px) {
+    .stApp:has(.upgrade-page-shell) [data-testid="stMainBlockContainer"],
+    .stApp:has(.appdl-page-shell) [data-testid="stMainBlockContainer"] {
+        width: calc(100% - 16px) !important;
+        padding: 70px 0 60px !important;
+    }
+    .stApp:has(.upgrade-page-shell)
+    [data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"],
+    .stApp:has(.appdl-page-shell)
+    [data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] {
+        padding: 18px 14px 22px !important;
+        border-radius: 22px !important;
+    }
+}
 """
