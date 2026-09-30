@@ -2406,22 +2406,40 @@ body [class*="st-key-ap_support"] a {
 .stApp:has(.appdl-page-shell) [data-testid="stAppViewContainer"] {
     background: transparent !important;
 }
-.stApp:has(.upgrade-page-shell) [data-testid="stMainBlockContainer"],
-.stApp:has(.appdl-page-shell) [data-testid="stMainBlockContainer"] {
-    width: calc(100% - 32px) !important;
+body .stApp:has(.upgrade-page-shell) [data-testid="stMain"],
+body .stApp:has(.appdl-page-shell) [data-testid="stMain"],
+body .stApp:has(.upgrade-page-shell) [data-testid="stMain"] > div,
+body .stApp:has(.appdl-page-shell) [data-testid="stMain"] > div {
+    width: 100% !important;
     max-width: none !important;
-    margin: 0 auto !important;
-    padding: 26px 0 70px !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+body .stApp:has(.upgrade-page-shell) section[data-testid="stSidebar"],
+body .stApp:has(.appdl-page-shell) section[data-testid="stSidebar"] {
+    display: none !important;
+    width: 0 !important;
+}
+body .stApp:has(.upgrade-page-shell) [data-testid="stMainBlockContainer"],
+body .stApp:has(.appdl-page-shell) [data-testid="stMainBlockContainer"],
+body .stApp:has(.upgrade-page-shell) .stMainBlockContainer,
+body .stApp:has(.appdl-page-shell) .stMainBlockContainer {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 18px 16px 48px !important;
     box-sizing: border-box !important;
 }
 
 /* Zona tengah: seluruh isi halaman dibungkus satu panel besar supaya
    halaman terasa penuh, bukan kartu-kartu yang mengambang sendiri. */
-.stApp:has(.upgrade-page-shell)
+body .stApp:has(.upgrade-page-shell)
 [data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"],
-.stApp:has(.appdl-page-shell)
+body .stApp:has(.appdl-page-shell)
 [data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] {
-    padding: 26px 30px 34px !important;
+    width: 100% !important;
+    max-width: none !important;
+    padding: 30px 34px 38px !important;
     border: 1px solid #E8DCC9 !important;
     border-radius: 28px !important;
     background:
