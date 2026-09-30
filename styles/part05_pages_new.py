@@ -2221,27 +2221,39 @@ body [class*="st-key-up_cta"] a {
     box-shadow: 0 18px 38px rgba(76, 58, 43, .12);
 }
 .ap-hero-mark {
-    flex: 0 0 56px; width: 56px; height: 56px;
-    display: flex; align-items: center; justify-content: center;
-    align-self: flex-start;
-    margin-top: 4px; padding: 0;
+    flex: 0 0 60px; width: 60px; height: 60px;
+    align-self: center;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 !important;
+    padding: 12px !important;
     border-radius: 18px; background: #FFFFFF;
     border: 1px solid #ECDFCB;
     box-shadow: 0 8px 18px rgba(76, 58, 43, .10);
-    overflow: hidden;
+    box-sizing: border-box !important;
+    line-height: 0 !important;
 }
-/* logo-greeting membawa ukuran & vertical-align sendiri, jadi ditimpa
-   di sini supaya benar-benar pas di tengah kotak. */
-.ap-hero-mark .logo-greeting,
-.ap-hero-mark span {
-    width: 34px !important; height: 34px !important;
-    margin: 0 !important; vertical-align: middle !important;
-    display: flex !important; align-items: center !important;
-    justify-content: center !important; line-height: 0 !important;
+/* logo_img_html() menanam width/height/vertical-align inline, jadi semua
+   lapisannya ditimpa di sini supaya logo benar-benar pas di tengah. */
+.ap-hero-mark > span,
+.ap-hero-mark .logo-greeting {
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    vertical-align: middle !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 0 !important;
 }
 .ap-hero-mark img {
-    width: 34px !important; height: 34px !important;
-    object-fit: contain !important; display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    object-fit: contain !important;
+    display: block !important;
 }
 .ap-hero-copy { flex: 1 1 auto; min-width: 0; }
 .ap-hero-copy h1 {
