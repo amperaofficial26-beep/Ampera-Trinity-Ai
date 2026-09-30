@@ -2024,4 +2024,175 @@ div.stButton > button p strong { color: #2C1F33; }
         width: 100% !important;
     }
 }
+
+
+/* ================================================================
+   HALAMAN BERLANGGANAN (TINGKATKAN PAKET) — kartu premium pastel
+   ================================================================ */
+.up-hero {
+    display: flex; align-items: center; gap: 18px;
+    position: relative; overflow: hidden;
+    margin: 2px 0 18px;
+    padding: 20px 22px;
+    border: 1px solid #EADFCD;
+    border-radius: 22px;
+    background: linear-gradient(115deg, #FDF8F1 0%, #F7EEE2 55%, #F3E7F1 100%);
+    box-shadow: 0 16px 34px rgba(76, 58, 43, .10);
+}
+.up-hero-mark {
+    flex: 0 0 56px; width: 56px; height: 56px;
+    display: grid; place-items: center;
+    border-radius: 18px;
+    background: #FFFFFF;
+    border: 1px solid #ECDFCB;
+    color: #B8873C;
+    box-shadow: 0 8px 18px rgba(76, 58, 43, .10);
+}
+.up-hero-mark .mi { font-size: 26px; }
+.up-hero-copy { flex: 1 1 auto; min-width: 0; }
+.up-hero-copy h1 {
+    margin: 0 0 4px; color: #2E2040;
+    font-size: 1.62rem; font-weight: 800; letter-spacing: -.02em;
+}
+.up-hero-copy p {
+    margin: 0; color: #7C7183; font-size: .93rem; line-height: 1.5;
+}
+.up-hero-art { flex: 0 0 auto; opacity: .85; }
+.up-hero-art img { width: 58px; height: 58px; }
+
+.up-head { margin: 16px 0 10px; }
+.up-head b {
+    display: block; color: #2E2040;
+    font-size: 1.02rem; font-weight: 800;
+}
+.up-head span {
+    display: block; margin-top: 2px;
+    color: #8A7F8A; font-size: .84rem;
+}
+
+/* ---- kartu harga ---- */
+.up-plan {
+    position: relative;
+    min-height: 168px;
+    margin: 6px 0 8px;
+    padding: 18px 16px 14px;
+    border: 1px solid #EADFCD;
+    border-radius: 18px;
+    background: #FFFDF9;
+    box-shadow: 0 10px 24px rgba(76, 58, 43, .07);
+}
+.up-plan.is-pro {
+    border-color: #4A3559;
+    background: linear-gradient(180deg, #FFFFFF 0%, #FBF6FF 100%);
+    box-shadow: 0 16px 34px rgba(74, 53, 89, .16);
+}
+.up-plan-badge {
+    position: absolute; top: -13px; left: 50%;
+    transform: translateX(-50%);
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 5px 12px; border-radius: 999px;
+    background: #2E2040; color: #FFE9B8;
+    font-size: .68rem; font-weight: 800; letter-spacing: .02em;
+    white-space: nowrap;
+    box-shadow: 0 8px 18px rgba(46, 32, 64, .28);
+}
+.up-plan-badge .mi { font-size: 14px; color: #F2B23E; }
+.up-plan-top { display: flex; align-items: center; gap: 8px; }
+.up-plan-ic {
+    width: 30px; height: 30px; display: grid; place-items: center;
+    border-radius: 10px; background: #F5ECE0; color: #6B4F86;
+}
+.up-plan-ic .mi { font-size: 18px; }
+.up-plan-name {
+    color: #2E2040; font-size: 1.02rem; font-weight: 750;
+}
+.up-plan-price {
+    margin: 12px 0 4px; color: #2E2040;
+    font-size: 1.72rem; font-weight: 820; letter-spacing: -.025em;
+}
+.up-plan-note {
+    color: #8A7F8A; font-size: .78rem; line-height: 1.45;
+}
+body [class*="st-key-up_plan_btn_"] button {
+    border-radius: 12px !important;
+    min-height: 42px !important;
+    font-weight: 650 !important;
+}
+
+/* ---- daftar manfaat ---- */
+.up-benefit-grid {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 18px;
+    padding: 14px 16px;
+    border: 1px solid #EADFCD; border-radius: 18px;
+    background: #FFFDF9;
+}
+.up-benefit {
+    display: flex; align-items: flex-start; gap: 8px;
+    color: #4C4453; font-size: .85rem; line-height: 1.4;
+}
+.up-benefit .mi { font-size: 17px; color: #4A3559; }
+
+/* ---- kartu produk lain ---- */
+.up-product {
+    display: flex; align-items: center; gap: 12px;
+    margin-top: 12px; padding: 14px 16px;
+    border: 1px solid #EADFCD; border-radius: 18px;
+    background: #FFFDF9;
+}
+.up-product-ic {
+    width: 34px; height: 34px; display: grid; place-items: center;
+    border-radius: 12px; background: #F3E7F1; color: #6B4F86;
+}
+.up-product-copy { flex: 1 1 auto; min-width: 0; }
+.up-product-copy b { display: block; color: #2E2040; font-size: .92rem; }
+.up-product-copy small {
+    display: block; margin-top: 2px; color: #8A7F8A;
+    font-size: .78rem; line-height: 1.45;
+}
+.up-product-go { color: #8A7F8A; }
+
+/* ---- panel cara berlangganan ---- */
+.up-side {
+    padding: 16px;
+    border: 1px solid #EADFCD; border-radius: 20px;
+    background: #FFFDF9;
+    box-shadow: 0 12px 26px rgba(76, 58, 43, .07);
+}
+.up-side-title {
+    margin: 0 0 10px; color: #2E2040;
+    font-size: 1rem; font-weight: 800;
+}
+.up-step {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 0;
+    border-top: 1px solid #F1E7D9;
+}
+.up-step:first-of-type { border-top: none; }
+.up-step-no {
+    flex: 0 0 22px; width: 22px; height: 22px;
+    display: grid; place-items: center;
+    border-radius: 999px; background: #F1E6D6; color: #6B4F86;
+    font-size: .72rem; font-weight: 800;
+}
+.up-step-ic { color: #6B4F86; }
+.up-step-ic .mi { font-size: 18px; }
+.up-step-copy { min-width: 0; }
+.up-step-copy b { display: block; color: #2E2040; font-size: .88rem; }
+.up-step-copy small {
+    display: block; margin-top: 2px; color: #8A7F8A;
+    font-size: .76rem; line-height: 1.45;
+}
+body [class*="st-key-up_cta"] a {
+    margin-top: 12px !important;
+    border-radius: 999px !important;
+    min-height: 44px !important;
+    font-weight: 700 !important;
+}
+
+@media (max-width: 820px) {
+    .up-hero { flex-direction: column; text-align: center; }
+    .up-hero-art { display: none; }
+    .up-benefit-grid { grid-template-columns: 1fr; }
+}
 """
