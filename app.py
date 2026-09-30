@@ -1991,6 +1991,11 @@ def page_pelajari() -> None:
 def page_tingkatkan() -> None:
     """Halaman berlangganan bergaya kartu premium (hero + harga + langkah)."""
 
+    # Penanda shell: memberi latar & lebar halaman yang sama dengan
+    # halaman lain (artefak, desain, jadwal).
+    st.markdown('<div class="upgrade-page-shell"></div>',
+                unsafe_allow_html=True)
+
     s = get_settings()
 
     # ---- Hero -------------------------------------------------------------
@@ -2161,6 +2166,9 @@ def page_tingkatkan() -> None:
 def page_aplikasi() -> None:
     """Halaman "Dapatkan Aplikasi" — aplikasi belum rilis, jadi yang tampil
     adalah daftar tunggu: pengguna meninggalkan email untuk dikabari."""
+
+    st.markdown('<div class="appdl-page-shell"></div>',
+                unsafe_allow_html=True)
 
     # ---- Hero -------------------------------------------------------------
     st.markdown(

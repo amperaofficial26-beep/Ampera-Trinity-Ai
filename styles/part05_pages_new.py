@@ -2390,4 +2390,46 @@ body [class*="st-key-ap_support"] a {
     .ap-hero-art { display: none; }
     .ap-plat { min-height: 0; }
 }
+
+
+/* ================================================================
+   LEBAR & LATAR HALAMAN: BERLANGGANAN + DAPATKAN APLIKASI
+   Disamakan dengan halaman artefak/desain/jadwal.
+   ================================================================ */
+.stApp:has(.upgrade-page-shell),
+.stApp:has(.appdl-page-shell) {
+    background: #F5EBDD !important;
+}
+.stApp:has(.upgrade-page-shell) [data-testid="stMain"],
+.stApp:has(.upgrade-page-shell) [data-testid="stAppViewContainer"],
+.stApp:has(.appdl-page-shell) [data-testid="stMain"],
+.stApp:has(.appdl-page-shell) [data-testid="stAppViewContainer"] {
+    background: transparent !important;
+}
+.stApp:has(.upgrade-page-shell) [data-testid="stMainBlockContainer"],
+.stApp:has(.appdl-page-shell) [data-testid="stMainBlockContainer"] {
+    width: calc(100% - 136px) !important;
+    max-width: none !important;
+    margin: 0 auto !important;
+    padding: 32px 0 90px !important;
+    box-sizing: border-box !important;
+}
+.stApp:has(.upgrade-page-shell)
+[data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"],
+.stApp:has(.appdl-page-shell)
+[data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+}
+.upgrade-page-shell,
+.appdl-page-shell { display: none !important; }
+
+@media (max-width: 900px) {
+    .stApp:has(.upgrade-page-shell) [data-testid="stMainBlockContainer"],
+    .stApp:has(.appdl-page-shell) [data-testid="stMainBlockContainer"] {
+        width: calc(100% - 28px) !important;
+        padding: 74px 0 70px !important;
+    }
+}
 """
