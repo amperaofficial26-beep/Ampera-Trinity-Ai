@@ -212,11 +212,48 @@ show_proyek_dialog = _register_dialog("Proyek", _proyek_dialog_body)
 show_artefak_dialog = _register_dialog("Artefak", _artefak_dialog_body)
 show_sesuaikan_dialog = _register_dialog("Sesuaikan", _sesuaikan_dialog_body)
 
+# ============================================================================
+# POSISI TOMBOL "KEMBALI KE CHAT" (halaman selain chat)  <<< UBAH DI SINI
+#   BACK_CHAT_ATAS_PX : jarak dari tepi ATAS layar (px).
+#   BACK_CHAT_KIRI_PX : jarak dari tepi KIRI layar (px).
+# ============================================================================
+BACK_CHAT_ATAS_PX = 72
+BACK_CHAT_KIRI_PX = 18
+
+
 def render_sidebar(page: str | None = None) -> None:
     page = page if page is not None else st.session_state.get("page", "chat")
     if page != "chat":
         st.markdown(
             '<div class="secondary-page-shell"></div>',
+            unsafe_allow_html=True,
+        )
+        # Tombol kembali dipaku di pojok KIRI ATAS, sedikit diturunkan
+        # supaya tetap mudah dijangkau (tidak mentok ke tepi atas layar).
+        st.markdown(
+            "<style>"
+            'body [class*="st-key-secondary_back_chat"]{'
+            "position:fixed!important;"
+            "top:" + str(BACK_CHAT_ATAS_PX) + "px!important;"
+            "left:" + str(BACK_CHAT_KIRI_PX) + "px!important;"
+            "right:auto!important;bottom:auto!important;"
+            "width:auto!important;max-width:none!important;"
+            "margin:0!important;z-index:999995!important;}"
+            'body [class*="st-key-secondary_back_chat"] button{'
+            "min-height:40px!important;padding:0 16px!important;"
+            "border-radius:999px!important;"
+            "background:#FBF5EC!important;color:#2C1F33!important;"
+            "border:1px solid #E4D6C3!important;"
+            "font-weight:650!important;white-space:nowrap!important;"
+            "box-shadow:0 8px 20px rgba(76,58,43,.12)!important;}"
+            'body [class*="st-key-secondary_back_chat"] button:hover{'
+            "background:#F1E6D6!important;border-color:#4A3559!important;"
+            "transform:translateY(-1px)!important;}"
+            "@media(max-width:820px){"
+            'body [class*="st-key-secondary_back_chat"]{'
+            "top:" + str(BACK_CHAT_ATAS_PX + 6) + "px!important;"
+            "left:10px!important;}}"
+            "</style>",
             unsafe_allow_html=True,
         )
         with st.container(key="secondary_back_chat"):
