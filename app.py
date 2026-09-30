@@ -29,6 +29,7 @@ from __future__ import annotations
 import base64
 import html
 import io
+import re
 from contextlib import contextmanager
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -2158,57 +2159,182 @@ def page_tingkatkan() -> None:
 # HALAMAN: DAPATKAN APLIKASI
 # ============================================================================
 def page_aplikasi() -> None:
-    
+    """Halaman "Dapatkan Aplikasi" — aplikasi belum rilis, jadi yang tampil
+    adalah daftar tunggu: pengguna meninggalkan email untuk dikabari."""
+
+    # ---- Hero -------------------------------------------------------------
     st.markdown(
-        f'<div class="trinity-hero">{logo_img_html("logo-greeting")}'
-        '<div class="hero-text"><h1>Trinity di genggaman</h1>'
-        "<p>Ampera Trinity AI sedang disiapkan menjadi aplikasi Android & iOS. "
-        "Semua fitur yang ada di sini — Yuki, gambar, suara, artefak, dan "
-        "kursus — ikut terbawa.</p></div></div>",
+        '<div class="ap-hero">'
+        '<div class="ap-hero-mark">' + logo_img_html("logo-greeting") + "</div>"
+        '<div class="ap-hero-copy">'
+        "<h1>Dapatkan Aplikasi<br>Trinity AI</h1>"
+        "<p>Akses Trinity AI kapan saja, di mana saja. Tingkatkan "
+        "produktivitas dan kreativitas Anda dengan aplikasi resmi kami.</p>"
+        '<span class="ap-hero-tag">' + mi(":material/schedule:")
+        + "Belum rilis · daftar untuk dikabari</span>"
+        "</div>"
+        '<div class="ap-hero-art">'
+        '<span class="ap-dev ap-dev-lap"></span>'
+        '<span class="ap-dev ap-dev-phone"></span>'
+        "</div>"
+        "</div>",
         unsafe_allow_html=True,
     )
 
-    c1, c2 = st.columns([1, 1.35])
-    with c1:
+    kiri, kanan = st.columns([1.7, 1], gap="medium")
+
+    # ---- Kolom kiri: platform --------------------------------------------
+    with kiri:
         st.markdown(
-            f'<div class="phone-card">{logo_img_html("logo-greeting")}'
-            '<div class="phone-name">Ampera Trinity AI</div>'
-            '<div class="phone-tag">pratinjau aplikasi</div></div>',
+            '<div class="ap-head"><b>' + mi(":material/download:")
+            + "Download Aplikasi</b>"
+            "<span>Pilih platform yang sesuai dengan perangkat Anda. "
+            "Semua versi masih dalam penyiapan.</span></div>",
             unsafe_allow_html=True,
         )
-    with c2:
-        st.markdown('<div class="set-section">Unduh</div>', unsafe_allow_html=True)
-        b1, b2 = st.columns(2)
-        with b1:
-            if st.button(":material/android:  Android", key="app_android",
-                         use_container_width=True):
-                st.toast("Versi Android belum dirilis. Daftar beta di bawah ya!",
-                         icon=":material/android:")
-        with b2:
-            if st.button(":material/smartphone:  iOS", key="app_ios", use_container_width=True):
-                st.toast("Versi iOS belum dirilis. Daftar beta di bawah ya!",
-                         icon=":material/smartphone:")
-        st.markdown('<div class="set-section">Rencana rilis</div>', unsafe_allow_html=True)
+
+        platform = [
+            (":material/android:", "Android", "Akan tersedia di Google Play "
+             "Store untuk semua perangkat Android.", "± 45 MB"),
+            (":material/phone_iphone:", "iOS", "Akan tersedia di App Store "
+             "untuk iPhone dan iPad.", "± 52 MB"),
+            (":material/desktop_windows:", "Desktop", "Untuk pengalaman lebih "
+             "maksimal di laptop atau PC Anda.", "± 120 MB"),
+        ]
+        kolom = st.columns(3, gap="small")
+        for i, (icon, nama, desc, ukuran) in enumerate(platform):
+            with kolom[i]:
+                st.markdown(
+                    '<div class="ap-plat">'
+                    '<span class="ap-plat-ic">' + mi(icon) + "</span>"
+                    '<span class="ap-plat-name">' + nama + "</span>"
+                    '<span class="ap-plat-desc">' + desc + "</span>"
+                    '<span class="ap-plat-soon">' + mi(":material/lock_clock:")
+                    + "Segera hadir</span>"
+                    '<span class="ap-plat-size">' + mi(":material/save:")
+                    + "Perkiraan ukuran " + ukuran + "</span>"
+                    "</div>",
+                    unsafe_allow_html=True,
+                )
+
+        # ---- Daftar tunggu (email) ---------------------------------------
         st.markdown(
-            '<div class="feat-row"><span>Android (APK & Play Store)</span>'
-            '<span class="chip-off">Tahap 1</span></div>'
-            '<div class="feat-row"><span>iOS (App Store)</span>'
-            '<span class="chip-off">Tahap 2</span></div>'
-            '<div class="feat-row"><span>Desktop (Windows & macOS)</span>'
-            '<span class="chip-off">Tahap 3</span></div>'
-            '<div class="feat-row"><span>Sinkronisasi antar perangkat</span>'
-            '<span class="chip-off">Menyusul</span></div>',
+            '<div class="ap-wait-title">'
+            + mi(":material/notifications_active:")
+            + "Kabari saya saat aplikasi rilis</div>",
             unsafe_allow_html=True,
         )
-        email = st.text_input("Email untuk kabar rilis", key="app_email",
-                              placeholder="nama@email.com")
-        if st.button(":material/notifications_active:  Kabari saya saat rilis",
-                     key="app_notify", type="primary", use_container_width=True):
-            if email.strip():
-                st.toast("Terima kasih! Kami kabari begitu aplikasi siap.",
-                         icon=":material/check_circle:")
-            else:
+        with st.container(key="ap_wait_form"):
+            kol_email, kol_tombol = st.columns([2.2, 1], gap="small")
+            with kol_email:
+                email = st.text_input(
+                    "Email",
+                    key="app_email",
+                    placeholder="nama@email.com",
+                    label_visibility="collapsed",
+                )
+            with kol_tombol:
+                kirim = st.button(
+                    ":material/send:  Daftar",
+                    key="app_notify",
+                    type="primary",
+                    use_container_width=True,
+                )
+
+        if kirim:
+            alamat = (email or "").strip()
+            sah = bool(re.match(r"^[^@\s]+@[^@\s]+\.[A-Za-z]{2,}$", alamat))
+            if not alamat:
                 st.toast("Isi dulu email kamu ya.", icon=":material/warning:")
+            elif not sah:
+                st.toast(
+                    "Format email belum benar. Contoh: nama@email.com",
+                    icon=":material/warning:",
+                )
+            else:
+                daftar = st.session_state.setdefault("app_waitlist", [])
+                if alamat.lower() in {e.lower() for e in daftar}:
+                    st.toast(
+                        "Email ini sudah terdaftar. Kami kabari saat rilis 🙌",
+                        icon=":material/check_circle:",
+                    )
+                else:
+                    daftar.append(alamat)
+                    st.toast(
+                        "Terima kasih! Kami kirim kabar ke " + alamat
+                        + " begitu aplikasi siap.",
+                        icon=":material/check_circle:",
+                    )
+
+        st.markdown(
+            '<div class="ap-note">Email hanya dipakai untuk memberi kabar '
+            "peluncuran aplikasi. Tidak ada promosi berlebihan, dan kamu bisa "
+            "minta berhenti kapan saja.</div>",
+            unsafe_allow_html=True,
+        )
+
+        terdaftar = st.session_state.get("app_waitlist") or []
+        if terdaftar:
+            st.markdown(
+                '<div class="ap-listed">' + mi(":material/mark_email_read:")
+                + "Terdaftar di perangkat ini: "
+                + ", ".join(html.escape(e) for e in terdaftar)
+                + "</div>",
+                unsafe_allow_html=True,
+            )
+
+        st.markdown(
+            '<div class="ap-safe">'
+            '<span class="ap-safe-ic">' + mi(":material/verified_user:")
+            + "</span>"
+            '<span class="ap-safe-copy"><b>Aman &amp; Terpercaya</b>'
+            "<small>Aplikasi Trinity AI akan melalui proses keamanan dan "
+            "verifikasi resmi sebelum dirilis ke publik.</small></span>"
+            "</div>",
+            unsafe_allow_html=True,
+        )
+
+    # ---- Kolom kanan: keunggulan + bantuan --------------------------------
+    with kanan:
+        unggulan = [
+            (":material/bolt:", "Akses cepat", "ke semua fitur Trinity AI"),
+            (":material/cloud_sync:", "Sinkronisasi otomatis", "antar perangkat"),
+            (":material/notifications:", "Notifikasi & update", "fitur terbaru"),
+            (":material/smartphone:", "Antarmuka yang lebih",
+             "ringkas dan mudah digunakan"),
+        ]
+        st.markdown(
+            '<div class="ap-side">'
+            '<div class="ap-side-title">' + mi(":material/auto_awesome:")
+            + "Keunggulan Aplikasi</div>"
+            + "".join(
+                '<div class="ap-adv">'
+                '<span class="ap-adv-ic">' + mi(icon) + "</span>"
+                '<span class="ap-adv-copy"><b>' + judul + "</b>"
+                "<small>" + isi + "</small></span></div>"
+                for icon, judul, isi in unggulan
+            )
+            + "</div>",
+            unsafe_allow_html=True,
+        )
+
+        st.markdown(
+            '<div class="ap-help">'
+            '<div class="ap-help-title">' + mi(":material/lightbulb:")
+            + "Butuh bantuan?</div>"
+            "<p>Jika kamu punya pertanyaan seputar peluncuran aplikasi, "
+            "hubungi tim support kami.</p>"
+            "</div>",
+            unsafe_allow_html=True,
+        )
+        with st.container(key="ap_support"):
+            st.link_button(
+                ":material/support_agent:  Hubungi Support",
+                ROOM_CHAT_URL,
+                use_container_width=True,
+                type="primary",
+            )
+
     _page_footer()
 
 
