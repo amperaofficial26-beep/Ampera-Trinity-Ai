@@ -1988,75 +1988,172 @@ def page_pelajari() -> None:
 # HALAMAN: TINGKATKAN PAKET
 # ============================================================================
 def page_tingkatkan() -> None:
+    """Halaman berlangganan bergaya kartu premium (hero + harga + langkah)."""
 
     s = get_settings()
+
+    # ---- Hero -------------------------------------------------------------
     st.markdown(
-        '<div class="trinity-hero"><div class="hero-text">'
-        f'<h1>{html.escape(AMPERA_BRAND)}</h1>'
-        f"<p>Trinity Pro kini bergabung ke keluarga {html.escape(AMPERA_BRAND)} — "
-        f"{html.escape(AMPERA_LOKASI)}. Semua kemampuan dibuka penuh: model "
-        "tertinggi tanpa batas, gambar resolusi tinggi, memori tak terbatas, "
-        "artefak penuh, serta seluruh Trinity kursus dengan Yuki sebagai "
-        "mentor pribadi.</p>"
-        "</div></div>",
+        '<div class="up-hero">'
+        '<div class="up-hero-mark">' + mi(":material/workspace_premium:") + "</div>"
+        '<div class="up-hero-copy">'
+        "<h1>Berlangganan</h1>"
+        "<p>Dapatkan lebih banyak fitur, akses tanpa batas,<br>"
+        "dan pengalaman terbaik bersama Trinity Pro.</p>"
+        "</div>"
+        '<div class="up-hero-art">' + logo_img_html("logo-greeting") + "</div>"
+        "</div>",
         unsafe_allow_html=True,
     )
 
-    st.markdown('<div class="set-section">Pilih paket Trinity Pro</div>',
-                unsafe_allow_html=True)
-    kolom_harga = st.columns(3)
+    # ---- Pilihan paket ----------------------------------------------------
+    st.markdown(
+        '<div class="up-head"><b>Pilih paket Trinity Pro</b>'
+        "<span>Tingkatkan produktivitasmu dengan paket yang sesuai kebutuhan.</span>"
+        "</div>",
+        unsafe_allow_html=True,
+    )
+
+    ikon_paket = [
+        ":material/calendar_month:",
+        ":material/star:",
+        ":material/all_inclusive:",
+    ]
+    kolom_harga = st.columns(3, gap="small")
     for i, paket in enumerate(PRO_HARGA):
         with kolom_harga[i]:
-            _harga_col(paket, f"plan_pro_{i}")
+            unggul = bool(paket.get("unggul"))
+            st.markdown(
+                '<div class="up-plan' + (" is-pro" if unggul else "") + '">'
+                + (
+                    '<div class="up-plan-badge">'
+                    + mi(":material/local_fire_department:")
+                    + "Paling Populer</div>"
+                    if unggul
+                    else ""
+                )
+                + '<div class="up-plan-top">'
+                '<span class="up-plan-ic">'
+                + mi(ikon_paket[i % len(ikon_paket)])
+                + "</span>"
+                '<span class="up-plan-name">'
+                + html.escape(paket["nama"])
+                + "</span></div>"
+                '<div class="up-plan-price">'
+                + html.escape(paket["harga"])
+                + "</div>"
+                '<div class="up-plan-note">'
+                + html.escape(paket["satuan"])
+                + " · "
+                + html.escape(paket["catatan"])
+                + "</div></div>",
+                unsafe_allow_html=True,
+            )
+            with st.container(key=f"up_plan_btn_{i}"):
+                if st.button(
+                    ":material/workspace_premium:  Pilih paket ini",
+                    key=f"plan_pro_{i}",
+                    use_container_width=True,
+                    type="primary" if unggul else "secondary",
+                ):
+                    st.toast(
+                        "Untuk berlangganan, tekan tombol ke Room Chat Ampera "
+                        "di bagian bawah halaman ini 👇",
+                        icon=":material/forum:",
+                    )
 
-    st.markdown('<div class="set-section">Semua paket Pro mendapat</div>',
-                unsafe_allow_html=True)
-    for label, _pro, _free in PRO_FEATURES:
+    # ---- Bagian bawah: manfaat (kiri) + cara berlangganan (kanan) ---------
+    kiri, kanan = st.columns([1.55, 1], gap="medium")
+
+    with kiri:
         st.markdown(
-            f'<div class="feat-row"><span>{label}</span>'
-            f'<span class="chip-on">{mi(":material/check_circle:")}</span></div>',
+            '<div class="up-head"><b>Semua paket Pro mendapat</b></div>'
+            '<div class="up-benefit-grid">'
+            + "".join(
+                '<div class="up-benefit">'
+                + mi(":material/check_circle:")
+                + "<span>"
+                + html.escape(label)
+                + "</span></div>"
+                for label, _pro, _free in PRO_FEATURES
+            )
+            + "</div>",
             unsafe_allow_html=True,
         )
 
-    st.markdown('<div class="set-section">Keluarga produk Ampera</div>',
-                unsafe_allow_html=True)
-    for produk in AMPERA_PRODUK_LAIN:
+        for produk in AMPERA_PRODUK_LAIN:
+            st.markdown(
+                '<div class="up-product">'
+                '<span class="up-product-ic">'
+                + mi(":material/auto_awesome:")
+                + "</span>"
+                '<span class="up-product-copy"><b>'
+                + html.escape(produk["nama"])
+                + "</b><small>"
+                + html.escape(produk["desc"])
+                + "</small></span>"
+                '<span class="up-product-go">'
+                + mi(":material/chevron_right:")
+                + "</span>"
+                "</div>",
+                unsafe_allow_html=True,
+            )
+
+    with kanan:
+        langkah = [
+            (
+                ":material/tap_and_play:",
+                "Pilih paket",
+                "Bulanan, tahunan (paling hemat), atau sekali bayar untuk "
+                "selamanya.",
+            ),
+            (
+                ":material/forum:",
+                "Chat di Room Ampera",
+                'Tekan tombol "ke Room Chat Ampera" di bawah — kamu langsung '
+                "diarahkan ke room chat resmi Ampera Official.",
+            ),
+            (
+                ":material/bolt:",
+                "Langsung aktif",
+                "Setelah pembayaran dikonfirmasi, paket berubah menjadi "
+                "Trinity Pro dan semua kemampuan terbuka saat itu juga.",
+            ),
+        ]
         st.markdown(
-            f'<div class="help-step"><span class="step-icon">'
-            f'{mi(":material/auto_awesome:")}</span>'
-            f'<span class="step-text"><b>{html.escape(produk["nama"])}</b><br>'
-            f'{html.escape(produk["desc"])}</span></div>',
+            '<div class="up-side">'
+            '<div class="up-side-title">Cara berlangganan</div>'
+            + "".join(
+                '<div class="up-step">'
+                '<span class="up-step-no">' + str(i + 1) + "</span>"
+                '<span class="up-step-ic">' + mi(icon) + "</span>"
+                '<span class="up-step-copy"><b>'
+                + html.escape(judul)
+                + "</b><small>"
+                + html.escape(isi)
+                + "</small></span>"
+                "</div>"
+                for i, (icon, judul, isi) in enumerate(langkah)
+            )
+            + "</div>",
             unsafe_allow_html=True,
         )
 
-    st.markdown('<div class="set-section">Cara berlangganan</div>',
-                unsafe_allow_html=True)
-    for i, (icon, title, desc) in enumerate([
-        (":material/tap_and_play:", "Pilih paket",
-         "Bulanan, tahunan (paling hemat), atau sekali bayar untuk selamanya."),
-        (":material/forum:", "Chat di Room Ampera",
-         'Tekan tombol "ke Room Chat Ampera" di bawah — kamu langsung '
-         "diarahkan ke room chat resmi Ampera Official. Tulis pesanmu "
-         "(sebutkan paket pilihanmu) dan pesan itu langsung sampai "
-         "ke admin."),
-        (":material/bolt:", "Langsung aktif",
-         "Setelah pembayaran dikonfirmasi, paket berubah menjadi Trinity Pro "
-         "dan semua kemampuan terbuka saat itu juga."),
-    ]):
-        st.markdown(
-            f'<div class="help-step"><span class="step-no">{i + 1}</span>'
-            f'<span class="step-icon">{mi(icon)}</span>'
-            f'<span class="step-text"><b>{title}</b><br>{desc}</span></div>',
-            unsafe_allow_html=True,
-        )
+        with st.container(key="up_cta"):
+            st.link_button(
+                ":material/forum:  Ke Room Chat Ampera",
+                ROOM_CHAT_URL,
+                use_container_width=True,
+                type="primary",
+            )
 
-    st.link_button("💬 ke Room Chat Ampera", ROOM_CHAT_URL,
-                   use_container_width=True, type="primary")
     st.caption(
         f"Pesanmu di room chat langsung masuk ke admin {AMPERA_BRAND} — "
         f"{AMPERA_LOKASI}. Status paket kamu saat ini: {s.get('plan', 'Free')}."
     )
     _page_footer()
+
+
 # ============================================================================
 # HALAMAN: DAPATKAN APLIKASI
 # ============================================================================
