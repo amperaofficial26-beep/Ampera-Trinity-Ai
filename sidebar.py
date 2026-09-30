@@ -217,7 +217,7 @@ show_sesuaikan_dialog = _register_dialog("Sesuaikan", _sesuaikan_dialog_body)
 #   BACK_CHAT_ATAS_PX : jarak dari tepi ATAS layar (px).
 #   BACK_CHAT_KIRI_PX : jarak dari tepi KIRI layar (px).
 # ============================================================================
-BACK_CHAT_ATAS_PX = 30
+BACK_CHAT_ATAS_PX = 35
 BACK_CHAT_KIRI_PX = 18
 
 
