@@ -2058,7 +2058,16 @@ div.stButton > button p strong { color: #2C1F33; }
     margin: 0; color: #7C7183; font-size: .93rem; line-height: 1.5;
 }
 .up-hero-art { flex: 0 0 auto; opacity: .85; }
-.up-hero-art img { width: 58px; height: 58px; }
+.up-hero-art .logo-greeting,
+.up-hero-art span {
+    width: 54px !important; height: 54px !important;
+    margin: 0 !important; vertical-align: middle !important;
+    display: block !important; line-height: 0 !important;
+}
+.up-hero-art img {
+    width: 54px !important; height: 54px !important;
+    object-fit: contain !important; display: block !important;
+}
 
 .up-head { margin: 16px 0 10px; }
 .up-head b {
@@ -2212,13 +2221,40 @@ body [class*="st-key-up_cta"] a {
     box-shadow: 0 18px 38px rgba(76, 58, 43, .12);
 }
 .ap-hero-mark {
-    flex: 0 0 62px; width: 62px; height: 62px;
-    display: grid; place-items: center;
-    border-radius: 20px; background: #FFFFFF;
+    flex: 0 0 60px; width: 60px; height: 60px;
+    align-self: center;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 !important;
+    padding: 12px !important;
+    border-radius: 18px; background: #FFFFFF;
     border: 1px solid #ECDFCB;
     box-shadow: 0 8px 18px rgba(76, 58, 43, .10);
+    box-sizing: border-box !important;
+    line-height: 0 !important;
 }
-.ap-hero-mark img { width: 40px; height: 40px; }
+/* logo_img_html() menanam width/height/vertical-align inline, jadi semua
+   lapisannya ditimpa di sini supaya logo benar-benar pas di tengah. */
+.ap-hero-mark > span,
+.ap-hero-mark .logo-greeting {
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    vertical-align: middle !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 0 !important;
+}
+.ap-hero-mark img {
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    object-fit: contain !important;
+    display: block !important;
+}
 .ap-hero-copy { flex: 1 1 auto; min-width: 0; }
 .ap-hero-copy h1 {
     margin: 0 0 6px; color: #2E2040;
