@@ -2408,11 +2408,27 @@ body [class*="st-key-ap_support"] a {
 }
 .stApp:has(.upgrade-page-shell) [data-testid="stMainBlockContainer"],
 .stApp:has(.appdl-page-shell) [data-testid="stMainBlockContainer"] {
-    width: calc(100% - 136px) !important;
+    width: calc(100% - 32px) !important;
     max-width: none !important;
     margin: 0 auto !important;
-    padding: 32px 0 90px !important;
+    padding: 26px 0 70px !important;
     box-sizing: border-box !important;
+}
+
+/* Zona tengah: seluruh isi halaman dibungkus satu panel besar supaya
+   halaman terasa penuh, bukan kartu-kartu yang mengambang sendiri. */
+.stApp:has(.upgrade-page-shell)
+[data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"],
+.stApp:has(.appdl-page-shell)
+[data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] {
+    padding: 26px 30px 34px !important;
+    border: 1px solid #E8DCC9 !important;
+    border-radius: 28px !important;
+    background:
+        radial-gradient(90% 120% at 50% -10%, #FFFDF9 0%,
+                        rgba(255, 253, 249, 0) 58%),
+        linear-gradient(180deg, #FDF7EF 0%, #FBF3E8 100%) !important;
+    box-shadow: 0 22px 50px rgba(76, 58, 43, .10) !important;
 }
 .stApp:has(.upgrade-page-shell)
 [data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"],
@@ -2428,8 +2444,15 @@ body [class*="st-key-ap_support"] a {
 @media (max-width: 900px) {
     .stApp:has(.upgrade-page-shell) [data-testid="stMainBlockContainer"],
     .stApp:has(.appdl-page-shell) [data-testid="stMainBlockContainer"] {
-        width: calc(100% - 28px) !important;
-        padding: 74px 0 70px !important;
+        width: calc(100% - 16px) !important;
+        padding: 70px 0 60px !important;
+    }
+    .stApp:has(.upgrade-page-shell)
+    [data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"],
+    .stApp:has(.appdl-page-shell)
+    [data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] {
+        padding: 18px 14px 22px !important;
+        border-radius: 22px !important;
     }
 }
 """
