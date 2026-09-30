@@ -11,6 +11,8 @@ dan CSS di styles.py.
 
 HALAMAN (routing internal lewat st.session_state.page):
   - chat        → halaman utama (default)
+  - image       → AI Image: text-to-image ala Canva (chip gaya & format,
+                  hasil muncul sebagai balasan di thread halaman itu)
   - artefak     → kotak kategori ala Claude, Yuki menjawab di halaman itu
   - pengaturan  → 8 tab: Umum · Akun · Privasi · Penagihan · Kemampuan ·
                   Memori · Refleksi · Waktu dan fokus
@@ -27,6 +29,8 @@ from __future__ import annotations
 import base64
 import html
 import io
+import re
+from contextlib import contextmanager
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -48,7 +52,7 @@ from config import (
     CHAT_INPUT_SUPPORTS_AUDIO, CHAT_INPUT_SUPPORTS_FILE,
     CHAT_READY, COURSE_BY_KEY, COURSE_CATALOG,
     IMAGE_INPUT_TYPES, IMAGE_READY,
-    ARTIFACT_BY_KEY, ARTIFACT_CATEGORIES, DEFAULT_LANG_CODE, LANG_BY_CODE,
+    MODEL_CATALOG,ARTIFACT_BY_KEY, ARTIFACT_CATEGORIES, DEFAULT_LANG_CODE, LANG_BY_CODE,
     SUPPORTED_LANGUAGES, course_curriculum, CLARIFY_OPTIONS,
     AMPERA_BRAND, AMPERA_EMAIL, AMPERA_LOKASI, AMPERA_PRODUK_LAIN, PRO_HARGA,
 )
@@ -65,11 +69,13 @@ from ui_helpers import (
     logo_img_html, render_message,
 )
 from anim import inject_anim_css, inject_page_anim
+from toast_anim import inject_toast_anim
 from panel_file import render_file_dock          # ← BARIS BARU
 from page_desain import page_desain
 from page_jadwal import page_jadwal
+from page_multi_agent import page_multi_agent
+from page_image import page_image
 from styles import inject_css
-from toast_anim import inject_toast_anim
 from riwayat import dialog_bersihkan, tampilkan_toast_tertunda
 from tampilan import (
     PALET_NAMES, WALLPAPER_NAMES, SUDUT_NAMES, DEFAULT_PALET,
@@ -86,6 +92,7 @@ from chat_handlers import (
 # Tombol "ke Room Chat Ampera" di halaman Tingkatkan mengarah ke sini;
 # pesan user di room itu diteruskan ke inbox amperaofficialgroup@gmail.com.
 ROOM_CHAT_URL = "https://room-chat-ampera-group.streamlit.app/"
+
 
 # ============================================================================
 # KONFIGURASI HALAMAN
@@ -132,10 +139,438 @@ _TAB_ICON = _buat_ikon_tab() or (
 st.set_page_config(
     page_title="Ampera Trinity AI",
     page_icon=_TAB_ICON,
-    layout="centered",
+    layout="wide",
     initial_sidebar_state="expanded",
 )
 
+def _clip_text(value: str, limit: int = 46) -> str:
+    """Potong teks untuk panel ringkas tanpa memecah layout."""
+    value = (value or "").strip()
+    if len(value) <= limit:
+        return value
+    return value[: max(0, limit - 1)].rstrip() + "…"
+
+
+def _render_chat_chrome(is_fresh: bool) -> None:
+    """Topbar dashboard chat seperti referensi, tetap memakai tema app.
+
+    Elemen ini sengaja tidak memakai gambar baru: avatar aplikasi dibuat dari
+    huruf "T" berbasis CSS, dan seluruh warna mengambil variabel tema
+    (var(--tr-*)).
+    """
+    s = get_settings()
+    display_name = (s.get("display_name") or "User").strip() or "User"
+    plan = (s.get("plan") or "Free").strip() or "Free"
+    initial = html.escape(display_name[:1].upper() or "U")
+
+    mode_title = "Generate Gambar" if st.session_state.get("image_mode") else "AI Assistant"
+    mode_hint = (
+        "Deskripsikan gambar yang ingin dibuat…"
+        if st.session_state.get("image_mode")
+        else "Tanyakan apa saja, kami siap membantumu…"
+    )
+    marker_class = "tr-chat-layout tr-fresh-home" if is_fresh else "tr-chat-layout"
+
+    st.markdown(
+        f"""
+        <div class="{marker_class}"></div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    with st.container(key="chat_topbar"):
+        # Kolom "AI Assistant" dipendekkan agar tidak menelan ruang topbar.
+        brand_col, status_col, user_col, out_col = st.columns(
+            [1.15, 1.75, 1.25, 0.82],
+            gap="small",
+        )
+
+        with brand_col:
+            st.markdown(
+                """
+                <div class="tr-brand-profile">
+                  <div class="tr-brand-avatar">T</div>
+                  <div class="tr-brand-copy">
+                    <div class="tr-brand-name">Trinity</div>
+                    <div class="tr-brand-sub">Room Chat AI</div>
+                  </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+        with status_col:
+            st.markdown(
+                (
+                    '<div class="tr-assistant-pill">'
+                    f'<div class="tr-pill-icon">{mi(":material/support_agent:")}</div>'
+                    '<div class="tr-pill-copy">'
+                    f'<div class="tr-pill-title">{html.escape(mode_title)}</div>'
+                    f'<div class="tr-pill-sub">{html.escape(mode_hint)}</div>'
+                    '</div></div>'
+                ),
+                unsafe_allow_html=True,
+            )
+
+        with user_col:
+            st.markdown(
+                (
+                    '<div class="tr-user-pill">'
+                    f'<span class="tr-user-avatar">{initial}</span>'
+                    '<span class="tr-user-copy">'
+                    f'<b>{html.escape(_clip_text(display_name, 18))}</b>'
+                    f'<small>{html.escape(plan)}</small>'
+                    '</span>'
+                    '</div>'
+                ),
+                unsafe_allow_html=True,
+            )
+
+        with out_col:
+            if st.button(
+                ":material/logout:  Keluar",
+                key="top_logout",
+                use_container_width=True,
+            ):
+                st.session_state.logged_out = True
+                go("chat")
+
+# ============================================================================
+# AKSI RIWAYAT CHAT PANEL KANAN
+# ============================================================================
+
+def _export_conversation_text(conv: dict) -> str:
+    lines = [
+        "# Riwayat Obrolan — Ampera Trinity AI",
+        f"# Percakapan: {conv.get('title') or 'Percakapan baru'}",
+        f"# Tanggal Ekspor: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}",
+        "# by Ampera Official",
+        "",
+        "---",
+        "",
+    ]
+
+    for m in conv.get("messages") or []:
+        role_label = "Pengguna" if m.get("role") == "user" else "Yuki"
+        time_tag = f" [{m.get('time', '')}]" if m.get("time") else ""
+
+        lines.append(f"### {role_label}{time_tag}")
+        lines.append("")
+
+        if m.get("type") == "image":
+            lines.append(
+                f"*(gambar dihasilkan — prompt: {m.get('prompt', '')})*"
+            )
+        else:
+            body = (m.get("content") or "").strip()
+
+            if m.get("images"):
+                body += "\n*(dengan lampiran gambar)*"
+
+            if m.get("via_voice"):
+                body += "\n*(dikirim via suara)*"
+
+            lines.append(body)
+
+        lines.extend(["", "---", ""])
+
+    return "\n".join(lines)
+
+
+def _hapus_percakapan_panel(conv_id: int) -> None:
+    convs = st.session_state.get("conversations") or []
+
+    st.session_state.conversations = [
+        c for c in convs
+        if c.get("id") != conv_id
+    ]
+
+    if st.session_state.get("active_conv_id") == conv_id:
+        st.session_state.messages = []
+        st.session_state.active_conv_id = None
+
+        import uuid
+        st.session_state.conv_key = uuid.uuid4().hex
+
+        st.session_state.pop("_db_synced", None)
+
+    st.rerun()
+
+
+_RIGHT_HISTORY_MENU_CSS = """
+<style>
+
+[class*="st-key-right_hist_menu_"] button {
+    min-width: 30px !important;
+    width: 30px !important;
+    height: 30px !important;
+    min-height: 30px !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+
+    border-radius: 8px !important;
+    color: #766F7A !important;
+}
+
+[class*="st-key-right_hist_menu_"] button:hover {
+    background: #E8DDF0 !important;
+    color: #49315C !important;
+}
+
+[class*="st-key-right_hist_menu_"]
+[data-testid="stIconMaterial"] {
+    font-size: 19px !important;
+}
+
+</style>
+"""
+
+def _render_chat_right_rail() -> None:
+    """Panel fitur kanan untuk chat utama.
+
+    Semua kontrol tetap memakai fitur yang sudah ada, tanpa gambar baru.
+    """
+    with st.container(key="chat_right_rail"):
+        st.markdown(
+            '<div class="tr-rail-title-row">'
+            f'<span class="rail-heading-icon">{mi(":material/bolt:")}</span>'
+            '<span>Fitur Cepat</span>'
+            '</div>',
+            unsafe_allow_html=True,
+        )
+        q1, q2 = st.columns(2, gap="small")
+
+        with q1:
+            with st.container(key="rail_quick_chat"):
+                if st.button(
+                    ":material/chat_bubble:  \n**Chat AI**  \n:gray[Tanya apa saja]",
+                    key="rail_btn_chat",
+                    use_container_width=True,
+                ):
+                    st.session_state.image_mode = False
+                    go("chat")
+
+            with st.container(key="rail_quick_image"):
+                if st.button(
+                    ":material/image:  \n**Generate Gambar**  \n:gray[Buat visual cepat]",
+                    key="rail_btn_image",
+                    use_container_width=True,
+                ):
+                    go("image")
+
+        with q2:
+            with st.container(key="rail_quick_multi"):
+                if st.button(
+                    ":material/groups:  \n**Multi AI**  \n:gray[Room agent]",
+                    key="rail_btn_multi",
+                    use_container_width=True,
+                ):
+                    go("multi_agent")
+
+            with st.container(key="rail_quick_upload"):
+                if st.button(
+                    ":material/upload_file:  \n**Upload File**  \n:gray[Pakai tombol +]",
+                    key="rail_btn_upload",
+                    use_container_width=True,
+                ):
+                    st.toast(
+                        "Upload file tersedia lewat tombol + di kotak chat.",
+                        icon=":material/attach_file:",
+                    )
+
+        st.markdown(
+            '<div class="tr-rail-title-row with-link"><span>Model AI Populer</span>'
+            '<small>Pilih</small></div>',
+            unsafe_allow_html=True,
+        )
+
+        popular_models = [
+            m for m in MODEL_CATALOG
+            if m.get("chat_selectable", True) and not m.get("premium")
+        ][:4]
+
+        for m in popular_models:
+            row_key = f"rail_model_{m['key']}"
+            active = m.get("key") == st.session_state.get("selected_model_key")
+
+            with st.container(key=row_key):
+                if st.button(
+                    f"**{m['name']}**  \n:gray[{_clip_text(m.get('desc', ''), 36)}]",
+                    key=f"rail_btn_model_{m['key']}",
+                    use_container_width=True,
+                    type="primary" if active else "secondary",
+                ):
+                    st.session_state.selected_model_key = m["key"]
+                    st.toast(f"Model dipilih: {m['name']}", icon=":material/check_circle:")
+                    st.rerun()
+
+        st.markdown(_RIGHT_HISTORY_MENU_CSS, unsafe_allow_html=True)
+
+        st.markdown(
+            '<div class="tr-rail-title-row with-link">'
+            '<span>Chat Terbaru</span>'
+            '<small>Riwayat</small>'
+            '</div>',
+            unsafe_allow_html=True,
+        )
+        
+        convs = st.session_state.get("conversations", [])[:3]
+        
+        if not convs:
+            st.markdown(
+                '<div class="tr-rail-empty">Belum ada chat terbaru.</div>',
+                unsafe_allow_html=True,
+            )
+        
+        for c in convs:
+        
+            cid = c.get("id")
+            title = _clip_text(
+                c.get("title") or "Chat baru",
+                30,
+            )
+            meta = c.get("time") or c.get("updated") or "Terbaru"
+        
+            col_chat, col_menu = st.columns(
+                [1, 0.15],
+                gap="small",
+            )
+        
+            # ================================================================
+            # CHAT
+            # ================================================================
+            with col_chat:
+        
+                with st.container(
+                    key=f"right_recent_{cid}"
+                ):
+        
+                    if st.button(
+                        f":material/forum:  **{title}**  \n"
+                        f":gray[{_clip_text(str(meta), 28)}]",
+                        key=f"right_btn_recent_{cid}",
+                        use_container_width=True,
+                    ):
+                        open_conversation(cid)
+                        st.rerun()
+        
+            # ================================================================
+            # TITIK TIGA
+            # ================================================================
+            with col_menu:
+        
+                with st.container(
+                    key=f"right_hist_menu_{cid}"
+                ):
+        
+                    with st.popover(
+                        ":material/more_horiz:",
+                        use_container_width=True,
+                        help="Opsi chat",
+                    ):
+        
+                        st.markdown(
+                            f"**{html.escape(title)}**",
+                            unsafe_allow_html=True,
+                        )
+        
+                        # ----------------------------------------------------
+                        # RENAME
+                        # ----------------------------------------------------
+                        nama_baru = st.text_input(
+                            "Nama chat",
+                            value=c.get("title") or "Chat baru",
+                            key=f"right_rename_input_{cid}",
+                            placeholder="Nama chat…",
+                            label_visibility="collapsed",
+                        )
+        
+                        if st.button(
+                            ":material/edit:  Rename",
+                            key=f"right_rename_{cid}",
+                            use_container_width=True,
+                        ):
+                            nama_bersih = " ".join(
+                                (nama_baru or "").split()
+                            ).strip()
+        
+                            if nama_bersih:
+                                c["title"] = nama_bersih[:80]
+                                st.rerun()
+        
+                        # ----------------------------------------------------
+                        # HAPUS
+                        # ----------------------------------------------------
+                        confirm_key = (
+                            f"_right_delete_confirm_{cid}"
+                        )
+        
+                        if not st.session_state.get(confirm_key):
+        
+                            if st.button(
+                                ":material/delete:  Hapus",
+                                key=f"right_delete_{cid}",
+                                use_container_width=True,
+                            ):
+                                st.session_state[
+                                    confirm_key
+                                ] = True
+        
+                                st.rerun()
+        
+                        else:
+        
+                            st.warning(
+                                "Hapus chat ini?",
+                                icon=":material/warning:",
+                            )
+        
+                            d1, d2 = st.columns(
+                                2,
+                                gap="small",
+                            )
+        
+                            with d1:
+        
+                                if st.button(
+                                    "Batal",
+                                    key=f"right_delete_cancel_{cid}",
+                                    use_container_width=True,
+                                ):
+                                    st.session_state.pop(
+                                        confirm_key,
+                                        None,
+                                    )
+                                    st.rerun()
+        
+                            with d2:
+        
+                                if st.button(
+                                    ":material/delete_forever:  Hapus",
+                                    key=f"right_delete_yes_{cid}",
+                                    type="primary",
+                                    use_container_width=True,
+                                ):
+                                    _hapus_percakapan_panel(
+                                        cid
+                                    )
+        
+                        # ----------------------------------------------------
+                        # UNDUH
+                        # ----------------------------------------------------
+                        st.download_button(
+                            label=":material/download:  Unduh",
+                            data=_export_conversation_text(c),
+                            file_name=f"trinity-chat-{cid}.md",
+                            mime="text/markdown",
+                            use_container_width=True,
+                            key=f"right_download_{cid}",
+                        )
 
 # ============================================================================
 # HALAMAN: CHAT UTAMA
@@ -143,9 +578,12 @@ st.set_page_config(
 def render_chat_page() -> None:
     is_fresh = len(main_thread()) == 0
 
+    _render_chat_chrome(is_fresh)
+    _render_chat_right_rail()
+
     if is_fresh:
         # ---------- HALAMAN AWAL ala Claude ----------
-        st.markdown(_FRESH_BOTTOM_CSS, unsafe_allow_html=True)
+        st.markdown(_FRESH_BOTTOM_CSS, unsafe_allow_html=True)        
         st.markdown(
             '<div class="trinity-greeting" style="margin-top:18vh;">'
             f'{logo_img_html("logo-greeting")} {get_greeting()}'
@@ -218,18 +656,41 @@ def start_artifact_thread(key: str) -> None:
     go("artefak")
 
 
-def _artifact_grid(prefix: str) -> None:
-    cats = ARTIFACT_CATEGORIES
-    for i in range(0, len(cats), 3):
-        cols = st.columns(3)
-        for j, cat in enumerate(cats[i:i + 3]):
+def _artifact_visual_html(cat: dict) -> str:
+    """Visual dekoratif ringan untuk kartu Artefak tanpa aset gambar baru."""
+    key = cat["key"]
+    icon = mi(cat["icon"])
+    return (
+        f'<div class="artifact-card-visual artifact-visual-{key}">'
+        f'<div class="artifact-visual-glow"></div>'
+        f'<div class="artifact-visual-icon">{icon}</div>'
+        '<div class="artifact-visual-sheet">'
+        '<span></span><span></span><span></span>'
+        '</div>'
+        f'<div class="artifact-visual-badge">{icon}</div>'
+        '</div>'
+    )
+
+
+def _artifact_grid(prefix: str, categories: list[dict] | None = None) -> None:
+    cats = categories if categories is not None else ARTIFACT_CATEGORIES
+    for i in range(0, len(cats), 4):
+        cols = st.columns(4, gap="medium")
+        for j, cat in enumerate(cats[i:i + 4]):
             with cols[j]:
-                label = (f"{cat['icon']}  \n"
-                         f"**{cat['title']}**  \n"
-                         f":gray[{cat['desc']}]")
-                if st.button(label, key=f"{prefix}_{cat['key']}",
-                             use_container_width=True):
-                    start_artifact_thread(cat["key"])
+                with st.container(key=f"artifact_card_{cat['key']}"):
+                    st.markdown(_artifact_visual_html(cat), unsafe_allow_html=True)
+                    label = (
+                        f"**{cat['title']}**  \n"
+                        f":gray[{cat['desc']}]  \n"
+                        "→"
+                    )
+                    if st.button(
+                        label,
+                        key=f"{prefix}_{cat['key']}",
+                        use_container_width=True,
+                    ):
+                        start_artifact_thread(cat["key"])
 
 
 
@@ -241,12 +702,51 @@ def _artifact_workspace(aid: int) -> None:
             meta = m.get("meta") or ""
             break
 
+    safe_meta = html.escape(meta or "Artefak")
+    st.markdown('<div class="artifact-workspace-shell"></div>', unsafe_allow_html=True)
+
+    back_col, heading_col, status_col = st.columns([0.22, 2.55, 0.75], gap="medium")
+    with back_col:
+        if st.button(
+            ":material/arrow_back:",
+            key="artifact_workspace_back",
+            help="Kembali ke semua artefak",
+        ):
+            st.session_state.artifact_active_id = None
+            go("artefak")
+            st.rerun()
+    with heading_col:
+        st.markdown(
+            f'''
+            <div class="artifact-workspace-heading">
+              <div class="artifact-workspace-icon">{mi(":material/auto_awesome:")}</div>
+              <div>
+                <h1>{safe_meta}</h1>
+                <p>Ruang kerja Artefak · Yuki membantu menyusun hasilnya.</p>
+              </div>
+            </div>
+            ''',
+            unsafe_allow_html=True,
+        )
+    with status_col:
+        st.markdown(
+            '<div class="artifact-workspace-status">'
+            f'{mi(":material/check_circle:")} Artefak aktif'
+            '</div>',
+            unsafe_allow_html=True,
+        )
+
     st.markdown(
-        f'<div class="page-head"><div class="page-head-icon">'
-        f'{mi(":material/data_object:")}</div>'
-        f'<div><h2 class="page-title">{html.escape(meta or "Artefak")}</h2>'
-        '<p class="page-sub">Yuki mengerjakan artefak ini di halaman ini — '
-        "chat utamamu tetap bersih.</p></div></div>",
+        f'''
+        <div class="artifact-workspace-banner">
+          <div class="artifact-workspace-banner-icon">{mi(":material/auto_awesome:")}</div>
+          <div>
+            <strong>Mulai kerjakan {safe_meta}</strong>
+            <p>Jelaskan kebutuhanmu di bawah. Yuki akan membantu membuat hasil
+            yang rapi, siap digunakan, dan tetap berada di ruang kerja ini.</p>
+          </div>
+        </div>
+        ''',
         unsafe_allow_html=True,
     )
 
@@ -295,31 +795,107 @@ def page_artefak() -> None:
         return
 
     artifacts = st.session_state.get("artifacts", [])
+    st.markdown('<div class="artifact-page-shell"></div>', unsafe_allow_html=True)
+
     st.markdown(
-        '<div class="page-head"><div class="page-head-icon">'
-        f'{mi(":material/data_object:")}</div>'
-        '<div><h2 class="page-title">Artefak</h2>'
-        "<p class=\"page-sub\">Pilih salah satu kotak di bawah. Yuki langsung "
-        "menjawab di halaman ini — bukan di chat utama.</p></div></div>",
+        f'''
+        <div class="artifact-topbar">
+          <div class="artifact-heading">
+            <div class="artifact-heading-icon">{mi(":material/auto_awesome:")}</div>
+            <div>
+              <h1>Artefak</h1>
+              <p>Buat berbagai file kreatif dengan mudah dan cepat.</p>
+            </div>
+          </div>
+          <div class="artifact-brand">
+            <span>{mi(":material/auto_awesome:")} Trinity AI</span>
+            <i></i>
+            <small>Lebih cerdas, lebih produktif.</small>
+          </div>
+        </div>
+        ''',
         unsafe_allow_html=True,
     )
 
-    if not artifacts:
+    st.markdown(
+        f'''
+        <section class="artifact-hero">
+          <div class="artifact-hero-copy">
+            <div class="artifact-welcome">{mi(":material/auto_awesome:")} Selamat datang di Artefak</div>
+            <h2>Ubah ide jadi karya nyata</h2>
+            <p>Pilih salah satu jenis artefak di bawah ini. Kami siap membantu
+            Anda membuat berbagai kebutuhan kreatif dengan cepat, praktis,
+            dan hasil yang berkualitas.</p>
+          </div>
+          <div class="artifact-hero-art" aria-hidden="true">
+            <div class="artifact-orbit artifact-orbit-a"></div>
+            <div class="artifact-orbit artifact-orbit-b"></div>
+            <div class="artifact-hero-window">
+              <div class="artifact-window-bar"><b></b><b></b><b></b></div>
+              <div class="artifact-window-line wide"></div>
+              <div class="artifact-window-line"></div>
+              <div class="artifact-window-line short"></div>
+              <div class="artifact-window-spark">{mi(":material/auto_awesome:")}</div>
+            </div>
+            <div class="artifact-float artifact-float-image">{mi(":material/image:")}</div>
+            <div class="artifact-float artifact-float-code">{mi(":material/code:")}</div>
+            <div class="artifact-float artifact-float-type">T</div>
+            <div class="artifact-float artifact-float-play">{mi(":material/play_arrow:")}</div>
+          </div>
+        </section>
+        ''',
+        unsafe_allow_html=True,
+    )
+
+    title_col, search_col = st.columns([2.15, 1], gap="large")
+    with title_col:
         st.markdown(
-            '<div class="empty-card">Belum ada artefak. Kode panjang dari '
-            "jawaban Yuki otomatis tersimpan dan muncul di bagian bawah "
-            "halaman ini.</div>",
+            f'''
+            <div class="artifact-category-heading">
+              <div class="artifact-category-icon">{mi(":material/widgets:")}</div>
+              <div>
+                <h2>Pilih Kategori Artefak</h2>
+                <p>Jelajahi berbagai jenis artefak yang tersedia dan temukan yang sesuai dengan kebutuhan Anda.</p>
+              </div>
+            </div>
+            ''',
+            unsafe_allow_html=True,
+        )
+    with search_col:
+        with st.container(key="artifact_search_box"):
+            query = st.text_input(
+                "Cari artefak",
+                key="artifact_search",
+                placeholder="Cari artefak...",
+                label_visibility="collapsed",
+            )
+
+    query = (query or "").strip().casefold()
+    categories = [
+        cat for cat in ARTIFACT_CATEGORIES
+        if not query
+        or query in cat["title"].casefold()
+        or query in cat["desc"].casefold()
+    ]
+
+    if categories:
+        _artifact_grid("cat", categories)
+    else:
+        st.markdown(
+            '<div class="artifact-no-results">Tidak ada kategori yang cocok dengan pencarianmu.</div>',
             unsafe_allow_html=True,
         )
 
-    _artifact_grid("cat")
-
     if artifacts:
-        st.markdown('<div class="sb-group" style="margin-top:14px;">Artefak tersimpan</div>',
-                    unsafe_allow_html=True)
+        st.markdown(
+            '<div class="artifact-saved-heading">Artefak tersimpan</div>',
+            unsafe_allow_html=True,
+        )
         for art in artifacts[:20]:
             with st.container(key=f"art_saved_{art['id']}"):
-                with st.expander(f":material/extension:  {art['title']}  ·  {art.get('time', '')}"):
+                with st.expander(
+                    f":material/extension:  {art['title']}  ·  {art.get('time', '')}"
+                ):
                     st.code(art["content"], language=art.get("lang") or None)
 
     _page_footer()
@@ -354,6 +930,7 @@ def _save_settings(patch: dict, label: str = "Perubahan disimpan.") -> None:
     merged = dict(st.session_state.get("settings") or {})
     merged.update(patch)
     st.session_state.settings = merged
+
     # Import lokal menjaga fungsi selalu tersedia saat callback dijalankan,
     # termasuk setelah hot-reload Streamlit memakai modul app versi lama.
     from toast_anim import toast_sukses
@@ -376,6 +953,28 @@ def _baris_aksi_simpan(label: str, key: str, patch: dict, toast: str,
                      use_container_width=True):
             _save_settings(patch, toast)
             st.rerun()
+
+
+@contextmanager
+def _settings_card(
+    key: str,
+    icon: str,
+    title: str,
+    subtitle: str,
+):
+    """Kartu visual seragam untuk setiap kelompok Pengaturan."""
+    with st.container(key=f"settings_card_{key}"):
+        st.markdown(
+            f'<div class="settings-card">'
+            f'<div class="settings-card-head">'
+            f'<div class="settings-card-icon">{mi(icon)}</div>'
+            f'<div class="settings-card-copy">'
+            f'<div class="settings-card-title">{html.escape(title)}</div>'
+            f'<div class="settings-card-subtitle">{html.escape(subtitle)}</div>'
+            "</div></div></div>",
+            unsafe_allow_html=True,
+        )
+        yield
 
 
 def _capability_state(setting_key: str) -> str:
@@ -414,35 +1013,61 @@ def _set_umum() -> None:
     # Catatan: pemilih "Tema" yang dulu ada di sini sudah dipindah ke tab
     # "Tampilan" (tampilan.py) yang benar-benar mengubah warna aplikasi.
     # Selectbox lama hanya menyimpan nilai tanpa efek apa pun.
-    st.markdown('<div class="set-section">Tampilan</div>', unsafe_allow_html=True)
-    st.caption(
-        "Wallpaper dan warna aplikasi diatur di tab **Tampilan**."
-    )
-    c2, c3 = st.columns(2)
-    with c2:
-        font = st.selectbox("Ukuran teks", FONT_OPTIONS, index=_opt_index(FONT_OPTIONS, s["font_size"]),
-                            key="set_font")
-    with c3:
-        speed = st.selectbox("Kecepatan aliran jawaban", SPEED_OPTIONS,
-                             index=_opt_index(SPEED_OPTIONS, s["stream_speed"]), key="set_speed",
-                             help="Seberapa cepat kalimat Yuki muncul satu per satu.")
+    with _settings_card(
+        "umum_tampilan",
+        ":material/palette:",
+        "Tampilan",
+        "Atur ukuran teks dan kecepatan jawaban Yuki.",
+    ):
+        c2, c3 = st.columns(2)
+        with c2:
+            font = st.selectbox(
+                "Ukuran teks", FONT_OPTIONS,
+                index=_opt_index(FONT_OPTIONS, s["font_size"]),
+                key="set_font",
+            )
+        with c3:
+            speed = st.selectbox(
+                "Kecepatan aliran jawaban", SPEED_OPTIONS,
+                index=_opt_index(SPEED_OPTIONS, s["stream_speed"]),
+                key="set_speed",
+                help="Seberapa cepat kalimat Yuki muncul satu per satu.",
+            )
 
-    st.markdown('<div class="set-section">Perilaku Yuki</div>', unsafe_allow_html=True)
-    c5, c6 = st.columns(2)
-    with c5:
-        persona = st.selectbox("Kepribadian", PERSONA_OPTIONS,
-                               index=_opt_index(PERSONA_OPTIONS, s["personality"]), key="set_persona")
-        clarify = st.selectbox(
-            "Bertanya balik saat permintaan kurang jelas", CLARIFY_OPTIONS,
-            index=_opt_index(CLARIFY_OPTIONS, s.get("clarify_mode", "Seperlunya")),
-            key="set_clarify",
-            help="Mati: Yuki langsung mengerjakan dengan asumsi sendiri. "
-                 "Seperlunya: bertanya hanya kalau permintaan benar-benar kabur. "
-                 "Teliti: lebih sering memastikan detail penting dulu.",
+    with _settings_card(
+        "umum_perilaku",
+        ":material/person:",
+        "Perilaku Yuki",
+        "Atur cara Yuki merespons dan berinteraksi.",
+    ):
+        c5, c6 = st.columns(2)
+        with c5:
+            persona = st.selectbox(
+                "Kepribadian", PERSONA_OPTIONS,
+                index=_opt_index(PERSONA_OPTIONS, s["personality"]),
+                key="set_persona",
+            )
+        with c6:
+            clarify = st.selectbox(
+                "Bertanya balik saat permintaan kurang jelas", CLARIFY_OPTIONS,
+                index=_opt_index(CLARIFY_OPTIONS, s.get("clarify_mode", "Seperlunya")),
+                key="set_clarify",
+                help="Mati: Yuki langsung mengerjakan dengan asumsi sendiri. "
+                     "Seperlunya: bertanya hanya kalau permintaan benar-benar kabur. "
+                     "Teliti: lebih sering memastikan detail penting dulu.",
+            )
+
+    with _settings_card(
+        "umum_mode",
+        ":material/bolt:",
+        "Mode bawaan saat membuka aplikasi",
+        "Pilih mode yang akan aktif secara default ketika aplikasi dibuka.",
+    ):
+        mode = st.radio(
+            "Mode bawaan saat membuka aplikasi", ["Chat", "Gambar"],
+            index=_opt_index(["Chat", "Gambar"], s["default_mode"]),
+            key="set_mode", horizontal=True,
         )
-    mode = st.radio("Mode bawaan saat membuka aplikasi", ["Chat", "Gambar"],
-                    index=_opt_index(["Chat", "Gambar"], s["default_mode"]),
-                    key="set_mode", horizontal=True)
 
     _baris_aksi_simpan(
         "Simpan perubahan", "save_umum",
@@ -455,92 +1080,96 @@ def _set_umum() -> None:
         "Pengaturan umum disimpan.",
     )
 
-def _set_tampilan() -> None:
-    """Tab Pengaturan > Tampilan: wallpaper & warna pilihan User.
 
-    Pratinjau diperbarui LANGSUNG saat pilihan diubah (tanpa menekan
-    Simpan) karena widget-nya dibaca dari nilai balik, bukan dari
-    settings. Yang tersimpan permanen tetap lewat tombol Simpan.
-    """
+def _set_tampilan() -> None:
+    """Tab Pengaturan > Tampilan: wallpaper & warna pilihan User."""
     s = get_settings()
 
-    st.markdown('<div class="set-section">Warna</div>', unsafe_allow_html=True)
-    c1, c2 = st.columns(2)
-    with c1:
-        palet = st.selectbox(
-            "Tema warna", PALET_NAMES,
-            index=_opt_index(PALET_NAMES, s.get("ui_palet", DEFAULT_PALET)),
-            key="set_ui_palet",
-            help="Mengubah warna latar, kartu, sidebar, dan teks di seluruh aplikasi.",
+    with _settings_card(
+        "tampilan_warna",
+        ":material/palette:",
+        "Warna",
+        "Atur tema warna, bentuk sudut, dan aksen aplikasi.",
+    ):
+        c1, c2 = st.columns(2)
+        with c1:
+            palet = st.selectbox(
+                "Tema warna", PALET_NAMES,
+                index=_opt_index(PALET_NAMES, s.get("ui_palet", DEFAULT_PALET)),
+                key="set_ui_palet",
+                help="Mengubah warna latar, kartu, sidebar, dan teks di seluruh aplikasi.",
+            )
+        with c2:
+            sudut = st.selectbox(
+                "Kelengkungan sudut", SUDUT_NAMES,
+                index=_opt_index(SUDUT_NAMES, s.get("ui_sudut", "Sedang")),
+                key="set_ui_sudut",
+                help="Seberapa bulat sudut kartu, gelembung pesan, dan tombol.",
+            )
+
+        pakai_aksen = st.checkbox(
+            "Pakai warna aksen sendiri", value=bool(s.get("ui_accent_custom")),
+            key="set_ui_aksen_on",
+            help="Warna tombol utama, tautan, dan tab aktif.",
         )
-    with c2:
-        sudut = st.selectbox(
-            "Kelengkungan sudut", SUDUT_NAMES,
-            index=_opt_index(SUDUT_NAMES, s.get("ui_sudut", "Sedang")),
-            key="set_ui_sudut",
-            help="Seberapa bulat sudut kartu, gelembung pesan, dan tombol.",
+        if pakai_aksen:
+            aksen = st.color_picker(
+                "Warna aksen",
+                value=(s.get("ui_accent_custom") or palet_aktif(s)["accent"]),
+                key="set_ui_aksen",
+            )
+        else:
+            aksen = ""
+
+    with _settings_card(
+        "tampilan_wallpaper",
+        ":material/wallpaper:",
+        "Wallpaper",
+        "Pilih pola atau gambar latar, lalu atur keterbacaannya.",
+    ):
+        wp = st.selectbox(
+            "Pola latar belakang", WALLPAPER_NAMES,
+            index=_opt_index(WALLPAPER_NAMES, s.get("ui_wallpaper", "Polos")),
+            key="set_ui_wp",
+            help="Pola dibuat dari CSS, jadi ringan dan tidak menambah waktu muat.",
         )
-
-    pakai_aksen = st.checkbox(
-        "Pakai warna aksen sendiri", value=bool(s.get("ui_accent_custom")),
-        key="set_ui_aksen_on",
-        help="Warna tombol utama, tautan, dan tab aktif.",
-    )
-    if pakai_aksen:
-        aksen = st.color_picker(
-            "Warna aksen",
-            value=(s.get("ui_accent_custom") or palet_aktif(s)["accent"]),
-            key="set_ui_aksen",
+        berkas = st.file_uploader(
+            "Atau unggah gambar sendiri (JPG/PNG)",
+            type=["jpg", "jpeg", "png", "webp"], key="set_ui_wp_file",
+            help="Gambar unggahan menimpa pilihan pola di atas. "
+                 "Otomatis dikecilkan maks 1920px agar aplikasi tetap ringan.",
         )
-    else:
-        aksen = ""
+        wp_custom = s.get("ui_wallpaper_custom") or ""
+        if berkas is not None:
+            try:
+                wp_custom = siapkan_wallpaper_unggahan(berkas.getvalue())
+            except Exception:
+                st.warning("Gambar tidak bisa dibaca. Coba berkas lain.")
 
-    st.markdown('<div class="set-section">Wallpaper</div>', unsafe_allow_html=True)
-    wp = st.selectbox(
-        "Pola latar belakang", WALLPAPER_NAMES,
-        index=_opt_index(WALLPAPER_NAMES, s.get("ui_wallpaper", "Polos")),
-        key="set_ui_wp",
-        help="Pola dibuat dari CSS, jadi ringan dan tidak menambah waktu muat.",
-    )
+        if wp_custom:
+            k1, k2 = st.columns([3, 1])
+            with k1:
+                st.caption("Gambar wallpaper sedang dipakai.")
+            with k2:
+                if st.button("Hapus gambar", key="set_ui_wp_hapus",
+                             use_container_width=True):
+                    _save_settings({"ui_wallpaper_custom": ""}, "Wallpaper gambar dihapus.")
+                    st.rerun()
 
-    berkas = st.file_uploader(
-        "Atau unggah gambar sendiri (JPG/PNG)",
-        type=["jpg", "jpeg", "png", "webp"], key="set_ui_wp_file",
-        help="Gambar unggahan menimpa pilihan pola di atas. "
-             "Otomatis dikecilkan maks 1920px agar aplikasi tetap ringan.",
-    )
-
-    wp_custom = s.get("ui_wallpaper_custom") or ""
-    if berkas is not None:
-        try:
-            wp_custom = siapkan_wallpaper_unggahan(berkas.getvalue())
-        except Exception:
-            st.warning("Gambar tidak bisa dibaca. Coba berkas lain.")
-
-    if wp_custom:
-        k1, k2 = st.columns([3, 1])
-        with k1:
-            st.caption("Gambar wallpaper sedang dipakai.")
-        with k2:
-            if st.button("Hapus gambar", key="set_ui_wp_hapus",
-                         use_container_width=True):
-                _save_settings({"ui_wallpaper_custom": ""}, "Wallpaper gambar dihapus.")
-                st.rerun()
-
-    c3, c4 = st.columns(2)
-    with c3:
-        opac = st.slider(
-            "Kepekatan wallpaper", 0, 100,
-            value=int(s.get("ui_wallpaper_opacity", 100)), step=5,
-            key="set_ui_wp_opac",
-            help="Turunkan kalau wallpaper membuat teks susah dibaca.",
-        )
-    with c4:
-        blur = st.slider(
-            "Buram", 0, 20, value=int(s.get("ui_wallpaper_blur", 0)),
-            key="set_ui_wp_blur",
-            help="Berguna untuk foto unggahan supaya teks tetap jelas terbaca.",
-        )
+        c3, c4 = st.columns(2)
+        with c3:
+            opac = st.slider(
+                "Kepekatan wallpaper", 0, 100,
+                value=int(s.get("ui_wallpaper_opacity", 100)), step=5,
+                key="set_ui_wp_opac",
+                help="Turunkan kalau wallpaper membuat teks susah dibaca.",
+            )
+        with c4:
+            blur = st.slider(
+                "Buram", 0, 20, value=int(s.get("ui_wallpaper_blur", 0)),
+                key="set_ui_wp_blur",
+                help="Berguna untuk foto unggahan supaya teks tetap jelas terbaca.",
+            )
 
     # Pratinjau memakai pilihan SAAT INI, bukan yang tersimpan.
     pratinjau = dict(s)
@@ -550,9 +1179,14 @@ def _set_tampilan() -> None:
         "ui_wallpaper": wp, "ui_wallpaper_custom": wp_custom,
         "ui_wallpaper_opacity": opac, "ui_wallpaper_blur": blur,
     })
-    st.markdown('<div class="set-section">Pratinjau</div>', unsafe_allow_html=True)
-    st.markdown(kartu_pratinjau(pratinjau), unsafe_allow_html=True)
-    st.caption("Tekan Simpan untuk menerapkan ke seluruh aplikasi.")
+    with _settings_card(
+        "tampilan_pratinjau",
+        ":material/preview:",
+        "Pratinjau",
+        "Lihat hasil pilihan sebelum menyimpannya.",
+    ):
+        st.markdown(kartu_pratinjau(pratinjau), unsafe_allow_html=True)
+        st.caption("Tekan Simpan untuk menerapkan ke seluruh aplikasi.")
 
     def _reset() -> None:
         _save_settings({
@@ -578,39 +1212,49 @@ def _set_tampilan() -> None:
 
 def _set_akun() -> None:
     s = get_settings()
-    st.markdown('<div class="set-section">Profil</div>', unsafe_allow_html=True)
-    c1, c2 = st.columns(2)
-    with c1:
-        name = st.text_input("Nama tampilan", value=s["display_name"], key="set_name",
-                             help="Nama ini muncul di baris akun sidebar.")
-        uname = st.text_input("Nama pengguna", value=s["username"], key="set_uname")
-    with c2:
-        email = st.text_input("Email", value=s["email"], key="set_email",
-                              placeholder="nama@email.com")
-        pilihan_wilayah = ["Indonesia", "Malaysia", "Singapura", "Lainnya"]
-        region = st.selectbox(
-            "Wilayah", pilihan_wilayah,
-            index=pilihan_wilayah.index(s.get("region")) if s.get("region") in pilihan_wilayah else 0,
-            key="set_region")
-    bio = st.text_area("Tentang kamu (dibaca Yuki)", value=s["bio"], key="set_bio",
-                       height=90, placeholder="mis. Aku pemilik UMKM kopi di Lampung…")
+    with _settings_card(
+        "akun_profil",
+        ":material/person:",
+        "Profil",
+        "Atur identitas yang digunakan oleh aplikasi dan Yuki.",
+    ):
+        c1, c2 = st.columns(2)
+        with c1:
+            name = st.text_input("Nama tampilan", value=s["display_name"], key="set_name",
+                                 help="Nama ini muncul di baris akun sidebar.")
+            uname = st.text_input("Nama pengguna", value=s["username"], key="set_uname")
+        with c2:
+            email = st.text_input("Email", value=s["email"], key="set_email",
+                                  placeholder="nama@email.com")
+            pilihan_wilayah = ["Indonesia", "Malaysia", "Singapura", "Lainnya"]
+            region = st.selectbox(
+                "Wilayah", pilihan_wilayah,
+                index=pilihan_wilayah.index(s.get("region")) if s.get("region") in pilihan_wilayah else 0,
+                key="set_region")
+        bio = st.text_area("Tentang kamu (dibaca Yuki)", value=s["bio"], key="set_bio",
+                           height=90, placeholder="mis. Aku pemilik UMKM kopi di Lampung…")
 
-    st.markdown('<div class="set-section">Paket</div>', unsafe_allow_html=True)
-    st.markdown(
-        f'<div class="feat-row"><span>Paket aktif</span>'
-        f'<span class="chip-off">{html.escape(s["plan"])}</span></div>',
-        unsafe_allow_html=True,
-    )
-    c3, c4 = st.columns(2)
-    with c3:
-        if st.button(":material/workspace_premium:  Tingkatkan ke Trinity Pro",
-                     key="akun_pro", use_container_width=True):
-            go("tingkatkan")
-    with c4:
-        if st.button(":material/lock:  Ubah kata sandi", key="akun_pw",
-                     use_container_width=True):
-            st.toast("Tautan ubah kata sandi akan dikirim ke email kamu.",
-                     icon=":material/mail:")
+    with _settings_card(
+        "akun_paket",
+        ":material/workspace_premium:",
+        "Paket",
+        "Lihat paket aktif dan kelola akses akun.",
+    ):
+        st.markdown(
+            f'<div class="feat-row"><span>Paket aktif</span>'
+            f'<span class="chip-off">{html.escape(s["plan"])}</span></div>',
+            unsafe_allow_html=True,
+        )
+        c3, c4 = st.columns(2)
+        with c3:
+            if st.button(":material/workspace_premium:  Tingkatkan ke Trinity Pro",
+                         key="akun_pro", use_container_width=True):
+                go("tingkatkan")
+        with c4:
+            if st.button(":material/lock:  Ubah kata sandi", key="akun_pw",
+                         use_container_width=True):
+                st.toast("Tautan ubah kata sandi akan dikirim ke email kamu.",
+                         icon=":material/mail:")
 
     _baris_aksi_simpan(
         "Simpan profil", "save_akun",
@@ -622,18 +1266,27 @@ def _set_akun() -> None:
 
 def _set_privasi() -> None:
     s = get_settings()
-    st.markdown('<div class="set-section">Data &amp; percakapan</div>',
-                unsafe_allow_html=True)
-    st.toggle("Simpan riwayat percakapan di perangkat ini", value=s["save_history"],
-              key="set_hist")
-    st.toggle("Simpan rekaman suara setelah ditranskrip", value=s["keep_voice"],
-              key="set_voice")
+    with _settings_card(
+        "privasi_data",
+        ":material/shield:",
+        "Data & percakapan",
+        "Pilih data apa yang boleh disimpan dan digunakan aplikasi.",
+    ):
+        st.toggle("Simpan riwayat percakapan di perangkat ini", value=s["save_history"],
+                  key="set_hist")
+        st.toggle("Simpan rekaman suara setelah ditranskrip", value=s["keep_voice"],
+                  key="set_voice")
 
-    st.markdown('<div class="set-section">Personalisasi</div>', unsafe_allow_html=True)
-    st.toggle("Kirim data pemakaian anonim untuk perbaikan aplikasi",
-              value=s["analytics"], key="set_analytics")
-    st.toggle("Gunakan memoriku untuk jawaban yang lebih personal",
-              value=s["personalization"], key="set_personal")
+    with _settings_card(
+        "privasi_personalisasi",
+        ":material/auto_awesome:",
+        "Personalisasi",
+        "Bantu Yuki memberi jawaban yang lebih relevan untukmu.",
+    ):
+        st.toggle("Kirim data pemakaian anonim untuk perbaikan aplikasi",
+                  value=s["analytics"], key="set_analytics")
+        st.toggle("Gunakan memoriku untuk jawaban yang lebih personal",
+                  value=s["personalization"], key="set_personal")
 
     _baris_aksi_simpan(
         "Simpan privasi", "save_privasi",
@@ -646,52 +1299,57 @@ def _set_privasi() -> None:
         "Pengaturan privasi disimpan.",
     )
 
-    st.markdown('<div class="set-section">Riwayat obrolan</div>',
-                unsafe_allow_html=True)
-    st.caption(
-        "Menghapus riwayat hanya mengosongkan percakapan. Pengaturan, "
-        "memori, dan tampilan tetap tersimpan."
-    )
-    dialog_bersihkan("set")
-
-    st.markdown('<div class="set-section danger">Hapus data</div>',
-                unsafe_allow_html=True)
-    st.markdown(
-        '<div class="danger-box">Menghapus seluruh data akan mengosongkan '
-        "percakapan, artefak, memori, dan pengaturan. Tindakan ini tidak bisa "
-        "dibatalkan.</div>",
-        unsafe_allow_html=True,
-    )
-    # Konfirmasi dua langkah: tombol ini menghapus SEMUANYA (termasuk
-    # pengaturan & tampilan), jadi tidak boleh jalan hanya karena satu
-    # klik tak sengaja.
-    if not st.session_state.get("_wipe_tahap"):
-        _, kolom_hapus = st.columns([3, 1])
-        with kolom_hapus:
-            if st.button(":material/delete_forever:  Hapus seluruh data saya",
-                         key="wipe_data", use_container_width=True):
-                st.session_state["_wipe_tahap"] = True
-                st.rerun()
-    else:
-        st.error(
-            "Seluruh data akan dihapus: percakapan, artefak, memori, "
-            "pengaturan, dan tampilan kembali ke bawaan.",
-            icon=":material/warning:",
+    with _settings_card(
+        "privasi_riwayat",
+        ":material/history:",
+        "Riwayat obrolan",
+        "Kelola percakapan yang tersimpan di akunmu.",
+    ):
+        st.caption(
+            "Menghapus riwayat hanya mengosongkan percakapan. Pengaturan, "
+            "memori, dan tampilan tetap tersimpan."
         )
-        w1, w2 = st.columns(2)
-        with w1:
-            if st.button("Batal", key="wipe_batal", use_container_width=True):
-                st.session_state.pop("_wipe_tahap", None)
-                st.rerun()
-        with w2:
-            if st.button(":material/delete_forever:  Ya, hapus semua",
-                         key="wipe_ya", type="primary",
-                         use_container_width=True):
-                for k in list(st.session_state.keys()):
-                    del st.session_state[k]
-                st.session_state.page = "chat"
-                st.session_state["_toast_riwayat"] = "Seluruh data dihapus."
-                st.rerun()
+        dialog_bersihkan("set")
+
+    with _settings_card(
+        "privasi_hapus",
+        ":material/delete_forever:",
+        "Hapus data",
+        "Tindakan ini permanen dan tidak dapat dibatalkan.",
+    ):
+        st.markdown(
+            '<div class="danger-box">Menghapus seluruh data akan mengosongkan '
+            "percakapan, artefak, memori, dan pengaturan. Tindakan ini tidak bisa "
+            "dibatalkan.</div>",
+            unsafe_allow_html=True,
+        )
+        if not st.session_state.get("_wipe_tahap"):
+            _, kolom_hapus = st.columns([3, 1])
+            with kolom_hapus:
+                if st.button(":material/delete_forever:  Hapus seluruh data saya",
+                             key="wipe_data", use_container_width=True):
+                    st.session_state["_wipe_tahap"] = True
+                    st.rerun()
+        else:
+            st.error(
+                "Seluruh data akan dihapus: percakapan, artefak, memori, "
+                "pengaturan, dan tampilan kembali ke bawaan.",
+                icon=":material/warning:",
+            )
+            w1, w2 = st.columns(2)
+            with w1:
+                if st.button("Batal", key="wipe_batal", use_container_width=True):
+                    st.session_state.pop("_wipe_tahap", None)
+                    st.rerun()
+            with w2:
+                if st.button(":material/delete_forever:  Ya, hapus semua",
+                             key="wipe_ya", type="primary",
+                             use_container_width=True):
+                    for k in list(st.session_state.keys()):
+                        del st.session_state[k]
+                    st.session_state.page = "chat"
+                    st.session_state["_toast_riwayat"] = "Seluruh data dihapus."
+                    st.rerun()
 
 
 PRO_FEATURES = [
@@ -728,39 +1386,54 @@ def _harga_col(paket: dict, key: str) -> None:
 
 def _set_penagihan() -> None:
     s = get_settings()
-    st.markdown('<div class="set-section">Siklus &amp; pembayaran</div>',
-                unsafe_allow_html=True)
     opsi_siklus = [f"{p['nama']} — {p['harga']}" for p in PRO_HARGA]
-    st.radio("Siklus penagihan", opsi_siklus,
-             index=_opt_index(opsi_siklus, s.get("billing_cycle")),
-             key="set_cycle", horizontal=True)
-    _, kolom_bayar = st.columns([3, 1])
-    with kolom_bayar:
-        if st.button(":material/credit_card:  Atur pembayaran", key="bayar_metode",
-                     use_container_width=True):
-            st.toast(
-                f"Untuk berlangganan Trinity Pro, hubungi Ampera Official "
-                f"lewat email: {AMPERA_EMAIL}",
-                icon=":material/mail:",
-            )
-    st.markdown(
-        f'<div class="feat-row"><span>Info berlangganan</span>'
-        f'<span class="chip-off">{html.escape(AMPERA_EMAIL)}</span></div>',
-        unsafe_allow_html=True,
-    )
+    with _settings_card(
+        "tagihan_paket",
+        ":material/receipt_long:",
+        "Siklus & pembayaran",
+        "Pilih siklus tagihan dan atur cara pembayaran.",
+    ):
+        st.radio("Siklus penagihan", opsi_siklus,
+                 index=_opt_index(opsi_siklus, s.get("billing_cycle")),
+                 key="set_cycle", horizontal=True)
+        _, kolom_bayar = st.columns([3, 1])
+        with kolom_bayar:
+            if st.button(":material/credit_card:  Atur pembayaran", key="bayar_metode",
+                         use_container_width=True):
+                st.toast(
+                    f"Untuk berlangganan Trinity Pro, hubungi Ampera Official "
+                    f"lewat email: {AMPERA_EMAIL}",
+                    icon=":material/mail:",
+                )
+        st.markdown(
+            f'<div class="feat-row"><span>Info berlangganan</span>'
+            f'<span class="chip-off">{html.escape(AMPERA_EMAIL)}</span></div>',
+            unsafe_allow_html=True,
+        )
 
-    st.markdown('<div class="set-section">Pemakaian bulan ini</div>', unsafe_allow_html=True)
-    st.markdown(
-        "| Kemampuan | Terpakai | Sisa |\n|---|---|---|\n"
-        "| Pesan chat | 0 | Tak terbatas |\n"
-        "| Gambar dibuat | 0 | 10 |\n"
-        "| Artefak | "
-        f"{len(st.session_state.get('artifacts', []))} | 20 |\n"
-        "| Kursus diikuti | 0 | 1 |",
-    )
-    st.markdown('<div class="set-section">Riwayat tagihan</div>', unsafe_allow_html=True)
-    st.caption("Belum ada tagihan. Tagihan muncul di sini setelah kamu "
-               "berlangganan Trinity Pro.")
+    with _settings_card(
+        "tagihan_pemakaian",
+        ":material/insights:",
+        "Pemakaian bulan ini",
+        "Ringkasan penggunaan kemampuan Trinity.",
+    ):
+        st.markdown(
+            "| Kemampuan | Terpakai | Sisa |\n|---|---|---|\n"
+            "| Pesan chat | 0 | Tak terbatas |\n"
+            "| Gambar dibuat | 0 | 10 |\n"
+            "| Artefak | "
+            f"{len(st.session_state.get('artifacts', []))} | 20 |\n"
+            "| Kursus diikuti | 0 | 1 |",
+        )
+
+    with _settings_card(
+        "tagihan_riwayat",
+        ":material/history:",
+        "Riwayat tagihan",
+        "Riwayat pembayaran akan muncul setelah berlangganan.",
+    ):
+        st.caption("Belum ada tagihan. Tagihan muncul di sini setelah kamu "
+                   "berlangganan Trinity Pro.")
 
     _baris_aksi_simpan(
         "Simpan penagihan", "save_tagih",
@@ -771,18 +1444,28 @@ def _set_penagihan() -> None:
 
 def _set_kemampuan() -> None:
     s = get_settings()
-    st.markdown('<div class="set-section">Status kemampuan</div>', unsafe_allow_html=True)
-    st.markdown(_cap_rows_html(), unsafe_allow_html=True)
-    st.caption("Kemampuan bertanda \"butuh …\" hanya menunggu kredensial diisi "
-               "pemilik aplikasi lewat Streamlit Secrets / environment variable.")
+    with _settings_card(
+        "kemampuan_status",
+        ":material/bolt:",
+        "Status kemampuan",
+        "Lihat fitur yang aktif dan kredensial yang masih diperlukan.",
+    ):
+        st.markdown(_cap_rows_html(), unsafe_allow_html=True)
+        st.caption("Kemampuan bertanda \"butuh …\" hanya menunggu kredensial diisi "
+                   "pemilik aplikasi lewat Streamlit Secrets / environment variable.")
 
-    st.markdown('<div class="set-section">Nyalakan / matikan</div>', unsafe_allow_html=True)
-    st.toggle("Pencarian web", value=s["cap_web_search"], key="cap_web",
-              help="Bila mati, toggle pencarian web di kotak chat diabaikan.")
-    st.toggle("Transkrip suara", value=s["cap_voice"], key="cap_voice_t")
-    st.toggle("Analisis gambar (Vision)", value=s["cap_vision"], key="cap_vision_t")
-    st.toggle("Generate gambar", value=s["cap_image"], key="cap_image_t")
-    st.toggle("Tangkap artefak otomatis", value=s["cap_artifacts"], key="cap_art_t")
+    with _settings_card(
+        "kemampuan_toggle",
+        ":material/toggle_on:",
+        "Nyalakan / matikan",
+        "Pilih kemampuan yang boleh digunakan oleh aplikasi.",
+    ):
+        st.toggle("Pencarian web", value=s["cap_web_search"], key="cap_web",
+                  help="Bila mati, toggle pencarian web di kotak chat diabaikan.")
+        st.toggle("Transkrip suara", value=s["cap_voice"], key="cap_voice_t")
+        st.toggle("Analisis gambar (Vision)", value=s["cap_vision"], key="cap_vision_t")
+        st.toggle("Generate gambar", value=s["cap_image"], key="cap_image_t")
+        st.toggle("Tangkap artefak otomatis", value=s["cap_artifacts"], key="cap_art_t")
 
     _baris_aksi_simpan(
         "Simpan kemampuan", "save_kemampuan",
@@ -799,33 +1482,42 @@ def _set_kemampuan() -> None:
 
 def _set_memori() -> None:
     s = get_settings()
-    st.markdown('<div class="set-section">Kemampuan memori</div>', unsafe_allow_html=True)
-    st.toggle("Gunakan memori jangka panjang", value=s["memory_on"], key="mem_on",
-              help="Bila mati, daftar di bawah tidak dikirim ke Yuki.")
-    st.toggle("Biarkan Yuki menambah memori otomatis", value=s["memory_auto"],
-              key="mem_auto")
+    with _settings_card(
+        "memori_pengaturan",
+        ":material/history_edu:",
+        "Kemampuan memori",
+        "Atur bagaimana Yuki menggunakan memori jangka panjang.",
+    ):
+        st.toggle("Gunakan memori jangka panjang", value=s["memory_on"], key="mem_on",
+                  help="Bila mati, daftar di bawah tidak dikirim ke Yuki.")
+        st.toggle("Biarkan Yuki menambah memori otomatis", value=s["memory_auto"],
+                  key="mem_auto")
 
-    st.markdown('<div class="set-section">Yang Yuki ingat tentang kamu</div>',
-                unsafe_allow_html=True)
-    facts = list(s.get("memories") or [])
-    if not facts:
-        st.caption("Belum ada memori. Tambahkan fakta singkat, misalnya "
-                   "\"Usahaku: kopi bubuk, jual lewat WhatsApp\".")
-    for i, f in enumerate(facts):
-        row = st.columns([6, 1])
-        with row[0]:
-            st.markdown(f'<div class="mem-item">{i + 1}. {html.escape(str(f))}</div>',
-                        unsafe_allow_html=True)
-        with row[1]:
-            if st.button(":material/delete:", key=f"mem_del_{i}",
-                         use_container_width=True, help="Hapus memori ini"):
-                new = dict(st.session_state.get("settings") or {})
-                new["memories"] = [x for j, x in enumerate(facts) if j != i]
-                st.session_state.settings = new
-                st.rerun()
+    with _settings_card(
+        "memori_daftar",
+        ":material/bookmark:",
+        "Yang Yuki ingat tentang kamu",
+        "Kelola fakta yang membantu Yuki memberi jawaban personal.",
+    ):
+        facts = list(s.get("memories") or [])
+        if not facts:
+            st.caption("Belum ada memori. Tambahkan fakta singkat, misalnya "
+                       "\"Usahaku: kopi bubuk, jual lewat WhatsApp\".")
+        for i, f in enumerate(facts):
+            row = st.columns([6, 1])
+            with row[0]:
+                st.markdown(f'<div class="mem-item">{i + 1}. {html.escape(str(f))}</div>',
+                            unsafe_allow_html=True)
+            with row[1]:
+                if st.button(":material/delete:", key=f"mem_del_{i}",
+                             use_container_width=True, help="Hapus memori ini"):
+                    new = dict(st.session_state.get("settings") or {})
+                    new["memories"] = [x for j, x in enumerate(facts) if j != i]
+                    st.session_state.settings = new
+                    st.rerun()
 
-    st.text_input("Tambah memori baru", key="mem_new",
-                  placeholder="mis. Aku lebih suka jawaban singkat & pakai tabel")
+        st.text_input("Tambah memori baru", key="mem_new",
+                      placeholder="mis. Aku lebih suka jawaban singkat & pakai tabel")
 
     def _tambah_memori() -> None:
         baru = (st.session_state.get("mem_new") or "").strip()
@@ -833,7 +1525,6 @@ def _set_memori() -> None:
             merged = dict(st.session_state.get("settings") or {})
             merged["memories"] = facts + [baru]
             st.session_state.settings = merged
-            from toast_anim import toast_sukses
             toast_sukses("Memori ditambahkan.")
             st.rerun()
 
@@ -848,24 +1539,34 @@ def _set_memori() -> None:
 
 def _set_refleksi() -> None:
     s = get_settings()
-    st.markdown('<div class="set-section">Target &amp; kebiasaan</div>',
-                unsafe_allow_html=True)
-    goal = st.text_area("Target yang sedang kamu kejar", value=s["reflection_goal"],
-                        key="refl_goal", height=90,
-                        placeholder="mis. Menambah 20 pelanggan baru bulan ini")
-    habit = st.text_area("Kebiasaan yang ingin dibangun", value=s["reflection_habit"],
-                         key="refl_habit", height=90,
-                         placeholder="mis. Menulis konten setiap pagi 15 menit")
-    st.markdown('<div class="set-section">Gaya refleksi</div>', unsafe_allow_html=True)
-    c1, c2 = st.columns(2)
-    with c1:
-        freq = st.selectbox("Yuki menanyakan progres", REFL_FREQ_OPTIONS,
-                            index=_opt_index(REFL_FREQ_OPTIONS, s["reflection_freq"]),
-                            key="refl_freq")
-    with c2:
-        tone = st.selectbox("Gaya dorongan", REFL_TONE_OPTIONS,
-                            index=_opt_index(REFL_TONE_OPTIONS, s["reflection_tone"]),
-                            key="refl_tone")
+    with _settings_card(
+        "refleksi_target",
+        ":material/flag:",
+        "Target & kebiasaan",
+        "Tentukan hal yang sedang kamu kejar dan kebiasaan yang ingin dibangun.",
+    ):
+        goal = st.text_area("Target yang sedang kamu kejar", value=s["reflection_goal"],
+                            key="refl_goal", height=90,
+                            placeholder="mis. Menambah 20 pelanggan baru bulan ini")
+        habit = st.text_area("Kebiasaan yang ingin dibangun", value=s["reflection_habit"],
+                             key="refl_habit", height=90,
+                             placeholder="mis. Menulis konten setiap pagi 15 menit")
+
+    with _settings_card(
+        "refleksi_gaya",
+        ":material/self_improvement:",
+        "Gaya refleksi",
+        "Atur kapan dan dengan gaya apa Yuki menanyakan progresmu.",
+    ):
+        c1, c2 = st.columns(2)
+        with c1:
+            freq = st.selectbox("Yuki menanyakan progres", REFL_FREQ_OPTIONS,
+                                index=_opt_index(REFL_FREQ_OPTIONS, s["reflection_freq"]),
+                                key="refl_freq")
+        with c2:
+            tone = st.selectbox("Gaya dorongan", REFL_TONE_OPTIONS,
+                                index=_opt_index(REFL_TONE_OPTIONS, s["reflection_tone"]),
+                                key="refl_tone")
 
     def _minta_refleksi() -> None:
         go("chat")
@@ -887,31 +1588,40 @@ def _set_refleksi() -> None:
 
 def _set_waktu_fokus() -> None:
     s = get_settings()
-    st.markdown('<div class="set-section">Sesi fokus</div>', unsafe_allow_html=True)
-    c1, c2, c3 = st.columns(3)
-    with c1:
-        focus = st.number_input("Durasi fokus (menit)", 5, 180, int(s["focus_minutes"]),
-                                5, key="set_focus")
-    with c2:
-        brk = st.number_input("Durasi jeda (menit)", 1, 60, int(s["break_minutes"]),
-                              1, key="set_break")
-    with c3:
-        st.selectbox("Zona waktu", TZ_OPTIONS,
-                     index=TZ_OPTIONS.index(s["tz_label"]) if s["tz_label"] in TZ_OPTIONS else 0,
-                     key="set_tz")
+    with _settings_card(
+        "waktu_sesi",
+        ":material/timer:",
+        "Sesi fokus",
+        "Atur durasi fokus, jeda, dan zona waktu.",
+    ):
+        c1, c2, c3 = st.columns(3)
+        with c1:
+            focus = st.number_input("Durasi fokus (menit)", 5, 180, int(s["focus_minutes"]),
+                                    5, key="set_focus")
+        with c2:
+            brk = st.number_input("Durasi jeda (menit)", 1, 60, int(s["break_minutes"]),
+                                  1, key="set_break")
+        with c3:
+            st.selectbox("Zona waktu", TZ_OPTIONS,
+                         index=TZ_OPTIONS.index(s["tz_label"]) if s["tz_label"] in TZ_OPTIONS else 0,
+                         key="set_tz")
 
-    st.markdown('<div class="set-section">Jam kerja</div>', unsafe_allow_html=True)
-    c4, c5 = st.columns(2)
-    with c4:
-        start = st.text_input("Mulai", value=s["work_start"], key="set_start")
-    with c5:
-        end = st.text_input("Selesai", value=s["work_end"], key="set_end")
-    zona = (st.session_state.get("set_tz") or s["tz_label"]).split(" (")[0]
-    st.caption(f"⏰ Waktu lokal sekarang: **{_waktu_lokal(zona)}** ({zona}). "
-               "Zona waktu bisa diganti di bagian Sesi fokus di atas.")
-
-    remind = st.toggle("Ingatkan aku saat jam fokus selesai", value=s["focus_reminder"],
-                       key="set_remind")
+    with _settings_card(
+        "waktu_kerja",
+        ":material/schedule:",
+        "Jam kerja",
+        "Tentukan rentang kerja dan pengingat fokus.",
+    ):
+        c4, c5 = st.columns(2)
+        with c4:
+            start = st.text_input("Mulai", value=s["work_start"], key="set_start")
+        with c5:
+            end = st.text_input("Selesai", value=s["work_end"], key="set_end")
+        zona = (st.session_state.get("set_tz") or s["tz_label"]).split(" (")[0]
+        st.caption(f"⏰ Waktu lokal sekarang: **{_waktu_lokal(zona)}** ({zona}). "
+                   "Zona waktu bisa diganti di bagian Sesi fokus di atas.")
+        remind = st.toggle("Ingatkan aku saat jam fokus selesai", value=s["focus_reminder"],
+                           key="set_remind")
 
     _baris_aksi_simpan(
         "Simpan waktu & fokus", "save_fokus",
@@ -928,41 +1638,79 @@ def page_pengaturan() -> None:
     st.markdown(
         f'<div class="page-head"><div class="page-head-icon">{mi(":material/settings:")}</div>'
         '<div><h2 class="page-title">Pengaturan</h2>'
-        "<p class=\"page-sub\">Delapan bagian pengaturan Trinity. Perubahan "
+        "<p class=\"page-sub\">Sembilan bagian pengaturan Trinity. Perubahan "
         "disimpan per bagian lewat tombol simpan.</p></div></div>",
         unsafe_allow_html=True,
     )
 
-    tabs = st.tabs([
-        ":material/tune:  Umum",
-        ":material/palette:  Tampilan",
-        ":material/person:  Akun",
-        ":material/shield:  Privasi",
-        ":material/receipt_long:  Penagihan",
-        ":material/bolt:  Kemampuan",
-        ":material/history_edu:  Memori",
-        ":material/self_improvement:  Refleksi",
-        ":material/schedule:  Waktu dan fokus",
-    ])
-    with tabs[0]:
+    # ============================================================
+    # FLOATING SETTINGS NAVIGATION
+    # ============================================================
+    
+    settings_items = [
+        ("umum", ":material/tune:", "Umum"),
+        ("tampilan", ":material/palette:", "Tampilan"),
+        ("akun", ":material/person:", "Akun"),
+        ("privasi", ":material/shield:", "Privasi"),
+        ("penagihan", ":material/receipt_long:", "Penagihan"),
+        ("kemampuan", ":material/bolt:", "Kemampuan"),
+        ("memori", ":material/history_edu:", "Memori"),
+        ("refleksi", ":material/self_improvement:", "Refleksi"),
+        ("waktu", ":material/schedule:", "Waktu dan fokus"),
+    ]
+    
+    if "settings_section" not in st.session_state:
+        st.session_state.settings_section = "umum"
+    
+    
+    # Buat tombol navigasi
+    for key, icon, label in settings_items:
+    
+        with st.container(key=f"settings_float_{key}"):
+    
+            if st.button(
+                icon,
+                key=f"settings_nav_{key}",
+                help=label,
+                use_container_width=False,
+            ):
+                st.session_state.settings_section = key
+                st.rerun()
+    
+    
+    # ============================================================
+    # ISI PENGATURAN
+    # ============================================================
+    
+    section = st.session_state.settings_section
+    
+    if section == "umum":
         _set_umum()
-    with tabs[1]:
+    
+    elif section == "tampilan":
         _set_tampilan()
-    with tabs[2]:
+    
+    elif section == "akun":
         _set_akun()
-    with tabs[3]:
+    
+    elif section == "privasi":
         _set_privasi()
-    with tabs[4]:
+    
+    elif section == "penagihan":
         _set_penagihan()
-    with tabs[5]:
+    
+    elif section == "kemampuan":
         _set_kemampuan()
-    with tabs[6]:
+    
+    elif section == "memori":
         _set_memori()
-    with tabs[7]:
+    
+    elif section == "refleksi":
         _set_refleksi()
-    with tabs[8]:
+    
+    elif section == "waktu":
         _set_waktu_fokus()
-
+      
     _page_footer()
   # ============================================================================
 # HALAMAN: BAHASA
@@ -1241,130 +1989,352 @@ def page_pelajari() -> None:
 # HALAMAN: TINGKATKAN PAKET
 # ============================================================================
 def page_tingkatkan() -> None:
+    """Halaman berlangganan bergaya kartu premium (hero + harga + langkah)."""
 
     s = get_settings()
+
+    # ---- Hero -------------------------------------------------------------
     st.markdown(
-        '<div class="trinity-hero"><div class="hero-text">'
-        f'<h1>{html.escape(AMPERA_BRAND)}</h1>'
-        f"<p>Trinity Pro kini bergabung ke keluarga {html.escape(AMPERA_BRAND)} — "
-        f"{html.escape(AMPERA_LOKASI)}. Semua kemampuan dibuka penuh: model "
-        "tertinggi tanpa batas, gambar resolusi tinggi, memori tak terbatas, "
-        "artefak penuh, serta seluruh Trinity kursus dengan Yuki sebagai "
-        "mentor pribadi.</p>"
-        "</div></div>",
+        '<div class="up-hero">'
+        '<div class="up-hero-mark">' + mi(":material/workspace_premium:") + "</div>"
+        '<div class="up-hero-copy">'
+        "<h1>Berlangganan</h1>"
+        "<p>Dapatkan lebih banyak fitur, akses tanpa batas,<br>"
+        "dan pengalaman terbaik bersama Trinity Pro.</p>"
+        "</div>"
+        '<div class="up-hero-art">' + logo_img_html("logo-greeting") + "</div>"
+        "</div>",
         unsafe_allow_html=True,
     )
 
-    st.markdown('<div class="set-section">Pilih paket Trinity Pro</div>',
-                unsafe_allow_html=True)
-    kolom_harga = st.columns(3)
+    # ---- Pilihan paket ----------------------------------------------------
+    st.markdown(
+        '<div class="up-head"><b>Pilih paket Trinity Pro</b>'
+        "<span>Tingkatkan produktivitasmu dengan paket yang sesuai kebutuhan.</span>"
+        "</div>",
+        unsafe_allow_html=True,
+    )
+
+    ikon_paket = [
+        ":material/calendar_month:",
+        ":material/star:",
+        ":material/all_inclusive:",
+    ]
+    kolom_harga = st.columns(3, gap="small")
     for i, paket in enumerate(PRO_HARGA):
         with kolom_harga[i]:
-            _harga_col(paket, f"plan_pro_{i}")
+            unggul = bool(paket.get("unggul"))
+            st.markdown(
+                '<div class="up-plan' + (" is-pro" if unggul else "") + '">'
+                + (
+                    '<div class="up-plan-badge">'
+                    + mi(":material/local_fire_department:")
+                    + "Paling Populer</div>"
+                    if unggul
+                    else ""
+                )
+                + '<div class="up-plan-top">'
+                '<span class="up-plan-ic">'
+                + mi(ikon_paket[i % len(ikon_paket)])
+                + "</span>"
+                '<span class="up-plan-name">'
+                + html.escape(paket["nama"])
+                + "</span></div>"
+                '<div class="up-plan-price">'
+                + html.escape(paket["harga"])
+                + "</div>"
+                '<div class="up-plan-note">'
+                + html.escape(paket["satuan"])
+                + " · "
+                + html.escape(paket["catatan"])
+                + "</div></div>",
+                unsafe_allow_html=True,
+            )
+            with st.container(key=f"up_plan_btn_{i}"):
+                if st.button(
+                    ":material/workspace_premium:  Pilih paket ini",
+                    key=f"plan_pro_{i}",
+                    use_container_width=True,
+                    type="primary" if unggul else "secondary",
+                ):
+                    st.toast(
+                        "Untuk berlangganan, tekan tombol ke Room Chat Ampera "
+                        "di bagian bawah halaman ini 👇",
+                        icon=":material/forum:",
+                    )
 
-    st.markdown('<div class="set-section">Semua paket Pro mendapat</div>',
-                unsafe_allow_html=True)
-    for label, _pro, _free in PRO_FEATURES:
+    # ---- Bagian bawah: manfaat (kiri) + cara berlangganan (kanan) ---------
+    kiri, kanan = st.columns([1.55, 1], gap="medium")
+
+    with kiri:
         st.markdown(
-            f'<div class="feat-row"><span>{label}</span>'
-            f'<span class="chip-on">{mi(":material/check_circle:")}</span></div>',
+            '<div class="up-head"><b>Semua paket Pro mendapat</b></div>'
+            '<div class="up-benefit-grid">'
+            + "".join(
+                '<div class="up-benefit">'
+                + mi(":material/check_circle:")
+                + "<span>"
+                + html.escape(label)
+                + "</span></div>"
+                for label, _pro, _free in PRO_FEATURES
+            )
+            + "</div>",
             unsafe_allow_html=True,
         )
 
-    st.markdown('<div class="set-section">Keluarga produk Ampera</div>',
-                unsafe_allow_html=True)
-    for produk in AMPERA_PRODUK_LAIN:
+        for produk in AMPERA_PRODUK_LAIN:
+            st.markdown(
+                '<div class="up-product">'
+                '<span class="up-product-ic">'
+                + mi(":material/auto_awesome:")
+                + "</span>"
+                '<span class="up-product-copy"><b>'
+                + html.escape(produk["nama"])
+                + "</b><small>"
+                + html.escape(produk["desc"])
+                + "</small></span>"
+                '<span class="up-product-go">'
+                + mi(":material/chevron_right:")
+                + "</span>"
+                "</div>",
+                unsafe_allow_html=True,
+            )
+
+    with kanan:
+        langkah = [
+            (
+                ":material/tap_and_play:",
+                "Pilih paket",
+                "Bulanan, tahunan (paling hemat), atau sekali bayar untuk "
+                "selamanya.",
+            ),
+            (
+                ":material/forum:",
+                "Chat di Room Ampera",
+                'Tekan tombol "ke Room Chat Ampera" di bawah — kamu langsung '
+                "diarahkan ke room chat resmi Ampera Official.",
+            ),
+            (
+                ":material/bolt:",
+                "Langsung aktif",
+                "Setelah pembayaran dikonfirmasi, paket berubah menjadi "
+                "Trinity Pro dan semua kemampuan terbuka saat itu juga.",
+            ),
+        ]
         st.markdown(
-            f'<div class="help-step"><span class="step-icon">'
-            f'{mi(":material/auto_awesome:")}</span>'
-            f'<span class="step-text"><b>{html.escape(produk["nama"])}</b><br>'
-            f'{html.escape(produk["desc"])}</span></div>',
+            '<div class="up-side">'
+            '<div class="up-side-title">Cara berlangganan</div>'
+            + "".join(
+                '<div class="up-step">'
+                '<span class="up-step-no">' + str(i + 1) + "</span>"
+                '<span class="up-step-ic">' + mi(icon) + "</span>"
+                '<span class="up-step-copy"><b>'
+                + html.escape(judul)
+                + "</b><small>"
+                + html.escape(isi)
+                + "</small></span>"
+                "</div>"
+                for i, (icon, judul, isi) in enumerate(langkah)
+            )
+            + "</div>",
             unsafe_allow_html=True,
         )
 
-    st.markdown('<div class="set-section">Cara berlangganan</div>',
-                unsafe_allow_html=True)
-    for i, (icon, title, desc) in enumerate([
-        (":material/tap_and_play:", "Pilih paket",
-         "Bulanan, tahunan (paling hemat), atau sekali bayar untuk selamanya."),
-        (":material/forum:", "Chat di Room Ampera",
-         'Tekan tombol "ke Room Chat Ampera" di bawah — kamu langsung '
-         "diarahkan ke room chat resmi Ampera Official. Tulis pesanmu "
-         "(sebutkan paket pilihanmu) dan pesan itu langsung sampai "
-         "ke admin."),
-        (":material/bolt:", "Langsung aktif",
-         "Setelah pembayaran dikonfirmasi, paket berubah menjadi Trinity Pro "
-         "dan semua kemampuan terbuka saat itu juga."),
-    ]):
-        st.markdown(
-            f'<div class="help-step"><span class="step-no">{i + 1}</span>'
-            f'<span class="step-icon">{mi(icon)}</span>'
-            f'<span class="step-text"><b>{title}</b><br>{desc}</span></div>',
-            unsafe_allow_html=True,
-        )
+        with st.container(key="up_cta"):
+            st.link_button(
+                ":material/forum:  Ke Room Chat Ampera",
+                ROOM_CHAT_URL,
+                use_container_width=True,
+                type="primary",
+            )
 
-    st.link_button("💬 ke Room Chat Ampera", ROOM_CHAT_URL,
-                   use_container_width=True, type="primary")
     st.caption(
         f"Pesanmu di room chat langsung masuk ke admin {AMPERA_BRAND} — "
         f"{AMPERA_LOKASI}. Status paket kamu saat ini: {s.get('plan', 'Free')}."
     )
     _page_footer()
+
+
 # ============================================================================
 # HALAMAN: DAPATKAN APLIKASI
 # ============================================================================
 def page_aplikasi() -> None:
-    
+    """Halaman "Dapatkan Aplikasi" — aplikasi belum rilis, jadi yang tampil
+    adalah daftar tunggu: pengguna meninggalkan email untuk dikabari."""
+
+    # ---- Hero -------------------------------------------------------------
     st.markdown(
-        f'<div class="trinity-hero">{logo_img_html("logo-greeting")}'
-        '<div class="hero-text"><h1>Trinity di genggaman</h1>'
-        "<p>Ampera Trinity AI sedang disiapkan menjadi aplikasi Android & iOS. "
-        "Semua fitur yang ada di sini — Yuki, gambar, suara, artefak, dan "
-        "kursus — ikut terbawa.</p></div></div>",
+        '<div class="ap-hero">'
+        '<div class="ap-hero-mark">' + logo_img_html("logo-greeting") + "</div>"
+        '<div class="ap-hero-copy">'
+        "<h1>Dapatkan Aplikasi<br>Trinity AI</h1>"
+        "<p>Akses Trinity AI kapan saja, di mana saja. Tingkatkan "
+        "produktivitas dan kreativitas Anda dengan aplikasi resmi kami.</p>"
+        '<span class="ap-hero-tag">' + mi(":material/schedule:")
+        + "Belum rilis · daftar untuk dikabari</span>"
+        "</div>"
+        '<div class="ap-hero-art">'
+        '<span class="ap-dev ap-dev-lap"></span>'
+        '<span class="ap-dev ap-dev-phone"></span>'
+        "</div>"
+        "</div>",
         unsafe_allow_html=True,
     )
 
-    c1, c2 = st.columns([1, 1.35])
-    with c1:
+    kiri, kanan = st.columns([1.7, 1], gap="medium")
+
+    # ---- Kolom kiri: platform --------------------------------------------
+    with kiri:
         st.markdown(
-            f'<div class="phone-card">{logo_img_html("logo-greeting")}'
-            '<div class="phone-name">Ampera Trinity AI</div>'
-            '<div class="phone-tag">pratinjau aplikasi</div></div>',
+            '<div class="ap-head"><b>' + mi(":material/download:")
+            + "Download Aplikasi</b>"
+            "<span>Pilih platform yang sesuai dengan perangkat Anda. "
+            "Semua versi masih dalam penyiapan.</span></div>",
             unsafe_allow_html=True,
         )
-    with c2:
-        st.markdown('<div class="set-section">Unduh</div>', unsafe_allow_html=True)
-        b1, b2 = st.columns(2)
-        with b1:
-            if st.button(":material/android:  Android", key="app_android",
-                         use_container_width=True):
-                st.toast("Versi Android belum dirilis. Daftar beta di bawah ya!",
-                         icon=":material/android:")
-        with b2:
-            if st.button(":material/smartphone:  iOS", key="app_ios", use_container_width=True):
-                st.toast("Versi iOS belum dirilis. Daftar beta di bawah ya!",
-                         icon=":material/smartphone:")
-        st.markdown('<div class="set-section">Rencana rilis</div>', unsafe_allow_html=True)
+
+        platform = [
+            (":material/android:", "Android", "Akan tersedia di Google Play "
+             "Store untuk semua perangkat Android.", "± 45 MB"),
+            (":material/phone_iphone:", "iOS", "Akan tersedia di App Store "
+             "untuk iPhone dan iPad.", "± 52 MB"),
+            (":material/desktop_windows:", "Desktop", "Untuk pengalaman lebih "
+             "maksimal di laptop atau PC Anda.", "± 120 MB"),
+        ]
+        kolom = st.columns(3, gap="small")
+        for i, (icon, nama, desc, ukuran) in enumerate(platform):
+            with kolom[i]:
+                st.markdown(
+                    '<div class="ap-plat">'
+                    '<span class="ap-plat-ic">' + mi(icon) + "</span>"
+                    '<span class="ap-plat-name">' + nama + "</span>"
+                    '<span class="ap-plat-desc">' + desc + "</span>"
+                    '<span class="ap-plat-soon">' + mi(":material/lock_clock:")
+                    + "Segera hadir</span>"
+                    '<span class="ap-plat-size">' + mi(":material/save:")
+                    + "Perkiraan ukuran " + ukuran + "</span>"
+                    "</div>",
+                    unsafe_allow_html=True,
+                )
+
+        # ---- Daftar tunggu (email) ---------------------------------------
         st.markdown(
-            '<div class="feat-row"><span>Android (APK & Play Store)</span>'
-            '<span class="chip-off">Tahap 1</span></div>'
-            '<div class="feat-row"><span>iOS (App Store)</span>'
-            '<span class="chip-off">Tahap 2</span></div>'
-            '<div class="feat-row"><span>Desktop (Windows & macOS)</span>'
-            '<span class="chip-off">Tahap 3</span></div>'
-            '<div class="feat-row"><span>Sinkronisasi antar perangkat</span>'
-            '<span class="chip-off">Menyusul</span></div>',
+            '<div class="ap-wait-title">'
+            + mi(":material/notifications_active:")
+            + "Kabari saya saat aplikasi rilis</div>",
             unsafe_allow_html=True,
         )
-        email = st.text_input("Email untuk kabar rilis", key="app_email",
-                              placeholder="nama@email.com")
-        if st.button(":material/notifications_active:  Kabari saya saat rilis",
-                     key="app_notify", type="primary", use_container_width=True):
-            if email.strip():
-                st.toast("Terima kasih! Kami kabari begitu aplikasi siap.",
-                         icon=":material/check_circle:")
-            else:
+        with st.container(key="ap_wait_form"):
+            kol_email, kol_tombol = st.columns([2.2, 1], gap="small")
+            with kol_email:
+                email = st.text_input(
+                    "Email",
+                    key="app_email",
+                    placeholder="nama@email.com",
+                    label_visibility="collapsed",
+                )
+            with kol_tombol:
+                kirim = st.button(
+                    ":material/send:  Daftar",
+                    key="app_notify",
+                    type="primary",
+                    use_container_width=True,
+                )
+
+        if kirim:
+            alamat = (email or "").strip()
+            sah = bool(re.match(r"^[^@\s]+@[^@\s]+\.[A-Za-z]{2,}$", alamat))
+            if not alamat:
                 st.toast("Isi dulu email kamu ya.", icon=":material/warning:")
+            elif not sah:
+                st.toast(
+                    "Format email belum benar. Contoh: nama@email.com",
+                    icon=":material/warning:",
+                )
+            else:
+                daftar = st.session_state.setdefault("app_waitlist", [])
+                if alamat.lower() in {e.lower() for e in daftar}:
+                    st.toast(
+                        "Email ini sudah terdaftar. Kami kabari saat rilis 🙌",
+                        icon=":material/check_circle:",
+                    )
+                else:
+                    daftar.append(alamat)
+                    st.toast(
+                        "Terima kasih! Kami kirim kabar ke " + alamat
+                        + " begitu aplikasi siap.",
+                        icon=":material/check_circle:",
+                    )
+
+        st.markdown(
+            '<div class="ap-note">Email hanya dipakai untuk memberi kabar '
+            "peluncuran aplikasi. Tidak ada promosi berlebihan, dan kamu bisa "
+            "minta berhenti kapan saja.</div>",
+            unsafe_allow_html=True,
+        )
+
+        terdaftar = st.session_state.get("app_waitlist") or []
+        if terdaftar:
+            st.markdown(
+                '<div class="ap-listed">' + mi(":material/mark_email_read:")
+                + "Terdaftar di perangkat ini: "
+                + ", ".join(html.escape(e) for e in terdaftar)
+                + "</div>",
+                unsafe_allow_html=True,
+            )
+
+        st.markdown(
+            '<div class="ap-safe">'
+            '<span class="ap-safe-ic">' + mi(":material/verified_user:")
+            + "</span>"
+            '<span class="ap-safe-copy"><b>Aman &amp; Terpercaya</b>'
+            "<small>Aplikasi Trinity AI akan melalui proses keamanan dan "
+            "verifikasi resmi sebelum dirilis ke publik.</small></span>"
+            "</div>",
+            unsafe_allow_html=True,
+        )
+
+    # ---- Kolom kanan: keunggulan + bantuan --------------------------------
+    with kanan:
+        unggulan = [
+            (":material/bolt:", "Akses cepat", "ke semua fitur Trinity AI"),
+            (":material/cloud_sync:", "Sinkronisasi otomatis", "antar perangkat"),
+            (":material/notifications:", "Notifikasi & update", "fitur terbaru"),
+            (":material/smartphone:", "Antarmuka yang lebih",
+             "ringkas dan mudah digunakan"),
+        ]
+        st.markdown(
+            '<div class="ap-side">'
+            '<div class="ap-side-title">' + mi(":material/auto_awesome:")
+            + "Keunggulan Aplikasi</div>"
+            + "".join(
+                '<div class="ap-adv">'
+                '<span class="ap-adv-ic">' + mi(icon) + "</span>"
+                '<span class="ap-adv-copy"><b>' + judul + "</b>"
+                "<small>" + isi + "</small></span></div>"
+                for icon, judul, isi in unggulan
+            )
+            + "</div>",
+            unsafe_allow_html=True,
+        )
+
+        st.markdown(
+            '<div class="ap-help">'
+            '<div class="ap-help-title">' + mi(":material/lightbulb:")
+            + "Butuh bantuan?</div>"
+            "<p>Jika kamu punya pertanyaan seputar peluncuran aplikasi, "
+            "hubungi tim support kami.</p>"
+            "</div>",
+            unsafe_allow_html=True,
+        )
+        with st.container(key="ap_support"):
+            st.link_button(
+                ":material/support_agent:  Hubungi Support",
+                ROOM_CHAT_URL,
+                use_container_width=True,
+                type="primary",
+            )
+
     _page_footer()
 
 
@@ -1489,22 +2459,43 @@ def main() -> None:
     from welcome_gate import tampilkan_gerbang
     if tampilkan_gerbang():
         st.stop()
-
-    render_sidebar()
-
+      
+    # Launcher "Analisis berlapis" dihapus; navigasi Multi AI tetap tersedia
+    # melalui sidebar dan halaman Multi AI.
     page = st.session_state.get("page", "chat")
-    # Dok file kecil (panel_file.py): ikon folder melayang + daftar file
-    # buatan Yuki. Tidak buka otomatis — hanya gelembung penanda.
-    render_file_dock()
+    render_sidebar(page)
+
+    # Panel File hanya tampil di halaman yang mendukung fitur file.
+    if page in ("chat", "desain", "jadwal", "multi_agent"):
+        render_file_dock()
 
     # Animasi ala iOS untuk perpindahan halaman.
 
-    # Animasi ala iOS untuk perpindahan halaman. Kelasnya HANYA dipasang
-    # saat halaman benar-benar berganti — kalau dipasang terus-menerus,
-    # animasinya akan terputar ulang setiap kali kirim chat atau klik
-    # tombol apa pun (mengganggu).
-    if st.session_state.get("_last_page") != page:
+    # ================================================================
+    # ANIMASI PERPINDAHAN HALAMAN
+    # ================================================================
+    #
+    # JANGAN jalankan animasi pada first load.
+    # First load harus langsung stabil supaya topbar, panel kanan,
+    # sidebar, dan elemen position:fixed tidak terpengaruh transform
+    # dari animasi halaman.
+    #
+    # Animasi hanya dijalankan kalau user BENAR-BENAR berpindah
+    # dari satu halaman ke halaman lain.
+    
+    _last_page = st.session_state.get("_last_page")
+    
+    if _last_page is None:
+    
+        # First load:
+        # simpan halaman sekarang, TANPA animasi.
         st.session_state["_last_page"] = page
+    
+    elif _last_page != page:
+    
+        # Benar-benar pindah halaman.
+        st.session_state["_last_page"] = page
+    
         inject_page_anim()
     if page == "artefak":
         page_artefak()
@@ -1526,6 +2517,10 @@ def main() -> None:
         page_desain()
     elif page == "jadwal":
         page_jadwal()
+    elif page == "multi_agent":
+        page_multi_agent()
+    elif page == "image":
+        page_image()
     else:
         render_chat_page()
 
