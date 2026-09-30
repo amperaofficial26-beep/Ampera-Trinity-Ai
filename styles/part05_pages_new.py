@@ -2195,4 +2195,199 @@ body [class*="st-key-up_cta"] a {
     .up-hero-art { display: none; }
     .up-benefit-grid { grid-template-columns: 1fr; }
 }
+
+
+/* ================================================================
+   HALAMAN DAPATKAN APLIKASI — kartu premium + daftar tunggu email
+   ================================================================ */
+.ap-hero {
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; gap: 18px;
+    margin: 2px 0 16px; padding: 22px 24px;
+    border: 1px solid #E6DAC8; border-radius: 24px;
+    background:
+        radial-gradient(120% 140% at 88% 20%, #6B4F86 0%, #4A3559 42%,
+                        rgba(74, 53, 89, 0) 62%),
+        linear-gradient(115deg, #FDF8F1 0%, #F7EEE2 58%, #F1E6F2 100%);
+    box-shadow: 0 18px 38px rgba(76, 58, 43, .12);
+}
+.ap-hero-mark {
+    flex: 0 0 62px; width: 62px; height: 62px;
+    display: grid; place-items: center;
+    border-radius: 20px; background: #FFFFFF;
+    border: 1px solid #ECDFCB;
+    box-shadow: 0 8px 18px rgba(76, 58, 43, .10);
+}
+.ap-hero-mark img { width: 40px; height: 40px; }
+.ap-hero-copy { flex: 1 1 auto; min-width: 0; }
+.ap-hero-copy h1 {
+    margin: 0 0 6px; color: #2E2040;
+    font-size: 1.58rem; font-weight: 820; line-height: 1.2;
+    letter-spacing: -.02em;
+}
+.ap-hero-copy p {
+    margin: 0; max-width: 46ch;
+    color: #7C7183; font-size: .9rem; line-height: 1.55;
+}
+.ap-hero-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 10px; padding: 5px 12px; border-radius: 999px;
+    background: #FFFFFF; border: 1px solid #E4D6C3;
+    color: #6B4F86; font-size: .74rem; font-weight: 700;
+}
+.ap-hero-tag .mi { font-size: 15px; }
+.ap-hero-art {
+    position: relative; flex: 0 0 150px; height: 104px;
+}
+.ap-dev {
+    position: absolute; display: block;
+    border-radius: 10px; background: #FFFDF9;
+    border: 2px solid #2E2040;
+    box-shadow: 0 10px 22px rgba(20, 12, 26, .28);
+}
+.ap-dev-lap { right: 26px; top: 16px; width: 112px; height: 70px; }
+.ap-dev-lap::after {
+    content: ""; position: absolute; left: -12px; right: -12px; bottom: -8px;
+    height: 7px; border-radius: 0 0 8px 8px; background: #2E2040;
+}
+.ap-dev-phone {
+    right: 0; bottom: 4px; width: 40px; height: 74px; border-radius: 12px;
+}
+
+.ap-head { margin: 14px 0 10px; }
+.ap-head b {
+    display: flex; align-items: center; gap: 7px;
+    color: #2E2040; font-size: 1.02rem; font-weight: 800;
+}
+.ap-head b .mi { font-size: 19px; color: #4A3559; }
+.ap-head span {
+    display: block; margin-top: 3px; color: #8A7F8A; font-size: .84rem;
+}
+
+/* ---- kartu platform ---- */
+.ap-plat {
+    display: flex; flex-direction: column; gap: 6px;
+    min-height: 196px; height: 100%;
+    padding: 16px 15px;
+    border: 1px solid #EADFCD; border-radius: 18px;
+    background: #FFFDF9;
+    box-shadow: 0 10px 22px rgba(76, 58, 43, .07);
+}
+.ap-plat-ic {
+    width: 38px; height: 38px; display: grid; place-items: center;
+    border-radius: 13px; background: #F3E7F1; color: #4A3559;
+}
+.ap-plat-ic .mi { font-size: 21px; }
+.ap-plat-name {
+    margin-top: 4px; color: #2E2040; font-size: 1rem; font-weight: 780;
+}
+.ap-plat-desc {
+    color: #8A7F8A; font-size: .79rem; line-height: 1.45; flex: 1 1 auto;
+}
+.ap-plat-soon {
+    display: inline-flex; align-items: center; gap: 6px;
+    align-self: flex-start;
+    padding: 7px 13px; border-radius: 999px;
+    background: #2E2040; color: #F6EEDF;
+    font-size: .76rem; font-weight: 700;
+}
+.ap-plat-soon .mi { font-size: 15px; color: #E8B04B; }
+.ap-plat-size {
+    display: inline-flex; align-items: center; gap: 5px;
+    color: #9A8F9A; font-size: .72rem;
+}
+.ap-plat-size .mi { font-size: 14px; }
+
+/* ---- daftar tunggu ---- */
+.ap-wait-title {
+    display: flex; align-items: center; gap: 7px;
+    margin: 18px 0 8px; color: #2E2040;
+    font-size: .98rem; font-weight: 800;
+}
+.ap-wait-title .mi { font-size: 19px; color: #4A3559; }
+body [class*="st-key-ap_wait_form"] {
+    padding: 12px 14px;
+    border: 1px solid #EADFCD; border-radius: 16px;
+    background: #FFFDF9;
+}
+body [class*="st-key-ap_wait_form"] input {
+    border-radius: 12px !important;
+    min-height: 42px !important;
+}
+body [class*="st-key-ap_wait_form"] button {
+    min-height: 42px !important;
+    border-radius: 12px !important;
+    font-weight: 700 !important;
+}
+.ap-note {
+    margin: 8px 2px 0; color: #9A8F9A;
+    font-size: .76rem; line-height: 1.5;
+}
+.ap-listed {
+    display: flex; align-items: center; gap: 7px;
+    margin-top: 8px; padding: 9px 13px;
+    border: 1px dashed #D9C8B4; border-radius: 12px;
+    background: #FBF5EC; color: #6B4F86; font-size: .78rem;
+}
+.ap-listed .mi { font-size: 16px; }
+
+.ap-safe {
+    display: flex; align-items: flex-start; gap: 11px;
+    margin: 14px 0 4px; padding: 14px 16px;
+    border: 1px solid #EADFCD; border-radius: 18px;
+    background: #FFFDF9;
+}
+.ap-safe-ic {
+    width: 34px; height: 34px; display: grid; place-items: center;
+    border-radius: 12px; background: #EDF3EA; color: #4B7A52;
+}
+.ap-safe-copy b { display: block; color: #2E2040; font-size: .9rem; }
+.ap-safe-copy small {
+    display: block; margin-top: 2px; color: #8A7F8A;
+    font-size: .78rem; line-height: 1.45;
+}
+
+/* ---- panel kanan ---- */
+.ap-side, .ap-help {
+    padding: 16px;
+    border: 1px solid #EADFCD; border-radius: 20px;
+    background: #FFFDF9;
+    box-shadow: 0 12px 26px rgba(76, 58, 43, .07);
+}
+.ap-side-title, .ap-help-title {
+    display: flex; align-items: center; gap: 7px;
+    margin-bottom: 10px; color: #2E2040;
+    font-size: .98rem; font-weight: 800;
+}
+.ap-side-title .mi, .ap-help-title .mi { font-size: 18px; color: #6B4F86; }
+.ap-adv {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 9px 0; border-top: 1px solid #F1E7D9;
+}
+.ap-adv:first-of-type { border-top: none; }
+.ap-adv-ic { color: #6B4F86; }
+.ap-adv-ic .mi { font-size: 18px; }
+.ap-adv-copy b { display: block; color: #2E2040; font-size: .86rem; }
+.ap-adv-copy small {
+    display: block; margin-top: 1px; color: #8A7F8A; font-size: .76rem;
+}
+.ap-help {
+    margin-top: 14px;
+    background: linear-gradient(180deg, #FFFFFF 0%, #F7F0FA 100%);
+}
+.ap-help p {
+    margin: 0; color: #8A7F8A; font-size: .78rem; line-height: 1.5;
+}
+body [class*="st-key-ap_support"] a {
+    margin-top: 10px !important;
+    border-radius: 999px !important;
+    min-height: 42px !important;
+    font-weight: 700 !important;
+}
+
+@media (max-width: 820px) {
+    .ap-hero { flex-direction: column; text-align: center; }
+    .ap-hero-art { display: none; }
+    .ap-plat { min-height: 0; }
+}
 """
