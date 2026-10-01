@@ -9,8 +9,12 @@ bayangan lembut, ikon kecil di dalam lingkaran, dan teks sans-serif.
 """
 from __future__ import annotations
 
+import html
+
 import streamlit as st
 import streamlit.components.v1 as components
+
+from icons import mi
 
 # Berapa lama notifikasi terlihat sebelum memudar (milidetik).
 DURASI_MS = 4200
@@ -167,84 +171,144 @@ div:has(> [data-testid="stToast"]) {{
   will-change: transform, opacity !important;
 }}
 
+/* ================================================================
+   NOTIFIKASI KUSTOM (pengganti st.toast) — animasi geser milik sendiri
+   ================================================================ */
+.tr-toast-wrap {{
+  position: fixed !important;
+  right: 18px;
+  bottom: calc(18px + var(--tr-toast-i, 0) * 62px);
+  z-index: 1000000;
+  pointer-events: none;
+  animation:
+    trToastMasuk {MASUK_MS}ms cubic-bezier(.22, 1, .36, 1) both,
+    trToastKeluar {KELUAR_MS}ms cubic-bezier(.4, 0, .9, .3)
+      {DURASI_MS}ms forwards;
+}}
+.tr-toast {{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-sizing: border-box;
+  width: min({LEBAR_PX}px, calc(100vw - 28px));
+  padding: 12px 15px;
+  border: 1px solid {WARNA_GARIS};
+  border-left: 3px solid {WARNA_AKSEN};
+  border-radius: 14px;
+  background: {WARNA_LATAR};
+  color: {WARNA_TEKS};
+  box-shadow:
+    0 10px 28px rgba(44, 31, 51, .12),
+    0 1px 2px rgba(44, 31, 51, .06);
+  pointer-events: auto;
+}}
+.tr-toast-ic {{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 26px;
+  width: 26px;
+  height: 26px;
+  border-radius: 9px;
+  background: {WARNA_AKSEN_LEMBUT};
+  color: {WARNA_AKSEN};
+}}
+.tr-toast-ic .mi {{ font-size: 16px; }}
+.tr-toast-teks {{
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system,
+               "Segoe UI", sans-serif;
+  font-size: .88rem;
+  font-weight: 560;
+  line-height: 1.45;
+  letter-spacing: -.005em;
+}}
+
+/* Masuk: dari kanan ke kiri. Keluar: dari kiri ke kanan. */
+@keyframes trToastMasuk {{
+  from {{ opacity: 0; transform: translateX(calc(100% + 40px)); }}
+  to   {{ opacity: 1; transform: translateX(0); }}
+}}
+@keyframes trToastKeluar {{
+  from {{ opacity: 1; transform: translateX(0); visibility: visible; }}
+  to   {{ opacity: 0; transform: translateX(calc(100% + 40px));
+         visibility: hidden; }}
+}}
+
 @media (prefers-reduced-motion: reduce) {{
   [data-testid="stToast"],
-  div:has(> [data-testid="stToast"]) {{ animation: none !important; }}
+  div:has(> [data-testid="stToast"]),
+  .tr-toast-wrap {{ animation: none !important; }}
 }}
 </style>
 """,
         unsafe_allow_html=True,
     )
-    _pasang_pengamat_toast()
+    # st.toast diganti sekali saja per sesi proses.
+    if getattr(st, "_tr_toast_asli", None) is None:
+        st._tr_toast_asli = st.toast
+        st.toast = _toast_kustom
+
+    st.session_state["_tr_toast_n"] = 0
+    st.session_state["_tr_run"] = int(st.session_state.get("_tr_run", 0)) + 1
+
+    # Banyak tempat memanggil st.toast lalu langsung st.rerun(). Notifikasi
+    # seperti itu dititipkan di antrean dan baru digambar pada run berikut
+    # supaya tetap sempat terlihat.
+    antrean = st.session_state.get("_tr_toast_q") or []
+    sekarang = st.session_state["_tr_run"]
+    tersisa = []
+    for run_id, pesan, ikon in antrean:
+        if run_id < sekarang:
+            _gambar_toast(pesan, ikon)
+        else:
+            tersisa.append((run_id, pesan, ikon))
+    st.session_state["_tr_toast_q"] = tersisa
 
 
-def _pasang_pengamat_toast() -> None:
-    """Animasi geser lewat Web Animations API.
-
-    CSS saja kadang kalah oleh animasi/transform bawaan Streamlit, jadi
-    setiap toast baru dianimasikan langsung dari JavaScript: masuk dari
-    kanan ke kiri, lalu keluar ke kanan sebelum menghilang.
-    """
-    components.html(
-        """
-<script>
-(function () {
-  const doc = window.parent && window.parent.document;
-  if (!doc) return;
-  const w = window.parent;
-  if (w.__trinityToastSlide) return;   // cukup satu pengamat
-  w.__trinityToastSlide = true;
-
-  const MASUK_MS = """ + str(MASUK_MS) + """;
-  const KELUAR_MS = """ + str(KELUAR_MS) + """;
-  const TAHAN_MS = """ + str(DURASI_MS) + """;
-  const JARAK = "calc(100% + 40px)";
-
-  function animasikan(el) {
-    if (!el || el.__trinitySlide) return;
-    el.__trinitySlide = true;
-    const target = el.parentElement || el;
-    target.style.willChange = "transform, opacity";
-
-    target.animate(
-      [
-        { transform: "translateX(" + JARAK + ")", opacity: 0 },
-        { transform: "translateX(0)", opacity: 1 }
-      ],
-      { duration: MASUK_MS, easing: "cubic-bezier(.22,1,.36,1)", fill: "both" }
-    );
-
-    setTimeout(function () {
-      if (!target.isConnected) return;
-      target.animate(
-        [
-          { transform: "translateX(0)", opacity: 1 },
-          { transform: "translateX(" + JARAK + ")", opacity: 0 }
-        ],
-        { duration: KELUAR_MS, easing: "cubic-bezier(.4,0,.9,.3)", fill: "forwards" }
-      );
-    }, TAHAN_MS);
-  }
-
-  function sapu(akar) {
-    akar.querySelectorAll('[data-testid="stToast"]').forEach(animasikan);
-  }
-
-  sapu(doc);
-  new MutationObserver(function (list) {
-    list.forEach(function (m) {
-      m.addedNodes.forEach(function (n) {
-        if (n.nodeType !== 1) return;
-        if (n.matches && n.matches('[data-testid="stToast"]')) animasikan(n);
-        else if (n.querySelectorAll) sapu(n);
-      });
-    });
-  }).observe(doc.body, { childList: true, subtree: true });
-})();
-</script>
-""",
-        height=0,
+def _html_toast(pesan: str, ikon: str | None) -> str:
+    """Satu kartu notifikasi beserta animasi gesernya."""
+    bagian_ikon = ""
+    if ikon:
+        if ikon.startswith(":material"):
+            bagian_ikon = f'<span class="tr-toast-ic">{mi(ikon)}</span>'
+        else:
+            bagian_ikon = f'<span class="tr-toast-ic">{html.escape(ikon)}</span>'
+    return (
+        '<div class="tr-toast">'
+        + bagian_ikon
+        + '<span class="tr-toast-teks">'
+        + html.escape(str(pesan))
+        + "</span></div>"
     )
+
+
+def _gambar_toast(pesan: str, ikon: str | None) -> None:
+    """Gambar satu notifikasi di pojok kanan bawah (bertumpuk ke atas)."""
+    urutan = int(st.session_state.get("_tr_toast_n", 0))
+    st.session_state["_tr_toast_n"] = urutan + 1
+    st.markdown(
+        '<div class="tr-toast-wrap" style="--tr-toast-i:'
+        + str(urutan)
+        + ';">'
+        + _html_toast(pesan, ikon)
+        + "</div>",
+        unsafe_allow_html=True,
+    )
+
+
+def _toast_kustom(body: str, *, icon: str | None = None, **_lain) -> None:
+    """Pengganti st.toast dengan animasi geser yang pasti terlihat.
+
+    st.toast bawaan dirender React dengan transform sendiri sehingga CSS
+    kita selalu kalah. Notifikasi digambar sendiri sebagai elemen biasa
+    berposisi fixed, jadi animasinya sepenuhnya milik kita.
+    """
+    _gambar_toast(body, icon)
+    # Dititipkan juga ke antrean: kalau run ini diakhiri st.rerun(),
+    # notifikasinya tetap muncul di run berikutnya.
+    antrean = st.session_state.get("_tr_toast_q") or []
+    antrean.append((int(st.session_state.get("_tr_run", 0)), str(body), icon))
+    st.session_state["_tr_toast_q"] = antrean[-4:]
 
 
 def toast_sukses(pesan: str) -> None:
