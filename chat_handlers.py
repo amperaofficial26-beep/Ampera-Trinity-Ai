@@ -96,7 +96,19 @@ _STOP_BTN_CSS = (
 # POSISI LOADER "YUKI SEDANG BERPIKIR"  <<< UBAH DI SINI
 #   Negatif = geser ke kiri, positif = ke kanan (px).
 # ============================================================================
-LOADER_GESER_X = -190
+LOADER_GESER_X = 0
+
+def _loader_geser_css(kelas: str) -> str:
+    """CSS geser loader — hanya ditulis bila LOADER_GESER_X memang diisi,
+    supaya loader tidak tertarik keluar dari kolom kontennya."""
+    if not LOADER_GESER_X:
+        return ""
+    return (
+        'body .stApp [class*="' + kelas + '"] iframe{'
+        "position:relative!important;"
+        "left:" + str(LOADER_GESER_X) + "px!important;}"
+    )
+
 
 IMAGE_MIN_SECONDS = float(THINKING_MIN_SECONDS)
 IMAGE_DONE_SECONDS = 0.7
@@ -286,25 +298,13 @@ def handle_image_request(prompt: str, gaya: str | None = None,
     # Markdown dapat menutup tag <span> lebih awal dan menampilkan sisanya
     # sebagai teks kode; components.html merendernya sebagai dokumen HTML utuh.
     with progress_slot.container():
-        # Dibungkus container berkunci agar posisi/ukurannya sama dengan
-        # loader teks, dan agar animasinya tidak hilang saat st.empty()
-        # dipakai ulang.
+        # Hanya perataan kiri yang dipaksa; tanpa menggeser keluar kolom.
         st.markdown(
             "<style>"
-            'body .stApp [class*="st-key-img_loader_slot"],'
-            'body .stApp [class*="st-key-img_loader_slot"] '
-            '[data-testid="stElementContainer"],'
-            'body .stApp [class*="st-key-img_loader_slot"] '
-            '[data-testid="stIFrame"]{'
+            'body .stApp [class*="st-key-img_loader_slot"]{'
             "width:100%!important;max-width:100%!important;"
-            "margin-left:0!important;margin-right:0!important;"
             "align-items:flex-start!important;}"
-            'body .stApp [class*="st-key-img_loader_slot"] iframe{'
-            "position:relative!important;"
-            "left:" + str(LOADER_GESER_X) + "px!important;"
-            "width:100%!important;max-width:100%!important;"
-            "margin-left:0!important;margin-right:auto!important;"
-            "display:block!important;}"
+            + _loader_geser_css("st-key-img_loader_slot") +
             "</style>",
             unsafe_allow_html=True,
         )
@@ -739,18 +739,13 @@ def render_loader_yuki() -> None:
     st.markdown(
         "<style>"
         'body .stApp [class*="st-key-yuki_loader_slot"],'
-        'body .stApp [class*="st-key-yuki_loader_slot"] > div,'
-        'body .stApp [class*="st-key-yuki_loader_slot"] [data-testid="stElementContainer"],'
-        'body .stApp [class*="st-key-yuki_loader_slot"] [data-testid="stIFrame"]{'
-        "width:100%!important;max-width:100%!important;min-width:0!important;"
-        "margin-left:0!important;margin-right:0!important;"
-        "align-items:flex-start!important;text-align:left!important;}"
-        'body .stApp [class*="st-key-yuki_loader_slot"] iframe{'
-        "position:relative!important;"
-        "left:" + str(LOADER_GESER_X) + "px!important;"
+        'body .stApp [class*="st-key-yuki_loader_slot"] '
+        '[data-testid="stElementContainer"],'
+        'body .stApp [class*="st-key-yuki_loader_slot"] '
+        '[data-testid="stIFrame"]{'
         "width:100%!important;max-width:100%!important;"
-        "margin-left:0!important;margin-right:auto!important;"
-        "display:block!important;}"
+        "align-items:flex-start!important;}"
+        + _loader_geser_css("st-key-yuki_loader_slot") +
         "</style>",
         unsafe_allow_html=True,
     )
