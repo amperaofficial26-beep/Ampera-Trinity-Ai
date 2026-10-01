@@ -150,8 +150,28 @@ def inject_toast_anim() -> None:
   [data-testid="stToast"] p {{ font-size: .84rem !important; }}
 }}
 
+/* ---------------------------------------------------------------
+   Streamlit membungkus toast dalam beberapa lapis div yang punya
+   transform/animation sendiri. Lapisan itu dinetralkan, lalu animasi
+   geser dipasang pada pembungkus terluar supaya benar-benar terlihat.
+   --------------------------------------------------------------- */
+[data-testid="stToastContainer"],
+div:has(> [data-testid="stToast"]) {{
+  animation: none !important;
+  transition: none !important;
+  overflow: visible !important;
+}}
+div:has(> [data-testid="stToast"]) {{
+  will-change: transform, opacity !important;
+  animation:
+    trinityToastMasuk 320ms cubic-bezier(.22, 1, .36, 1) both,
+    trinityToastKeluar 300ms cubic-bezier(.4, 0, .9, .3)
+      {DURASI_MS}ms forwards !important;
+}}
+
 @media (prefers-reduced-motion: reduce) {{
-  [data-testid="stToast"] {{ animation: none !important; }}
+  [data-testid="stToast"],
+  div:has(> [data-testid="stToast"]) {{ animation: none !important; }}
 }}
 </style>
 """,
