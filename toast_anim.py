@@ -10,9 +10,14 @@ bayangan lembut, ikon kecil di dalam lingkaran, dan teks sans-serif.
 from __future__ import annotations
 
 import streamlit as st
+import streamlit.components.v1 as components
 
 # Berapa lama notifikasi terlihat sebelum memudar (milidetik).
 DURASI_MS = 4200
+
+# Durasi animasi geser masuk (kanan → kiri) dan keluar (kiri → kanan).
+MASUK_MS = 340
+KELUAR_MS = 300
 
 # Warna dasar notifikasi — mengikuti palet premium krem + ungu Trinity.
 WARNA_LATAR = "#FFFDF9"
@@ -48,12 +53,9 @@ def inject_toast_anim() -> None:
     0 10px 28px rgba(44, 31, 51, .12),
     0 1px 2px rgba(44, 31, 51, .06) !important;
 
+  /* Animasi geser dijalankan dari JavaScript (lihat _pasang_pengamat_toast)
+     agar tidak tertimpa animasi bawaan Streamlit. */
   will-change: transform, opacity !important;
-
-  animation:
-    trinityToastMasuk 320ms cubic-bezier(.22, 1, .36, 1) both,
-    trinityToastKeluar 300ms cubic-bezier(.4, 0, .9, .3)
-      {DURASI_MS}ms forwards !important;
 }}
 
 /* Garis aksen tipis di tepi kiri sebagai penanda merek. */
@@ -163,10 +165,6 @@ div:has(> [data-testid="stToast"]) {{
 }}
 div:has(> [data-testid="stToast"]) {{
   will-change: transform, opacity !important;
-  animation:
-    trinityToastMasuk 320ms cubic-bezier(.22, 1, .36, 1) both,
-    trinityToastKeluar 300ms cubic-bezier(.4, 0, .9, .3)
-      {DURASI_MS}ms forwards !important;
 }}
 
 @media (prefers-reduced-motion: reduce) {{
@@ -176,6 +174,76 @@ div:has(> [data-testid="stToast"]) {{
 </style>
 """,
         unsafe_allow_html=True,
+    )
+    _pasang_pengamat_toast()
+
+
+def _pasang_pengamat_toast() -> None:
+    """Animasi geser lewat Web Animations API.
+
+    CSS saja kadang kalah oleh animasi/transform bawaan Streamlit, jadi
+    setiap toast baru dianimasikan langsung dari JavaScript: masuk dari
+    kanan ke kiri, lalu keluar ke kanan sebelum menghilang.
+    """
+    components.html(
+        """
+<script>
+(function () {
+  const doc = window.parent && window.parent.document;
+  if (!doc) return;
+  const w = window.parent;
+  if (w.__trinityToastSlide) return;   // cukup satu pengamat
+  w.__trinityToastSlide = true;
+
+  const MASUK_MS = """ + str(MASUK_MS) + """;
+  const KELUAR_MS = """ + str(KELUAR_MS) + """;
+  const TAHAN_MS = """ + str(DURASI_MS) + """;
+  const JARAK = "calc(100% + 40px)";
+
+  function animasikan(el) {
+    if (!el || el.__trinitySlide) return;
+    el.__trinitySlide = true;
+    const target = el.parentElement || el;
+    target.style.willChange = "transform, opacity";
+
+    target.animate(
+      [
+        { transform: "translateX(" + JARAK + ")", opacity: 0 },
+        { transform: "translateX(0)", opacity: 1 }
+      ],
+      { duration: MASUK_MS, easing: "cubic-bezier(.22,1,.36,1)", fill: "both" }
+    );
+
+    setTimeout(function () {
+      if (!target.isConnected) return;
+      target.animate(
+        [
+          { transform: "translateX(0)", opacity: 1 },
+          { transform: "translateX(" + JARAK + ")", opacity: 0 }
+        ],
+        { duration: KELUAR_MS, easing: "cubic-bezier(.4,0,.9,.3)", fill: "forwards" }
+      );
+    }, TAHAN_MS);
+  }
+
+  function sapu(akar) {
+    akar.querySelectorAll('[data-testid="stToast"]').forEach(animasikan);
+  }
+
+  sapu(doc);
+  new MutationObserver(function (list) {
+    list.forEach(function (m) {
+      m.addedNodes.forEach(function (n) {
+        if (n.nodeType !== 1) return;
+        if (n.matches && n.matches('[data-testid="stToast"]')) animasikan(n);
+        else if (n.querySelectorAll) sapu(n);
+      });
+    });
+  }).observe(doc.body, { childList: true, subtree: true });
+})();
+</script>
+""",
+        height=0,
     )
 
 
