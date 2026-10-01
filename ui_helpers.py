@@ -858,18 +858,24 @@ def render_message(msg: dict) -> None:
         # kali halaman digambar ulang.
         thread = active_thread()
         baru = bool(thread) and thread[-1] is msg
-        # Preview gambar dibungkus container berkunci supaya ukurannya kecil
-        # dan posisinya bisa digeser lewat IMG_LEBAR / IMG_GESER_X / IMG_GESER_Y.
+        # Preview gambar hanya DIBATASI lebarnya; posisi kiri/kanan dibiarkan
+        # mengikuti tata letak halaman masing-masing (chat, AI Image, dll).
+        # Geseran hanya ditulis kalau knob-nya memang diisi, supaya tidak
+        # menarik gambar keluar dari kolom kontennya.
+        _geser = ""
+        if IMG_GESER_X or IMG_GESER_Y:
+            _geser = (
+                "position:relative!important;"
+                "left:" + str(IMG_GESER_X) + "px!important;"
+                "top:" + str(IMG_GESER_Y) + "px!important;"
+            )
         st.markdown(
             "<style>"
             'body .stApp [class*="st-key-img_prev_"],'
             'body .stApp [class*="st-key-img_pop_"]{'
-            "position:relative!important;"
-            "left:" + str(IMG_GESER_X) + "px!important;"
-            "top:" + str(IMG_GESER_Y) + "px!important;"
+            + _geser +
             "width:100%!important;"
-            "max-width:" + str(IMG_LEBAR) + "px!important;"
-            "margin-left:0!important;margin-right:auto!important;}"
+            "max-width:" + str(IMG_LEBAR) + "px!important;}"
             'body .stApp [class*="st-key-img_prev_"] img,'
             'body .stApp [class*="st-key-img_pop_"] img{'
             "width:100%!important;"
