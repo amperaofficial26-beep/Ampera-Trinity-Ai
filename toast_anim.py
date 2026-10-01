@@ -48,9 +48,12 @@ def inject_toast_anim() -> None:
     0 10px 28px rgba(44, 31, 51, .12),
     0 1px 2px rgba(44, 31, 51, .06) !important;
 
+  will-change: transform, opacity !important;
+
   animation:
-    trinityToastMasuk 220ms cubic-bezier(.2, .8, .2, 1) both,
-    trinityToastKeluar 260ms ease-in {DURASI_MS}ms forwards !important;
+    trinityToastMasuk 320ms cubic-bezier(.22, 1, .36, 1) both,
+    trinityToastKeluar 300ms cubic-bezier(.4, 0, .9, .3)
+      {DURASI_MS}ms forwards !important;
 }}
 
 /* Garis aksen tipis di tepi kiri sebagai penanda merek. */
@@ -126,14 +129,17 @@ def inject_toast_anim() -> None:
 /* ---------------------------------------------------------------
    ANIMASI — halus dan singkat, tanpa kilau berlebihan
    --------------------------------------------------------------- */
+/* Masuk: meluncur dari kanan ke kiri. */
 @keyframes trinityToastMasuk {{
-  from {{ opacity: 0; transform: translateY(10px) scale(.985); }}
-  to   {{ opacity: 1; transform: none; }}
+  from {{ opacity: 0; transform: translateX(calc(100% + 32px)); }}
+  60%  {{ opacity: 1; }}
+  to   {{ opacity: 1; transform: translateX(0); }}
 }}
 
+/* Keluar: meluncur dari kiri ke kanan. */
 @keyframes trinityToastKeluar {{
-  from {{ opacity: 1; transform: none; }}
-  to   {{ opacity: 0; transform: translateY(-6px) scale(.99); }}
+  from {{ opacity: 1; transform: translateX(0); }}
+  to   {{ opacity: 0; transform: translateX(calc(100% + 32px)); }}
 }}
 
 @media (max-width: 640px) {{
