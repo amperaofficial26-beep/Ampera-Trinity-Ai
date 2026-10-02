@@ -33,7 +33,7 @@ MOBILE_BP = 820
 PANEL_LEBAR_VW = 86
 PANEL_LEBAR_MAX = 320
 FAB_KANAN = 14
-FAB_BAWAH = 108
+FAB_BAWAH = 156
 HALAMAN_BERPANEL = ("chat", "image")
 
 # Kunci session_state untuk keadaan buka/tutup panel kanan.
@@ -62,6 +62,22 @@ _TOMBOL_SB = (
     '[data-testid="stSidebarCollapseButton"]',
     'button[kind="headerNoPadding"]',
 )
+
+
+def _kuat(bagian: str, isi: str) -> str:
+    """Bangun aturan CSS dengan spesifisitas tinggi.
+
+    Aturan desktop banyak memakai bentuk `.stApp:has(.tr-chat-layout) X`.
+    Supaya versi mobile selalu menang, setiap selektor ditulis ulang dengan
+    awalan `body .stApp:has(<layout>)` untuk tiap layout yang dikenal.
+    """
+    bagian_list = [b.strip() for b in bagian.split(",") if b.strip()]
+    sel = []
+    for b in bagian_list:
+        sel.append("body .stApp " + b)
+        for lay in _LAYOUT:
+            sel.append("body .stApp:has(" + lay + ") " + b)
+    return ",".join(sel) + "{" + isi + "}"
 
 
 def _tombol_sidebar_css() -> str:
@@ -134,43 +150,64 @@ def inject_mobile_css() -> None:
         "--tr-gap:10px;"
         "--aiimg-panel-w:0px;}"
 
-        # Input chat: lebar penuh, tanpa geseran sisa hitungan desktop.
-        'body .stApp [data-testid="stBottom"],'
-        'body .stApp [data-testid="stBottomBlockContainer"]{'
-        "transform:none!important;"
-        "width:100%!important;max-width:100%!important;"
-        "margin-left:0!important;margin-right:0!important;}"
-
-        # Sapaan besar di beranda dikecilkan agar tidak terpotong.
-        "body .stApp .trinity-greeting{"
-        "margin-top:10vh!important;text-align:center!important;}"
-        "body .stApp .trinity-greeting h1,"
-        "body .stApp .trinity-greeting h2,"
-        "body .stApp .trinity-greeting .greet-title{"
-        "font-size:clamp(1.5rem,7vw,2.1rem)!important;"
-        "line-height:1.2!important;word-break:normal!important;}"
-
         # ---------- 1. ISI HALAMAN MEMAKAI LEBAR PENUH ----------
-        'body .stApp [data-testid="stMainBlockContainer"],'
-        'body .stApp .stMainBlockContainer{'
-        "width:100%!important;max-width:none!important;"
-        "margin:0!important;"
-        "padding:76px 12px 132px!important;}"
-
-        'body .stApp [data-testid="stBottomBlockContainer"]{'
-        "width:100%!important;max-width:none!important;"
-        "margin-left:0!important;margin-right:0!important;"
-        "padding-left:8px!important;padding-right:8px!important;}"
-
-        # Topbar chat ikut melebar, tidak lagi menyisakan ruang panel.
-        "body .stApp .st-key-chat_topbar,"
-        "body .stApp:has(.tr-chat-layout) .st-key-chat_topbar{"
-        "left:62px!important;right:10px!important;top:8px!important;"
-        "width:auto!important;max-width:none!important;"
-        "padding:6px!important;}"
-
+        + ("html,body,.stApp,[data-testid=\"stAppViewContainer\"]{"
+           "overflow-x:hidden!important;max-width:100vw!important;}")
+        + _kuat(
+            '[data-testid="stMain"], [data-testid="stMain"] > div',
+            "margin-left:0!important;margin-right:0!important;"
+            "width:100%!important;max-width:100vw!important;"
+            "padding-left:0!important;padding-right:0!important;"
+        )
+        + _kuat(
+            '[data-testid="stMainBlockContainer"], .stMainBlockContainer',
+            "width:100%!important;max-width:100vw!important;"
+            "margin:0!important;"
+            "padding:72px 12px 150px!important;"
+        )
+        + _kuat(
+            '[data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"]',
+            "width:100%!important;max-width:100%!important;"
+            "min-width:0!important;margin:0!important;"
+        )
+        + _kuat(
+            '[data-testid="stBottom"], [data-testid="stBottomBlockContainer"]',
+            "transform:none!important;"
+            "width:100%!important;max-width:100vw!important;"
+            "margin-left:0!important;margin-right:0!important;"
+            "padding-left:8px!important;padding-right:8px!important;"
+        )
+        + _kuat(
+            '[data-testid="stBottomBlockContainer"] > *',
+            "width:100%!important;max-width:100%!important;"
+            "margin-left:0!important;margin-right:0!important;"
+        )
+        # Sapaan besar di beranda dikecilkan agar tidak terpotong.
+        + _kuat(
+            ".trinity-greeting",
+            "margin-top:8vh!important;width:100%!important;"
+            "max-width:100%!important;text-align:center!important;"
+        )
+        + _kuat(
+            ".trinity-greeting h1, .trinity-greeting h2,"
+            ".trinity-greeting p, .trinity-greeting div",
+            "font-size:clamp(1.35rem,6.4vw,1.95rem)!important;"
+            "line-height:1.22!important;white-space:normal!important;"
+            "word-break:normal!important;"
+        )
+        + _kuat(
+            ".trinity-greeting p.sub, .trinity-greeting small",
+            "font-size:.82rem!important;"
+        )
+        # Topbar chat
+        + _kuat(
+            ".st-key-chat_topbar",
+            "left:60px!important;right:8px!important;top:8px!important;"
+            "width:auto!important;max-width:none!important;"
+            "padding:6px!important;"
+        )
         # ---------- 2. SIDEBAR JADI LAPISAN MENGAMBANG ----------
-        'body .stApp section[data-testid="stSidebar"],'
+        + 'body .stApp section[data-testid="stSidebar"],'
         'body .stApp:has(.tr-chat-layout) section[data-testid="stSidebar"],'
         'body .stApp:has(.tr-multi-ai-layout) section[data-testid="stSidebar"],'
         'body .stApp:has(.aiimg-page-shell) section[data-testid="stSidebar"]{'
