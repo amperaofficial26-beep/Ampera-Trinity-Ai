@@ -66,7 +66,7 @@ body .stApp:has(.about-page-shell)
         radial-gradient(2px 2px at 54% 72%, rgba(154, 128, 173, .40), transparent),
         radial-gradient(2px 2px at 88% 30%, rgba(201, 170, 93, .35), transparent);
 }
-.ab-hero-copy { flex: 1 1 46%; min-width: 0; z-index: 1; }
+.ab-hero-copy { flex: 1 1 40%; min-width: 0; z-index: 1; }
 .ab-badge {
     display: inline-block;
     margin-bottom: 12px;
@@ -118,10 +118,13 @@ body .stApp:has(.about-page-shell)
 /* ---- Maskot ---- */
 .ab-hero-art {
     position: relative;
-    flex: 0 1 260px;
+    flex: 1 1 260px;
     display: flex;
     align-items: flex-end;
-    justify-content: center;
+    /* maskot dirapatkan ke teks (geser kiri) — ubah angka ini kalau
+       ingin lebih mepet atau lebih renggang */
+    justify-content: flex-start;
+    margin-left: -26px;
     z-index: 1;
 }
 .ab-maskot {
@@ -151,7 +154,7 @@ body .stApp:has(.about-page-shell)
 
 /* ---- Lencana AOG ---- */
 .ab-hero-brand {
-    flex: 0 0 150px;
+    flex: 0 0 196px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -165,9 +168,9 @@ body .stApp:has(.about-page-shell)
 .ab-brand-mark {
     display: grid;
     place-items: center;
-    width: 54px;
-    height: 54px;
-    margin-bottom: 4px;
+    width: 86px;
+    height: 86px;
+    margin-bottom: 6px;
 }
 .ab-brand-mark img.ab-brand-logo {
     width: 100% !important;
@@ -178,20 +181,20 @@ body .stApp:has(.about-page-shell)
 .ab-brand-name {
     color: #2E2040;
     font-family: Georgia, "Times New Roman", serif;
-    font-size: 1.85rem;
+    font-size: 2.6rem;
     font-weight: 700;
     letter-spacing: .06em;
     line-height: 1;
 }
 .ab-brand-sub {
     color: #6B5B45;
-    font-size: .6rem;
+    font-size: .74rem;
     font-weight: 700;
     letter-spacing: .14em;
 }
 .ab-brand-sub2 {
     color: #9A8B7A;
-    font-size: .58rem;
+    font-size: .68rem;
     font-weight: 600;
     letter-spacing: .3em;
 }
@@ -318,27 +321,23 @@ body .stApp:has(.about-page-shell)
     background: linear-gradient(135deg, #3B2B50 0%, #513663 48%, #7A4F63 100%);
     box-shadow: 0 16px 38px rgba(46, 32, 64, .28);
 }
-.ab-quote-sky {
+.ab-quote-foto {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 42%;
+}
+.ab-quote-tint {   /* lapisan gelap agar teks tetap terbaca */
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(60% 80% at 82% 22%, rgba(243, 198, 134, .45), transparent 65%),
-        radial-gradient(2px 2px at 24% 24%, rgba(255, 255, 255, .55), transparent),
-        radial-gradient(2px 2px at 44% 14%, rgba(255, 255, 255, .4), transparent),
-        radial-gradient(2px 2px at 66% 40%, rgba(255, 255, 255, .35), transparent);
-}
-.ab-quote-city {   /* siluet kota + pantulan air */
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 46%;
-    background:
-        linear-gradient(180deg, rgba(27, 18, 38, 0) 0%,
-                        rgba(27, 18, 38, .55) 55%, rgba(27, 18, 38, .8) 100%),
-        repeating-linear-gradient(90deg,
-            rgba(255, 228, 176, .22) 0 3px,
-            transparent 3px 16px);
+        linear-gradient(100deg, rgba(32, 20, 48, .88) 0%,
+                        rgba(44, 28, 62, .72) 45%,
+                        rgba(60, 34, 60, .45) 100%),
+        linear-gradient(180deg, rgba(20, 12, 30, .25) 0%,
+                        rgba(20, 12, 30, .55) 100%);
 }
 .ab-quote-text {
     position: relative;
