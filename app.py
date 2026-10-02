@@ -69,6 +69,7 @@ from ui_helpers import (
     logo_img_html, render_message,
 )
 from anim import inject_anim_css, inject_page_anim
+from page_tentang import page_tentang
 from toast_anim import inject_toast_anim
 from panel_file import render_file_dock          # ← BARIS BARU
 from page_desain import page_desain
@@ -2517,6 +2518,8 @@ def main() -> None:
         page_tingkatkan()
     elif page == "aplikasi":
         page_aplikasi()
+    elif page == "tentang":
+        page_tentang()
     elif page == "kursus":
         page_kursus()
     elif page == "pelajari":
