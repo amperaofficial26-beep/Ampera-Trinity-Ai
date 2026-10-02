@@ -46,6 +46,56 @@ _PANEL = (
 )
 
 
+# Layout yang di desktop menyembunyikan tombol sidebar — harus dilawan
+# satu per satu supaya spesifisitas CSS-nya menang.
+_LAYOUT = (
+    ".tr-chat-layout",
+    ".tr-multi-ai-layout",
+    ".aiimg-page-shell",
+)
+
+# Semua nama tombol buka/tutup sidebar di berbagai versi Streamlit.
+_TOMBOL_SB = (
+    '[data-testid="stSidebarCollapsedControl"]',
+    '[data-testid="collapsedControl"]',
+    '[data-testid="stExpandSidebarButton"]',
+    '[data-testid="stSidebarCollapseButton"]',
+    'button[kind="headerNoPadding"]',
+)
+
+
+def _tombol_sidebar_css() -> str:
+    """CSS yang memaksa tombol buka/tutup sidebar muncul di mobile."""
+    sel = []
+    for t in _TOMBOL_SB:
+        sel.append("body .stApp " + t)
+        for lay in _LAYOUT:
+            sel.append("body .stApp:has(" + lay + ") " + t)
+    tampil = (
+        ",".join(sel) + "{"
+        "display:flex!important;visibility:visible!important;"
+        "opacity:1!important;pointer-events:auto!important;"
+        "z-index:1000002!important;}"
+    )
+    # Tombol "buka" (saat sidebar tertutup) dipaku di pojok kiri atas.
+    buka = []
+    for t in _TOMBOL_SB[:3]:
+        buka.append("body .stApp " + t)
+        for lay in _LAYOUT:
+            buka.append("body .stApp:has(" + lay + ") " + t)
+    paku = (
+        ",".join(buka) + "{"
+        "position:fixed!important;top:10px!important;left:10px!important;"
+        "right:auto!important;"
+        "align-items:center!important;justify-content:center!important;"
+        "width:42px!important;height:42px!important;"
+        "border-radius:12px!important;"
+        "background:#F2E8D6!important;"
+        "box-shadow:0 6px 18px rgba(76,58,43,.18)!important;}"
+    )
+    return tampil + paku
+
+
 def _sel(akhiran: str = "") -> str:
     """Gabungkan daftar panel jadi satu selektor CSS."""
     return ",".join(p + akhiran for p in _PANEL)
@@ -82,11 +132,21 @@ def inject_mobile_css() -> None:
         "left:0!important;z-index:1000000!important;"
         "width:min(84vw,300px)!important;min-width:0!important;"
         "box-shadow:0 0 44px rgba(46,32,64,.28)!important;}"
-        # Tombol buka/tutup sidebar bawaan Streamlit dibuat selalu terlihat.
-        'body .stApp [data-testid="stSidebarCollapsedControl"],'
-        'body .stApp [data-testid="stSidebarCollapseButton"]{'
-        "display:block!important;visibility:visible!important;"
-        "opacity:1!important;z-index:1000002!important;}"
+        # Tombol buka/tutup sidebar bawaan Streamlit WAJIB terlihat.
+        # Di desktop, part07_dashboard_layout.py sengaja menyembunyikannya
+        # (sidebar selalu terbuka), jadi di sini selektornya dibuat lebih
+        # kuat: body + .stApp:has(<layout>) supaya menang di cascade.
+        + _tombol_sidebar_css() +
+
+        # Halaman yang memang tanpa sidebar (Tingkatkan paket, Dapatkan
+        # aplikasi, Tentang kami): tombolnya tidak perlu muncul.
+        '.stApp:has(.upgrade-page-shell) [data-testid="stSidebarCollapsedControl"],'
+        '.stApp:has(.appdl-page-shell) [data-testid="stSidebarCollapsedControl"],'
+        '.stApp:has(.about-page-shell) [data-testid="stSidebarCollapsedControl"],'
+        '.stApp:has(.upgrade-page-shell) [data-testid="collapsedControl"],'
+        '.stApp:has(.appdl-page-shell) [data-testid="collapsedControl"],'
+        '.stApp:has(.about-page-shell) [data-testid="collapsedControl"]{'
+        "display:none!important;}"
 
         # ---------- 3. PANEL KANAN JADI LACI GESER ----------
         + _sel() + "{"
