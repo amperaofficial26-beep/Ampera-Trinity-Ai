@@ -471,6 +471,9 @@ def render_sidebar(page: str | None = None) -> None:
                         if st.button(":material/phone_iphone:  Dapatkan aplikasi",
                                      key="acct_app", use_container_width=True):
                             go("aplikasi")
+                        if st.button(":material/info:  Tentang kami",
+                                     key="acct_tentang", use_container_width=True):
+                            go("tentang")
                         if st.button(":material/school:  Trinity kursus", key="acct_kursus",
                                      use_container_width=True):
                             go("kursus")
