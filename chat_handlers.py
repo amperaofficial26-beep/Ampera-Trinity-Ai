@@ -105,7 +105,7 @@ _STOP_BTN_CSS = (
 LOADER_GESER = {
     "chat": (-160, 0),        # chat utama
     "image": (0, 0),          # halaman AI Gambar
-    "desain": (-160, 0),      # AI Desain
+    "desain": (0, 0),      # AI Desain
     "jadwal": (0, 0),         # Jadwal
     "multi_agent": (0, 0),    # Multi AI
     "default": (0, 0),
