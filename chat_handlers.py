@@ -99,7 +99,7 @@ _STOP_BTN_CSS = (
 #   LOADER_GESER_Y : negatif = geser ke ATAS, positif = ke BAWAH (px).
 #   Isi 0 = biarkan mengikuti posisi normal kolom chat.
 # ============================================================================
-LOADER_GESER_X = 0
+LOADER_GESER_X = -160
 LOADER_GESER_Y = 0
 
 
