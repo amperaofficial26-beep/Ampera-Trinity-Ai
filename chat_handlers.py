@@ -94,19 +94,25 @@ _STOP_BTN_CSS = (
 # mencegah kedipan jika API gambar menjawab sangat cepat.
 # ============================================================================
 # POSISI LOADER "YUKI SEDANG BERPIKIR"  <<< UBAH DI SINI
-#   Negatif = geser ke kiri, positif = ke kanan (px).
+#   Berlaku untuk loader berpikir di chat utama DAN loader pembuatan gambar.
+#   LOADER_GESER_X : negatif = geser ke KIRI, positif = ke KANAN (px).
+#   LOADER_GESER_Y : negatif = geser ke ATAS, positif = ke BAWAH (px).
+#   Isi 0 = biarkan mengikuti posisi normal kolom chat.
 # ============================================================================
 LOADER_GESER_X = 0
+LOADER_GESER_Y = 0
+
 
 def _loader_geser_css(kelas: str) -> str:
-    """CSS geser loader — hanya ditulis bila LOADER_GESER_X memang diisi,
+    """CSS geser loader — hanya ditulis bila knob-nya memang diisi,
     supaya loader tidak tertarik keluar dari kolom kontennya."""
-    if not LOADER_GESER_X:
+    if not LOADER_GESER_X and not LOADER_GESER_Y:
         return ""
     return (
         'body .stApp [class*="' + kelas + '"] iframe{'
         "position:relative!important;"
-        "left:" + str(LOADER_GESER_X) + "px!important;}"
+        "left:" + str(LOADER_GESER_X) + "px!important;"
+        "top:" + str(LOADER_GESER_Y) + "px!important;}"
     )
 
 
