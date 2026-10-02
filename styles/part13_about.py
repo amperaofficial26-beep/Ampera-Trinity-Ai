@@ -318,45 +318,50 @@ body .stApp:has(.about-page-shell)
     overflow: hidden;
     padding: 24px 26px;
     border-radius: 22px;
-    background: linear-gradient(135deg, #3B2B50 0%, #513663 48%, #7A4F63 100%);
+    background: #2A1B3D;
     box-shadow: 0 16px 38px rgba(46, 32, 64, .28);
 }
 .ab-quote-foto {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center 42%;
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    min-width: 100% !important;
+    object-fit: cover !important;
+    object-position: center 45% !important;
+    border-radius: 0 !important;
 }
-.ab-quote-tint {   /* lapisan gelap agar teks tetap terbaca */
+.ab-quote-tint {   /* lapisan tipis saja — foto tetap terlihat jelas */
     position: absolute;
     inset: 0;
     background:
-        linear-gradient(100deg, rgba(32, 20, 48, .88) 0%,
-                        rgba(44, 28, 62, .72) 45%,
-                        rgba(60, 34, 60, .45) 100%),
-        linear-gradient(180deg, rgba(20, 12, 30, .25) 0%,
-                        rgba(20, 12, 30, .55) 100%);
+        linear-gradient(100deg, rgba(28, 16, 44, .62) 0%,
+                        rgba(32, 20, 50, .34) 52%,
+                        rgba(32, 20, 50, .12) 100%);
 }
-.ab-quote-text {
+.ab-quote-text,
+.ab-quote .ab-quote-text,
+.ab-quote p.ab-quote-text {
     position: relative;
-    z-index: 1;
+    z-index: 2;
     margin: 0 0 10px !important;
-    color: #FFF6E7 !important;
+    color: #FFFFFF !important;
     font-family: Georgia, "Times New Roman", serif;
     font-size: 1.04rem !important;
     font-style: italic;
     font-weight: 600 !important;
     line-height: 1.6 !important;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, .3);
+    text-shadow: 0 2px 6px rgba(0, 0, 0, .75),
+                 0 1px 18px rgba(0, 0, 0, .55) !important;
 }
 .ab-quote-by {
     position: relative;
-    z-index: 1;
-    color: rgba(255, 240, 220, .8);
+    z-index: 2;
+    color: #FFF2DF !important;
     font-size: .8rem;
-    font-weight: 600;
+    font-weight: 700;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, .7);
 }
 
 /* ================================================================
