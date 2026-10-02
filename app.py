@@ -69,6 +69,7 @@ from ui_helpers import (
     logo_img_html, render_message,
 )
 from anim import inject_anim_css, inject_page_anim
+from mobile import inject_mobile_css, render_panel_toggle
 from page_tentang import page_tentang
 from toast_anim import inject_toast_anim
 from panel_file import render_file_dock          # ← BARIS BARU
@@ -2450,6 +2451,8 @@ def main() -> None:
     inject_css()
     inject_toast_anim()
     inject_anim_css()
+    # Penyesuaian khusus layar mobile (sidebar & panel kanan bisa buka tutup).
+    inject_mobile_css()
     # Lapisan tampilan pilihan User (wallpaper & warna) — HARUS sesudah
     # inject_css() supaya menimpa tema bawaan, bukan tertimpa.
     inject_tampilan()
@@ -2506,6 +2509,8 @@ def main() -> None:
         st.session_state["_last_page"] = page
     
         inject_page_anim()
+    render_panel_toggle(page)
+
     if page == "artefak":
         page_artefak()
     elif page == "pengaturan":
