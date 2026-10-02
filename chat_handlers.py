@@ -93,20 +93,42 @@ _STOP_BTN_CSS = (
 # Siklus frasa desain tetap 15 detik di loading_params.py; angka ini hanya
 # mencegah kedipan jika API gambar menjawab sangat cepat.
 # ============================================================================
-# POSISI LOADER "YUKI SEDANG BERPIKIR"  <<< UBAH DI SINI
-#   Negatif = geser ke kiri, positif = ke kanan (px).
+# POSISI LOADER "SEDANG BERPIKIR" / "SEDANG MEMBUAT GAMBAR"
+#   <<< UBAH DI SINI — SETIAP HALAMAN PUNYA ANGKANYA SENDIRI >>>
+#
+#   Kunci dict = nama halaman (st.session_state["page"]).
+#   Nilainya (geser_x, geser_y) dalam piksel:
+#       x : negatif = ke KIRI, positif = ke KANAN
+#       y : negatif = ke ATAS, positif = ke BAWAH
+#   "default" dipakai untuk halaman yang tidak disebut di sini.
 # ============================================================================
-LOADER_GESER_X = -170
+LOADER_GESER = {
+    "chat": (-160, 0),        # chat utama
+    "image": (0, 0),          # halaman AI Gambar
+    "desain": (-160, 0),      # AI Desain
+    "jadwal": (0, 0),         # Jadwal
+    "multi_agent": (0, 0),    # Multi AI
+    "default": (0, 0),
+}
+
+
+def _loader_geser() -> tuple[int, int]:
+    """Ambil geseran loader sesuai halaman yang sedang dibuka."""
+    halaman = st.session_state.get("page", "chat")
+    return LOADER_GESER.get(halaman, LOADER_GESER["default"])
+
 
 def _loader_geser_css(kelas: str) -> str:
-    """CSS geser loader — hanya ditulis bila LOADER_GESER_X memang diisi,
-    supaya loader tidak tertarik keluar dari kolom kontennya."""
-    if not LOADER_GESER_X:
+    """CSS geser loader — hanya ditulis bila halaman ini memang diberi
+    geseran, supaya loader tidak tertarik keluar dari kolom kontennya."""
+    gx, gy = _loader_geser()
+    if not gx and not gy:
         return ""
     return (
         'body .stApp [class*="' + kelas + '"] iframe{'
         "position:relative!important;"
-        "left:" + str(LOADER_GESER_X) + "px!important;}"
+        "left:" + str(gx) + "px!important;"
+        "top:" + str(gy) + "px!important;}"
     )
 
 
