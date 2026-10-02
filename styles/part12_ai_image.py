@@ -608,4 +608,37 @@ CSS = r"""
     .aiimg-hero h2 { font-size: 1.55rem; }
     .aiimg-hero-tags span { font-size: 0.72rem; }
 }
+
+/* ================================================================
+   HASIL GAMBAR & LOADER DI HALAMAN AI IMAGE
+   Keduanya dipaku sejajar dengan teks percakapan, tidak boleh melar
+   atau tertarik ke tepi kiri layar.
+
+   --aiimg-hasil-x : geser halus kiri/kanan (px). 0 = sejajar teks.
+   ================================================================ */
+.stApp:has(.aiimg-page-shell) {
+    --aiimg-hasil-x: 0px;
+}
+.stApp:has(.aiimg-page-shell) [class*="st-key-img_prev_"],
+.stApp:has(.aiimg-page-shell) [class*="st-key-img_pop_"],
+.stApp:has(.aiimg-page-shell) [class*="st-key-img_loader_slot"],
+.stApp:has(.aiimg-page-shell) [class*="st-key-yuki_loader_slot"] {
+    position: static !important;
+    left: auto !important;
+    right: auto !important;
+    margin-left: var(--aiimg-hasil-x) !important;
+    margin-right: auto !important;
+    align-items: flex-start !important;
+}
+.stApp:has(.aiimg-page-shell) [class*="st-key-img_loader_slot"] iframe,
+.stApp:has(.aiimg-page-shell) [class*="st-key-yuki_loader_slot"] iframe {
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    margin-left: 0 !important;
+}
+.stApp:has(.aiimg-page-shell)
+[data-testid="stMainBlockContainer"] div.stDownloadButton {
+    margin-left: var(--aiimg-hasil-x) !important;
+}
 """
