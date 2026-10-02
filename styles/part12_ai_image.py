@@ -623,20 +623,14 @@ CSS = r"""
 .stApp:has(.aiimg-page-shell) [class*="st-key-img_pop_"],
 .stApp:has(.aiimg-page-shell) [class*="st-key-img_loader_slot"],
 .stApp:has(.aiimg-page-shell) [class*="st-key-yuki_loader_slot"] {
-    position: static !important;
     left: auto !important;
     right: auto !important;
     margin-left: var(--aiimg-hasil-x) !important;
     margin-right: auto !important;
     align-items: flex-start !important;
 }
-.stApp:has(.aiimg-page-shell) [class*="st-key-img_loader_slot"] iframe,
-.stApp:has(.aiimg-page-shell) [class*="st-key-yuki_loader_slot"] iframe {
-    position: static !important;
-    left: auto !important;
-    top: auto !important;
-    margin-left: 0 !important;
-}
+/* Catatan: iframe loader sengaja TIDAK dikunci di sini, supaya knob
+   LOADER_GESER di chat_handlers.py tetap bisa menggesernya per halaman. */
 .stApp:has(.aiimg-page-shell)
 [data-testid="stMainBlockContainer"] div.stDownloadButton {
     margin-left: var(--aiimg-hasil-x) !important;

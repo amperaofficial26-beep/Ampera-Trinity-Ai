@@ -93,26 +93,42 @@ _STOP_BTN_CSS = (
 # Siklus frasa desain tetap 15 detik di loading_params.py; angka ini hanya
 # mencegah kedipan jika API gambar menjawab sangat cepat.
 # ============================================================================
-# POSISI LOADER "YUKI SEDANG BERPIKIR"  <<< UBAH DI SINI
-#   Berlaku untuk loader berpikir di chat utama DAN loader pembuatan gambar.
-#   LOADER_GESER_X : negatif = geser ke KIRI, positif = ke KANAN (px).
-#   LOADER_GESER_Y : negatif = geser ke ATAS, positif = ke BAWAH (px).
-#   Isi 0 = biarkan mengikuti posisi normal kolom chat.
+# POSISI LOADER "SEDANG BERPIKIR" / "SEDANG MEMBUAT GAMBAR"
+#   <<< UBAH DI SINI — SETIAP HALAMAN PUNYA ANGKANYA SENDIRI >>>
+#
+#   Kunci dict = nama halaman (st.session_state["page"]).
+#   Nilainya (geser_x, geser_y) dalam piksel:
+#       x : negatif = ke KIRI, positif = ke KANAN
+#       y : negatif = ke ATAS, positif = ke BAWAH
+#   "default" dipakai untuk halaman yang tidak disebut di sini.
 # ============================================================================
-LOADER_GESER_X = 0
-LOADER_GESER_Y = 0
+LOADER_GESER = {
+    "chat": (-160, 0),        # chat utama
+    "image": (0, 0),          # halaman AI Gambar
+    "desain": (-160, 0),      # AI Desain
+    "jadwal": (0, 0),         # Jadwal
+    "multi_agent": (0, 0),    # Multi AI
+    "default": (0, 0),
+}
+
+
+def _loader_geser() -> tuple[int, int]:
+    """Ambil geseran loader sesuai halaman yang sedang dibuka."""
+    halaman = st.session_state.get("page", "chat")
+    return LOADER_GESER.get(halaman, LOADER_GESER["default"])
 
 
 def _loader_geser_css(kelas: str) -> str:
-    """CSS geser loader — hanya ditulis bila knob-nya memang diisi,
-    supaya loader tidak tertarik keluar dari kolom kontennya."""
-    if not LOADER_GESER_X and not LOADER_GESER_Y:
+    """CSS geser loader — hanya ditulis bila halaman ini memang diberi
+    geseran, supaya loader tidak tertarik keluar dari kolom kontennya."""
+    gx, gy = _loader_geser()
+    if not gx and not gy:
         return ""
     return (
         'body .stApp [class*="' + kelas + '"] iframe{'
         "position:relative!important;"
-        "left:" + str(LOADER_GESER_X) + "px!important;"
-        "top:" + str(LOADER_GESER_Y) + "px!important;}"
+        "left:" + str(gx) + "px!important;"
+        "top:" + str(gy) + "px!important;}"
     )
 
 
