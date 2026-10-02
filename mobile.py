@@ -110,6 +110,46 @@ def inject_mobile_css() -> None:
         "<style>"
         f"@media (max-width: {MOBILE_BP}px){{"
 
+        # ---------- 0. SETEL ULANG VARIABEL UKURAN DASHBOARD ----------
+        # part07/part09 menghitung posisi topbar, isi, dan input chat dari
+        # variabel ini. Di mobile semuanya dinolkan supaya tidak ada lagi
+        # ruang yang disisakan untuk sidebar & panel kanan.
+        ".stApp,"
+        ".stApp:has(.tr-chat-layout),"
+        ".stApp:has(.tr-multi-ai-layout),"
+        ".stApp:has(.aiimg-page-shell){"
+        "--dash-sidebar:0px;"
+        "--dash-rail:0px;"
+        "--dash-gap:10px;"
+        "--dash-top:8px;"
+        "--dash-bottom:8px;"
+        "--dash-center-left:10px;"
+        "--dash-center-right:10px;"
+        "--dash-center-width:calc(100vw - 20px);"
+        "--dash-content-width:calc(100vw - 20px);"
+        "--chat-width:calc(100vw - 20px);"
+        "--chat-shift:0px;"
+        "--tr-sidebar-width:0px;"
+        "--tr-right-width:0px;"
+        "--tr-gap:10px;"
+        "--aiimg-panel-w:0px;}"
+
+        # Input chat: lebar penuh, tanpa geseran sisa hitungan desktop.
+        'body .stApp [data-testid="stBottom"],'
+        'body .stApp [data-testid="stBottomBlockContainer"]{'
+        "transform:none!important;"
+        "width:100%!important;max-width:100%!important;"
+        "margin-left:0!important;margin-right:0!important;}"
+
+        # Sapaan besar di beranda dikecilkan agar tidak terpotong.
+        "body .stApp .trinity-greeting{"
+        "margin-top:10vh!important;text-align:center!important;}"
+        "body .stApp .trinity-greeting h1,"
+        "body .stApp .trinity-greeting h2,"
+        "body .stApp .trinity-greeting .greet-title{"
+        "font-size:clamp(1.5rem,7vw,2.1rem)!important;"
+        "line-height:1.2!important;word-break:normal!important;}"
+
         # ---------- 1. ISI HALAMAN MEMAKAI LEBAR PENUH ----------
         'body .stApp [data-testid="stMainBlockContainer"],'
         'body .stApp .stMainBlockContainer{'
@@ -123,15 +163,37 @@ def inject_mobile_css() -> None:
         "padding-left:8px!important;padding-right:8px!important;}"
 
         # Topbar chat ikut melebar, tidak lagi menyisakan ruang panel.
-        ".st-key-chat_topbar{"
-        "left:56px!important;right:10px!important;top:10px!important;}"
+        "body .stApp .st-key-chat_topbar,"
+        "body .stApp:has(.tr-chat-layout) .st-key-chat_topbar{"
+        "left:62px!important;right:10px!important;top:8px!important;"
+        "width:auto!important;max-width:none!important;"
+        "padding:6px!important;}"
 
         # ---------- 2. SIDEBAR JADI LAPISAN MENGAMBANG ----------
-        'body .stApp section[data-testid="stSidebar"]{'
+        'body .stApp section[data-testid="stSidebar"],'
+        'body .stApp:has(.tr-chat-layout) section[data-testid="stSidebar"],'
+        'body .stApp:has(.tr-multi-ai-layout) section[data-testid="stSidebar"],'
+        'body .stApp:has(.aiimg-page-shell) section[data-testid="stSidebar"]{'
         "position:fixed!important;top:0!important;bottom:0!important;"
         "left:0!important;z-index:1000000!important;"
-        "width:min(84vw,300px)!important;min-width:0!important;"
+        "width:min(84vw,300px)!important;"
+        "min-width:min(84vw,300px)!important;"
+        "max-width:min(84vw,300px)!important;"
+        "transition:transform .26s cubic-bezier(.22,1,.36,1)!important;"
         "box-shadow:0 0 44px rgba(46,32,64,.28)!important;}"
+        # Isi sidebar ikut melebar supaya tulisannya tidak menumpuk vertikal.
+        'body .stApp section[data-testid="stSidebar"] > div,'
+        'body .stApp section[data-testid="stSidebar"] [data-testid="stSidebarContent"],'
+        'body .stApp section[data-testid="stSidebar"] [data-testid="stVerticalBlock"]{'
+        "width:100%!important;min-width:0!important;max-width:100%!important;}"
+        # Saat ditutup, sidebar benar-benar keluar layar.
+        'body .stApp section[data-testid="stSidebar"][aria-expanded="false"]{'
+        "transform:translateX(-102%)!important;"
+        "box-shadow:none!important;}"
+        # Konten utama tidak pernah digeser oleh sidebar.
+        'body .stApp [data-testid="stMain"],'
+        'body .stApp [data-testid="stAppViewContainer"] > section:last-child{'
+        "margin-left:0!important;width:100%!important;max-width:100%!important;}"
         # Tombol buka/tutup sidebar bawaan Streamlit WAJIB terlihat.
         # Di desktop, part07_dashboard_layout.py sengaja menyembunyikannya
         # (sidebar selalu terbuka), jadi di sini selektornya dibuat lebih
