@@ -14,6 +14,7 @@ import streamlit as st
 
 from icons import mi
 from logo import LOGO_B64
+from foto_ampera import AMPERA_URL
 from maskot import MASKOT_URL
 from ui_helpers import _page_footer
 
@@ -175,8 +176,9 @@ def page_tentang() -> None:
     with kanan2:
         st.markdown(
             '<div class="ab-quote">'
-            '<div class="ab-quote-sky"></div>'
-            '<div class="ab-quote-city"></div>'
+            f'<img class="ab-quote-foto" src="{AMPERA_URL}" '
+            'alt="Jembatan Ampera, Palembang">'
+            '<div class="ab-quote-tint"></div>'
             f'<p class="ab-quote-text">“{KUTIPAN}”</p>'
             f'<span class="ab-quote-by">— {NAMA_GRUP}</span>'
             "</div>",
