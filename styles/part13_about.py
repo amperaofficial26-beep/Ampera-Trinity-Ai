@@ -118,7 +118,7 @@ body .stApp:has(.about-page-shell)
 /* ---- Maskot ---- */
 .ab-hero-art {
     position: relative;
-    flex: 0 1 300px;
+    flex: 0 1 260px;
     display: flex;
     align-items: flex-end;
     justify-content: center;
@@ -126,7 +126,7 @@ body .stApp:has(.about-page-shell)
 }
 .ab-maskot {
     width: 100%;
-    max-width: 290px;
+    max-width: 232px;
     height: auto;
     object-fit: contain;
     filter: drop-shadow(0 16px 26px rgba(76, 58, 43, .18));
