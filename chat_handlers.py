@@ -96,7 +96,7 @@ _STOP_BTN_CSS = (
 # POSISI LOADER "YUKI SEDANG BERPIKIR"  <<< UBAH DI SINI
 #   Negatif = geser ke kiri, positif = ke kanan (px).
 # ============================================================================
-LOADER_GESER_X = -160
+LOADER_GESER_X = -170
 
 def _loader_geser_css(kelas: str) -> str:
     """CSS geser loader — hanya ditulis bila LOADER_GESER_X memang diisi,
