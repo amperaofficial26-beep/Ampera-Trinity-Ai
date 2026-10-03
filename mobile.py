@@ -6,7 +6,7 @@ dan pesan permintaan maaf. Di desktop app tampil seperti biasa.
 
 from __future__ import annotations
 
-import streamlit as st
+import streamlit as st 
 
 from trinity_logo import LOGO_B64
 
