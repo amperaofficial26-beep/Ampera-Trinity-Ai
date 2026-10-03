@@ -145,6 +145,9 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+import mobile
+mobile.guard()
+
 def _clip_text(value: str, limit: int = 46) -> str:
     """Potong teks untuk panel ringkas tanpa memecah layout."""
     value = (value or "").strip()
