@@ -21,7 +21,12 @@ _MOBILE_KEYWORDS = ("android", "iphone", "ipod", "mobile", "windows phone")
 
 
 def is_mobile() -> bool:
-    """Deteksi HP lewat User-Agent. Aman: bila tidak terbaca, dianggap desktop."""
+    """Deteksi HP lewat User-Agent. ?mobile=1 memaksa mode mobile (untuk tes)."""
+    try:
+        if st.query_params.get("mobile") == "1":
+            return True
+    except Exception:
+        pass
     try:
         ua = (st.context.headers.get("User-Agent") or "").lower()
     except Exception:
