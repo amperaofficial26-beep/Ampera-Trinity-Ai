@@ -69,7 +69,7 @@ from ui_helpers import (
     logo_img_html, render_message,
 )
 from anim import inject_anim_css, inject_page_anim
-from mobile import inject_mobile_css, render_panel_toggle
+from mobile import inject_mobile_css, render_panel_toggle, guard
 from page_tentang import page_tentang
 from toast_anim import inject_toast_anim
 from panel_file import render_file_dock          # ← BARIS BARU
