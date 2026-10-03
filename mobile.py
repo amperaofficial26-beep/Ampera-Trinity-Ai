@@ -71,3 +71,11 @@ def guard() -> None:
     if is_mobile():
         render_mobile_notice()
         st.stop()
+
+# --- Dipertahankan supaya app.py lama tidak error. Sengaja tidak melakukan apa-apa. ---
+def inject_mobile_css(*args, **kwargs) -> None:
+    return None
+
+
+def render_panel_toggle(*args, **kwargs) -> None:
+    return None
