@@ -30,6 +30,10 @@ import streamlit as st
 #                     di halaman-halaman ini).
 # ============================================================================
 MOBILE_BP = 820
+# Lebar sidebar saat dibuka di mobile.
+SIDEBAR_LEBAR = "min(78vw, 268px)"
+# Perkecil seluruh ukuran berbasis rem (1rem = angka ini).
+SKALA_FONT_PX = 14
 PANEL_LEBAR_VW = 86
 PANEL_LEBAR_MAX = 320
 FAB_KANAN = 14
@@ -130,11 +134,12 @@ def inject_mobile_css() -> None:
         # part07/part09 menghitung posisi topbar, isi, dan input chat dari
         # variabel ini. Di mobile semuanya dinolkan supaya tidak ada lagi
         # ruang yang disisakan untuk sidebar & panel kanan.
+        f"html{{font-size:{SKALA_FONT_PX}px;}}"
         ".stApp,"
         ".stApp:has(.tr-chat-layout),"
         ".stApp:has(.tr-multi-ai-layout),"
         ".stApp:has(.aiimg-page-shell){"
-        "--dash-sidebar:0px;"
+        f"--dash-sidebar:{SIDEBAR_LEBAR};"
         "--dash-rail:0px;"
         "--dash-gap:10px;"
         "--dash-top:8px;"
@@ -199,6 +204,23 @@ def inject_mobile_css() -> None:
             ".trinity-greeting p.sub, .trinity-greeting small",
             "font-size:.82rem!important;"
         )
+        # Kotak input chat diperkecil supaya tidak memenuhi layar.
+        + _kuat(
+            '[data-testid="stBottomBlockContainer"] [data-testid="stChatInput"],'
+            '[data-testid="stBottomBlockContainer"] textarea',
+            "font-size:.9rem!important;min-height:0!important;"
+        )
+        + _kuat(
+            '[data-testid="stBottomBlockContainer"] button',
+            "min-height:34px!important;width:34px!important;"
+            "height:34px!important;padding:0!important;"
+        )
+        # Sapaan benar-benar di tengah.
+        + _kuat(
+            ".trinity-greeting, .trinity-greeting *",
+            "margin-left:auto!important;margin-right:auto!important;"
+            "text-align:center!important;"
+        )
         # Topbar chat
         + _kuat(
             ".st-key-chat_topbar",
@@ -213,9 +235,9 @@ def inject_mobile_css() -> None:
         'body .stApp:has(.aiimg-page-shell) section[data-testid="stSidebar"]{'
         "position:fixed!important;top:0!important;bottom:0!important;"
         "left:0!important;z-index:1000000!important;"
-        "width:min(84vw,300px)!important;"
-        "min-width:min(84vw,300px)!important;"
-        "max-width:min(84vw,300px)!important;"
+        f"width:{SIDEBAR_LEBAR}!important;"
+        f"min-width:{SIDEBAR_LEBAR}!important;"
+        f"max-width:{SIDEBAR_LEBAR}!important;"
         "transition:transform .26s cubic-bezier(.22,1,.36,1)!important;"
         "box-shadow:0 0 44px rgba(46,32,64,.28)!important;}"
         # Isi sidebar ikut melebar supaya tulisannya tidak menumpuk vertikal.
@@ -248,6 +270,10 @@ def inject_mobile_css() -> None:
         "display:none!important;}"
 
         # ---------- 3. PANEL KANAN JADI LACI GESER ----------
+        # part07 menyembunyikan panel di bawah 1180px — dilawan di sini.
+        + _kuat(".st-key-chat_right_rail, .st-key-aiimg_panel",
+                "display:flex!important;visibility:visible!important;"
+                "opacity:1!important;")
         + _sel() + "{"
         "position:fixed!important;top:0!important;bottom:0!important;"
         "right:0!important;left:auto!important;"
